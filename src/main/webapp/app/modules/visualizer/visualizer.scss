@@ -1,0 +1,61 @@
+#chart-container {
+  z-index: 999;
+  overflow: auto;
+  padding: 20px;
+  opacity: 0.95;
+}
+
+#stats-panel {
+  opacity: 0.95;
+  font-size: 0.9rem;
+}
+
+.bottom-panel-group {
+  z-index: 999;
+  position: absolute;
+  bottom: 10px;
+  right: 470px;
+}
+
+#query-info-panel {
+  width: 220px;
+  opacity: 0.95;
+  font-size: 0.5rem;
+}
+
+#query-info-panel.expanded {
+  width: 600px;
+}
+
+.field-stats.ui.statistics .statistic > .value {
+  font-size: 0.9rem !important;
+}
+
+.field-stats.ui.statistics .statistic > .label {
+  font-size: 0.7rem !important;
+}
+
+.query-stats.ui.statistics .statistic > .value {
+  font-size: 0.9rem !important;
+}
+
+.query-stats.ui.statistics .statistic > .label {
+  font-size: 0.7rem !important;
+}
+
+/* Multiple progress bar */
+/* Multiple */
+.ui.multiple.progress {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  max-width: 100%;
+
+  .bar {
+    border-radius: 0rem;
+  }
+
+  .label {
+    font-size: 0.85rem;
+  }
+}
