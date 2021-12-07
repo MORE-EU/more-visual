@@ -5,14 +5,14 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import {Box, FormControl, Grid, InputLabel, MenuItem, Select, Slider, Stack, Typography} from "@mui/material";
+import {Box, FormControl, Grid, InputLabel, MenuItem, Select, Switch, Slider, Stack, Typography} from "@mui/material";
 import {
   updateFilters,
   filterData,
   updateFrom,
   updateResampleFreq,
   updateSelectedMeasures,
-  updateTo
+  updateTo,
 } from "app/modules/visualizer/visualizer.reducer";
 import TextField from '@mui/material/TextField';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
@@ -85,8 +85,18 @@ export const VisControl = (props: IVisControlProps) => {
           <MenuItem value="minute">Minute</MenuItem>
           <MenuItem value="hour">Hour</MenuItem>
         </Select>
+        
       </FormControl>
     </Grid>
+    {/* <Grid item container >
+      <Grid item xs={8} >
+        Normalize Data
+      </Grid>
+      <Grid item xs={4} >
+         <Switch />  
+      </Grid>
+    </Grid>
+     */}
     <Grid item xs={12}>
       <Typography variant="h6" gutterBottom>
         Measures

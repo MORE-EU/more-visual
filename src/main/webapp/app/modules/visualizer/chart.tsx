@@ -6,6 +6,7 @@ import HighchartsReact from 'highcharts-react-official';
 import {IDataset} from "app/shared/model/dataset.model";
 import {updateQueryResults} from './visualizer.reducer';
 import {IQueryResults} from "app/shared/model/query-results.model";
+import {IPatternGroup} from "app/shared/model/pattern-group.model";
 
 Highcharts.setOptions({
   time: {
@@ -21,16 +22,28 @@ export interface IChartProps {
   from: Date,
   to: Date,
   resampleFreq: string,
+  patterns: IPatternGroup[],
 }
 
 
 export const Chart = (props: IChartProps) => {
-  const {dataset, data, selectedMeasures, from, to} = props;
+  const {dataset, data, selectedMeasures, from, to, patterns} = props;
+  const setZones = () => {
+    let zones = []
 
+    zones = (patterns !== null && [].concat(...patterns.map(patternGroup => {
+      const zone = [].concat(...patternGroup.patterns.map(pattern => {
+        return [{value: pattern.start}, {value: pattern.end, color: patternGroup.color}]
+      }));
+      return zone;
+    })).sort((a, b)=>  a.value.getTime() - b.value.getTime()));
+    return zones;
+  }
+
+  const zones = setZones();
   useEffect(() => {
     props.updateQueryResults(dataset.id);
   }, [dataset]);
-
 
   return <div id='chart-container'>
     {data && <HighchartsReact
@@ -57,7 +70,9 @@ export const Chart = (props: IChartProps) => {
         series: selectedMeasures.map((measure, index) => ({
           data: data.map(d => ([new Date(d[0]), parseFloat(d[measure])])),
           yAxis: index,
-          name: dataset.header[measure]
+          name: dataset.header[measure],
+          zoneAxis: 'x',
+          zones,
         })),
         chart: {
           type: 'line',

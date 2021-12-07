@@ -18,8 +18,16 @@ import {
   updateResampleFreq,
   updateSelectedMeasures,
   updateTo,
+  updatePatternLength,
+  updatePatterns,
+  updateTopPatterns,
+  updateSelectedPattern,
+  updateComputedPatternLength,
+  getPatterns,
 } from "app/modules/visualizer/visualizer.reducer";
 import Chart from "app/modules/visualizer/chart";
+import PatternExtraction from "app/modules/visualizer/pattern-extraction";
+import VisPatterns from "app/modules/visualizer/find-patterns";
 import VisControl from "app/modules/visualizer/vis-control";
 import {Typography} from "@mui/material";
 
@@ -32,6 +40,7 @@ export const Visualizer = (props: IVisualizerProps) => {
   const {
     dataset,
     loading, queryResults, data, selectedMeasures,
+    patternLength, topPatterns, computedPatternLength,
   } = props;
 
   useEffect(() => {
@@ -70,16 +79,30 @@ export const Visualizer = (props: IVisualizerProps) => {
                               updateResampleFreq={props.updateResampleFreq} updateFilters={props.updateFilters} filterData={props.filterData} filters={props.filters}/>
                 </Paper>
               </Grid>
-              <Grid item xs={12} md={8} lg={9}>
+              <Grid item xs={12} md={8} lg={9} spacing={5}>
                 <Paper sx={{
                   p: 4,
                   display: 'flex',
                   flexDirection: 'column',
                 }}><Chart dataset={dataset} data={data} selectedMeasures={selectedMeasures}
                           updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
-                          resampleFreq={props.resampleFreq}/>
+                          resampleFreq={props.resampleFreq} patterns = {props.patterns}/>
+                </Paper>
+                <Paper sx={{
+                  p: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}><PatternExtraction dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+                          updateQueryResults={props.updateQueryResults} patternLength={patternLength} from={props.from} to={props.to}
+                          resampleFreq={props.resampleFreq} updatePatternLength = {props.updatePatternLength}
+                          updatePatterns={props.updatePatterns} patterns={props.patterns} topPatterns = {props.topPatterns}
+                          updateTopPatterns = {props.updateTopPatterns} selectedPattern ={props.selectedPattern}
+                          updateSelectedPattern={props.updateSelectedPattern} computedPatternLength={computedPatternLength}
+                                      updateComputedPatternLength={props.updateComputedPatternLength}
+                          getPatterns = {props.getPatterns}/>
                 </Paper>
               </Grid>
+
               {/* <Grid item xs={12} md={8} lg={9} >
                 <Paper sx={{
                   p: 4,
@@ -107,10 +130,20 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   to: visualizer.to,
   resampleFreq: visualizer.resampleFreq,
   filters: visualizer.filters,
+  patternLength: visualizer.patternLength,
+  patterns: visualizer.patterns,
+  topPatterns: visualizer.topPatterns,
+  selectedPattern: visualizer.selectedPattern,
+  computedPatternLength: visualizer.computedPatternLength,
 });
 
 const mapDispatchToProps = {
-  getDataset, updateQueryResults, updateSelectedMeasures, updateFrom, updateTo, updateResampleFreq, updateFilters, filterData,
+  getDataset, updateQueryResults,
+  updateSelectedMeasures, updateFrom, updateTo,
+  updateResampleFreq, updateFilters, filterData,
+  updatePatternLength, updatePatterns, updateTopPatterns,
+  updateSelectedPattern, updateComputedPatternLength,
+  getPatterns,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;
