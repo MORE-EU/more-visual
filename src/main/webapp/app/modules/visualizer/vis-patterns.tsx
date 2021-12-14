@@ -121,7 +121,7 @@ export const VisPatterns = (props: IVisPatternsProps) => {
       <Grid item container xs={12}>
         {selectedMeasures.length > 1 &&
           <Grid item xs = {6}>
-            <Button>Plot Knee</Button>}
+            <Button>Plot Knee</Button>
         </Grid>}
         <Grid item xs = {6}>
 
