@@ -5,7 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import {Box, FormControl, Grid, InputLabel, MenuItem, Select, Switch, Slider, Stack, Typography} from "@mui/material";
+import {Box, FormControl, Grid, InputLabel, MenuItem, Select, Switch, Slider, Stack, Typography, Button} from "@mui/material";
 import {
   updateFilters,
   filterData,
@@ -13,12 +13,14 @@ import {
   updateResampleFreq,
   updateSelectedMeasures,
   updateTo,
+  updateChangeChart,
 } from "app/modules/visualizer/visualizer.reducer";
 import TextField from '@mui/material/TextField';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import {IQueryResults} from "app/shared/model/query-results.model";
+import axios from 'axios';
 
 export interface IVisControlProps {
   dataset: IDataset,
@@ -34,6 +36,7 @@ export interface IVisControlProps {
   updateResampleFreq: typeof updateResampleFreq,
   updateFilters: typeof updateFilters,
   filterData: typeof filterData,
+  updateChangeChart: typeof updateChangeChart,
 }
 
 
@@ -97,11 +100,27 @@ export const VisControl = (props: IVisControlProps) => {
       </Grid>
     </Grid>
      */}
+    <Grid item xs={11}>
+      <List>
+        <ListItem
+            key="ok"
+            secondaryAction={
+              <Checkbox
+                edge="end"
+                onChange={props.updateChangeChart}
+              />
+            }
+            disablePadding
+          > 
+          <ListItemText primary={`Change chart view`} />
+          </ListItem>
+      </List>
+    </Grid>
     <Grid item xs={12}>
       <Typography variant="h6" gutterBottom>
         Measures
       </Typography>
-      <List dense sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
+      <List dense sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper', maxHeight: 200, overflowY: "scroll"}}>
         {dataset.measures.map((col) => {
           const labelId = `checkbox-list-secondary-label-${col}`;
           return (
@@ -143,7 +162,18 @@ export const VisControl = (props: IVisControlProps) => {
               }}
               onChangeCommitted={props.filterData}
               valueLabelDisplay="auto"
-            /></Box>
+            />
+            <Stack direction="row" spacing={2}>
+            <TextField id="outlined-basic" label="Min-Value" variant="outlined" size="small" value={filters[col] ? filters[col][0] : stats.min} onChange={(e) => {
+                props.updateFilters(col, [e.target.value, filters[col] ? filters[col][1] : stats.max]);
+                props.filterData();
+              }}/>
+            <TextField id="outlined-basic" label="Max-Value" variant="outlined" size="small" value={filters[col] ? filters[col][1] : stats.max} onChange={(e) => {
+              props.updateFilters(col, [filters[col] ? filters[col][0] : stats.min, e.target.value]);  
+              props.filterData();
+            }}/>
+            </Stack>
+            </Box>
         })}
       </List>
     </Grid>

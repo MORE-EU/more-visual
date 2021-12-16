@@ -35,6 +35,7 @@ export interface IVisPatternsProps {
   updatePatterns: typeof updatePatterns,
   getPatterns: typeof  getPatterns,
   patterns: IPatternGroup[],
+  changeChart: boolean,
 }
 
 
@@ -42,7 +43,7 @@ export interface IVisPatternsProps {
 export const VisPatterns = (props: IVisPatternsProps) => {
   const {dataset, data, selectedMeasures,
     computedPatternLength, patterns, resampleFreq,
-    selectedPattern} = props;
+    selectedPattern, changeChart} = props;
 
 
   const changeComputedPatternLength = (e) => {
@@ -116,7 +117,7 @@ export const VisPatterns = (props: IVisPatternsProps) => {
         <Chart dataset={dataset} data={data}
                from={patterns[selectedPattern - 1].patterns[0].start} to={patterns[selectedPattern - 1].patterns[0].end} patterns={null}
                resampleFreq={resampleFreq} selectedMeasures={selectedMeasures}
-               updateQueryResults={updateQueryResults}/>}
+               updateQueryResults={updateQueryResults} changeChart={changeChart}/>}
       </Grid>
       <Grid item container xs={12}>
         {selectedMeasures.length > 1 &&

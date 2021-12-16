@@ -24,6 +24,7 @@ import {
   updateSelectedPattern,
   updateComputedPatternLength,
   getPatterns,
+  updateChangeChart,
 } from "app/modules/visualizer/visualizer.reducer";
 import Chart from "app/modules/visualizer/chart";
 import PatternExtraction from "app/modules/visualizer/pattern-extraction";
@@ -38,7 +39,7 @@ export interface IVisualizerProps extends StateProps, DispatchProps, RouteCompon
 
 export const Visualizer = (props: IVisualizerProps) => {
   const {
-    dataset,
+    dataset, changeChart,
     loading, queryResults, data, selectedMeasures,
     patternLength, topPatterns, computedPatternLength,
   } = props;
@@ -76,7 +77,8 @@ export const Visualizer = (props: IVisualizerProps) => {
                   <VisControl dataset={dataset} selectedMeasures={props.selectedMeasures} queryResults={queryResults}
                               updateSelectedMeasures={props.updateSelectedMeasures} from={props.from} to={props.to}
                               resampleFreq={props.resampleFreq} updateFrom={props.updateFrom} updateTo={props.updateTo}
-                              updateResampleFreq={props.updateResampleFreq} updateFilters={props.updateFilters} filterData={props.filterData} filters={props.filters}/>
+                              updateResampleFreq={props.updateResampleFreq} updateFilters={props.updateFilters} filterData={props.filterData} filters={props.filters}
+                              updateChangeChart = {props.updateChangeChart} />
                 </Paper>
               </Grid>
               <Grid item xs={12} md={8} lg={9} spacing={5}>
@@ -86,7 +88,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                   flexDirection: 'column',
                 }}><Chart dataset={dataset} data={data} selectedMeasures={selectedMeasures}
                           updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
-                          resampleFreq={props.resampleFreq} patterns = {props.patterns}/>
+                          resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart}/>
                 </Paper>
                 <Paper sx={{
                   p: 4,
@@ -135,6 +137,7 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   topPatterns: visualizer.topPatterns,
   selectedPattern: visualizer.selectedPattern,
   computedPatternLength: visualizer.computedPatternLength,
+  changeChart: visualizer.changeChart,
 });
 
 const mapDispatchToProps = {
@@ -143,7 +146,7 @@ const mapDispatchToProps = {
   updateResampleFreq, updateFilters, filterData,
   updatePatternLength, updatePatterns, updateTopPatterns,
   updateSelectedPattern, updateComputedPatternLength,
-  getPatterns,
+  getPatterns, updateChangeChart
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

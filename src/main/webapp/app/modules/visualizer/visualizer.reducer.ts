@@ -19,6 +19,7 @@ export const ACTION_TYPES = {
   UPDATE_COMPUTED_PATTERN_LENGTH: 'visualizer/UPDATE_COMPUTED_PATTERN_LENGTH',
   UPDATE_SELECTED_PATTERN: 'visualizer/UPDATE_SELECTED_PATTERN',
   GET_PATTERNS: 'visualizer/GET_PATTERNS',
+  UPDATE_CHANGECHART: 'visualizer/UPDATE_CHANGECHART',
 };
 
 const initialState = {
@@ -38,6 +39,7 @@ const initialState = {
   topPatterns: 1,
   selectedPattern: null,
   patterns: null,
+  changeChart: false,
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
@@ -140,6 +142,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         data: action.payload,
       };
+    case ACTION_TYPES.UPDATE_CHANGECHART:
+      return {
+        ...state,
+        changeChart: !state.changeChart,
+      };
     case ACTION_TYPES.GET_PATTERNS:
       return {
         ...state,
@@ -239,6 +246,10 @@ export const updateFilters = (measureCol, range) => ({
 export const updatePatterns = patterns => ({
   type: ACTION_TYPES.UPDATE_PATTERNS,
   payload: patterns,
+});
+
+export const updateChangeChart = () => ({
+  type: ACTION_TYPES.UPDATE_CHANGECHART,
 });
 
 export const filterData = () => (dispatch, getState) => {
