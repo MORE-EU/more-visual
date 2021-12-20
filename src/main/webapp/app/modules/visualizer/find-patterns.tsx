@@ -22,18 +22,15 @@ Highcharts.setOptions({
 export interface IFindPatternsProps {
   data: any,
   selectedMeasures: number[],
-  patternLength: number,
   updatePatterns: typeof updatePatterns,
-  topPatterns: number,
-  updatePatternLength: typeof updatePatternLength,
-  updateTopPatterns: typeof updateTopPatterns,
 }
 
 
 
 export const FindPatterns = (props: IFindPatternsProps) => {
-  const {data, selectedMeasures,   patternLength,  topPatterns} = props;
-
+  const {data, selectedMeasures} = props;
+  const [patternLength, setPatternLength] = React.useState(10);
+  const [topPatterns, setTopPatterns] = React.useState(1);
   const  findPatterns = (e) => {
     let pattern1 = {start: new Date(data[500][0]), end: new Date(data[500 + patternLength][0])};
     let pattern2 = {start: new Date(data[4000][0]), end: new Date(data[4000 + patternLength][0])};
@@ -55,13 +52,13 @@ export const FindPatterns = (props: IFindPatternsProps) => {
   }
 
   const changePatternLength = (e) => {
-    const val = parseInt(e.target.value);
-    props.updatePatternLength(val === NaN ? 0 : val);
+    const val = parseInt(e.target.value, 10);
+    setPatternLength(val);
   }
 
   const changeTopPatterns = (e) => {
-    const val = parseInt(e.target.value);
-    props.updateTopPatterns(val === NaN ? 0 : val);
+    const val = parseInt(e.target.value, 10);
+    setTopPatterns(val);
   }
 
   return (
@@ -99,7 +96,7 @@ export const FindPatterns = (props: IFindPatternsProps) => {
         <Button onClick={e => findPatterns(e)} variant="contained">Find Patterns</Button>
       </Grid>
       </Grid>
-      
+
     </Grid>
 )};
 

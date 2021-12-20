@@ -79,7 +79,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                               updateResampleFreq={props.updateResampleFreq} updateFilters={props.updateFilters} filterData={props.filterData} filters={props.filters}/>
                 </Paper>
               </Grid>
-              <Grid item xs={12} md={8} lg={9} spacing={5}>
+              <Grid item xs={12} md={8} lg={9}>
                 <Paper sx={{
                   p: 4,
                   display: 'flex',
@@ -102,17 +102,6 @@ export const Visualizer = (props: IVisualizerProps) => {
                           getPatterns = {props.getPatterns}/>
                 </Paper>
               </Grid>
-
-              {/* <Grid item xs={12} md={8} lg={9} >
-                <Paper sx={{
-                  p: 4,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}>{selectedMeasures.map(measureIndex =>
-                  <Chart key={measureIndex} dataset={dataset} queryResults={queryResults} measureIndex={measureIndex}
-                         updateQueryResults={props.updateQueryResults} from={props.from} to={props.to} resampleFreq={props.resampleFreq}/> )}
-                </Paper>
-              </Grid>*/}
             </Grid>
           </Container>
         </Box>

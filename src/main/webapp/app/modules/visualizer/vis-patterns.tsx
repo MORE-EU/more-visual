@@ -5,7 +5,7 @@ import {
   updateQueryResults,
   updateComputedPatternLength,
   updateSelectedPattern,
-  updatePatterns, getPatterns
+  updatePatterns, getPatterns,
 } from './visualizer.reducer';
 import { Button, Typography } from '@mui/material';
 import { Grid } from '@mui/material';
@@ -15,6 +15,8 @@ import { InputLabel } from '@mui/material';
 import { Select } from '@mui/material';
 import { MenuItem } from '@mui/material';
 import Chart from './chart';
+import VisCorrection from "app/modules/visualizer/vis-correction";
+import {IPatterns} from "app/shared/model/patterns.model";
 
 Highcharts.setOptions({
   time: {
@@ -34,7 +36,7 @@ export interface IVisPatternsProps {
   updateSelectedPattern: typeof  updateSelectedPattern,
   updatePatterns: typeof updatePatterns,
   getPatterns: typeof  getPatterns,
-  patterns: IPatternGroup[],
+  patterns: IPatterns,
 }
 
 
@@ -46,9 +48,9 @@ export const VisPatterns = (props: IVisPatternsProps) => {
 
 
   const changeComputedPatternLength = (e) => {
-    const val = parseInt(e.target.value);
+    const val = parseInt(e.target.value, 10);
     // TODO: Change to real data
-    props.updateComputedPatternLength(val === NaN ? 0 : val);
+    props.updateComputedPatternLength(isNaN(val) ? 0 : val);
     props.getPatterns(data, val, resampleFreq);
     props.updateSelectedPattern(1);
   }
@@ -61,8 +63,8 @@ export const VisPatterns = (props: IVisPatternsProps) => {
 
   const changeSelectedPattern = (e) => {
     // TODO: Change to real data
-    const val = parseInt(e.target.value);
-    props.updateSelectedPattern(val === NaN ? 0 : val);
+    const val = parseInt(e.target.value, 10);
+    props.updateSelectedPattern(isNaN(val) ? 0 : val);
 
   }
   return (
@@ -96,7 +98,7 @@ export const VisPatterns = (props: IVisPatternsProps) => {
             label="View Pattern"
             onChange={changeSelectedPattern}
           >
-            {patterns.map((mGroup, i)=> {
+            {patterns.patternGroups.map((mGroup, i)=> {
               return <MenuItem
                 key={i}
                 value={i + 1} >{i + 1}</MenuItem>
@@ -110,24 +112,18 @@ export const VisPatterns = (props: IVisPatternsProps) => {
         <Button onClick={e => clearPatterns(e)} variant="contained">Clear Patterns</Button>
       </Grid>
       }
-      <Grid item xs={12}>
-        {(patterns && selectedPattern  && computedPatternLength)
-          &&
-        <Chart dataset={dataset} data={data}
-               from={patterns[selectedPattern - 1].patterns[0].start} to={patterns[selectedPattern - 1].patterns[0].end} patterns={null}
-               resampleFreq={resampleFreq} selectedMeasures={selectedMeasures}
-               updateQueryResults={updateQueryResults}/>}
-      </Grid>
-      <Grid item container xs={12}>
-        {selectedMeasures.length > 1 &&
-          <Grid item xs = {6}>
-            <Button>Plot Knee</Button>
-        </Grid>}
-        <Grid item xs = {6}>
-
+      {(patterns && selectedPattern && computedPatternLength)
+        &&
+        <Grid item xs={12}>
+            <Chart dataset={dataset} data={data}
+                   from={patterns.patternGroups[selectedPattern - 1].patterns[0].start}
+                   to={patterns.patternGroups[selectedPattern - 1].patterns[0].end} patterns={null}
+                   resampleFreq={resampleFreq} selectedMeasures={selectedMeasures}
+                   updateQueryResults={updateQueryResults}/>
+            {selectedMeasures.length > 1 &&
+            <VisCorrection patterns={patterns} data={data} dataset={dataset} isCorrected={false}/>}
         </Grid>
-      </Grid>
-
+      }
     </Grid>
   )};
 

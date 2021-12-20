@@ -1,7 +1,7 @@
 import React from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import {FormControl, Grid, InputLabel, MenuItem, Select, Typography} from "@mui/material";
-import {IPatternGroup} from "app/shared/model/pattern-group.model";
+import {IPatterns} from "app/shared/model/patterns.model";
 import {updateQueryResults, updatePatternLength,
   updatePatterns, updateTopPatterns, updateSelectedPattern,
   updateComputedPatternLength, getPatterns} from './visualizer.reducer';
@@ -19,14 +19,13 @@ export interface IPatternExtractionProps {
   patternLength: number,
   computedPatternLength: number,
   resampleFreq: string,
-  patterns: IPatternGroup[],
+  patterns: IPatterns,
   topPatterns: number,
   selectedPattern: number,
   updateQueryResults: typeof updateQueryResults,
   updatePatternLength: typeof updatePatternLength,
   updateComputedPatternLength: typeof updateComputedPatternLength,
   updatePatterns: typeof updatePatterns,
-  updateTopPatterns: typeof updateTopPatterns,
   updateSelectedPattern: typeof updateSelectedPattern,
   getPatterns: typeof getPatterns,
 }
@@ -58,10 +57,7 @@ export const PatternExtraction = (props: IPatternExtractionProps) => {
       <Typography variant="h6" gutterBottom>
         Find New Patterns
       </Typography>
-      <FindPatterns data={data} selectedMeasures={selectedMeasures}
-                    patternLength={patternLength}  updatePatternLength = {props.updatePatternLength}
-                   updatePatterns={props.updatePatterns} topPatterns = {props.topPatterns}
-                   updateTopPatterns = {props.updateTopPatterns}
+      <FindPatterns data={data} selectedMeasures={selectedMeasures} updatePatterns={props.updatePatterns}
                    />
     </Grid>
 

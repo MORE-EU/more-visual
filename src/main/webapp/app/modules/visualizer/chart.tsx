@@ -6,7 +6,7 @@ import HighchartsReact from 'highcharts-react-official';
 import {IDataset} from "app/shared/model/dataset.model";
 import {updateQueryResults} from './visualizer.reducer';
 import {IQueryResults} from "app/shared/model/query-results.model";
-import {IPatternGroup} from "app/shared/model/pattern-group.model";
+import {IPatterns} from "app/shared/model/patterns.model";
 
 Highcharts.setOptions({
   time: {
@@ -22,7 +22,7 @@ export interface IChartProps {
   from: Date,
   to: Date,
   resampleFreq: string,
-  patterns: IPatternGroup[],
+  patterns: IPatterns,
 }
 
 
@@ -31,7 +31,7 @@ export const Chart = (props: IChartProps) => {
   const setZones = () => {
     let zones = []
 
-    zones = (patterns !== null && [].concat(...patterns.map(patternGroup => {
+    zones = (patterns !== null && [].concat(...patterns.patternGroups.map(patternGroup => {
       const zone = [].concat(...patternGroup.patterns.map(pattern => {
         return [{value: pattern.start}, {value: pattern.end, color: patternGroup.color}]
       }));

@@ -34,13 +34,39 @@ const initialState = {
   to: null as Date,
   filters: {},
   patternLength: 10,
-  computedPatternLength: null,
+  computedPatternLength: -1,
   topPatterns: 1,
-  selectedPattern: null,
+  selectedPattern: -1,
   patterns: null,
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
+
+const initPatterns = (data, length, frequency) => {
+  let pattern1 = { start: new Date(data[500][0]), end: new Date(data[500 + length][0]) };
+  let pattern2 = { start: new Date(data[4000][0]), end: new Date(data[4000 + length][0]) };
+  let randomColor = Math.floor(Math.random() * 16777215).toString(16);
+
+  let patternGroup = { patterns: [], color: '#' + randomColor };
+  patternGroup.patterns.push(pattern1);
+  patternGroup.patterns.push(pattern2);
+  const patternGroups = [];
+  patternGroups.push(patternGroup);
+
+  pattern1 = { start: new Date(data[2000][0]), end: new Date(data[2000 + length][0]) };
+  pattern2 = { start: new Date(data[3000][0]), end: new Date(data[3000 + length][0]) };
+
+  randomColor = Math.floor(Math.random() * 16777215).toString(16);
+
+  patternGroup = { patterns: [], color: '#' + randomColor };
+  patternGroup.patterns.push(pattern1);
+  patternGroup.patterns.push(pattern2);
+
+  patternGroups.push(patternGroup);
+  const knee = [1, 1, 1, 1, 7, 8, 9];
+  const corrected = { knee: null, annotationVector: false };
+  return { frequency, length, patternGroups, knee, corrected };
+};
 
 // Reducer
 
@@ -145,35 +171,12 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         patterns: initPatterns(action.payload.data, action.payload.length, action.payload.frequency),
       };
+
     default:
       return state;
   }
 };
 
-const initPatterns = (data, length, frequency) => {
-  let pattern1 = { start: new Date(data[500][0]), end: new Date(data[500 + length][0]) };
-  let pattern2 = { start: new Date(data[4000][0]), end: new Date(data[4000 + length][0]) };
-  let randomColor = Math.floor(Math.random() * 16777215).toString(16);
-
-  let patternGroup = { length: length, frequency: frequency, patterns: [], color: '#' + randomColor };
-  patternGroup.patterns.push(pattern1);
-  patternGroup.patterns.push(pattern2);
-  const patterns = [];
-  patterns.push(patternGroup);
-
-  pattern1 = { start: new Date(data[2000][0]), end: new Date(data[2000 + length][0]) };
-  pattern2 = { start: new Date(data[3000][0]), end: new Date(data[3000 + length][0]) };
-
-  randomColor = Math.floor(Math.random() * 16777215).toString(16);
-
-  patternGroup = { length: length, frequency: frequency, patterns: [], color: '#' + randomColor };
-  patternGroup.patterns.push(pattern1);
-  patternGroup.patterns.push(pattern2);
-
-  patterns.push(patternGroup);
-  console.log(patterns);
-  return patterns;
-};
 // Actions
 export const getDataset = id => {
   const requestUrl = `api/datasets/${id}`;
