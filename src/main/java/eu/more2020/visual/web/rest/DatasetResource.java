@@ -3,7 +3,6 @@ package eu.more2020.visual.web.rest;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.domain.Dataset;
-import eu.more2020.visual.domain.Folder;
 import eu.more2020.visual.domain.Query;
 import eu.more2020.visual.domain.QueryResults;
 import eu.more2020.visual.repository.DatasetRepository;
@@ -127,9 +126,9 @@ public class DatasetResource {
     }
     
     @GetMapping("/datasets/folder")
-    public List<Folder> getFolder() throws IOException {
-        log.debug("REST request to get Folders and Files");
-        return datasetRepository.findFolder();
+    public List<String> getFolder() throws IOException {
+        log.debug("REST request to get Available Files");
+        return datasetRepository.findFiles();
     }
 
     /**

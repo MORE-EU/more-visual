@@ -3,13 +3,13 @@ package eu.more2020.visual.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.Dataset;
-import eu.more2020.visual.domain.Folder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
@@ -70,30 +70,15 @@ public class DataRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public List<Folder> findFolder() throws IOException {
-            List<Folder> folderList = new ArrayList<>();
-            File folder = new File(applicationProperties.getWorkspacePath());
-            String[] directories = folder.list(new FilenameFilter() {
-                @Override
-                public boolean accept(File current, String name) {
-                  return new File(current, name).isDirectory();
-                }
-            });
-
-            for(String directory: directories){
-                File file = new File(applicationProperties.getWorkspacePath() + "/" + directory);
-                Folder newfolder = new Folder();
-                newfolder.setFolderName(directory);
-                File[] fileNames = file.listFiles();
-                List<String> nameArray = new ArrayList<>();
-                for(File FN: fileNames){
-                    nameArray.add(FN.getName().toString());
-                }
-                newfolder.setFolderFileNames(nameArray);
-                folderList.add(newfolder);
-            }
-            return folderList;
-         
+    public List<String> findFiles() throws IOException {
+    File file = new File(applicationProperties.getWorkspacePath());
+    FileFilter fileFilter = f -> !f.isDirectory() && f.getName().endsWith(".csv");
+    File[] fileNames = file.listFiles(fileFilter);
+    List<String> fileList = new ArrayList<>();
+    for (File newFile : fileNames){
+        fileList.add(newFile.getName().toString());
+    }
+    return fileList;
     }
 
     @Override

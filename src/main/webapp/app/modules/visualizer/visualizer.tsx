@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {useEffect} from 'react';
+import {useState} from 'react';
 import {connect} from 'react-redux';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -31,7 +32,10 @@ import PatternExtraction from "app/modules/visualizer/patterns/interesting-patte
 import VisPatterns from "app/modules/visualizer/patterns/interesting-patterns/find-patterns";
 import VisControl from "app/modules/visualizer/vis-control";
 import {Typography} from "@mui/material";
+
 import PatternNav from "app/modules/visualizer/patterns/pattern-nav";
+
+import axios from 'axios';
 
 const mdTheme = createTheme();
 
@@ -45,9 +49,23 @@ export const Visualizer = (props: IVisualizerProps) => {
     patternLength, topPatterns, computedPatternLength,
   } = props;
 
+const [wdFiles, editWdFiles] = useState([]);
+const [datasets, editDatasets] = useState([]);
+const [datasetChoice, editDatasetChoice] = useState([]);
+
   useEffect(() => {
     props.getDataset(props.match.params.id);
   }, [props.match.params.id]);
+
+  useEffect(() => {
+  axios.get("api/datasets/folder").then(res => {editWdFiles(res.data)});
+  }, []);
+
+  useEffect(() => {
+    wdFiles.map(file => {
+      axios.get(`api/datasets/${file.substring(0, file.indexOf("."))}`).then(res => editDatasets(oldDatasets => [...oldDatasets, res.data]))
+    });
+  }, [wdFiles]);
 
 
   return !loading && <div>
@@ -69,17 +87,13 @@ export const Visualizer = (props: IVisualizerProps) => {
           <Toolbar/>
           <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
             <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography component="h2" variant="h4" align="center">
-                  {dataset.name}
-                </Typography></Grid>
               <Grid item xs={12} md={4} lg={3}>
                 <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
                   <VisControl dataset={dataset} selectedMeasures={props.selectedMeasures} queryResults={queryResults}
                               updateSelectedMeasures={props.updateSelectedMeasures} from={props.from} to={props.to}
                               resampleFreq={props.resampleFreq} updateFrom={props.updateFrom} updateTo={props.updateTo}
                               updateResampleFreq={props.updateResampleFreq} updateFilters={props.updateFilters} filterData={props.filterData} filters={props.filters}
-                              updateChangeChart = {props.updateChangeChart} />
+                              updateChangeChart = {props.updateChangeChart} folder={wdFiles} editDatasetChoice={editDatasetChoice} datasetChoice={datasetChoice}/>
                 </Paper>
               </Grid>
               <Grid item xs={12} md={8} lg={9}>
@@ -87,9 +101,11 @@ export const Visualizer = (props: IVisualizerProps) => {
                   p: 4,
                   display: 'flex',
                   flexDirection: 'column',
-                }}><Chart dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+                }}>{datasets.map((dataseto, idx) => {if(datasetChoice.includes(dataseto.name)){
+                  return(<Chart dataset={dataseto} data={data[idx]} selectedMeasures={selectedMeasures}
                           updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
-                          resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart}/>
+                          resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart}/>)
+                        }})}
                 </Paper>
                 <Paper sx={{
                   p: 4,
@@ -136,7 +152,7 @@ const mapDispatchToProps = {
   updateResampleFreq, updateFilters, filterData,
   updatePatternLength, updatePatterns, updateTopPatterns,
   updateSelectedPattern, updateComputedPatternLength,
-  getPatterns, updateChangeChart
+  getPatterns, updateChangeChart,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

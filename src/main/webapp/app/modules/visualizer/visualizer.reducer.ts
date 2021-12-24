@@ -27,7 +27,7 @@ const initialState = {
   errorMessage: null,
   dataset: null,
   queryResults: null,
-  data: null,
+  data: [],
   queryResultsLoading: true,
   selectedMeasures: [],
   resampleFreq: 'second',
@@ -108,7 +108,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         queryResultsLoading: false,
         queryResults: action.payload.data,
-        data: action.payload.data.data,
+        data: [...state.data, action.payload.data.data],
         from: _.min(action.payload.data.data.map(row => new Date(row[state.dataset.timeCol]))),
         to: _.max(action.payload.data.data.map(row => new Date(row[state.dataset.timeCol]))),
       };

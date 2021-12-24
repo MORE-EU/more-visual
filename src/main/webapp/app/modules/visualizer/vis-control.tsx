@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import {Box, FormControl, Grid, InputLabel, MenuItem, Select, Switch, Slider, Stack, Typography, Button} from "@mui/material";
+import {Box, FormControl, Grid, InputLabel, MenuItem, Select, Switch, Slider, Stack, Typography, Button, ListItemIcon} from "@mui/material";
 import {
   updateFilters,
   filterData,
@@ -20,7 +20,6 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import {IQueryResults} from "app/shared/model/query-results.model";
-import axios from 'axios';
 
 export interface IVisControlProps {
   dataset: IDataset,
@@ -31,17 +30,21 @@ export interface IVisControlProps {
   filters: any,
   queryResults: IQueryResults,
   resampleFreq: string,
+  folder: any[],
+  datasetChoice: any[],
   updateFrom: typeof updateFrom,
   updateTo: typeof updateTo,
   updateResampleFreq: typeof updateResampleFreq,
   updateFilters: typeof updateFilters,
   filterData: typeof filterData,
   updateChangeChart: typeof updateChangeChart,
+  editDatasetChoice: Dispatch<SetStateAction<any>>,
 }
 
 
 export const VisControl = (props: IVisControlProps) => {
-  const {dataset, selectedMeasures, from, to, queryResults, filters} = props;
+  const {dataset, selectedMeasures, from, to, queryResults, filters, folder} = props;
+
 
   const handleToggle = (col) => () => {
     const currentIndex = selectedMeasures.indexOf(col);
@@ -54,6 +57,14 @@ export const VisControl = (props: IVisControlProps) => {
     }
     props.updateSelectedMeasures(newChecked);
   };
+
+  const handleDataset = (idx) => {
+    if(!props.datasetChoice.includes(idx)){
+      props.editDatasetChoice(old => [...old, idx])
+    }else{
+      props.editDatasetChoice(old => old.filter(item => item !== idx))
+    }
+  }
 
 
   return <Grid container spacing={3}>
@@ -100,6 +111,30 @@ export const VisControl = (props: IVisControlProps) => {
       </Grid>
     </Grid>
      */}
+     <Grid item xs={11}>
+      {folder !== [] &&
+      <>
+      <Typography variant="h6" gutterBottom>
+          Available Files
+        </Typography><List disablePadding dense={true}>
+            {folder.map((file, idx) => {
+              return (
+                <ListItem
+                  key={file}
+                  secondaryAction={<Checkbox
+                    edge="end"
+                    checked={props.datasetChoice.includes(file)}
+                    onChange={() => handleDataset(file)} />}
+                  disablePadding
+                >
+                  <ListItemText primary={`${file}`} sx={{ pl: 4 }} />
+                </ListItem>
+              );
+            })}
+          </List>
+          </>
+      }
+     </Grid>
     <Grid item xs={11}>
       <List>
         <ListItem
