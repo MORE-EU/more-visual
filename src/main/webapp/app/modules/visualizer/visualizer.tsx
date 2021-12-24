@@ -112,7 +112,7 @@ const [datasetChoice, editDatasetChoice] = useState([]);
                   display: 'flex',
                   flexDirection: 'column',
                 }}>
-                  <PatternNav/>
+                  {/*<PatternNav/>*/}
                   <PatternExtraction dataset={dataset} data={data} selectedMeasures={selectedMeasures}
                           updateQueryResults={props.updateQueryResults} patternLength={patternLength} from={props.from} to={props.to}
                           resampleFreq={props.resampleFreq} updatePatternLength = {props.updatePatternLength}
