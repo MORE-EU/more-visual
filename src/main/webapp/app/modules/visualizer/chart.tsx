@@ -23,11 +23,12 @@ export interface IChartProps {
   to: Date,
   resampleFreq: string,
   patterns: IPatterns,
+  changeChart: boolean,
 }
 
 
 export const Chart = (props: IChartProps) => {
-  const {dataset, data, selectedMeasures, from, to, patterns} = props;
+  const {dataset, data, selectedMeasures, from, to, patterns, changeChart} = props;
   const setZones = () => {
     let zones = []
 
@@ -48,7 +49,7 @@ export const Chart = (props: IChartProps) => {
   return <div id='chart-container'>
     {data && <HighchartsReact
       highcharts={Highcharts}
-      constructorType={'stockChart'}
+      constructorType={'chart'}
       allowChartUpdate={true}
       immutable={false}
       updateArgs={[true, true, true]}
@@ -76,10 +77,9 @@ export const Chart = (props: IChartProps) => {
         })),
         chart: {
           type: 'line',
-          height: '350px',
+          height: '400px',
           marginTop: 10,
           paddingTop: 0,
-          marginBottom: 50,
           plotBorderWidth: 1,
           zoomType: 'x',
         },
@@ -88,11 +88,22 @@ export const Chart = (props: IChartProps) => {
           min: from.getTime(),
           max: to.getTime(),
         },
-        yAxis: selectedMeasures.map(measure => ({
+        yAxis: changeChart ? (selectedMeasures.map((measure,idx) => ({
           title: {
-            text: dataset.header[measure]
-          }
-        })),
+            text: dataset.header[measure],
+          },
+          top: `${(100/selectedMeasures.length)*idx}%`,
+          height: `${selectedMeasures.length > 1 ? ((100/selectedMeasures.length)-5) : 100}%`,
+          offset: 0,
+
+        }))) : (selectedMeasures.map((measure,idx) => ({
+          title: {
+            text: dataset.header[measure],
+          },
+          top: "0%",
+          height: "100%",
+          offset: undefined,
+        }))),
         rangeSelector: {
           enabled: false
         },
@@ -104,7 +115,7 @@ export const Chart = (props: IChartProps) => {
         },
         colorAxis: null,
         legend: {
-          enabled: false
+          enabled: (changeChart ? false : true),
         },
         credits: {
           enabled: false

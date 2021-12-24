@@ -6,7 +6,7 @@ import {
   updateComputedPatternLength,
   updateSelectedPattern,
   updatePatterns, getPatterns,
-} from './visualizer.reducer';
+} from '../../visualizer.reducer';
 import { Button, Typography } from '@mui/material';
 import { Grid } from '@mui/material';
 import { IPatternGroup } from 'app/shared/model/pattern-group.model';
@@ -14,7 +14,7 @@ import { FormControl } from '@mui/material';
 import { InputLabel } from '@mui/material';
 import { Select } from '@mui/material';
 import { MenuItem } from '@mui/material';
-import Chart from './chart';
+import Chart from '../../chart';
 import VisCorrection from "app/modules/visualizer/vis-correction";
 import {IPatterns} from "app/shared/model/patterns.model";
 
@@ -37,6 +37,7 @@ export interface IVisPatternsProps {
   updatePatterns: typeof updatePatterns,
   getPatterns: typeof  getPatterns,
   patterns: IPatterns,
+  changeChart: boolean,
 }
 
 
@@ -44,7 +45,7 @@ export interface IVisPatternsProps {
 export const VisPatterns = (props: IVisPatternsProps) => {
   const {dataset, data, selectedMeasures,
     computedPatternLength, patterns, resampleFreq,
-    selectedPattern} = props;
+    selectedPattern, changeChart} = props;
 
 
   const changeComputedPatternLength = (e) => {
@@ -119,9 +120,9 @@ export const VisPatterns = (props: IVisPatternsProps) => {
                    from={patterns.patternGroups[selectedPattern - 1].patterns[0].start}
                    to={patterns.patternGroups[selectedPattern - 1].patterns[0].end} patterns={null}
                    resampleFreq={resampleFreq} selectedMeasures={selectedMeasures}
-                   updateQueryResults={updateQueryResults}/>
+                   updateQueryResults={updateQueryResults} changeChart={changeChart}/>
             {selectedMeasures.length > 1 &&
-            <VisCorrection patterns={patterns} data={data} dataset={dataset} isCorrected={false}/>}
+            <VisCorrection patterns={patterns} dataset={dataset} />}
         </Grid>
       }
     </Grid>

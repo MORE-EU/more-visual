@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import Highcharts from 'highcharts/highstock'
 import {IDataset} from "app/shared/model/dataset.model";
 import {updateQueryResults, updatePatternLength,
-  updatePatterns, updateTopPatterns, updateSelectedPattern} from './visualizer.reducer';
+  updatePatterns, updateTopPatterns, updateSelectedPattern} from '../../visualizer.reducer';
 import { Button, Typography } from '@mui/material';
 import { Grid } from '@mui/material';
 import { TextField } from '@mui/material';
@@ -11,7 +11,7 @@ import { FormControl } from '@mui/material';
 import { InputLabel } from '@mui/material';
 import { Select } from '@mui/material';
 import { MenuItem } from '@mui/material';
-import Chart from './chart';
+import Chart from '../../chart';
 
 Highcharts.setOptions({
   time: {

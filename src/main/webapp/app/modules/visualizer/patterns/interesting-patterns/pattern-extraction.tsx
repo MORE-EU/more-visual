@@ -4,10 +4,10 @@ import {FormControl, Grid, InputLabel, MenuItem, Select, Typography} from "@mui/
 import {IPatterns} from "app/shared/model/patterns.model";
 import {updateQueryResults, updatePatternLength,
   updatePatterns, updateTopPatterns, updateSelectedPattern,
-  updateComputedPatternLength, getPatterns} from './visualizer.reducer';
-import FindPatterns from "app/modules/visualizer/find-patterns";
+  updateComputedPatternLength, getPatterns} from '../../visualizer.reducer';
+import FindPatterns from "app/modules/visualizer/patterns/interesting-patterns/find-patterns";
 import Chart from "app/modules/visualizer/chart";
-import VisPatterns from "app/modules/visualizer/vis-patterns";
+import VisPatterns from "app/modules/visualizer/patterns/interesting-patterns/vis-patterns";
 
 
 export interface IPatternExtractionProps {
@@ -28,12 +28,14 @@ export interface IPatternExtractionProps {
   updatePatterns: typeof updatePatterns,
   updateSelectedPattern: typeof updateSelectedPattern,
   getPatterns: typeof getPatterns,
+  changeChart: boolean,
 }
 
 
 export const PatternExtraction = (props: IPatternExtractionProps) => {
   const {dataset, data, selectedMeasures,
-    patternLength, patterns, computedPatternLength} = props;
+    patternLength, patterns, computedPatternLength,
+    changeChart} = props;
 
 
   return (<Grid container spacing={3}>
@@ -52,7 +54,7 @@ export const PatternExtraction = (props: IPatternExtractionProps) => {
                                      patterns={patterns} computedPatternLength = {computedPatternLength}
                                      updateComputedPatternLength = {props.updateComputedPatternLength}
                                      selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern}
-                                     updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}/>}
+                                     updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} changeChart={changeChart}/>}
     <Grid item xs={12}>
       <Typography variant="h6" gutterBottom>
         Find New Patterns

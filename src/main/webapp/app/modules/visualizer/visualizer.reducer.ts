@@ -66,7 +66,7 @@ const initPatterns = (data, length, frequency) => {
 
   patternGroups.push(patternGroup);
   const knee = [1, 1, 1, 1, 7, 8, 9];
-  const corrected = { knee: null, annotationVector: false };
+  const corrected = { knee: null, annotationVector: null };
   return { frequency, length, patternGroups, knee, corrected };
 };
 

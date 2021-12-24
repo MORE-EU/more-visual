@@ -5,9 +5,7 @@ import {Button, Checkbox, ListItemIcon} from '@mui/material';
 import React from "react";
 import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
-import {IVisCorrectionProps} from "app/modules/visualizer/vis-correction";
-import {makeStyles} from "@material-ui/core/styles";
-import Backdrop from "@material-ui/core/Backdrop";
+import ModalStyles from "app/shared/layout/ModalStyle";
 
 export interface IKneePlotProps {
   dataset: IDataset,
@@ -15,29 +13,6 @@ export interface IKneePlotProps {
   setOpen: (boolean) => {},
 }
 
-const useStyles = makeStyles(theme => ({
-  modal: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  paper: {
-    backgroundColor: theme.palette.background.paper,
-    border: '2px solid #000',
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-  },
-  formControl: {
-    margin: theme.spacing(1),
-  },
-  formControlMulti: {
-    margin: theme.spacing(1),
-    width: 200
-  },
-  indeterminateColor: {
-    color: "#f50057"
-  },
-}));
 
 export const KneePlot = (props: IKneePlotProps) => {
   const {dataset, patterns} = props;
@@ -48,8 +23,8 @@ export const KneePlot = (props: IKneePlotProps) => {
   const [k, setK] = React.useState(correctedK);
   const [selectedDimensions, setSelectedDimensions] = React.useState(correctedDimensions);
   const header = dataset.header;
-  const classes = useStyles();
-  let [openSuccess, setOpenSuccess] = React.useState(false);
+  const classes = ModalStyles();
+  const [openSuccess, setOpenSuccess] = React.useState(false);
 
   const handleClose = () => {
     setOpenSuccess(false);
@@ -79,7 +54,7 @@ export const KneePlot = (props: IKneePlotProps) => {
 
     // TODO: set correction through api
     const knee = {k: 4, dimensions}
-    patterns.corrected = {knee, annotationVector: null}; // api call
+    patterns.corrected.knee = knee; // api call
 
     setCorrected(true);
     handleOpen();

@@ -27,10 +27,11 @@ import {
   updateChangeChart,
 } from "app/modules/visualizer/visualizer.reducer";
 import Chart from "app/modules/visualizer/chart";
-import PatternExtraction from "app/modules/visualizer/pattern-extraction";
-import VisPatterns from "app/modules/visualizer/find-patterns";
+import PatternExtraction from "app/modules/visualizer/patterns/interesting-patterns/pattern-extraction";
+import VisPatterns from "app/modules/visualizer/patterns/interesting-patterns/find-patterns";
 import VisControl from "app/modules/visualizer/vis-control";
 import {Typography} from "@mui/material";
+import PatternNav from "app/modules/visualizer/patterns/pattern-nav";
 
 const mdTheme = createTheme();
 
@@ -94,14 +95,14 @@ export const Visualizer = (props: IVisualizerProps) => {
                   p: 4,
                   display: 'flex',
                   flexDirection: 'column',
-                }}><PatternExtraction dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+                }}>
+                  <PatternNav/>
+                  <PatternExtraction dataset={dataset} data={data} selectedMeasures={selectedMeasures}
                           updateQueryResults={props.updateQueryResults} patternLength={patternLength} from={props.from} to={props.to}
                           resampleFreq={props.resampleFreq} updatePatternLength = {props.updatePatternLength}
                           updatePatterns={props.updatePatterns} patterns={props.patterns} topPatterns = {props.topPatterns}
-                          updateTopPatterns = {props.updateTopPatterns} selectedPattern ={props.selectedPattern}
-                          updateSelectedPattern={props.updateSelectedPattern} computedPatternLength={computedPatternLength}
-                                      updateComputedPatternLength={props.updateComputedPatternLength}
-                          getPatterns = {props.getPatterns}/>
+                          selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern} computedPatternLength={computedPatternLength} updateComputedPatternLength={props.updateComputedPatternLength}
+                          getPatterns = {props.getPatterns} changeChart={changeChart}/>
                 </Paper>
               </Grid>
             </Grid>

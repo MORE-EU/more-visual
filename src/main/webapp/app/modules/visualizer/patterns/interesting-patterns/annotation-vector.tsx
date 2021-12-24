@@ -1,0 +1,115 @@
+import React from "react";
+import {IDataset} from "app/shared/model/dataset.model";
+import {IPatterns} from "app/shared/model/patterns.model";
+import HighchartsReact from "highcharts-react-official";
+import Highcharts from "highcharts/highstock";
+import {Button, FormControl, Grid, InputLabel, MenuItem, Select} from "@mui/material";
+import ModalStyles from "app/shared/layout/ModalStyle";
+
+
+export interface IAnnotationVectorProps {
+  dataset: IDataset,
+  patterns: IPatterns,
+  setOpen: (boolean) => {},
+}
+
+const applyAV = (e, patterns) => {
+  // TODO: API CALL
+  patterns.corrected.annotationVector = {func: e.target.value};
+  //props.setOpen(false);
+
+}
+
+export const AnnotationVector = (props: IAnnotationVectorProps) => {
+  const {dataset, patterns} = props;
+  const [corrected, setCorrected] = React.useState(patterns.corrected.knee !== null);
+  const [avFunction, setAVFunction] = React.useState(0);
+
+  const classes = ModalStyles();
+  const options = {
+    title: {
+      text: 'Multivariate Pattern Knee Plot'
+    },
+    series: [
+      {
+        data: patterns.annotation_vector,
+        name: "Number of Dimensions"
+      }
+    ],
+    chart: {
+      width: 700
+    },
+    yAxis: {
+      title:{
+        text: "Matrix Profile Min. Value"
+      }
+    }
+
+  };
+
+  const changeFunction = (e) => {
+    setAVFunction(e.target.value);
+
+  }
+
+  const renderDescription = (description) => {
+    switch(description) {
+      case 0:
+        return "Utility function that returns an annotation vector where values are based\n" +
+          "    on the complexity estimation of the signal.";
+      case 1:
+        return "Utility function that returns an annotation vector where values are set to\n" +
+          "    1 if the standard deviation is less than the mean of standard deviation.\n" +
+          "    Otherwise, the values are set to 0."
+      case 2:
+        return "Utility function that returns an annotation vector such that\n" +
+          "    subsequences that have more clipping have less importance."
+      default:
+        return 'foo';
+    }
+  }
+
+  return (
+    <div className = {classes.paper} style={{width:"700px"}} >
+      {/*<Grid item xs={12}>*/}
+      {/*  <HighchartsReact*/}
+      {/*    highcharts={Highcharts}*/}
+      {/*    options={options}*/}
+      {/*  />*/}
+      {/*</Grid>*/}
+      <Grid item spacing={2} container xs={12}>
+        <Grid item xs={6}>
+          <FormControl fullWidth className={classes.formControl}>
+            <InputLabel id="av-func-label">Choose an Annotation Vector Function</InputLabel>
+            <Select
+              labelId="av-func-select-label"
+              id="av-func-select"
+              value={avFunction}
+              label="Choose an Annotation Vector Function"
+              onChange={changeFunction}
+            >
+              <MenuItem
+                key={0}
+                value={0}>Complexity</MenuItem>
+              <MenuItem
+                key={1}
+                value={1}>Meanstd</MenuItem>
+              <MenuItem
+                key={2}
+                value={2}>Clipping</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={6}>
+        <b>Description:</b>
+          {renderDescription(avFunction)}
+        </Grid>
+        <Grid item container xs={12} direction="row"
+              justifyContent="flex-end"
+              alignItems="center">
+          <Button onClick={e => applyAV(e, patterns)}>Apply</Button>
+        </Grid>
+      </Grid>
+    </div>
+  );
+}
