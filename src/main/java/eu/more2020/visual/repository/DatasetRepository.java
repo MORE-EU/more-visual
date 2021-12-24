@@ -1,8 +1,8 @@
 package eu.more2020.visual.repository;
 
 import eu.more2020.visual.domain.Dataset;
-import eu.more2020.visual.domain.Folder;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +14,8 @@ import java.util.Optional;
 public interface DatasetRepository {
 
     List<Dataset> findAll() throws IOException;
-    
-    List<Folder> findFolder() throws IOException;
+
+    List<String> findFiles() throws IOException;
 
     Optional<Dataset> findById(String id) throws IOException;
 

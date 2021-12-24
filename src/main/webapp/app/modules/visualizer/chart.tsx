@@ -7,6 +7,7 @@ import {IDataset} from "app/shared/model/dataset.model";
 import {updateQueryResults} from './visualizer.reducer';
 import {IQueryResults} from "app/shared/model/query-results.model";
 import {IPatternGroup} from "app/shared/model/pattern-group.model";
+import { Divider, Typography } from '@mui/material';
 
 Highcharts.setOptions({
   time: {
@@ -47,7 +48,12 @@ export const Chart = (props: IChartProps) => {
   }, [dataset]);
 
   return <div id='chart-container'>
-    {data && <HighchartsReact
+    {data && 
+    <>
+    <Typography component="h2" variant="h4" align="center">
+    {dataset.name}
+    </Typography>
+    <HighchartsReact
       highcharts={Highcharts}
       constructorType={'chart'}
       allowChartUpdate={true}
@@ -121,7 +127,8 @@ export const Chart = (props: IChartProps) => {
           enabled: false
         },
       }}
-    />}
+    />
+    </>}
   </div>
 };
 
