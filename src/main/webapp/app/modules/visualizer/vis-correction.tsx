@@ -24,7 +24,7 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
   const classes = ModalStyles();
   const [open, setOpen] = React.useState(false);
   const [openC, setOpenC] = React.useState(-1);
-  //let setOpenFunc = setOpen.bind(this); //so it can be passed as a prop of knee-plot
+  // let setOpenFunc = setOpen.bind(this); //so it can be passed as a prop of knee-plot
   const correctedKnee = patterns.corrected.knee !== null;
   const correctedAv = patterns.corrected.annotationVector !== null;
 
@@ -96,11 +96,11 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
         >
           <Fade in={open}>
             <div>
-              { /*<h2>Pattern Correction</h2>*/ }
-              {/*<Tabs value={openTab} onChange={(e, v) => { changeTab(v) }}  centered className={classes.paper}>*/}
-              {/*  <Tab label="Knee Plot"/>*/}
-              {/*  <Tab label="Annotation Vector"/>*/}
-              {/*</Tabs>*/}
+              { /* <h2>Pattern Correction</h2> */ }
+              {/* <Tabs value={openTab} onChange={(e, v) => { changeTab(v) }}  centered className={classes.paper}> */}
+              {/*  <Tab label="Knee Plot"/> */}
+              {/*  <Tab label="Annotation Vector"/> */}
+              {/* </Tabs> */}
               {openC === 0 && <KneePlot dataset={dataset} patterns={patterns} setOpen={setOpen.bind(this)}/>}
               {openC === 1 && <AnnotationVector dataset={dataset} patterns={patterns} setOpen={setOpen.bind(this)}/>}
             </div>

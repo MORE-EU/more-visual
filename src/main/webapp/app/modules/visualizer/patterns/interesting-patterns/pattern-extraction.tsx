@@ -38,16 +38,14 @@ export const PatternExtraction = (props: IPatternExtractionProps) => {
     changeChart} = props;
 
 
-  return (<Grid container spacing={3}>
-    <Typography variant="h6" gutterBottom>
-      Pattern Extraction
-    </Typography>
+  return (
+  <Grid container spacing={3}>
     <Grid item container xs={12}>
       <Grid item xs = {4}>
       <Typography variant="h6" gutterBottom>
         Discovered Patterns
-      </Typography></Grid>
-
+      </Typography>
+      </Grid>
     </Grid>
     {<VisPatterns dataset={dataset} data={data} selectedMeasures={selectedMeasures}
                                      patternLength={patternLength}  resampleFreq={props.resampleFreq}

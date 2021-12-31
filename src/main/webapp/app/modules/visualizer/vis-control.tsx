@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction} from 'react';
+import React from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -14,6 +14,8 @@ import {
   updateSelectedMeasures,
   updateTo,
   updateChangeChart,
+  getDataset,
+  updateDatasetChoice,
 } from "app/modules/visualizer/visualizer.reducer";
 import TextField from '@mui/material/TextField';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
@@ -23,7 +25,6 @@ import {IQueryResults} from "app/shared/model/query-results.model";
 
 export interface IVisControlProps {
   dataset: IDataset,
-  updateSelectedMeasures: typeof updateSelectedMeasures,
   selectedMeasures: number[],
   from: Date,
   to: Date,
@@ -31,14 +32,16 @@ export interface IVisControlProps {
   queryResults: IQueryResults,
   resampleFreq: string,
   folder: any[],
-  datasetChoice: any[],
+  datasetChoice: number,
+  updateDatasetChoice:  typeof updateDatasetChoice
   updateFrom: typeof updateFrom,
   updateTo: typeof updateTo,
+  updateSelectedMeasures: typeof updateSelectedMeasures,
   updateResampleFreq: typeof updateResampleFreq,
   updateFilters: typeof updateFilters,
   filterData: typeof filterData,
   updateChangeChart: typeof updateChangeChart,
-  editDatasetChoice: Dispatch<SetStateAction<any>>,
+  getDataset: typeof getDataset,
 }
 
 
@@ -59,10 +62,8 @@ export const VisControl = (props: IVisControlProps) => {
   };
 
   const handleDataset = (idx) => {
-    if(!props.datasetChoice.includes(idx)){
-      props.editDatasetChoice(old => [...old, idx])
-    }else{
-      props.editDatasetChoice(old => old.filter(item => item !== idx))
+    if(props.datasetChoice !== idx){
+      props.updateDatasetChoice(idx);
     }
   }
 
@@ -119,16 +120,14 @@ export const VisControl = (props: IVisControlProps) => {
         </Typography><List disablePadding dense={true}>
             {folder.map((file, idx) => {
               return (
-                <ListItem
-                  key={file}
-                  secondaryAction={<Checkbox
-                    edge="end"
-                    checked={props.datasetChoice.includes(file)}
-                    onChange={() => handleDataset(file)} />}
-                  disablePadding
+                <ListItemButton
+                key={idx}
+                selected={props.datasetChoice === idx}
+                onClick={() => {handleDataset(idx), props.getDataset(file.substring(0, file.indexOf(".")))}}
+                divider
                 >
-                  <ListItemText primary={`${file}`} sx={{ pl: 4 }} />
-                </ListItem>
+                <ListItemText primary={`${file}`} sx={{pl: 4}} />
+                </ListItemButton>
               );
             })}
           </List>

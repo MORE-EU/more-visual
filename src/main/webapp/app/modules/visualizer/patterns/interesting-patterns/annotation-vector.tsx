@@ -16,7 +16,7 @@ export interface IAnnotationVectorProps {
 const applyAV = (e, patterns) => {
   // TODO: API CALL
   patterns.corrected.annotationVector = {func: e.target.value};
-  //props.setOpen(false);
+  // props.setOpen(false);
 
 }
 
@@ -71,12 +71,12 @@ export const AnnotationVector = (props: IAnnotationVectorProps) => {
 
   return (
     <div className = {classes.paper} style={{width:"700px"}} >
-      {/*<Grid item xs={12}>*/}
-      {/*  <HighchartsReact*/}
-      {/*    highcharts={Highcharts}*/}
-      {/*    options={options}*/}
-      {/*  />*/}
-      {/*</Grid>*/}
+      {/* <Grid item xs={12}> */}
+      {/*  <HighchartsReact */}
+      {/*    highcharts={Highcharts} */}
+      {/*    options={options} */}
+      {/*  /> */}
+      {/* </Grid> */}
       <Grid item spacing={2} container xs={12}>
         <Grid item xs={6}>
           <FormControl fullWidth className={classes.formControl}>

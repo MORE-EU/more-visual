@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {useEffect} from 'react';
-import {useState} from 'react';
 import {connect} from 'react-redux';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,6 +14,8 @@ import {
   filterData,
   getDataset, updateFilters,
   updateFrom,
+  updateDatasetChoice,
+  updatePatternNav,
   updateQueryResults,
   updateResampleFreq,
   updateSelectedMeasures,
@@ -26,6 +27,7 @@ import {
   updateComputedPatternLength,
   getPatterns,
   updateChangeChart,
+  getWdFiles,
 } from "app/modules/visualizer/visualizer.reducer";
 import Chart from "app/modules/visualizer/chart";
 import PatternExtraction from "app/modules/visualizer/patterns/interesting-patterns/pattern-extraction";
@@ -35,8 +37,6 @@ import {Typography} from "@mui/material";
 
 import PatternNav from "app/modules/visualizer/patterns/pattern-nav";
 
-import axios from 'axios';
-
 const mdTheme = createTheme();
 
 export interface IVisualizerProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {
@@ -44,31 +44,18 @@ export interface IVisualizerProps extends StateProps, DispatchProps, RouteCompon
 
 export const Visualizer = (props: IVisualizerProps) => {
   const {
-    dataset, changeChart,
+    dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
     patternLength, topPatterns, computedPatternLength,
+    patternNav,
   } = props;
 
-const [wdFiles, editWdFiles] = useState([]);
-const [datasets, editDatasets] = useState([]);
-const [datasetChoice, editDatasetChoice] = useState([]);
-
   useEffect(() => {
-    props.getDataset(props.match.params.id);
+    props.getDataset(props.match.params.id); 
+    props.getWdFiles(); 
   }, [props.match.params.id]);
 
-  useEffect(() => {
-  axios.get("api/datasets/folder").then(res => {editWdFiles(res.data)});
-  }, []);
-
-  useEffect(() => {
-    wdFiles.map(file => {
-      axios.get(`api/datasets/${file.substring(0, file.indexOf("."))}`).then(res => editDatasets(oldDatasets => [...oldDatasets, res.data]))
-    });
-  }, [wdFiles]);
-
-
-  return !loading && <div>
+  return !loading && dataset !== null && <div>
     <ThemeProvider theme={mdTheme}>
       <Box sx={{display: 'flex'}}>
         <CssBaseline/>
@@ -93,7 +80,8 @@ const [datasetChoice, editDatasetChoice] = useState([]);
                               updateSelectedMeasures={props.updateSelectedMeasures} from={props.from} to={props.to}
                               resampleFreq={props.resampleFreq} updateFrom={props.updateFrom} updateTo={props.updateTo}
                               updateResampleFreq={props.updateResampleFreq} updateFilters={props.updateFilters} filterData={props.filterData} filters={props.filters}
-                              updateChangeChart = {props.updateChangeChart} folder={wdFiles} editDatasetChoice={editDatasetChoice} datasetChoice={datasetChoice}/>
+                              updateChangeChart = {props.updateChangeChart} folder={wdFiles} updateDatasetChoice={props.updateDatasetChoice} datasetChoice={datasetChoice}
+                              getDataset={props.getDataset}/>
                 </Paper>
               </Grid>
               <Grid item xs={12} md={8} lg={9}>
@@ -101,24 +89,23 @@ const [datasetChoice, editDatasetChoice] = useState([]);
                   p: 4,
                   display: 'flex',
                   flexDirection: 'column',
-                }}>{datasets.map((dataseto, idx) => {if(datasetChoice.includes(dataseto.name)){
-                  return(<Chart dataset={dataseto} data={data[idx]} selectedMeasures={selectedMeasures}
-                          updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
-                          resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart}/>)
-                        }})}
-                </Paper>
+                }}>
+                  <Chart dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+                    updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
+                    resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart}/>
+                {/* </Paper>
                 <Paper sx={{
                   p: 4,
                   display: 'flex',
                   flexDirection: 'column',
-                }}>
-                  {/*<PatternNav/>*/}
-                  <PatternExtraction dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+                }}> */}
+                  <PatternNav patternNav={patternNav} updatePatternNav={props.updatePatternNav}/>
+                  {patternNav === '0' && <PatternExtraction dataset={dataset} data={data} selectedMeasures={selectedMeasures}
                           updateQueryResults={props.updateQueryResults} patternLength={patternLength} from={props.from} to={props.to}
                           resampleFreq={props.resampleFreq} updatePatternLength = {props.updatePatternLength}
                           updatePatterns={props.updatePatterns} patterns={props.patterns} topPatterns = {props.topPatterns}
                           selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern} computedPatternLength={computedPatternLength} updateComputedPatternLength={props.updateComputedPatternLength}
-                          getPatterns = {props.getPatterns} changeChart={changeChart}/>
+                          getPatterns = {props.getPatterns} changeChart={changeChart}/>}
                 </Paper>
               </Grid>
             </Grid>
@@ -144,6 +131,9 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   selectedPattern: visualizer.selectedPattern,
   computedPatternLength: visualizer.computedPatternLength,
   changeChart: visualizer.changeChart,
+  datasetChoice: visualizer.datasetChoice,
+  wdFiles: visualizer.wdFiles,
+  patternNav: visualizer.patternNav,
 });
 
 const mapDispatchToProps = {
@@ -152,7 +142,8 @@ const mapDispatchToProps = {
   updateResampleFreq, updateFilters, filterData,
   updatePatternLength, updatePatterns, updateTopPatterns,
   updateSelectedPattern, updateComputedPatternLength,
-  getPatterns, updateChangeChart,
+  getPatterns, updateChangeChart, updateDatasetChoice,
+  getWdFiles, updatePatternNav,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

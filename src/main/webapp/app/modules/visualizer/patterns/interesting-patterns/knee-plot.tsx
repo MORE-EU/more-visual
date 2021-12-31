@@ -58,7 +58,7 @@ export const KneePlot = (props: IKneePlotProps) => {
 
     setCorrected(true);
     handleOpen();
-    //props.setOpen(false);
+    // props.setOpen(false);
   }
 
   const resetDimensions = (e) => {
@@ -171,7 +171,7 @@ export const KneePlot = (props: IKneePlotProps) => {
               onClose={handleClose}
               closeAfterTransition
               disableEnforceFocus
-              //BackdropComponent={Backdrop}
+              // BackdropComponent={Backdrop}
               BackdropProps={{
                 timeout: 500,
               }}

@@ -6,6 +6,7 @@ import _ from 'lodash';
 
 export const ACTION_TYPES = {
   FETCH_DATASET: 'visualizer/FETCH_DATASET',
+  FETCH_WDFILES: 'visualizer/FETCH_WDFILES',
   FETCH_QUERY_RESULTS: 'visualizer/FETCH_QUERY_RESULTS',
   UPDATE_SELECTED_MEASURES: 'visualizer/UPDATE_SELECTED_MEASURES',
   UPDATE_FROM: 'visualizer/UPDATE_FROM',
@@ -20,6 +21,8 @@ export const ACTION_TYPES = {
   UPDATE_SELECTED_PATTERN: 'visualizer/UPDATE_SELECTED_PATTERN',
   GET_PATTERNS: 'visualizer/GET_PATTERNS',
   UPDATE_CHANGECHART: 'visualizer/UPDATE_CHANGECHART',
+  UPDATE_DATASETCHOICE: 'visualizer/UPDATE_DATASETCHOICE',
+  UPDATE_PATTERNNAV: 'visualizer/UPDATE_PATTERNNAV',
 };
 
 const initialState = {
@@ -27,7 +30,7 @@ const initialState = {
   errorMessage: null,
   dataset: null,
   queryResults: null,
-  data: [],
+  data: null,
   queryResultsLoading: true,
   selectedMeasures: [],
   resampleFreq: 'second',
@@ -40,6 +43,9 @@ const initialState = {
   selectedPattern: -1,
   patterns: null,
   changeChart: false,
+  datasetChoice: 0,
+  wdFiles: [],
+  patternNav: '0',
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
@@ -74,17 +80,25 @@ const initPatterns = (data, length, frequency) => {
 
 export default (state: VisualizerState = initialState, action): VisualizerState => {
   switch (action.type) {
+    case REQUEST(ACTION_TYPES.FETCH_WDFILES):
     case REQUEST(ACTION_TYPES.FETCH_DATASET):
       return {
-        ...initialState,
+        ...state,
         errorMessage: null,
         loading: true,
       };
+    case FAILURE(ACTION_TYPES.FETCH_WDFILES):
     case FAILURE(ACTION_TYPES.FETCH_DATASET):
       return {
         ...state,
         loading: false,
         errorMessage: action.payload,
+      };
+    case SUCCESS(ACTION_TYPES.FETCH_WDFILES):
+      return {
+        ...state,
+        loading: false,
+        wdFiles: action.payload.data,
       };
     case SUCCESS(ACTION_TYPES.FETCH_DATASET):
       return {
@@ -108,7 +122,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         queryResultsLoading: false,
         queryResults: action.payload.data,
-        data: [...state.data, action.payload.data.data],
+        data: action.payload.data.data,
         from: _.min(action.payload.data.data.map(row => new Date(row[state.dataset.timeCol]))),
         to: _.max(action.payload.data.data.map(row => new Date(row[state.dataset.timeCol]))),
       };
@@ -173,6 +187,16 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         changeChart: !state.changeChart,
       };
+    case ACTION_TYPES.UPDATE_DATASETCHOICE:
+      return {
+        ...state,
+        datasetChoice: action.payload,
+      };
+    case ACTION_TYPES.UPDATE_PATTERNNAV:
+      return {
+        ...state,
+        patternNav: action.payload,
+      };
     case ACTION_TYPES.GET_PATTERNS:
       return {
         ...state,
@@ -190,6 +214,13 @@ export const getDataset = id => {
   return {
     type: ACTION_TYPES.FETCH_DATASET,
     payload: axios.get<IDataset>(requestUrl),
+  };
+};
+
+export const getWdFiles = () => {
+  return {
+    type: ACTION_TYPES.FETCH_WDFILES,
+    payload: axios.get('api/datasets/folder'),
   };
 };
 
@@ -253,6 +284,16 @@ export const updatePatterns = patterns => ({
 
 export const updateChangeChart = () => ({
   type: ACTION_TYPES.UPDATE_CHANGECHART,
+});
+
+export const updateDatasetChoice = data => ({
+  type: ACTION_TYPES.UPDATE_DATASETCHOICE,
+  payload: data,
+});
+
+export const updatePatternNav = data => ({
+  type: ACTION_TYPES.UPDATE_PATTERNNAV,
+  payload: data,
 });
 
 export const filterData = () => (dispatch, getState) => {
