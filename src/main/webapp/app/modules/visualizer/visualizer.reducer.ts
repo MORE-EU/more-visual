@@ -220,7 +220,7 @@ export const getDataset = (folder, id) => {
 export const getWdFiles = folder => {
   return {
     type: ACTION_TYPES.FETCH_WDFILES,
-    payload: axios.get(`api/datasets/folder/${folder}`),
+    payload: axios.get(`api/datasets/${folder}`),
   };
 };
 

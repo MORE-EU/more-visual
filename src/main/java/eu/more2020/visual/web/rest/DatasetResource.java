@@ -126,7 +126,7 @@ public class DatasetResource {
         return ResponseUtil.wrapOrNotFound(dataset);
     }
     
-    @GetMapping("/datasets/folder/{folder}")
+    @GetMapping("/datasets/{folder}")
     public List<String> getFolder(@PathVariable String folder) throws IOException {
         log.debug("REST request to get Available Files");
         return datasetRepository.findFiles(folder);
