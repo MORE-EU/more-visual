@@ -11,7 +11,7 @@ const Routes = () => (
   <div className="view-routes">
     <Switch>
       <ErrorBoundaryRoute path="/" exact component={Home}/>
-      <ErrorBoundaryRoute exact path={"/visualize/:id"} component={Visualizer}/>
+      <ErrorBoundaryRoute exact path={"/visualize/:folder/:id?"} component={Visualizer}/>
       <ErrorBoundaryRoute component={PageNotFound}/>
     </Switch>
   </div>

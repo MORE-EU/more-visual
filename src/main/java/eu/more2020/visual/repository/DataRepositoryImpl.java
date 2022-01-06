@@ -16,6 +16,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,16 +46,22 @@ public class DataRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public Optional<Dataset> findById(String id) throws IOException {
+    public Optional<Dataset> findById(String id, String folder) throws IOException {
         Assert.notNull(id, "Id must not be null!");
         ObjectMapper mapper = new ObjectMapper();
-
-        Dataset dataset = null;
-        File metadataFile = new File(applicationProperties.getWorkspacePath(), id + ".meta.json");
+        Dataset dataset = new Dataset();
+        List<Dataset> allDatasets = null;
+        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + folder, folder + ".meta.json");
 
         if (metadataFile.exists()) {
             FileReader reader = new FileReader(metadataFile);
-            dataset = mapper.readValue(reader, Dataset.class);
+            allDatasets = Arrays.asList(mapper.readValue(reader, Dataset[].class));
+        }
+        for(Dataset d : allDatasets){
+            if(d.getId().equals(id)){
+            dataset = d;
+            break;
+            }
         }
         return Optional.ofNullable(dataset);
     }
@@ -70,8 +77,8 @@ public class DataRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public List<String> findFiles() throws IOException {
-    File file = new File(applicationProperties.getWorkspacePath());
+    public List<String> findFiles(String folder) throws IOException {
+    File file = new File(applicationProperties.getWorkspacePath() + "/" + folder);
     FileFilter fileFilter = f -> !f.isDirectory() && f.getName().endsWith(".csv");
     File[] fileNames = file.listFiles(fileFilter);
     List<String> fileList = new ArrayList<>();

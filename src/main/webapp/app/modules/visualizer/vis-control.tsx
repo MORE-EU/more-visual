@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -22,6 +22,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import {IQueryResults} from "app/shared/model/query-results.model";
+import { Link } from "react-router-dom";
 
 export interface IVisControlProps {
   dataset: IDataset,
@@ -31,7 +32,8 @@ export interface IVisControlProps {
   filters: any,
   queryResults: IQueryResults,
   resampleFreq: string,
-  folder: any[],
+  wdFiles: any[],
+  folder: string,
   datasetChoice: number,
   updateDatasetChoice:  typeof updateDatasetChoice
   updateFrom: typeof updateFrom,
@@ -46,7 +48,7 @@ export interface IVisControlProps {
 
 
 export const VisControl = (props: IVisControlProps) => {
-  const {dataset, selectedMeasures, from, to, queryResults, filters, folder} = props;
+  const {dataset, selectedMeasures, from, to, queryResults, filters, wdFiles, folder} = props;
 
 
   const handleToggle = (col) => () => {
@@ -113,17 +115,19 @@ export const VisControl = (props: IVisControlProps) => {
     </Grid>
      */}
      <Grid item xs={11}>
-      {folder !== [] &&
+      {wdFiles !== [] &&
       <>
       <Typography variant="h6" gutterBottom>
           Available Files
         </Typography><List disablePadding dense={true}>
-            {folder.map((file, idx) => {
+            {wdFiles.map((file, idx) => {
               return (
                 <ListItemButton
                 key={idx}
                 selected={props.datasetChoice === idx}
-                onClick={() => {handleDataset(idx), props.getDataset(file.substring(0, file.indexOf(".")))}}
+                component={Link}
+                to={`/visualize/${folder}/${file.substring(0, file.indexOf("."))}`}
+                onClick={() => {handleDataset(idx),props.getDataset(folder,file.substring(0, file.indexOf(".")))}}
                 divider
                 >
                 <ListItemText primary={`${file}`} sx={{pl: 4}} />

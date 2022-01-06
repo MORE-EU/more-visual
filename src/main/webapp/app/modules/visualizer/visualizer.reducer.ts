@@ -209,26 +209,26 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
 };
 
 // Actions
-export const getDataset = id => {
-  const requestUrl = `api/datasets/${id}`;
+export const getDataset = (folder, id) => {
+  const requestUrl = `api/datasets/${folder}/${id}`;
   return {
     type: ACTION_TYPES.FETCH_DATASET,
     payload: axios.get<IDataset>(requestUrl),
   };
 };
 
-export const getWdFiles = () => {
+export const getWdFiles = folder => {
   return {
     type: ACTION_TYPES.FETCH_WDFILES,
-    payload: axios.get('api/datasets/folder'),
+    payload: axios.get(`api/datasets/folder/${folder}`),
   };
 };
 
-export const updateQueryResults = id => (dispatch, getState) => {
+export const updateQueryResults = (folder, id) => (dispatch, getState) => {
   const query = {} as IQuery;
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_RESULTS,
-    payload: axios.post(`api/datasets/${id}/query`, query),
+    payload: axios.post(`api/datasets/${folder}/${id}/query`, query),
   });
 };
 

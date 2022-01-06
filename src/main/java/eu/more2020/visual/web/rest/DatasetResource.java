@@ -104,10 +104,11 @@ public class DatasetResource {
      * @param id the id of the dataset to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the dataset, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/datasets/{id}")
-    public ResponseEntity<Dataset> getDataset(@PathVariable String id) throws IOException {
+    @GetMapping("/datasets/{folder}/{id}")
+    public ResponseEntity<Dataset> getDataset(@PathVariable String folder, @PathVariable String id) throws IOException {
         log.debug("REST request to get Dataset : {}", id);
-        Optional<Dataset> dataset = datasetRepository.findById(id);
+        log.debug("REST request to get Dataset : {}", folder);
+        Optional<Dataset> dataset = datasetRepository.findById(id,folder);
         dataset.ifPresent(d -> {
             CsvParserSettings parserSettings = new CsvParserSettings();
             parserSettings.getFormat().setDelimiter(',');
@@ -125,10 +126,10 @@ public class DatasetResource {
         return ResponseUtil.wrapOrNotFound(dataset);
     }
     
-    @GetMapping("/datasets/folder")
-    public List<String> getFolder() throws IOException {
+    @GetMapping("/datasets/folder/{folder}")
+    public List<String> getFolder(@PathVariable String folder) throws IOException {
         log.debug("REST request to get Available Files");
-        return datasetRepository.findFiles();
+        return datasetRepository.findFiles(folder);
     }
 
     /**
@@ -147,10 +148,10 @@ public class DatasetResource {
     /**
      * POST executeQuery
      */
-    @PostMapping("/datasets/{id}/query")
-    public ResponseEntity<QueryResults> executeQuery(@PathVariable String id, @Valid @RequestBody Query query) throws IOException {
+    @PostMapping("/datasets/{folder}/{id}/query")
+    public ResponseEntity<QueryResults> executeQuery(@PathVariable String folder,@PathVariable String id, @Valid @RequestBody Query query) throws IOException {
         log.debug("REST request to execute Query: {}", query);
-        Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id).map(dataset -> csvDataService.executeQuery(dataset, query));
+        Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id,folder).map(dataset -> csvDataService.executeQuery(dataset, query));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 

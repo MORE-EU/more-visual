@@ -8,7 +8,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import {RouteComponentProps} from 'react-router-dom';
+import {Redirect, RouteComponentProps} from 'react-router-dom';
 import {IRootState} from "app/shared/reducers";
 import {
   filterData,
@@ -39,7 +39,7 @@ import PatternNav from "app/modules/visualizer/patterns/pattern-nav";
 
 const mdTheme = createTheme();
 
-export interface IVisualizerProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {
+export interface IVisualizerProps extends StateProps, DispatchProps, RouteComponentProps<{ folder: string, id: string }> {
 }
 
 export const Visualizer = (props: IVisualizerProps) => {
@@ -50,10 +50,19 @@ export const Visualizer = (props: IVisualizerProps) => {
     patternNav,
   } = props;
 
+  if(props.match.params.id === undefined){
+    useEffect(() =>{
+      props.getWdFiles(props.match.params.folder);
+    }, [props.match.params.folder]);
+    return wdFiles.length !==0 && 
+    <div>
+      <Redirect to={`${props.match.params.folder}/${wdFiles[0].substring(0, wdFiles[0].indexOf("."))}`} />
+    </div>;
+  }
+
   useEffect(() => {
-    props.getDataset(props.match.params.id); 
-    props.getWdFiles(); 
-  }, [props.match.params.id]);
+    props.getDataset(props.match.params.folder,props.match.params.id);
+  }, [props.match.params.id !== undefined]);
 
   return !loading && dataset !== null && <div>
     <ThemeProvider theme={mdTheme}>
@@ -80,8 +89,8 @@ export const Visualizer = (props: IVisualizerProps) => {
                               updateSelectedMeasures={props.updateSelectedMeasures} from={props.from} to={props.to}
                               resampleFreq={props.resampleFreq} updateFrom={props.updateFrom} updateTo={props.updateTo}
                               updateResampleFreq={props.updateResampleFreq} updateFilters={props.updateFilters} filterData={props.filterData} filters={props.filters}
-                              updateChangeChart = {props.updateChangeChart} folder={wdFiles} updateDatasetChoice={props.updateDatasetChoice} datasetChoice={datasetChoice}
-                              getDataset={props.getDataset}/>
+                              updateChangeChart = {props.updateChangeChart} wdFiles={wdFiles} updateDatasetChoice={props.updateDatasetChoice} datasetChoice={datasetChoice}
+                              getDataset={props.getDataset} folder={props.match.params.folder}/>
                 </Paper>
               </Grid>
               <Grid item xs={12} md={8} lg={9}>
@@ -92,7 +101,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                 }}>
                   <Chart dataset={dataset} data={data} selectedMeasures={selectedMeasures}
                     updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
-                    resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart}/>
+                    resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart} folder={props.match.params.folder}/>
                 {/* </Paper>
                 <Paper sx={{
                   p: 4,

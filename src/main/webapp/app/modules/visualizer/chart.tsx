@@ -24,11 +24,12 @@ export interface IChartProps {
   resampleFreq: string,
   patterns: IPatterns,
   changeChart: boolean,
+  folder: string,
 }
 
 
 export const Chart = (props: IChartProps) => {
-  const {dataset, data, selectedMeasures, from, to, patterns, changeChart} = props;
+  const {dataset, data, selectedMeasures, from, to, patterns, changeChart, folder} = props;
   const setZones = () => {
     let zones = []
 
@@ -43,7 +44,7 @@ export const Chart = (props: IChartProps) => {
 
   const zones = setZones();
   useEffect(() => {
-    props.updateQueryResults(dataset.id);
+    props.updateQueryResults(folder,dataset.id);
   }, [dataset]);
 
   return <div id='chart-container'>

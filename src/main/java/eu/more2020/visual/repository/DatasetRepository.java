@@ -15,9 +15,9 @@ public interface DatasetRepository {
 
     List<Dataset> findAll() throws IOException;
 
-    List<String> findFiles() throws IOException;
+    List<String> findFiles(String folder) throws IOException;
 
-    Optional<Dataset> findById(String id) throws IOException;
+    Optional<Dataset> findById(String id, String folder) throws IOException;
 
     Dataset save(Dataset dataset) throws IOException;
 
