@@ -140,7 +140,7 @@ export const KneePlot = (props: IKneePlotProps) => {
                 {header.map((option) => (
                   <MenuItem key={option} value={option}>
                     <ListItemIcon>
-                      <Checkbox checked={selectedDimensions.indexOf(option) > -1}/>
+                      <Checkbox checked={selectedDimensions.includes(option)}/>
                     </ListItemIcon>
                     <ListItemText primary={option}/>
                   </MenuItem>

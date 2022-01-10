@@ -47,14 +47,14 @@ export const Visualizer = (props: IVisualizerProps) => {
     dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
     patternLength, topPatterns, computedPatternLength,
-    patternNav,
+    patternNav, folder,
   } = props;
 
   if(props.match.params.id === undefined){
     useEffect(() =>{
       props.getWdFiles(props.match.params.folder);
     }, [props.match.params.folder]);
-    return wdFiles.length !==0 && 
+    return wdFiles.length !==0 &&
     <div>
       <Redirect to={`${props.match.params.folder}/${wdFiles[0].substring(0, wdFiles[0].indexOf("."))}`} />
     </div>;
@@ -114,7 +114,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                           resampleFreq={props.resampleFreq} updatePatternLength = {props.updatePatternLength}
                           updatePatterns={props.updatePatterns} patterns={props.patterns} topPatterns = {props.topPatterns}
                           selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern} computedPatternLength={computedPatternLength} updateComputedPatternLength={props.updateComputedPatternLength}
-                          getPatterns = {props.getPatterns} changeChart={changeChart}/>}
+                          getPatterns = {props.getPatterns} changeChart={changeChart} folder={folder}/>}
                 </Paper>
               </Grid>
             </Grid>
@@ -143,6 +143,7 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   datasetChoice: visualizer.datasetChoice,
   wdFiles: visualizer.wdFiles,
   patternNav: visualizer.patternNav,
+  folder: visualizer.folder,
 });
 
 const mapDispatchToProps = {

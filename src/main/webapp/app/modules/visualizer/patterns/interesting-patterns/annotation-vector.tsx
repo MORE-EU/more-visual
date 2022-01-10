@@ -32,7 +32,7 @@ export const AnnotationVector = (props: IAnnotationVectorProps) => {
     },
     series: [
       {
-        data: patterns.annotation_vector,
+        data: patterns.annotationVector,
         name: "Number of Dimensions"
       }
     ],

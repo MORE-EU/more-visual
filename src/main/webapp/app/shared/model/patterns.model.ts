@@ -4,7 +4,7 @@ export interface IPatterns {
   frequency: number;
   length: number;
   knee: number[];
-  annotation_vector: number[];
+  annotationVector: number[];
   corrected: {
     knee: { k: number; dimensions: string[] };
     annotationVector: { func: number };
@@ -16,7 +16,7 @@ export const defaultValue: Readonly<IPatterns> = {
   frequency: 0,
   length: 0,
   knee: [],
-  annotation_vector: [],
+  annotationVector: [],
   corrected: { knee: { k: 0, dimensions: [] }, annotationVector: { func: 0 } },
   patternGroups: [],
 };

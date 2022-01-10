@@ -46,6 +46,7 @@ const initialState = {
   datasetChoice: 0,
   wdFiles: [],
   patternNav: '0',
+  folder: '',
 };
 
 export type VisualizerState = Readonly<typeof initialState>;

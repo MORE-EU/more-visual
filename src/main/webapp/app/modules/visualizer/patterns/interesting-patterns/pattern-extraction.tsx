@@ -29,13 +29,14 @@ export interface IPatternExtractionProps {
   updateSelectedPattern: typeof updateSelectedPattern,
   getPatterns: typeof getPatterns,
   changeChart: boolean,
+  folder: string,
 }
 
 
 export const PatternExtraction = (props: IPatternExtractionProps) => {
   const {dataset, data, selectedMeasures,
     patternLength, patterns, computedPatternLength,
-    changeChart} = props;
+    changeChart, folder} = props;
 
 
   return (
@@ -52,7 +53,8 @@ export const PatternExtraction = (props: IPatternExtractionProps) => {
                                      patterns={patterns} computedPatternLength = {computedPatternLength}
                                      updateComputedPatternLength = {props.updateComputedPatternLength}
                                      selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern}
-                                     updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} changeChart={changeChart}/>}
+                                     updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} changeChart={changeChart}
+                  folder={folder}/>}
     <Grid item xs={12}>
       <Typography variant="h6" gutterBottom>
         Find New Patterns

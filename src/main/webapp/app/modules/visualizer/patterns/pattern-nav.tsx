@@ -22,9 +22,9 @@ const PatternNav = (props: IPatternNavProps) => {
           aria-label="basic tabs"
         >
           <Tab label="Pattern Extraction" value="0" />
-          <Tab label="Item One" value="1" />
-          <Tab label="Item Two" value="2" />
-          <Tab label="Item Three" value="3" />
+          <Tab label="Changepoint Detection" value="1" />
+          <Tab label="Deviation Detection" value="2" />
+          <Tab label="Semantic Segmentation" value="3" />
         </Tabs>
       </Grid>
     </Grid>
