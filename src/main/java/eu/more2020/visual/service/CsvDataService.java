@@ -32,7 +32,7 @@ public class CsvDataService {
     }
 
 
-    public QueryResults executeQuery(Dataset dataset, Query query) {
+    public QueryResults executeQuery(String folder, Dataset dataset, Query query) {
         log.debug(query.toString());
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.getFormat().setDelimiter(',');
@@ -42,7 +42,7 @@ public class CsvDataService {
         parserSettings.setSkipEmptyLines(true);
         parserSettings.setHeaderExtractionEnabled(dataset.getHasHeader());
         CsvParser parser = new CsvParser(parserSettings);
-        parser.beginParsing(new File(applicationProperties.getWorkspacePath(), dataset.getName()), Charset.forName("US-ASCII"));
+        parser.beginParsing(new File(applicationProperties.getWorkspacePath() + "/" + folder, dataset.getName()), Charset.forName("US-ASCII"));
         String[] row;
         QueryResults results = new QueryResults();
         List<String[]> data = new ArrayList<>();

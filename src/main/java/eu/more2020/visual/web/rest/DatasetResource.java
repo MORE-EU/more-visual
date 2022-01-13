@@ -115,7 +115,7 @@ public class DatasetResource {
             parserSettings.setIgnoreLeadingWhitespaces(false);
             parserSettings.setIgnoreTrailingWhitespaces(false);
             CsvParser parser = new CsvParser(parserSettings);
-            parser.beginParsing(new File(workspacePath, d.getName()), Charset.forName("US-ASCII"));
+            parser.beginParsing(new File(workspacePath + "/" + folder, d.getName()), Charset.forName("US-ASCII"));
             parser.parseNext();
             d.setHeader(parser.getContext().parsedHeaders());
             log.debug("Headers: " + Arrays.toString(d.getHeader()));
@@ -151,7 +151,7 @@ public class DatasetResource {
     @PostMapping("/datasets/{folder}/{id}/query")
     public ResponseEntity<QueryResults> executeQuery(@PathVariable String folder,@PathVariable String id, @Valid @RequestBody Query query) throws IOException {
         log.debug("REST request to execute Query: {}", query);
-        Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id,folder).map(dataset -> csvDataService.executeQuery(dataset, query));
+        Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id,folder).map(dataset -> csvDataService.executeQuery(folder, dataset, query));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 
