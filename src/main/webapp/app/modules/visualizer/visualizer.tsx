@@ -61,6 +61,7 @@ export const Visualizer = (props: IVisualizerProps) => {
   }
 
   useEffect(() => {
+    wdFiles.length === 0 && props.getWdFiles(props.match.params.folder);
     props.getDataset(props.match.params.folder,props.match.params.id);
   }, [props.match.params.id !== undefined]);
 
