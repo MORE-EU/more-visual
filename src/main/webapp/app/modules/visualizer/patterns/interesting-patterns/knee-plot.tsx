@@ -26,12 +26,6 @@ export const KneePlot = (props: IKneePlotProps) => {
   const [selectedDimensions, setSelectedDimensions] = React.useState(correctedDimensions);
   const header = dataset.header;
   const classes = ModalStyles();
-  // const [openSuccess, setOpenSuccess] = React.useState(false);
-  //
-  //
-  // const handleOpen = () => {
-  //   setOpenSuccess(true);
-  // };
 
   const changeNoOfDimensions = (e) => {
     const dims = e.target.value;
@@ -172,31 +166,6 @@ export const KneePlot = (props: IKneePlotProps) => {
           </Grid>
         </Grid>
       }
-      {/*<Grid item xs={12}>*/}
-      {/*  <Modal*/}
-      {/*    aria-labelledby="transition-modal-title"*/}
-      {/*    aria-describedby="transition-modal-description"*/}
-      {/*    className={classes.modal}*/}
-      {/*    open={openSuccess}*/}
-      {/*    onClose={handleClose}*/}
-      {/*    closeAfterTransition*/}
-      {/*    disableEnforceFocus*/}
-      {/*    // BackdropComponent={Backdrop}*/}
-      {/*    BackdropProps={{*/}
-      {/*      timeout: 500,*/}
-      {/*    }}*/}
-      {/*  >*/}
-      {/*    <Fade in={openSuccess}>*/}
-      {/*      <div className={classes.paper}>*/}
-      {/*        <b>Dimensions found:</b> {correctedDimensions.map((d) => {*/}
-      {/*        return (d + ", ");*/}
-      {/*      })}*/}
-      {/*      </div>*/}
-      {/*    </Fade>*/}
-      {/*  </Modal>*/}
-      {/*</Grid>*/}
-
-
     </div>
   );
 }

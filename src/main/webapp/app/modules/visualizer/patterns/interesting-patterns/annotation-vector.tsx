@@ -19,9 +19,9 @@ export const AnnotationVector = (props: IAnnotationVectorProps) => {
   const [corrected, setCorrected] = React.useState(patterns.corrected.knee !== null);
   const [avFunction, setAVFunction] = React.useState(0);
 
-  const applyAV = (e, patterns) => {
+  const applyAV = (e, p) => {
     // TODO: API CALL
-    patterns.corrected.annotationVector = {func: e.target.value};
+    p.corrected.annotationVector = {func: e.target.value};
     props.setOpen(false);
   }
 
