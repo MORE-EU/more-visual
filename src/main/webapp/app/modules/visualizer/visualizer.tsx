@@ -110,7 +110,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                 }}> */}
                   <PatternNav patternNav={patternNav} updatePatternNav={props.updatePatternNav}/>
                   {patternNav === '0' && <PatternExtraction dataset={dataset} data={data} selectedMeasures={selectedMeasures}
-                          updateQueryResults={props.updateQueryResults} patternLength={patternLength} from={props.from} to={props.to}
+                          updateSelectedMeasures = {props.updateSelectedMeasures} updateQueryResults={props.updateQueryResults} patternLength={patternLength}
                           resampleFreq={props.resampleFreq} updatePatternLength = {props.updatePatternLength}
                           updatePatterns={props.updatePatterns} patterns={props.patterns} topPatterns = {props.topPatterns}
                           selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern} computedPatternLength={computedPatternLength} updateComputedPatternLength={props.updateComputedPatternLength}

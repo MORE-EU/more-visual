@@ -6,6 +6,7 @@ import {
   updateComputedPatternLength,
   updateSelectedPattern,
   updatePatterns, getPatterns,
+  updateSelectedMeasures,
 } from '../../visualizer.reducer';
 import { Button, Typography } from '@mui/material';
 import { Grid } from '@mui/material';
@@ -15,7 +16,7 @@ import { InputLabel } from '@mui/material';
 import { Select } from '@mui/material';
 import { MenuItem } from '@mui/material';
 import Chart from '../../chart';
-import VisCorrection from "app/modules/visualizer/vis-correction";
+import VisCorrection from "app/modules/visualizer/patterns/interesting-patterns/vis-correction";
 import {IPatterns} from "app/shared/model/patterns.model";
 
 Highcharts.setOptions({
@@ -34,6 +35,7 @@ export interface IVisPatternsProps {
   computedPatternLength: number,
   updateComputedPatternLength: typeof updateComputedPatternLength,
   updateSelectedPattern: typeof  updateSelectedPattern,
+  updateSelectedMeasures: typeof updateSelectedMeasures,
   updatePatterns: typeof updatePatterns,
   getPatterns: typeof  getPatterns,
   patterns: IPatterns,
@@ -124,7 +126,8 @@ export const VisPatterns = (props: IVisPatternsProps) => {
                    updateQueryResults={updateQueryResults} changeChart={changeChart}
                    folder = {folder}/>
             {selectedMeasures.length > 1 &&
-            <VisCorrection patterns={patterns} dataset={dataset} />}
+            <VisCorrection patterns={patterns} dataset={dataset}
+                           updateSelectedMeasures={props.updateSelectedMeasures} />}
         </Grid>
       }
     </Grid>

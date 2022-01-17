@@ -102,7 +102,7 @@ export const VisControl = (props: IVisControlProps) => {
           <MenuItem value="minute">Minute</MenuItem>
           <MenuItem value="hour">Hour</MenuItem>
         </Select>
-        
+
       </FormControl>
     </Grid>
     {/* <Grid item container >
@@ -110,7 +110,7 @@ export const VisControl = (props: IVisControlProps) => {
         Normalize Data
       </Grid>
       <Grid item xs={4} >
-         <Switch />  
+         <Switch />
       </Grid>
     </Grid>
      */}
@@ -149,7 +149,7 @@ export const VisControl = (props: IVisControlProps) => {
               />
             }
             disablePadding
-          > 
+          >
           <ListItemText primary={`Change chart view`} />
           </ListItem>
       </List>
@@ -207,7 +207,7 @@ export const VisControl = (props: IVisControlProps) => {
                 props.filterData();
               }}/>
             <TextField id="outlined-basic" label="Max-Value" variant="outlined" size="small" value={filters[col] ? filters[col][1] : stats.max} onChange={(e) => {
-              props.updateFilters(col, [filters[col] ? filters[col][0] : stats.min, e.target.value]);  
+              props.updateFilters(col, [filters[col] ? filters[col][0] : stats.min, e.target.value]);
               props.filterData();
             }}/>
             </Stack>

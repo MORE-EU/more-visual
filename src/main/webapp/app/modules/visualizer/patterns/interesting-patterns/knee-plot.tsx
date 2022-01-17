@@ -6,11 +6,13 @@ import React from "react";
 import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
 import ModalStyles from "app/shared/layout/ModalStyle";
+import {updateSelectedMeasures} from "app/modules/visualizer/visualizer.reducer";
 
 export interface IKneePlotProps {
   dataset: IDataset,
   patterns: IPatterns,
   setOpen: (boolean) => {},
+  updateSelectedMeasures: typeof updateSelectedMeasures,
 }
 
 
@@ -24,15 +26,12 @@ export const KneePlot = (props: IKneePlotProps) => {
   const [selectedDimensions, setSelectedDimensions] = React.useState(correctedDimensions);
   const header = dataset.header;
   const classes = ModalStyles();
-  const [openSuccess, setOpenSuccess] = React.useState(false);
-
-  const handleClose = () => {
-    setOpenSuccess(false);
-  };
-
-  const handleOpen = () => {
-    setOpenSuccess(true);
-  };
+  // const [openSuccess, setOpenSuccess] = React.useState(false);
+  //
+  //
+  // const handleOpen = () => {
+  //   setOpenSuccess(true);
+  // };
 
   const changeNoOfDimensions = (e) => {
     const dims = e.target.value;
@@ -48,6 +47,14 @@ export const KneePlot = (props: IKneePlotProps) => {
     setSelectedDimensions(val);
   }
 
+  const indexesOf = (arr, items) =>{
+    const filtered = [];
+    for(let i = 0; i < items.length; i++) {
+      filtered.push(arr.indexOf(items[i]));
+    }
+    return filtered;
+  }
+
   const filterDimensions = (e, open) => {
     // TODO: get dimensions through api
     const dimensions = ["active power", "wind speed", "rotor speed", "pitch angle"];
@@ -55,10 +62,9 @@ export const KneePlot = (props: IKneePlotProps) => {
     // TODO: set correction through api
     const knee = {k: 4, dimensions}
     patterns.corrected.knee = knee; // api call
-
+    props.updateSelectedMeasures(indexesOf(header, dimensions));
     setCorrected(true);
-    handleOpen();
-    // props.setOpen(false);
+    props.setOpen(false);
   }
 
   const resetDimensions = (e) => {
@@ -77,6 +83,10 @@ export const KneePlot = (props: IKneePlotProps) => {
     ],
     chart: {
       width: 700
+    },
+    xAxis :{
+      min: 1,
+      startOnTick: true,
     },
     yAxis: {
       title:{
@@ -162,29 +172,29 @@ export const KneePlot = (props: IKneePlotProps) => {
           </Grid>
         </Grid>
       }
-          <Grid item xs={12}>
-            <Modal
-              aria-labelledby="transition-modal-title"
-              aria-describedby="transition-modal-description"
-              className={classes.modal}
-              open={openSuccess}
-              onClose={handleClose}
-              closeAfterTransition
-              disableEnforceFocus
-              // BackdropComponent={Backdrop}
-              BackdropProps={{
-                timeout: 500,
-              }}
-            >
-              <Fade in={openSuccess}>
-                <div className={classes.paper}>
-                  <b>Dimensions found:</b> {correctedDimensions.map((d) => {
-                  return (d + ", ");
-                })}
-                </div>
-              </Fade>
-            </Modal>
-          </Grid>
+      {/*<Grid item xs={12}>*/}
+      {/*  <Modal*/}
+      {/*    aria-labelledby="transition-modal-title"*/}
+      {/*    aria-describedby="transition-modal-description"*/}
+      {/*    className={classes.modal}*/}
+      {/*    open={openSuccess}*/}
+      {/*    onClose={handleClose}*/}
+      {/*    closeAfterTransition*/}
+      {/*    disableEnforceFocus*/}
+      {/*    // BackdropComponent={Backdrop}*/}
+      {/*    BackdropProps={{*/}
+      {/*      timeout: 500,*/}
+      {/*    }}*/}
+      {/*  >*/}
+      {/*    <Fade in={openSuccess}>*/}
+      {/*      <div className={classes.paper}>*/}
+      {/*        <b>Dimensions found:</b> {correctedDimensions.map((d) => {*/}
+      {/*        return (d + ", ");*/}
+      {/*      })}*/}
+      {/*      </div>*/}
+      {/*    </Fade>*/}
+      {/*  </Modal>*/}
+      {/*</Grid>*/}
 
 
     </div>

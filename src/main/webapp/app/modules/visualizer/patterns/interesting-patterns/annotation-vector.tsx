@@ -13,17 +13,17 @@ export interface IAnnotationVectorProps {
   setOpen: (boolean) => {},
 }
 
-const applyAV = (e, patterns) => {
-  // TODO: API CALL
-  patterns.corrected.annotationVector = {func: e.target.value};
-  // props.setOpen(false);
-
-}
 
 export const AnnotationVector = (props: IAnnotationVectorProps) => {
   const {dataset, patterns} = props;
   const [corrected, setCorrected] = React.useState(patterns.corrected.knee !== null);
   const [avFunction, setAVFunction] = React.useState(0);
+
+  const applyAV = (e, patterns) => {
+    // TODO: API CALL
+    patterns.corrected.annotationVector = {func: e.target.value};
+    props.setOpen(false);
+  }
 
   const classes = ModalStyles();
   const options = {

@@ -3,7 +3,7 @@ import {IDataset} from "app/shared/model/dataset.model";
 import {FormControl, Grid, InputLabel, MenuItem, Select, Typography} from "@mui/material";
 import {IPatterns} from "app/shared/model/patterns.model";
 import {updateQueryResults, updatePatternLength,
-  updatePatterns, updateTopPatterns, updateSelectedPattern,
+  updatePatterns, updateSelectedMeasures, updateSelectedPattern,
   updateComputedPatternLength, getPatterns} from '../../visualizer.reducer';
 import FindPatterns from "app/modules/visualizer/patterns/interesting-patterns/find-patterns";
 import Chart from "app/modules/visualizer/chart";
@@ -14,8 +14,6 @@ export interface IPatternExtractionProps {
   dataset: IDataset,
   data: any,
   selectedMeasures: number[],
-  from: Date,
-  to: Date,
   patternLength: number,
   computedPatternLength: number,
   resampleFreq: string,
@@ -25,6 +23,7 @@ export interface IPatternExtractionProps {
   updateQueryResults: typeof updateQueryResults,
   updatePatternLength: typeof updatePatternLength,
   updateComputedPatternLength: typeof updateComputedPatternLength,
+  updateSelectedMeasures: typeof updateSelectedMeasures,
   updatePatterns: typeof updatePatterns,
   updateSelectedPattern: typeof updateSelectedPattern,
   getPatterns: typeof getPatterns,
@@ -37,7 +36,6 @@ export const PatternExtraction = (props: IPatternExtractionProps) => {
   const {dataset, data, selectedMeasures,
     patternLength, patterns, computedPatternLength,
     changeChart, folder} = props;
-
 
   return (
   <Grid container spacing={3}>
@@ -52,6 +50,7 @@ export const PatternExtraction = (props: IPatternExtractionProps) => {
                                      patternLength={patternLength}  resampleFreq={props.resampleFreq}
                                      patterns={patterns} computedPatternLength = {computedPatternLength}
                                      updateComputedPatternLength = {props.updateComputedPatternLength}
+                                     updateSelectedMeasures = {props.updateSelectedMeasures}
                                      selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern}
                                      updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} changeChart={changeChart}
                   folder={folder}/>}

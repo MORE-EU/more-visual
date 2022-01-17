@@ -8,7 +8,7 @@ import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
-import {Tab, Tabs} from '@mui/material';
+import {updateSelectedMeasures} from '../../visualizer.reducer';
 import {KneePlot} from "app/modules/visualizer/patterns/interesting-patterns/knee-plot";
 import {AnnotationVector} from "app/modules/visualizer/patterns/interesting-patterns/annotation-vector";
 import ModalStyles from "app/shared/layout/ModalStyle";
@@ -17,6 +17,7 @@ import ModalStyles from "app/shared/layout/ModalStyle";
 export interface IVisCorrectionProps {
   dataset: IDataset,
   patterns: IPatterns,
+  updateSelectedMeasures: typeof updateSelectedMeasures,
 }
 
 export const VisCorrection = (props: IVisCorrectionProps) => {
@@ -63,7 +64,7 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
       {correctedAv &&
         <Grid item container xs={12} spacing={4}>
           <Grid item xs={6}>
-            Annotation Vector has been applied
+            An Annotation Vector of type {correctedAv} has been applied
           </Grid>
           <Grid item xs={6}>
             <Button onClick={handleOpen(1)}>View Annotation Vector</Button>
@@ -101,7 +102,9 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
               {/*  <Tab label="Knee Plot"/> */}
               {/*  <Tab label="Annotation Vector"/> */}
               {/* </Tabs> */}
-              {openC === 0 && <KneePlot dataset={dataset} patterns={patterns} setOpen={setOpen.bind(this)}/>}
+              {openC === 0 && <KneePlot dataset={dataset} patterns={patterns}
+                                        updateSelectedMeasures = {props.updateSelectedMeasures}
+                                        setOpen={setOpen.bind(this)}/>}
               {openC === 1 && <AnnotationVector dataset={dataset} patterns={patterns} setOpen={setOpen.bind(this)}/>}
             </div>
           </Fade>
