@@ -78,10 +78,6 @@ export const KneePlot = (props: IKneePlotProps) => {
     chart: {
       width: 700
     },
-    xAxis :{
-      min: 1,
-      startOnTick: true,
-    },
     yAxis: {
       title:{
         text: "Matrix Profile Min. Value"
