@@ -36,7 +36,7 @@ import VisControl from "app/modules/visualizer/vis-control";
 import {Typography} from "@mui/material";
 
 import PatternNav from "app/modules/visualizer/patterns/pattern-nav";
-import {DeviationDetection} from "app/modules/visualizer/patterns/changepoint-detection/changepoint-detection";
+import {ChangepointDetection} from "app/modules/visualizer/patterns/changepoint-detection/changepoint-detection";
 
 const mdTheme = createTheme();
 
@@ -117,7 +117,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                           updatePatterns={props.updatePatterns} patterns={props.patterns} topPatterns = {props.topPatterns}
                           selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern} computedPatternLength={computedPatternLength} updateComputedPatternLength={props.updateComputedPatternLength}
                           getPatterns = {props.getPatterns} changeChart={changeChart} folder={folder}/>}
-                  {patternNav === '2' && <DeviationDetection dataset={dataset} data={data} from={from} to={to}/>}
+                  {patternNav === '1' && <ChangepointDetection dataset={dataset} data={data} from={from} to={to}/>}
                 </Paper>
               </Grid>
             </Grid>
