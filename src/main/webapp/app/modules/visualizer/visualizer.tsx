@@ -85,9 +85,8 @@ export const Visualizer = (props: IVisualizerProps) => {
           }}
         >
           <Toolbar/>
-          <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4} lg={3}>
+          <Grid container direction="row" spacing={2}>
+              <Grid item xs={2}>
                 <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
                   <VisControl dataset={dataset} selectedMeasures={props.selectedMeasures} queryResults={queryResults}
                               updateSelectedMeasures={props.updateSelectedMeasures} from={props.from} to={props.to}
@@ -97,7 +96,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                               getDataset={props.getDataset} folder={props.match.params.folder}/>
                 </Paper>
               </Grid>
-              <Grid item xs={12} md={8} lg={9}>
+              <Grid item xs={10}>
                 <Paper sx={{
                   p: 4,
                   display: 'flex',
@@ -128,10 +127,10 @@ export const Visualizer = (props: IVisualizerProps) => {
                 </Paper>
               </Grid>
             </Grid>
-          </Container>
         </Box>
       </Box>
-    </ThemeProvider></div>;
+    </ThemeProvider>
+    </div>;
 };
 
 const mapStateToProps = ({visualizer}: IRootState) => ({

@@ -5,7 +5,6 @@ import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official';
 import {IDataset} from "app/shared/model/dataset.model";
 import {updateQueryResults} from '../visualizer.reducer';
-import {IQueryResults} from "app/shared/model/query-results.model";
 import {IPatterns} from "app/shared/model/patterns.model";
 
 Highcharts.setOptions({
@@ -47,10 +46,28 @@ export const Chart = (props: IChartProps) => {
     props.updateQueryResults(folder,dataset.id);
   }, [dataset]);
 
+  // ZOOM FUNCTION FOR CHART
+  (function(H) {
+    const step = 2000 * 200;
+    H.addEvent(H.Chart, 'load', (e) => {
+      const chart = e.target;
+      H.addEvent(chart.container, 'wheel', (event: WheelEvent) => {
+        const xAxis = chart.xAxis[0],
+          extremes = xAxis.getExtremes(),
+          newMin = extremes.min
+        if (event.deltaY < 0) {
+          (newMin + step < extremes.max) ? xAxis.setExtremes(newMin + step, extremes.max, true, true) : xAxis.setExtremes(extremes.max - 2000, extremes.max, true, true);
+        } else if (event.deltaY > 0){
+          (newMin - step > extremes.dataMin) ? xAxis.setExtremes(newMin - step, extremes.max, true, true) : xAxis.setExtremes(extremes.dataMin, extremes.max, true, true);
+        }
+      });
+    });
+  }(Highcharts));
+
   return <div id='chart-container'>
     {data && <HighchartsReact
       highcharts={Highcharts}
-      constructorType={'chart'}
+      constructorType={'stockChart'}
       allowChartUpdate={true}
       immutable={false}
       updateArgs={[true, true, true]}
@@ -71,10 +88,9 @@ export const Chart = (props: IChartProps) => {
         },
         series: selectedMeasures.map((measure, index) => ({
           data: data.map(d => ([new Date(d[0]), parseFloat(d[measure])])),
-          yAxis: index,
           name: dataset.header[measure],
+          yAxis: changeChart ? index : 0,
           zoneAxis: 'x',
-          zones,
         })),
         chart: {
           type: 'line',
@@ -82,9 +98,15 @@ export const Chart = (props: IChartProps) => {
           marginTop: 10,
           paddingTop: 0,
           plotBorderWidth: 1,
+          panKey: "alt",
+          panning: {
+            enabled: true,
+            type: "x",
+          },
           zoomType: 'x',
         },
         xAxis: {
+          ordinal: false,
           type: 'datetime',
           min: from.getTime(),
           max: to.getTime(),
@@ -93,6 +115,7 @@ export const Chart = (props: IChartProps) => {
           title: {
             text: dataset.header[measure],
           },
+          opposite: false,
           top: `${(100/selectedMeasures.length)*idx}%`,
           height: `${selectedMeasures.length > 1 ? ((100/selectedMeasures.length)-5) : 100}%`,
           offset: 0,
@@ -101,18 +124,41 @@ export const Chart = (props: IChartProps) => {
           title: {
             text: dataset.header[measure],
           },
+          opposite: false,
           top: "0%",
           height: "100%",
           offset: undefined,
         }))),
         rangeSelector: {
-          enabled: false
+          buttons: [{
+            type: 'second',
+            count: 10,
+            text: '10s'
+          }, {
+            type: 'minute',
+            count: 1,
+            text: '1m'
+          }, 
+             {
+            type: 'minute',
+            count: 30,
+            text: '30m'
+          }, {
+            type: 'hour',
+            count: 1,
+            text: '1h'
+          },
+          {
+            type: 'all',
+            text: 'ALL'
+          }],
+          selected: 4
         },
         navigator: {
           enabled: false
         },
         scrollbar: {
-          enabled: false
+          enabled: true,
         },
         colorAxis: null,
         legend: {
