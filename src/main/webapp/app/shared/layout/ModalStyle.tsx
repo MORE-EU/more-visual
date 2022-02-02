@@ -5,6 +5,8 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    width:"50%",
+    margin: "auto",
   },
   paper: {
     backgroundColor: theme.palette.background.paper,

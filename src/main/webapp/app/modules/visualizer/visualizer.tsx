@@ -28,15 +28,17 @@ import {
   getPatterns,
   updateChangeChart,
   getWdFiles,
+  updateChangePointDates,
+  getChangePointDates,
 } from "app/modules/visualizer/visualizer.reducer";
-import Chart from "app/modules/visualizer/chart";
-import PatternExtraction from "app/modules/visualizer/patterns/interesting-patterns/pattern-extraction";
-import VisPatterns from "app/modules/visualizer/patterns/interesting-patterns/find-patterns";
+import Chart from "app/modules/visualizer/chart/chart";
+import PatternExtraction from "app/modules/visualizer/tools/pattern-extraction/pattern-extraction";
+import VisPatterns from "app/modules/visualizer/tools/pattern-extraction/find-patterns";
 import VisControl from "app/modules/visualizer/vis-control";
 import {Typography} from "@mui/material";
 
-import PatternNav from "app/modules/visualizer/patterns/pattern-nav";
-import {ChangepointDetection} from "app/modules/visualizer/patterns/changepoint-detection/changepoint-detection";
+import PatternNav from "app/modules/visualizer/tools/pattern-nav";
+import {ChangepointDetection} from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
 
 const mdTheme = createTheme();
 
@@ -48,7 +50,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
     patternLength, computedPatternLength,
-    patternNav, folder, from, to,
+    patternNav, folder, from, to, changePointDates,
   } = props;
 
   if(props.match.params.id === undefined){
@@ -117,7 +119,12 @@ export const Visualizer = (props: IVisualizerProps) => {
                           updatePatterns={props.updatePatterns} patterns={props.patterns} topPatterns = {props.topPatterns}
                           selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern} computedPatternLength={computedPatternLength} updateComputedPatternLength={props.updateComputedPatternLength}
                           getPatterns = {props.getPatterns} changeChart={changeChart} folder={folder}/>}
-                  {patternNav === '1' && <ChangepointDetection dataset={dataset} data={data} from={from} to={to}/>}
+                  {patternNav === '1' && <ChangepointDetection
+                    dataset={dataset}
+                    data={data} from={from} to={to}
+                    changePointDates={changePointDates}
+                    updateChangePointDates={props.updateChangePointDates}
+                    getChangePointDates={props.getChangePointDates}/>}
                 </Paper>
               </Grid>
             </Grid>
@@ -147,6 +154,7 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   wdFiles: visualizer.wdFiles,
   patternNav: visualizer.patternNav,
   folder: visualizer.folder,
+  changePointDates: visualizer.changePointDates,
 });
 
 const mapDispatchToProps = {
@@ -156,7 +164,7 @@ const mapDispatchToProps = {
   updatePatternLength, updatePatterns, updateTopPatterns,
   updateSelectedPattern, updateComputedPatternLength,
   getPatterns, updateChangeChart, updateDatasetChoice,
-  getWdFiles, updatePatternNav,
+  getWdFiles, updatePatternNav, updateChangePointDates, getChangePointDates,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

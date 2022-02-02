@@ -3,6 +3,7 @@ import { FAILURE, REQUEST, SUCCESS } from 'app/shared/reducers/action-type.util'
 import { IDataset } from 'app/shared/model/dataset.model';
 import { IQuery } from 'app/shared/model/query.model';
 import _ from 'lodash';
+import { DateObject } from 'react-multi-date-picker';
 
 export const ACTION_TYPES = {
   FETCH_DATASET: 'visualizer/FETCH_DATASET',
@@ -23,6 +24,8 @@ export const ACTION_TYPES = {
   UPDATE_CHANGECHART: 'visualizer/UPDATE_CHANGECHART',
   UPDATE_DATASETCHOICE: 'visualizer/UPDATE_DATASETCHOICE',
   UPDATE_PATTERNNAV: 'visualizer/UPDATE_PATTERNNAV',
+  GET_CHANGEPOINT_DATES: 'visualizer/GET_CHANGEPOINT_DATES',
+  UPDATE_CHANGEPOINT_DATES: 'visualizer/UPDATE_CHANGEPOINTS_DATES',
 };
 
 const initialState = {
@@ -47,9 +50,14 @@ const initialState = {
   wdFiles: [],
   patternNav: '0',
   folder: '',
+  changePointDates: [],
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
+
+const initChangePointDates = (func, col) => {
+  return [new DateObject('2019-01-02'), new DateObject('2019-04-30'), new DateObject('2019-05-13'), new DateObject('2019-09-01')];
+};
 
 const initPatterns = (data, length, frequency) => {
   let pattern1 = { start: new Date(data[500][0]), end: new Date(data[500 + length][0]) };
@@ -203,7 +211,16 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         patterns: initPatterns(action.payload.data, action.payload.length, action.payload.frequency),
       };
-
+    case ACTION_TYPES.UPDATE_CHANGEPOINT_DATES:
+      return {
+        ...state,
+        changePointDates: action.payload,
+      };
+    case ACTION_TYPES.GET_CHANGEPOINT_DATES:
+      return {
+        ...state,
+        changePointDates: initChangePointDates(action.payload.func, action.payload.col),
+      };
     default:
       return state;
   }
@@ -297,6 +314,11 @@ export const updatePatternNav = data => ({
   payload: data,
 });
 
+export const updateChangePointDates = data => ({
+  type: ACTION_TYPES.UPDATE_CHANGEPOINT_DATES,
+  payload: data,
+});
+
 export const filterData = () => (dispatch, getState) => {
   const { queryResults, filters } = getState().visualizer;
   dispatch({
@@ -315,9 +337,17 @@ export const filterData = () => (dispatch, getState) => {
     }),
   });
 };
+
 export const getPatterns = (data, length, frequency) => dispatch => {
   dispatch({
     type: ACTION_TYPES.GET_PATTERNS,
     payload: { data, length, frequency },
+  });
+};
+
+export const getChangePointDates = (func, col) => dispatch => {
+  dispatch({
+    type: ACTION_TYPES.GET_CHANGEPOINT_DATES,
+    payload: { func, col },
   });
 };

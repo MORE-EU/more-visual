@@ -25,6 +25,7 @@ export const KneePlot = (props: IKneePlotProps) => {
   const [k, setK] = React.useState(correctedK);
   const [selectedDimensions, setSelectedDimensions] = React.useState(correctedDimensions);
   const header = dataset.header;
+  const measures = dataset.measures;
   const classes = ModalStyles();
 
   const changeNoOfDimensions = (e) => {
@@ -35,7 +36,7 @@ export const KneePlot = (props: IKneePlotProps) => {
   const changeColumns = (e) => {
     const val = e.target.value;
     if (val[val.length - 1] === "all") {
-      setSelectedDimensions(selectedDimensions.length === header.length ? [] : header);
+      setSelectedDimensions(selectedDimensions.length === measures.length ? [] : measures);
       return;
     }
     setSelectedDimensions(val);
@@ -51,12 +52,12 @@ export const KneePlot = (props: IKneePlotProps) => {
 
   const filterDimensions = (e, open) => {
     // TODO: get dimensions through api
-    const dimensions = ["active power", "wind speed", "rotor speed", "pitch angle"];
+    const dimensions = [1, 2, 3, 4];
 
     // TODO: set correction through api
     const knee = {k: 4, dimensions}
     patterns.corrected.knee = knee; // api call
-    props.updateSelectedMeasures(indexesOf(header, dimensions));
+    props.updateSelectedMeasures(dimensions);
     setCorrected(true);
     props.setOpen(false);
   }
@@ -97,7 +98,7 @@ export const KneePlot = (props: IKneePlotProps) => {
       {corrected &&
         <Grid item container spacing={2} xs={12}>
           <Grid item xs={8}>
-            <b>Dimensions found:</b> {correctedDimensions.map((d) =>  {return (d + ", ");})}
+            <b>Dimensions found:</b> {correctedDimensions.map((d) =>  {return (header[d] + ", ");})}
           </Grid>
           <Grid item xs={4}>
             <Button variant="contained"
@@ -135,14 +136,14 @@ export const KneePlot = (props: IKneePlotProps) => {
                 value={selectedDimensions}
                 label="Choose Columns to be Included"
                 onChange={changeColumns}
-                renderValue={(selected) => selected.length === 0 ? "Choose Columns to be Included" : selected.join(", ")}
+                renderValue={(selected) => selected.length === 0 ? "Choose Columns to be Included" : (selected.map(s => header[s])).join(", ")}
               >
-                {header.map((option) => (
+                {measures.map((option) => (
                   <MenuItem key={option} value={option}>
                     <ListItemIcon>
                       <Checkbox checked={selectedDimensions.includes(option)}/>
                     </ListItemIcon>
-                    <ListItemText primary={option}/>
+                    <ListItemText primary={header[option]}/>
                   </MenuItem>
                 ))}
               </Select>

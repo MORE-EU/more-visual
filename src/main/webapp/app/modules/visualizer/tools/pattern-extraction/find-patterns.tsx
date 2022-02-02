@@ -11,7 +11,7 @@ import { FormControl } from '@mui/material';
 import { InputLabel } from '@mui/material';
 import { Select } from '@mui/material';
 import { MenuItem } from '@mui/material';
-import Chart from '../../chart';
+import Chart from '../../chart/chart';
 
 Highcharts.setOptions({
   time: {

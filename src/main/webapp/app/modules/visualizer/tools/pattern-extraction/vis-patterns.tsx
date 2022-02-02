@@ -15,8 +15,8 @@ import { FormControl } from '@mui/material';
 import { InputLabel } from '@mui/material';
 import { Select } from '@mui/material';
 import { MenuItem } from '@mui/material';
-import Chart from '../../chart';
-import VisCorrection from "app/modules/visualizer/patterns/interesting-patterns/vis-correction";
+import Chart from '../../chart/chart';
+import VisCorrection from "app/modules/visualizer/tools/pattern-extraction/vis-correction";
 import {IPatterns} from "app/shared/model/patterns.model";
 
 Highcharts.setOptions({

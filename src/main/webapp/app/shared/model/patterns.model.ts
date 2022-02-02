@@ -6,7 +6,7 @@ export interface IPatterns {
   knee: number[];
   annotationVector: number[];
   corrected: {
-    knee: { k: number; dimensions: string[] };
+    knee: { k: number; dimensions: number[] };
     annotationVector: { func: number };
   };
   patternGroups: IPatternGroup[];

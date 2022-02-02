@@ -5,9 +5,9 @@ import {IPatterns} from "app/shared/model/patterns.model";
 import {updateQueryResults, updatePatternLength,
   updatePatterns, updateSelectedMeasures, updateSelectedPattern,
   updateComputedPatternLength, getPatterns} from '../../visualizer.reducer';
-import FindPatterns from "app/modules/visualizer/patterns/interesting-patterns/find-patterns";
-import Chart from "app/modules/visualizer/chart";
-import VisPatterns from "app/modules/visualizer/patterns/interesting-patterns/vis-patterns";
+import FindPatterns from "app/modules/visualizer/tools/pattern-extraction/find-patterns";
+import Chart from "app/modules/visualizer/chart/chart";
+import VisPatterns from "app/modules/visualizer/tools/pattern-extraction/vis-patterns";
 
 
 export interface IPatternExtractionProps {

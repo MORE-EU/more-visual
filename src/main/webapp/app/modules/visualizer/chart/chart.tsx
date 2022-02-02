@@ -4,7 +4,7 @@ import Highcharts from 'highcharts/highstock'
 
 import HighchartsReact from 'highcharts-react-official';
 import {IDataset} from "app/shared/model/dataset.model";
-import {updateQueryResults} from './visualizer.reducer';
+import {updateQueryResults} from '../visualizer.reducer';
 import {IQueryResults} from "app/shared/model/query-results.model";
 import {IPatterns} from "app/shared/model/patterns.model";
 

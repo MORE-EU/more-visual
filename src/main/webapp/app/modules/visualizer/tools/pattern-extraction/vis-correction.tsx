@@ -9,8 +9,8 @@ import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import {updateSelectedMeasures} from '../../visualizer.reducer';
-import {KneePlot} from "app/modules/visualizer/patterns/interesting-patterns/knee-plot";
-import {AnnotationVector} from "app/modules/visualizer/patterns/interesting-patterns/annotation-vector";
+import {KneePlot} from "app/modules/visualizer/tools/pattern-extraction/knee-plot";
+import {AnnotationVector} from "app/modules/visualizer/tools/pattern-extraction/annotation-vector";
 import ModalStyles from "app/shared/layout/ModalStyle";
 
 
@@ -97,11 +97,7 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
         >
           <Fade in={open}>
             <div>
-              { /* <h2>Pattern Correction</h2> */ }
-              {/* <Tabs value={openTab} onChange={(e, v) => { changeTab(v) }}  centered className={classes.paper}> */}
-              {/*  <Tab label="Knee Plot"/> */}
-              {/*  <Tab label="Annotation Vector"/> */}
-              {/* </Tabs> */}
+
               {openC === 0 && <KneePlot dataset={dataset} patterns={patterns}
                                         updateSelectedMeasures = {props.updateSelectedMeasures}
                                         setOpen={setOpen.bind(this)}/>}
