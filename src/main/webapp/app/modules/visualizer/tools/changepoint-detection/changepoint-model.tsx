@@ -16,6 +16,7 @@ import ToolStyles from "app/shared/layout/ToolStyle";
 import Scores from "app/modules/visualizer/tools/changepoint-detection/scores";
 import {DateObject} from "react-multi-date-picker";
 
+
 export interface IChangepointModelProps {
   dataset: IDataset,
   changePointDates: DateObject[],

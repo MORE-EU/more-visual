@@ -32,18 +32,15 @@ import {
   getChangePointDates,
 } from "app/modules/visualizer/visualizer.reducer";
 import Chart from "app/modules/visualizer/chart/chart";
-import PatternExtraction from "app/modules/visualizer/tools/pattern-extraction/pattern-extraction";
-import VisPatterns from "app/modules/visualizer/tools/pattern-extraction/find-patterns";
 import VisControl from "app/modules/visualizer/vis-control";
-import {Typography} from "@mui/material";
-
-import PatternNav from "app/modules/visualizer/tools/pattern-nav";
-import {ChangepointDetection} from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
+import Toolkit from "app/modules/visualizer/tools/toolkit";
+import {Divider, styled} from "@mui/material";
 
 const mdTheme = createTheme();
 
 export interface IVisualizerProps extends StateProps, DispatchProps, RouteComponentProps<{ folder: string, id: string }> {
 }
+
 
 export const Visualizer = (props: IVisualizerProps) => {
   const {
@@ -52,6 +49,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     patternLength, computedPatternLength,
     patternNav, folder, from, to, changePointDates,
   } = props;
+  const [open, setOpen] = React.useState(false);
 
   if(props.match.params.id === undefined){
     useEffect(() =>{
@@ -70,64 +68,46 @@ export const Visualizer = (props: IVisualizerProps) => {
 
   return !loading && dataset !== null && <div>
     <ThemeProvider theme={mdTheme}>
-      <Box sx={{display: 'flex'}}>
-        <CssBaseline/>
-        <Box
+      <Toolbar/>
+      <Divider/>
+      <CssBaseline/>
+      <Box
           component="main"
           sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            flexGrow: 1,
+            backgroundColor: "white",
+            display: 'flex',
+            flexDirection: 'row',
             height: '100vh',
             overflow: 'auto',
           }}
-        >
-          <Toolbar/>
-          <Grid container direction="row" spacing={2}>
-              <Grid item xs={2}>
-                <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
-                  <VisControl dataset={dataset} selectedMeasures={props.selectedMeasures} queryResults={queryResults}
-                              updateSelectedMeasures={props.updateSelectedMeasures} from={props.from} to={props.to}
-                              resampleFreq={props.resampleFreq} updateFrom={props.updateFrom} updateTo={props.updateTo}
-                              updateResampleFreq={props.updateResampleFreq} updateFilters={props.updateFilters} filterData={props.filterData} filters={props.filters}
-                              updateChangeChart = {props.updateChangeChart} wdFiles={wdFiles} updateDatasetChoice={props.updateDatasetChoice} datasetChoice={datasetChoice}
-                              getDataset={props.getDataset} folder={props.match.params.folder}/>
-                </Paper>
-              </Grid>
-              <Grid item xs={10}>
-                <Paper sx={{
-                  p: 4,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}>
-                  <Chart dataset={dataset} data={data} selectedMeasures={selectedMeasures}
-                    updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
+      >
+          <Box
+            sx={{flexBasis:"20%"}}>
+            <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
+              <VisControl dataset={dataset} selectedMeasures={props.selectedMeasures} queryResults={queryResults}
+                          updateSelectedMeasures={props.updateSelectedMeasures} from={props.from} to={props.to}
+                          resampleFreq={props.resampleFreq} updateFrom={props.updateFrom} updateTo={props.updateTo}
+                          updateResampleFreq={props.updateResampleFreq} updateFilters={props.updateFilters} filterData={props.filterData} filters={props.filters}
+                          updateChangeChart = {props.updateChangeChart} wdFiles={wdFiles} updateDatasetChoice={props.updateDatasetChoice} datasetChoice={datasetChoice}
+                          getDataset={props.getDataset} folder={props.match.params.folder}/>
+            </Paper>
+          </Box>
+          <Box
+            sx={{flexBasis:"80%", pl: 2, flexGrow: 1}}>
+            <Paper sx={{
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+
+            }}>
+              <Chart dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+                     updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
                     resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart} folder={props.match.params.folder}/>
-                {/* </Paper>
-                <Paper sx={{
-                  p: 4,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}> */}
-                  <PatternNav patternNav={patternNav} updatePatternNav={props.updatePatternNav}/>
-                  {patternNav === '0' && <PatternExtraction dataset={dataset} data={data} selectedMeasures={selectedMeasures}
-                          updateSelectedMeasures = {props.updateSelectedMeasures} updateQueryResults={props.updateQueryResults} patternLength={patternLength}
-                          resampleFreq={props.resampleFreq} updatePatternLength = {props.updatePatternLength}
-                          updatePatterns={props.updatePatterns} patterns={props.patterns} topPatterns = {props.topPatterns}
-                          selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern} computedPatternLength={computedPatternLength} updateComputedPatternLength={props.updateComputedPatternLength}
-                          getPatterns = {props.getPatterns} changeChart={changeChart} folder={folder}/>}
-                  {patternNav === '1' && <ChangepointDetection
-                    dataset={dataset}
-                    data={data} from={from} to={to}
-                    changePointDates={changePointDates}
-                    updateChangePointDates={props.updateChangePointDates}
-                    getChangePointDates={props.getChangePointDates}/>}
-                </Paper>
-              </Grid>
-            </Grid>
-        </Box>
+            </Paper>
+          </Box >
+          <Toolkit
+            open = {open}
+            setOpen = {setOpen}/>
       </Box>
     </ThemeProvider>
     </div>;
