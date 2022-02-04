@@ -1,29 +1,19 @@
 import * as React from 'react';
-import {
-  AppBarProps,
-  Box,
-  Divider,
-  List,
-  ListItem,
-  ListItemIcon, ListItemText, Theme, CSSObject, AppBar, CssBaseline
-} from '@mui/material';
+import {Dispatch, SetStateAction} from 'react';
+import {Box, CssBaseline, CSSObject, Divider, List, ListItem, ListItemIcon, ListItemText, Theme} from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
-import { styled, useTheme } from '@mui/material/styles';
+import {styled} from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import PatternIcon from '@mui/icons-material/Pattern'; // patterns
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows'; // deviation
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'; // changepoint
 import TimelineIcon from '@mui/icons-material/Timeline'; // segmentation
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ActiveTool from "app/modules/visualizer/tools/active-tool";
-import {Dispatch, SetStateAction} from "react";
 import {IDataset} from "app/shared/model/dataset.model";
-import {IQueryResults} from "app/shared/model/query-results.model"; // filter
-import {  updateSelectedMeasures, updateQueryResults, updatePatternLength, updateComputedPatternLength, updatePatterns, updateSelectedPattern, getPatterns } from '../visualizer.reducer';
+import {getPatterns, updatePatterns, updateSelectedMeasures} from '../visualizer.reducer';
 import {IPatterns} from "app/shared/model/patterns.model";
 
 const drawerWidth = 300;
@@ -50,7 +40,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
   },
 });
 
-const DrawerHeader = styled('div')(({ theme }) => ({
+const DrawerHeader = styled('div')(({theme}) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
@@ -59,8 +49,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
+const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})(
+  ({theme, open}) => ({
     width: drawerWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
@@ -77,33 +67,24 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 
-
 export interface IToolkitProps {
   open?: boolean,
   setOpen: Dispatch<SetStateAction<boolean>>,
   dataset: IDataset,
   data: any,
   selectedMeasures: number[],
-  patternLength: number,
-  computedPatternLength: number,
   resampleFreq: string,
   patterns: IPatterns,
-  topPatterns: number,
-  selectedPattern: number,
-  updateQueryResults: typeof updateQueryResults,
-  updatePatternLength: typeof updatePatternLength,
-  updateComputedPatternLength: typeof updateComputedPatternLength,
   updateSelectedMeasures: typeof updateSelectedMeasures,
   updatePatterns: typeof updatePatterns,
-  updateSelectedPattern: typeof updateSelectedPattern,
   getPatterns: typeof getPatterns,
-  changeChart: boolean,
-  folder: string,
 }
 
 const Toolkit = (props: IToolkitProps) => {
-  const {open, dataset, data, selectedMeasures, patternLength, patterns,
-    topPatterns, computedPatternLength, selectedPattern, resampleFreq, folder} = props;
+  const {
+    open, dataset, data, selectedMeasures, patterns,
+    resampleFreq
+  } = props;
   const [activeTool, setActiveTool] = React.useState(-1);
 
   const handleDrawer = () => {
@@ -117,57 +98,55 @@ const Toolkit = (props: IToolkitProps) => {
   }
   return (
     <Box>
-      <CssBaseline />
+      <CssBaseline/>
       <Drawer variant="permanent" open={open} anchor="right">
         <DrawerHeader>
           <IconButton onClick={handleDrawer}>
-            {open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            {open ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
           </IconButton>
         </DrawerHeader>
-        <Divider />
+        <Divider/>
         {activeTool === -1 &&
           <List>
             <ListItem button key={0} onClick={() => handleToolClick(0)}>
               <ListItemIcon>
                 <PatternIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Pattern Extraction"} />
+              <ListItemText primary={"Pattern Extraction"}/>
             </ListItem>
-          <ListItem button key={1}  onClick={() => handleToolClick(1)}>
-            <ListItemIcon>
-              <CompareArrowsIcon/>
-            </ListItemIcon>
-            <ListItemText primary={"Deviation Detection"} />
-          </ListItem>
-          <ListItem button key={2}  onClick={() => handleToolClick(2)}>
-            <ListItemIcon>
-              <ManageSearchIcon/>
-            </ListItemIcon>
-            <ListItemText primary={"Changepoint Detection"} />
-          </ListItem>
-          <ListItem button key={3} onClick={() => handleToolClick(3)}>
-            <ListItemIcon>
-              <TimelineIcon/>
-            </ListItemIcon>
-            <ListItemText primary={"Semantic Segmentation"} />
-          </ListItem>
-          <ListItem button key={4}  onClick={() => handleToolClick(4)}>
-            <ListItemIcon>
-              <FilterAltIcon/>
-            </ListItemIcon>
-            <ListItemText primary={"Filtering"} />
-          </ListItem>
-        </List>
+            <ListItem button key={1} onClick={() => handleToolClick(1)}>
+              <ListItemIcon>
+                <CompareArrowsIcon/>
+              </ListItemIcon>
+              <ListItemText primary={"Deviation Detection"}/>
+            </ListItem>
+            <ListItem button key={2} onClick={() => handleToolClick(2)}>
+              <ListItemIcon>
+                <ManageSearchIcon/>
+              </ListItemIcon>
+              <ListItemText primary={"Changepoint Detection"}/>
+            </ListItem>
+            <ListItem button key={3} onClick={() => handleToolClick(3)}>
+              <ListItemIcon>
+                <TimelineIcon/>
+              </ListItemIcon>
+              <ListItemText primary={"Semantic Segmentation"}/>
+            </ListItem>
+            <ListItem button key={4} onClick={() => handleToolClick(4)}>
+              <ListItemIcon>
+                <FilterAltIcon/>
+              </ListItemIcon>
+              <ListItemText primary={"Filtering"}/>
+            </ListItem>
+          </List>
         }
         <ActiveTool
-          activeTool = {activeTool}
+          activeTool={activeTool}
           setActiveTool={setActiveTool}
-          dataset={dataset} data={data} selectedMeasures={selectedMeasures} patternLength={patternLength}
-          computedPatternLength={computedPatternLength} resampleFreq={resampleFreq} patterns={patterns} topPatterns={topPatterns}
-          selectedPattern={selectedPattern} updateQueryResults={props.updateQueryResults} updatePatternLength={props.updatePatternLength}
-          updateComputedPatternLength={props.updateComputedPatternLength}  updateSelectedMeasures={props.updateSelectedMeasures}
-          updatePatterns={props.updatePatterns} updateSelectedPattern={props.updateSelectedPattern} getPatterns={props.getPatterns}
-          changeChart={props.changeChart} folder={folder}/>
+          dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+          resampleFreq={resampleFreq} patterns={patterns} updateSelectedMeasures={props.updateSelectedMeasures}
+          updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}
+        />
       </Drawer>
     </Box>
   );

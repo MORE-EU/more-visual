@@ -1,19 +1,17 @@
 import {Checkbox, FormControl, InputLabel, ListItemIcon, ListItemText, MenuItem, Select} from "@mui/material";
 import React, {Dispatch, SetStateAction} from "react";
-import ModalStyles from "app/shared/layout/ModalStyle";
-
 
 export interface IDimensionSelectorProps {
   dimensions: number[], // preselected dimensions
   setDimensions: Dispatch<SetStateAction<number[]>>,
   header: string[],
   measures: number[],
-  disabled: boolean,
+  disabled?: boolean,
+  label?: string,
 }
 
 export const DimensionSelector = (props: IDimensionSelectorProps) => {
-  const {dimensions, measures, header, disabled} = props;
-  const classes = ModalStyles();
+  const {dimensions, measures, header, disabled, label} = props;
 
   const changeColumns = (e) => {
     const val = e.target.value;
@@ -24,12 +22,12 @@ export const DimensionSelector = (props: IDimensionSelectorProps) => {
     props.setDimensions(val);
   }
   return (
-    <FormControl className={classes.formControlMulti}>
-      {/*<InputLabel id="mutiple-select-label">Choose Dimensions to be Included</InputLabel>*/}
+    <FormControl fullWidth>
+      {label && <InputLabel id="mutiple-select-label">{label}</InputLabel>}
       <Select
         labelId="mutiple-select-label"
         multiple
-        disabled = {disabled}
+        disabled={disabled}
         value={dimensions}
         label="Choose Columns to be Included"
         onChange={changeColumns}

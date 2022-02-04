@@ -1,7 +1,6 @@
-import {Fade, FormControl, Grid, InputLabel, ListItemText, MenuItem, Modal, Select} from "@mui/material";
+import {Button, FormControl, Grid, InputLabel, MenuItem, Select} from "@mui/material";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts/highstock";
-import {Button, Checkbox, ListItemIcon} from '@mui/material';
 import React from "react";
 import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
@@ -34,23 +33,6 @@ export const KneePlot = (props: IKneePlotProps) => {
     setK(dims);
   }
 
-  const changeColumns = (e) => {
-    const val = e.target.value;
-    if (val[val.length - 1] === "all") {
-      setSelectedDimensions(selectedDimensions.length === measures.length ? [] : measures);
-      return;
-    }
-    setSelectedDimensions(val);
-  }
-
-  const indexesOf = (arr, items) =>{
-    const filtered = [];
-    for(let i = 0; i < items.length; i++) {
-      filtered.push(arr.indexOf(items[i]));
-    }
-    return filtered;
-  }
-
   const filterDimensions = (e, open) => {
     // TODO: get dimensions through api
     const dimensions = [1, 2, 3, 4];
@@ -63,6 +45,13 @@ export const KneePlot = (props: IKneePlotProps) => {
     props.setOpen(false);
   }
 
+  const createData = () => {
+    let data = [];
+    for (let i = 0; i < patterns.knee.length; i ++){
+      data.push([(i+1), patterns.knee[i]]);
+    }
+    return data;
+  }
   const resetDimensions = (e) => {
     setCorrected(false);
   }
@@ -73,17 +62,26 @@ export const KneePlot = (props: IKneePlotProps) => {
     },
     series: [
       {
-        data: patterns.knee,
+        data: createData(),
         name: "Number of Dimensions"
       }
     ],
+    stockTools: {
+      gui: {
+        enabled: false // disable the built-in toolbar
+      }
+    },
     chart: {
       width: 700
     },
+    xAxis: {
+      min: 1,
+      startOnTick: true,
+    },
     yAxis: {
-      title:{
+      title: {
         text: "Matrix Profile Min. Value"
-      }
+      },
     }
 
   };
@@ -99,11 +97,13 @@ export const KneePlot = (props: IKneePlotProps) => {
       {corrected &&
         <Grid item container spacing={2} xs={12}>
           <Grid item xs={8}>
-            <b>Dimensions found:</b> {correctedDimensions.map((d) =>  {return (header[d] + ", ");})}
+            <b>Dimensions found:</b> {correctedDimensions.map((d) => {
+            return (header[d] + ", ");
+          })}
           </Grid>
           <Grid item xs={4}>
             <Button variant="contained"
-                    onClick = {e => resetDimensions(e)}
+                    onClick={e => resetDimensions(e)}
             >Re-Filter Dimensions</Button>
           </Grid>
         </Grid>
@@ -111,7 +111,7 @@ export const KneePlot = (props: IKneePlotProps) => {
       {!corrected &&
         <Grid item spacing={2} container xs={12}>
           <Grid item xs={4}>
-            <FormControl fullWidth className={classes.formControl}>
+            <FormControl fullWidth>
               <InputLabel id="k-label">Choose No. of dimensions</InputLabel>
               <Select
                 labelId="k-select-label"
@@ -129,7 +129,12 @@ export const KneePlot = (props: IKneePlotProps) => {
             </FormControl>
           </Grid>
           <Grid item xs={4}>
-            <DimensionSelector dimensions={correctedDimensions} header={header} measures={measures}/>
+            <DimensionSelector
+              label = "Choose Dimensions"
+              dimensions={selectedDimensions}
+              header={header}
+              measures={measures}
+              setDimensions={setSelectedDimensions}/>
           </Grid>
           <Grid item container xs={4} spacing={0}
                 direction="column"

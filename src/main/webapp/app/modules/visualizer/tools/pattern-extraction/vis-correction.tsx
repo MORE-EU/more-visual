@@ -1,8 +1,8 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
-import {Button, FormControl, InputLabel, MenuItem, Select, Typography, ListItemText, Box} from '@mui/material';
-import { IPatterns } from 'app/shared/model/patterns.model';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {Box, Button, Typography} from '@mui/material';
+import {IPatterns} from 'app/shared/model/patterns.model';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
@@ -28,6 +28,24 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
   const correctedKnee = patterns.corrected.knee !== null;
   const correctedAv = patterns.corrected.annotationVector !== null;
 
+
+  const getAVName = () => {
+    if(correctedAv)
+      switch (patterns.corrected.annotationVector.func) {
+        case 0:
+          return "Complexity";
+        case 1:
+          return "Meanstd"
+        case 2:
+          return "Clipping"
+        default:
+          return 'foo';
+      }
+    return "";
+  }
+
+  const avName = getAVName();
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -40,10 +58,10 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
 
   return (
 
-    <Box sx={{display:'flex', flexDirection: 'column', pt: 2}}>
+    <Box sx={{display: 'flex', flexDirection: 'column', pt: 2}}>
       {correctedKnee &&
         <Box>
-          <Box >
+          <Box>
             Uneeded dimensions have been filtered
           </Box>
           <Box>
@@ -52,23 +70,23 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
         </Box>}
       {!correctedKnee &&
         <Box>
-          <Box sx={{display:'flex', flexDirection: 'row'}}>
-            <Box>
+          <Box sx={{display: 'flex', flexDirection: 'row'}}>
+            <Box sx={{pr: 1}}>
               <FontAwesomeIcon icon={faExclamationTriangle}/>
             </Box>
-            <Box>
-              <Typography variant='body1' >These Patterns may contain uneeded dimensions</Typography>
+            <Box  sx={{whiteSpace:"normal"}}>
+              <Typography variant='body1'>These Patterns may contain uneeded dimensions</Typography>
             </Box>
           </Box>
-          <Box sx={{float:'right'}} >
+          <Box sx={{float: 'right'}}>
             <Button onClick={handleOpen(0)}>Filter them</Button>
           </Box>
         </Box>
       }
       {correctedAv &&
-        <Box >
-          <Box >
-            An Annotation Vector of type {correctedAv} has been applied
+        <Box>
+          <Box sx={{whiteSpace:"normal"}}>
+            A {avName} Annotation Vector has been applied
           </Box>
           <Box>
             <Button onClick={handleOpen(1)}>View Annotation Vector</Button>
@@ -76,15 +94,15 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
         </Box>}
       {!correctedAv &&
         <Box>
-          <Box sx={{display:'flex', flexDirection: 'row'}}>
-            <Box >
+          <Box sx={{display: 'flex', flexDirection: 'row'}}>
+            <Box sx={{pr: 1}}>
               <FontAwesomeIcon icon={faExclamationTriangle}/>
             </Box>
             <Box>
-              <Typography variant='body1' >Improve these patterns through the use of an Annotation Vector</Typography>
+              <Typography  sx={{whiteSpace:"normal"}} variant='body1'>Improve these patterns through the use of an Annotation Vector</Typography>
             </Box>
           </Box>
-          <Box sx={{float:'right'}}>
+          <Box sx={{float: 'right'}}>
             <Button onClick={handleOpen(1)}>Annotate Patterns</Button>
           </Box>
         </Box>
@@ -107,7 +125,7 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
             <div>
 
               {openC === 0 && <KneePlot dataset={dataset} patterns={patterns}
-                                        updateSelectedMeasures = {props.updateSelectedMeasures}
+                                        updateSelectedMeasures={props.updateSelectedMeasures}
                                         setOpen={setOpen.bind(this)}/>}
               {openC === 1 && <AnnotationVector dataset={dataset} patterns={patterns} setOpen={setOpen.bind(this)}/>}
             </div>
@@ -115,7 +133,8 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
         </Modal>
       </Box>
     </Box>
-  );};
+  );
+};
 
 
 export default VisCorrection;

@@ -25,6 +25,7 @@
     "@mui/styles": "^5.3.0",
     "@randex/material-ui-multiple-dates-picker": "^0.4.0",
     "axios": "^0.25.0",
+    "body-scroll-lock": "^4.0.0-beta.0",
     "date-fns": "^2.25.0",
     "highcharts": "^8.2.2",
     "highcharts-react-official": "^3.0.0",

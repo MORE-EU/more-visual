@@ -40,10 +40,6 @@ const initialState = {
   from: null as Date,
   to: null as Date,
   filters: {},
-  patternLength: 10,
-  computedPatternLength: -1,
-  topPatterns: 1,
-  selectedPattern: -1,
   patterns: null,
   changeChart: false,
   datasetChoice: 0,
@@ -140,16 +136,6 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         selectedMeasures: action.payload,
       };
-    case ACTION_TYPES.UPDATE_SELECTED_PATTERN:
-      return {
-        ...state,
-        selectedPattern: action.payload,
-      };
-    case ACTION_TYPES.UPDATE_TOP_PATTERNS:
-      return {
-        ...state,
-        topPatterns: action.payload,
-      };
     case ACTION_TYPES.UPDATE_FROM:
       return {
         ...state,
@@ -160,22 +146,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         to: action.payload,
       };
-    case ACTION_TYPES.UPDATE_PATTERN_LENGTH:
-      return {
-        ...state,
-        patternLength: action.payload,
-      };
-    case ACTION_TYPES.UPDATE_COMPUTED_PATTERN_LENGTH:
-      return {
-        ...state,
-        computedPatternLength: action.payload,
-      };
     case ACTION_TYPES.UPDATE_PATTERNS:
       return {
         ...state,
         patterns: action.payload,
       };
-
     case ACTION_TYPES.UPDATE_RESAMPLE_FREQ:
       return {
         ...state,
@@ -260,29 +235,9 @@ export const updateFrom = from => ({
   payload: from,
 });
 
-export const updatePatternLength = patternLength => ({
-  type: ACTION_TYPES.UPDATE_PATTERN_LENGTH,
-  payload: patternLength,
-});
-
-export const updateComputedPatternLength = computedPatternLength => ({
-  type: ACTION_TYPES.UPDATE_COMPUTED_PATTERN_LENGTH,
-  payload: computedPatternLength,
-});
-
-export const updateTopPatterns = topPatterns => ({
-  type: ACTION_TYPES.UPDATE_TOP_PATTERNS,
-  payload: topPatterns,
-});
-
 export const updateTo = to => ({
   type: ACTION_TYPES.UPDATE_TO,
   payload: to,
-});
-
-export const updateSelectedPattern = selectedPattern => ({
-  type: ACTION_TYPES.UPDATE_SELECTED_PATTERN,
-  payload: selectedPattern,
 });
 
 export const updateResampleFreq = freq => ({

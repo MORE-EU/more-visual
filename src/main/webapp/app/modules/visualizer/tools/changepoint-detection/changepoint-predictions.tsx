@@ -1,18 +1,6 @@
 import React, {useState} from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
-import {
-  Button,
-  Checkbox, FormControl,
-  Grid,
-  Box,
-  InputLabel,
-  ListItemIcon,
-  ListItemText,
-  MenuItem, Radio,
-  Select,
-  Typography
-} from "@mui/material";
-import ToolStyles from "app/shared/layout/ToolStyle";
+import {Grid} from "@mui/material";
 import Scores from "app/modules/visualizer/tools/changepoint-detection/scores";
 import {DateObject} from "react-multi-date-picker";
 
@@ -36,7 +24,7 @@ export const ChangepointModel = (props: IChangepointModelProps) => {
   return (
     <Grid container>
       <Grid item container xs={8}>
-        <Scores scores = {scores} changePointDates = {changePointDates} />
+        <Scores scores={scores} changePointDates={changePointDates}/>
       </Grid>
     </Grid>
   );

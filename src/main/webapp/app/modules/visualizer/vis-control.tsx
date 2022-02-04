@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -7,22 +7,22 @@ import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import {Box, FormControl, Grid, InputLabel, MenuItem, Select, Slider, Stack, Typography} from "@mui/material";
 import {
-  updateFilters,
   filterData,
+  getDataset,
+  updateChangeChart,
+  updateDatasetChoice,
+  updateFilters,
   updateFrom,
   updateResampleFreq,
   updateSelectedMeasures,
   updateTo,
-  updateChangeChart,
-  getDataset,
-  updateDatasetChoice,
 } from "app/modules/visualizer/visualizer.reducer";
 import TextField from '@mui/material/TextField';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import {IQueryResults} from "app/shared/model/query-results.model";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
 export interface IVisControlProps {
   dataset: IDataset,
@@ -35,7 +35,7 @@ export interface IVisControlProps {
   wdFiles: any[],
   folder: string,
   datasetChoice: number,
-  updateDatasetChoice:  typeof updateDatasetChoice,
+  updateDatasetChoice: typeof updateDatasetChoice,
   updateFrom: typeof updateFrom,
   updateTo: typeof updateTo,
   updateSelectedMeasures: typeof updateSelectedMeasures,
@@ -64,7 +64,7 @@ export const VisControl = (props: IVisControlProps) => {
   };
 
   const handleDataset = (idx) => {
-    if(props.datasetChoice !== idx){
+    if (props.datasetChoice !== idx) {
       props.updateDatasetChoice(idx);
     }
   }
@@ -114,30 +114,32 @@ export const VisControl = (props: IVisControlProps) => {
       </Grid>
     </Grid>
      */}
-     <Grid item xs={11}>
+    <Grid item xs={11}>
       {wdFiles !== [] &&
-      <>
-      <Typography variant="h6" gutterBottom>
-          Available Files
-        </Typography><List disablePadding dense={true}>
-            {wdFiles.map((file, idx) => {
-              return (
-                <ListItemButton
+        <>
+          <Typography variant="h6" gutterBottom>
+            Available Files
+          </Typography><List disablePadding dense={true}>
+          {wdFiles.map((file, idx) => {
+            return (
+              <ListItemButton
                 key={idx}
                 selected={props.datasetChoice === idx}
                 component={Link}
                 to={`/visualize/${folder}/${file.substring(0, file.indexOf("."))}`}
-                onClick={() => {handleDataset(idx),props.getDataset(folder,file.substring(0, file.indexOf(".")))}}
+                onClick={() => {
+                  handleDataset(idx), props.getDataset(folder, file.substring(0, file.indexOf(".")))
+                }}
                 divider
-                >
-                <ListItemText primary={`${file}`} sx={{pl: 4}} />
-                </ListItemButton>
-              );
-            })}
-          </List>
-          </>
+              >
+                <ListItemText primary={`${file}`} sx={{pl: 4}}/>
+              </ListItemButton>
+            );
+          })}
+        </List>
+        </>
       }
-     </Grid>
+    </Grid>
     <Grid item xs={12}>
       <Typography variant="h6" gutterBottom>
         Measures
@@ -186,16 +188,18 @@ export const VisControl = (props: IVisControlProps) => {
               valueLabelDisplay="auto"
             />
             <Stack direction="row" spacing={2}>
-            <TextField id="outlined-basic" label="Min-Value" variant="outlined" size="small" value={filters[col] ? filters[col][0] : stats.min} onChange={(e) => {
+              <TextField id="outlined-basic" label="Min-Value" variant="outlined" size="small"
+                         value={filters[col] ? filters[col][0] : stats.min} onChange={(e) => {
                 props.updateFilters(col, [e.target.value, filters[col] ? filters[col][1] : stats.max]);
                 props.filterData();
               }}/>
-            <TextField id="outlined-basic" label="Max-Value" variant="outlined" size="small" value={filters[col] ? filters[col][1] : stats.max} onChange={(e) => {
-              props.updateFilters(col, [filters[col] ? filters[col][0] : stats.min, e.target.value]);
-              props.filterData();
-            }}/>
+              <TextField id="outlined-basic" label="Max-Value" variant="outlined" size="small"
+                         value={filters[col] ? filters[col][1] : stats.max} onChange={(e) => {
+                props.updateFilters(col, [filters[col] ? filters[col][0] : stats.min, e.target.value]);
+                props.filterData();
+              }}/>
             </Stack>
-            </Box>
+          </Box>
         })}
       </List>
     </Grid>

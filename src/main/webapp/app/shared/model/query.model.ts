@@ -3,5 +3,4 @@ export interface IQuery {
   to?: number;
 }
 
-export const defaultValue: Readonly<IQuery> = {
-};
+export const defaultValue: Readonly<IQuery> = {};

@@ -1,11 +1,13 @@
-import React, { useState } from "react";
-import { Query, Builder, Utils as QbUtils } from "react-awesome-query-builder";
+import React, {useState} from "react";
 // types
 import {
-  JsonGroup,
+  Builder,
+  BuilderProps,
   Config,
   ImmutableTree,
-  BuilderProps
+  JsonGroup,
+  Query,
+  Utils as QbUtils
 } from "react-awesome-query-builder";
 
 import MaterialConfig from "react-awesome-query-builder/lib/config/material";
@@ -15,24 +17,21 @@ import "react-awesome-query-builder/lib/css/compact_styles.css"; // optional, fo
 // Choose your skin (ant/material/vanilla):
 const InitialConfig = MaterialConfig; // or MaterialConfig or BootstrapConfig or BasicConfig
 
-import {IChangepointPickerProps} from "app/modules/visualizer/tools/changepoint-detection/changepoint-picker";
-
 export interface IFilterProps {
-  columns : string[],
+  columns: string[],
   filters: any[],
 }
 
 
-
 // You can load query value from your backend storage (for saving see `Query.onChange()`)
-const queryValue: JsonGroup = { id: QbUtils.uuid(), type: "group" };
+const queryValue: JsonGroup = {id: QbUtils.uuid(), type: "group"};
 
 export const Filter = (props: IFilterProps) => {
   const {columns} = props;
 
   const createConfig = () => {
     const fields = {};
-    for (let i = 0; i < columns.length; i++){
+    for (let i = 0; i < columns.length; i++) {
       fields[columns[i]] = {
         "label": columns[i],
         "type": "number",
@@ -53,13 +52,13 @@ export const Filter = (props: IFilterProps) => {
   });
 
   const onChange = (immutableTree: ImmutableTree, conf: Config) => {
-    setState({ tree: immutableTree, config: conf });
+    setState({tree: immutableTree, config: conf});
 
     const jsonTree = QbUtils.getTree(immutableTree);
   };
 
   const renderBuilder = (p: BuilderProps) => (
-    <div className="query-builder-container" style={{ padding: "10px" }}>
+    <div className="query-builder-container" style={{padding: "10px"}}>
       <div className="query-builder">
         <Builder {...p} />
       </div>
@@ -67,21 +66,21 @@ export const Filter = (props: IFilterProps) => {
   );
 
   return (
-    <div >
+    <div>
       <Query
         {...config}
         value={state.tree}
         onChange={onChange}
         renderBuilder={renderBuilder}
       />
-      {/* <div className="query-builder-result"> */ }
-      {/*  <div>*/ }
-      {/*    Query string:{" "}*/ }
-      {/*    <pre>*/ }
-      {/*      {JSON.stringify(QbUtils.queryString(state.tree, state.config))}*/ }
-      {/*    </pre>*/ }
-      {/*  </div>*/ }
-      {/* </div>*/ }
+      {/* <div className="query-builder-result"> */}
+      {/*  <div>*/}
+      {/*    Query string:{" "}*/}
+      {/*    <pre>*/}
+      {/*      {JSON.stringify(QbUtils.queryString(state.tree, state.config))}*/}
+      {/*    </pre>*/}
+      {/*  </div>*/}
+      {/* </div>*/}
     </div>
   );
 };

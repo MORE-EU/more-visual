@@ -1,38 +1,30 @@
 import * as React from 'react';
+import {Dispatch, SetStateAction} from 'react';
 import {Box, IconButton} from "@mui/material";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import {Dispatch, SetStateAction} from "react";
 import PatternExtraction from "app/modules/visualizer/tools/pattern-extraction/pattern-extraction";
 import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
-import {  updateSelectedMeasures, updateQueryResults, updatePatternLength, updateComputedPatternLength, updatePatterns, updateSelectedPattern, getPatterns } from '../visualizer.reducer';
+import {getPatterns, updatePatterns, updateSelectedMeasures} from '../visualizer.reducer';
 
 export interface IActiveToolProps {
   activeTool: number,
-  setActiveTool:  Dispatch<SetStateAction<number>>,
+  setActiveTool: Dispatch<SetStateAction<number>>,
   dataset: IDataset,
   data: any,
   selectedMeasures: number[],
-  patternLength: number,
-  computedPatternLength: number,
   resampleFreq: string,
   patterns: IPatterns,
-  topPatterns: number,
-  selectedPattern: number,
-  updateQueryResults: typeof updateQueryResults,
-  updatePatternLength: typeof updatePatternLength,
-  updateComputedPatternLength: typeof updateComputedPatternLength,
   updateSelectedMeasures: typeof updateSelectedMeasures,
   updatePatterns: typeof updatePatterns,
-  updateSelectedPattern: typeof updateSelectedPattern,
   getPatterns: typeof getPatterns,
-  changeChart: boolean,
-  folder: string,
 }
 
 const ActiveTool = (props: IActiveToolProps) => {
-  const {activeTool, dataset, data, selectedMeasures, patternLength, patterns,
-    topPatterns, computedPatternLength, selectedPattern, resampleFreq, folder} = props;
+  const {
+    activeTool, dataset, data, selectedMeasures, patterns,
+    resampleFreq
+  } = props;
 
   const goBack = () => {
     props.setActiveTool(-1);
@@ -41,17 +33,16 @@ const ActiveTool = (props: IActiveToolProps) => {
     <Box>
       {activeTool !== -1 &&
         <Box>
-          <IconButton onClick = {() => goBack()}>
+          <IconButton onClick={() => goBack()}>
             <ArrowBackIosIcon/>
           </IconButton>
           {activeTool === 0 &&
             <PatternExtraction
-              dataset={dataset} data={data} selectedMeasures={selectedMeasures} patternLength={patternLength}
-              computedPatternLength={computedPatternLength} resampleFreq={resampleFreq} patterns={patterns} topPatterns={topPatterns}
-              selectedPattern={selectedPattern} updateQueryResults={props.updateQueryResults} updatePatternLength={props.updatePatternLength}
-              updateComputedPatternLength={props.updateComputedPatternLength}  updateSelectedMeasures={props.updateSelectedMeasures}
-              updatePatterns={props.updatePatterns} updateSelectedPattern={props.updateSelectedPattern} getPatterns={props.getPatterns}
-              changeChart={props.changeChart} folder={folder}/>}
+              dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+              resampleFreq={resampleFreq} patterns={patterns}
+              updateSelectedMeasures={props.updateSelectedMeasures} updatePatterns={props.updatePatterns}
+              getPatterns={props.getPatterns}
+            />}
         </Box>
       }
     </Box>

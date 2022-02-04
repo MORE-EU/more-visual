@@ -1,8 +1,6 @@
 import React from "react";
 import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
-import HighchartsReact from "highcharts-react-official";
-import Highcharts from "highcharts/highstock";
 import {Button, FormControl, Grid, InputLabel, MenuItem, Select} from "@mui/material";
 import ModalStyles from "app/shared/layout/ModalStyle";
 
@@ -40,7 +38,7 @@ export const AnnotationVector = (props: IAnnotationVectorProps) => {
       width: 700
     },
     yAxis: {
-      title:{
+      title: {
         text: "Matrix Profile Min. Value"
       }
     }
@@ -53,7 +51,7 @@ export const AnnotationVector = (props: IAnnotationVectorProps) => {
   }
 
   const renderDescription = (description) => {
-    switch(description) {
+    switch (description) {
       case 0:
         return "Utility function that returns an annotation vector where values are based\n" +
           "    on the complexity estimation of the signal.";
@@ -70,7 +68,7 @@ export const AnnotationVector = (props: IAnnotationVectorProps) => {
   }
 
   return (
-    <div className = {classes.paper} style={{width:"700px"}} >
+    <div className={classes.paper} style={{width: "700px"}}>
       {/* <Grid item xs={12}> */}
       {/*  <HighchartsReact */}
       {/*    highcharts={Highcharts} */}
@@ -79,7 +77,7 @@ export const AnnotationVector = (props: IAnnotationVectorProps) => {
       {/* </Grid> */}
       <Grid item spacing={2} container xs={12}>
         <Grid item xs={6}>
-          <FormControl fullWidth className={classes.formControl}>
+          <FormControl fullWidth >
             <InputLabel id="av-func-label">Choose an Annotation Vector Function</InputLabel>
             <Select
               labelId="av-func-select-label"
@@ -101,7 +99,7 @@ export const AnnotationVector = (props: IAnnotationVectorProps) => {
           </FormControl>
         </Grid>
         <Grid item xs={6}>
-        <b>Description:</b>
+          <b>Description:</b>
           {renderDescription(avFunction)}
         </Grid>
         <Grid item container xs={12} direction="row"
