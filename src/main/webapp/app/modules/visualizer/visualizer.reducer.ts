@@ -26,6 +26,7 @@ export const ACTION_TYPES = {
   UPDATE_PATTERNNAV: 'visualizer/UPDATE_PATTERNNAV',
   GET_CHANGEPOINT_DATES: 'visualizer/GET_CHANGEPOINT_DATES',
   UPDATE_CHANGEPOINT_DATES: 'visualizer/UPDATE_CHANGEPOINTS_DATES',
+  UPDATE_GRAPHZOOM: 'visualizer/UPDATE_GRAPHZOOM',
 };
 
 const initialState = {
@@ -47,6 +48,7 @@ const initialState = {
   patternNav: '0',
   folder: '',
   changePointDates: [],
+  graphZoom: null,
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
@@ -191,6 +193,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         changePointDates: action.payload,
       };
+    case ACTION_TYPES.UPDATE_GRAPHZOOM:
+      return {
+        ...state,
+        graphZoom: action.payload,
+      };
     case ACTION_TYPES.GET_CHANGEPOINT_DATES:
       return {
         ...state,
@@ -267,6 +274,11 @@ export const updateDatasetChoice = data => ({
 
 export const updatePatternNav = data => ({
   type: ACTION_TYPES.UPDATE_PATTERNNAV,
+  payload: data,
+});
+
+export const updateGraphZoom = data => ({
+  type: ACTION_TYPES.UPDATE_GRAPHZOOM,
   payload: data,
 });
 

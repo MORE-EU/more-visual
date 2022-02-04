@@ -25,6 +25,7 @@ import {
   updateResampleFreq,
   updateSelectedMeasures,
   updateTo,
+  updateGraphZoom,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
@@ -41,7 +42,7 @@ export const Visualizer = (props: IVisualizerProps) => {
   const {
     dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
-    resampleFreq, patterns,
+    resampleFreq, patterns, graphZoom,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -95,19 +96,22 @@ export const Visualizer = (props: IVisualizerProps) => {
             display: 'flex',
             flexDirection: 'column',
 
-          }}>
-            <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures}
-                            updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
-                            resampleFreq={props.resampleFreq} patterns={props.patterns} changeChart={changeChart}
-                            folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}/>
-          </Paper>
-        </Box>
-        <Toolkit
-          open={open} setOpen={setOpen}
-          dataset={dataset} data={data} selectedMeasures={selectedMeasures}
-          resampleFreq={resampleFreq} patterns={patterns} updateSelectedMeasures={props.updateSelectedMeasures}
-          updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}
-        />
+            }}>
+              <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+                    updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
+                    resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart}
+                    folder={props.match.params.folder} updateChangeChart = {props.updateChangeChart}
+                    graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}/>
+            </Paper>
+          </Box >
+          <Toolkit
+          open={open}
+          setOpen={setOpen} dataset={dataset}
+           data={data} selectedMeasures={selectedMeasures}
+            resampleFreq={resampleFreq} patterns={patterns} 
+            updateSelectedMeasures={props.updateSelectedMeasures} 
+            updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}         
+               />
       </Box>
     </ThemeProvider>
   </div>;
@@ -130,6 +134,7 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   patternNav: visualizer.patternNav,
   folder: visualizer.folder,
   changePointDates: visualizer.changePointDates,
+  graphZoom: visualizer.graphZoom,
 });
 
 const mapDispatchToProps = {
@@ -138,6 +143,7 @@ const mapDispatchToProps = {
   updateResampleFreq, updateFilters, filterData,
   updatePatterns, getPatterns, updateChangeChart, updateDatasetChoice,
   getWdFiles, updatePatternNav, updateChangePointDates, getChangePointDates,
+  updateGraphZoom,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;
