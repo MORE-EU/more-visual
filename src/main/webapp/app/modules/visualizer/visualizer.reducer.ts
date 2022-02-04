@@ -194,7 +194,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
     case ACTION_TYPES.UPDATE_CHANGECHART:
       return {
         ...state,
-        changeChart: !state.changeChart,
+        changeChart: action.payload,
       };
     case ACTION_TYPES.UPDATE_DATASETCHOICE:
       return {
@@ -300,8 +300,9 @@ export const updatePatterns = patterns => ({
   payload: patterns,
 });
 
-export const updateChangeChart = () => ({
+export const updateChangeChart = (bool: boolean) => ({
   type: ACTION_TYPES.UPDATE_CHANGECHART,
+  payload: bool,
 });
 
 export const updateDatasetChoice = data => ({

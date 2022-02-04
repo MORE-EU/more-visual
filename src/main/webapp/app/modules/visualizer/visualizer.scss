@@ -59,3 +59,18 @@
     font-size: 0.85rem;
   }
 }
+
+@import 'https://code.highcharts.com/css/stocktools/gui.css';
+@import 'https://code.highcharts.com/css/annotations/popup.css';
+
+.highcharts-stocktools-wrapper.highcharts-bindings-wrapper.highcharts-bindings-container {
+  position: relative;
+}
+
+.highcharts-menu-wrapper {
+  position: inherit;
+}
+
+.chartContainer {
+  display: flex;
+}

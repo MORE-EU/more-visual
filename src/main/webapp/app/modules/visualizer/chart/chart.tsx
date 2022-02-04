@@ -1,11 +1,16 @@
+import "../visualizer.scss"
 import React, {useEffect} from 'react';
-// import Highcharts from 'highcharts'
 import Highcharts from 'highcharts/highstock'
-
 import HighchartsReact from 'highcharts-react-official';
 import {IDataset} from "app/shared/model/dataset.model";
 import {updateQueryResults} from '../visualizer.reducer';
 import {IPatterns} from "app/shared/model/patterns.model";
+import { Grid } from '@mui/material';
+import indicatorsAll from "highcharts/indicators/indicators-all";
+import annotationsAdvanced from "highcharts/modules/annotations-advanced";
+import priceIndicator from "highcharts/modules/price-indicator";
+import fullScreen from "highcharts/modules/full-screen";
+import stockTools from "highcharts/modules/stock-tools";
 
 Highcharts.setOptions({
   time: {
@@ -26,6 +31,11 @@ export interface IChartProps {
   folder: string,
 }
 
+stockTools(Highcharts);
+indicatorsAll(Highcharts);
+annotationsAdvanced(Highcharts);
+priceIndicator(Highcharts);
+fullScreen(Highcharts);
 
 export const Chart = (props: IChartProps) => {
   const {dataset, data, selectedMeasures, from, to, patterns, changeChart, folder} = props;
@@ -46,7 +56,10 @@ export const Chart = (props: IChartProps) => {
     props.updateQueryResults(folder,dataset.id);
   }, [dataset]);
 
-  // ZOOM FUNCTION FOR CHART
+ 
+
+  // CHART: ZOOM FUNCTION 
+  // TODO: DISABLE PAGE SCROLL WHEN HOVERING OVER CHART
   (function(H) {
     const step = 2000 * 200;
     H.addEvent(H.Chart, 'load', (e) => {
@@ -64,10 +77,13 @@ export const Chart = (props: IChartProps) => {
     });
   }(Highcharts));
 
-  return <div id='chart-container'>
+  return <>
+   <Grid sx={{border: "1px solid rgba(0, 0, 0, .1)"}}>
+    {/* <div id="chart-container"> */}
     {data && <HighchartsReact
       highcharts={Highcharts}
       constructorType={'stockChart'}
+      containerProps = {{ className: 'chartContainer' }}
       allowChartUpdate={true}
       immutable={false}
       updateArgs={[true, true, true]}
@@ -94,10 +110,9 @@ export const Chart = (props: IChartProps) => {
         })),
         chart: {
           type: 'line',
-          height: '400px',
+          height: "700px",
           marginTop: 10,
-          paddingTop: 0,
-          plotBorderWidth: 1,
+          plotBorderWidth: 0,
           panKey: "alt",
           panning: {
             enabled: true,
@@ -108,11 +123,13 @@ export const Chart = (props: IChartProps) => {
         xAxis: {
           ordinal: false,
           type: 'datetime',
-          min: from.getTime(),
-          max: to.getTime(),
+          // min: from.getTime(),
+          // max: to.getTime(),
+          range: 3600 * 1000
         },
         yAxis: changeChart ? (selectedMeasures.map((measure,idx) => ({
           title: {
+            enabled: true,
             text: dataset.header[measure],
           },
           opposite: false,
@@ -122,6 +139,7 @@ export const Chart = (props: IChartProps) => {
 
         }))) : (selectedMeasures.map((measure,idx) => ({
           title: {
+            enabled: false,
             text: dataset.header[measure],
           },
           opposite: false,
@@ -130,6 +148,7 @@ export const Chart = (props: IChartProps) => {
           offset: undefined,
         }))),
         rangeSelector: {
+          enabled: false,
           buttons: [{
             type: 'second',
             count: 10,
@@ -167,9 +186,17 @@ export const Chart = (props: IChartProps) => {
         credits: {
           enabled: false
         },
+        stockTools: {
+          gui: {
+            className: "highcharts-bindings-wrapper",
+            toolbarClassName: "stocktools-toolbar"
+          }
+        }
       }}
     />}
-  </div>
+    {/* </div> */}
+  </Grid>
+  </>
 };
 
 

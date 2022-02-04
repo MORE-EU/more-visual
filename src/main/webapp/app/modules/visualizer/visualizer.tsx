@@ -5,7 +5,6 @@ import {createTheme, ThemeProvider} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import {Redirect, RouteComponentProps} from 'react-router-dom';
@@ -31,7 +30,7 @@ import {
   updateChangePointDates,
   getChangePointDates,
 } from "app/modules/visualizer/visualizer.reducer";
-import Chart from "app/modules/visualizer/chart/chart";
+import { ChartContainer } from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
 import Toolkit from "app/modules/visualizer/tools/toolkit";
 import {Divider, styled} from "@mui/material";
@@ -100,9 +99,9 @@ export const Visualizer = (props: IVisualizerProps) => {
               flexDirection: 'column',
 
             }}>
-              <Chart dataset={dataset} data={data} selectedMeasures={selectedMeasures}
-                     updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
-                    resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart} folder={props.match.params.folder}/>
+              <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+                    updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
+                    resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart} folder={props.match.params.folder} updateChangeChart = {props.updateChangeChart}/>
             </Paper>
           </Box >
           <Toolkit

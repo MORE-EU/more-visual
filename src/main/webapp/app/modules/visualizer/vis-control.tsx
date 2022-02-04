@@ -5,7 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import {Box, FormControl, Grid, InputLabel, MenuItem, Select, Switch, Slider, Stack, Typography, Button, ListItemIcon} from "@mui/material";
+import {Box, FormControl, Grid, InputLabel, MenuItem, Select, Slider, Stack, Typography} from "@mui/material";
 import {
   updateFilters,
   filterData,
@@ -138,22 +138,6 @@ export const VisControl = (props: IVisControlProps) => {
           </>
       }
      </Grid>
-    <Grid item xs={11}>
-      <List>
-        <ListItem
-            key="ok"
-            secondaryAction={
-              <Checkbox
-                edge="end"
-                onChange={props.updateChangeChart}
-              />
-            }
-            disablePadding
-          >
-          <ListItemText primary={`Change chart view`} />
-          </ListItem>
-      </List>
-    </Grid>
     <Grid item xs={12}>
       <Typography variant="h6" gutterBottom>
         Measures
