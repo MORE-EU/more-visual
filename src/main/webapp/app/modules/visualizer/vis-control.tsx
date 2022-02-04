@@ -35,7 +35,7 @@ export interface IVisControlProps {
   wdFiles: any[],
   folder: string,
   datasetChoice: number,
-  updateDatasetChoice:  typeof updateDatasetChoice
+  updateDatasetChoice:  typeof updateDatasetChoice,
   updateFrom: typeof updateFrom,
   updateTo: typeof updateTo,
   updateSelectedMeasures: typeof updateSelectedMeasures,

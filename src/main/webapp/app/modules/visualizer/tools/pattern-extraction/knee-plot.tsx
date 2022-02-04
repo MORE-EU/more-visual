@@ -7,6 +7,7 @@ import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
 import ModalStyles from "app/shared/layout/ModalStyle";
 import {updateSelectedMeasures} from "app/modules/visualizer/visualizer.reducer";
+import DimensionSelector from "app/shared/layout/DimensionSelector";
 
 export interface IKneePlotProps {
   dataset: IDataset,
@@ -128,26 +129,7 @@ export const KneePlot = (props: IKneePlotProps) => {
             </FormControl>
           </Grid>
           <Grid item xs={4}>
-            <FormControl className={classes.formControlMulti}>
-              <InputLabel id="mutiple-select-label">Choose Columns to be Included</InputLabel>
-              <Select
-                labelId="mutiple-select-label"
-                multiple
-                value={selectedDimensions}
-                label="Choose Columns to be Included"
-                onChange={changeColumns}
-                renderValue={(selected) => selected.length === 0 ? "Choose Columns to be Included" : (selected.map(s => header[s])).join(", ")}
-              >
-                {measures.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    <ListItemIcon>
-                      <Checkbox checked={selectedDimensions.includes(option)}/>
-                    </ListItemIcon>
-                    <ListItemText primary={header[option]}/>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <DimensionSelector dimensions={correctedDimensions} header={header} measures={measures}/>
           </Grid>
           <Grid item container xs={4} spacing={0}
                 direction="column"

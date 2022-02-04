@@ -1,6 +1,6 @@
 import React from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
-import {FormControl, Grid, InputLabel, MenuItem, Select, Typography} from "@mui/material";
+import {Box, Typography} from "@mui/material";
 import {IPatterns} from "app/shared/model/patterns.model";
 import {updateQueryResults, updatePatternLength,
   updatePatterns, updateSelectedMeasures, updateSelectedPattern,
@@ -38,32 +38,33 @@ export const PatternExtraction = (props: IPatternExtractionProps) => {
     changeChart, folder} = props;
 
   return (
-  <Grid container spacing={3}>
-    <Grid item container xs={12}>
-      <Grid item xs = {4}>
-      <Typography variant="h6" gutterBottom>
-        Discovered Patterns
-      </Typography>
-      </Grid>
-    </Grid>
+  <Box sx = {{pl: 2}}>
+    <Box >
+      <Box >
+        <Typography variant="h6" gutterBottom>
+          Pattern Extraction
+        </Typography>
+
+      </Box>
+    </Box>
     {<VisPatterns dataset={dataset} data={data} selectedMeasures={selectedMeasures}
-                                     patternLength={patternLength}  resampleFreq={props.resampleFreq}
-                                     patterns={patterns} computedPatternLength = {computedPatternLength}
-                                     updateComputedPatternLength = {props.updateComputedPatternLength}
-                                     updateSelectedMeasures = {props.updateSelectedMeasures}
-                                     selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern}
-                                     updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} changeChart={changeChart}
+                  patternLength={patternLength}  resampleFreq={props.resampleFreq}
+                  patterns={patterns} computedPatternLength = {computedPatternLength}
+                  updateComputedPatternLength = {props.updateComputedPatternLength}
+                  updateSelectedMeasures = {props.updateSelectedMeasures}
+                  selectedPattern ={props.selectedPattern}  updateSelectedPattern={props.updateSelectedPattern}
+                  updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} changeChart={changeChart}
                   folder={folder}/>}
-    <Grid item xs={12}>
-      <Typography variant="h6" gutterBottom>
-        Find New Patterns
-      </Typography>
-      <FindPatterns data={data} selectedMeasures={selectedMeasures} updatePatterns={props.updatePatterns}
-                   />
-    </Grid>
+    {/*<Box>*/}
+    {/*  <Typography variant="h6" gutterBottom>*/}
+    {/*    Find New Patterns*/}
+    {/*  </Typography>*/}
+    {/*  <FindPatterns data={data} selectedMeasures={selectedMeasures} updatePatterns={props.updatePatterns}*/}
+    {/*               />*/}
+    {/*</Box>*/}
 
 
-  </Grid>);
+  </Box>);
 
 };
 

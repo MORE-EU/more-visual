@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
-import {Button, FormControl, InputLabel, MenuItem, Select, Typography, ListItemText} from '@mui/material';
-import { Grid } from '@mui/material';
+import {Button, FormControl, InputLabel, MenuItem, Select, Typography, ListItemText, Box} from '@mui/material';
 import { IPatterns } from 'app/shared/model/patterns.model';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
@@ -41,47 +40,56 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
 
   return (
 
-    <Grid item container xs={12} spacing={4}>
+    <Box sx={{display:'flex', flexDirection: 'column', pt: 2}}>
       {correctedKnee &&
-        <Grid item container xs={12} spacing={4}>
-          <Grid item xs={6}>
+        <Box>
+          <Box >
             Uneeded dimensions have been filtered
-          </Grid>
-          <Grid item xs={6}>
+          </Box>
+          <Box>
             <Button onClick={handleOpen(0)}>View Useful Dimensions</Button>
-          </Grid>
-        </Grid>}
+          </Box>
+        </Box>}
       {!correctedKnee &&
-        <Grid item container xs={12}>
-          <Grid item xs={8}>
-            <FontAwesomeIcon icon={faExclamationTriangle}></FontAwesomeIcon> These Patterns may contain uneeded dimensions
-          </Grid>
-          <Grid item xs={4}>
+        <Box>
+          <Box sx={{display:'flex', flexDirection: 'row'}}>
+            <Box>
+              <FontAwesomeIcon icon={faExclamationTriangle}/>
+            </Box>
+            <Box>
+              <Typography variant='body1' >These Patterns may contain uneeded dimensions</Typography>
+            </Box>
+          </Box>
+          <Box sx={{float:'right'}} >
             <Button onClick={handleOpen(0)}>Filter them</Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       }
       {correctedAv &&
-        <Grid item container xs={12} spacing={4}>
-          <Grid item xs={6}>
+        <Box >
+          <Box >
             An Annotation Vector of type {correctedAv} has been applied
-          </Grid>
-          <Grid item xs={6}>
+          </Box>
+          <Box>
             <Button onClick={handleOpen(1)}>View Annotation Vector</Button>
-          </Grid>
-        </Grid>}
-
+          </Box>
+        </Box>}
       {!correctedAv &&
-        <Grid item container xs={12}>
-          <Grid item xs={8}>
-            <FontAwesomeIcon icon={faExclamationTriangle}></FontAwesomeIcon> Improve these patterns through the use of an Annotation Vector
-          </Grid>
-          <Grid item xs={4}>
+        <Box>
+          <Box sx={{display:'flex', flexDirection: 'row'}}>
+            <Box >
+              <FontAwesomeIcon icon={faExclamationTriangle}/>
+            </Box>
+            <Box>
+              <Typography variant='body1' >Improve these patterns through the use of an Annotation Vector</Typography>
+            </Box>
+          </Box>
+          <Box sx={{float:'right'}}>
             <Button onClick={handleOpen(1)}>Annotate Patterns</Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       }
-      <Grid item xs={12}>
+      <Box>
         <Modal
           aria-labelledby="transition-modal-title"
           aria-describedby="transition-modal-description"
@@ -105,8 +113,8 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
             </div>
           </Fade>
         </Modal>
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   );};
 
 

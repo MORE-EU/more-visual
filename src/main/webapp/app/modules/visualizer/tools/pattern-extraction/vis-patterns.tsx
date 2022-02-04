@@ -8,16 +8,12 @@ import {
   updatePatterns, getPatterns,
   updateSelectedMeasures,
 } from '../../visualizer.reducer';
-import { Button, Typography } from '@mui/material';
-import { Grid } from '@mui/material';
-import { IPatternGroup } from 'app/shared/model/pattern-group.model';
-import { FormControl } from '@mui/material';
-import { InputLabel } from '@mui/material';
-import { Select } from '@mui/material';
-import { MenuItem } from '@mui/material';
-import Chart from '../../chart/chart';
+import {Box, Button, TextField, Typography} from '@mui/material';
+
 import VisCorrection from "app/modules/visualizer/tools/pattern-extraction/vis-correction";
 import {IPatterns} from "app/shared/model/patterns.model";
+import DimensionSelector from "app/shared/layout/DimensionSelector";
+import PatternResults from "app/modules/visualizer/tools/pattern-extraction/pattern-results";
 
 Highcharts.setOptions({
   time: {
@@ -47,9 +43,13 @@ export interface IVisPatternsProps {
 
 export const VisPatterns = (props: IVisPatternsProps) => {
   const {dataset, data, selectedMeasures,
-    computedPatternLength, patterns, resampleFreq,
+    patterns, resampleFreq,
     selectedPattern, changeChart, folder} = props;
 
+  const [dimensions, setDimensions] = React.useState(selectedMeasures);
+  const [patternLength, setPatternLength] = React.useState(10);
+  const [minNeighbors, setMinNeighbors] = React.useState(1);
+  const [maxNeighbors, setMaxNeighbors] = React.useState(4);
 
   const changeComputedPatternLength = (e) => {
     const val = parseInt(e.target.value, 10);
@@ -65,72 +65,75 @@ export const VisPatterns = (props: IVisPatternsProps) => {
     props.updatePatterns(null);
   }
 
-  const changeSelectedPattern = (e) => {
-    // TODO: Change to real data
-    const val = parseInt(e.target.value, 10);
-    props.updateSelectedPattern(isNaN(val) ? 0 : val);
 
+  function handleFindPatterns(e: React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>) {
+    // TODO: Change to real data
+    props.getPatterns(data, patternLength, resampleFreq);
+    props.updateSelectedPattern(1);
   }
+
   return (
-    <Grid item container xs={12} spacing = {4}>
-      <Grid item xs = {6}>
-        <FormControl  fullWidth>
-          <InputLabel id="computed-pattern-length-label">Pattern Length</InputLabel>
-          <Select
-            labelId="computed-pattern-length-select-label;"
-            id="computed-pattern-length-select"
-            value={computedPatternLength}
-            label="Pattern Length"
-            onChange={changeComputedPatternLength}
-          >
-            <MenuItem value={30}>30</MenuItem>
-            <MenuItem value={60}>60</MenuItem>
-            <MenuItem value={90}>90</MenuItem>
-            <MenuItem value={180}>180</MenuItem>
-            <MenuItem value={240}>240</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
-      {patterns !== null &&
-        <Grid item xs={3}>
-        <FormControl fullWidth>
-          <InputLabel id="patterns-label">View Pattern</InputLabel>
-          <Select
-            labelId="pattern-select-label"
-            id="pattern-select"
-            value={selectedPattern}
-            label="View Pattern"
-            onChange={changeSelectedPattern}
-          >
-            {patterns.patternGroups.map((mGroup, i)=> {
-              return <MenuItem
-                key={i}
-                value={i + 1} >{i + 1}</MenuItem>
-            })}
-          </Select>
-        </FormControl>
-      </Grid>}
-      {(patterns && selectedPattern  && computedPatternLength)
-        &&
-      <Grid item xs = {3}>
-        <Button onClick={e => clearPatterns(e)} variant="contained">Clear Patterns</Button>
-      </Grid>
+    <Box sx={{display:'flex', flexDirection:'column'}}>
+      <Box >
+        <Box>Dimensions</Box>
+        <DimensionSelector
+          disabled = {patterns !== null}
+          dimensions={dimensions}
+          setDimensions={setDimensions}
+          measures={dataset.measures}
+          header= {dataset.header}/>
+      </Box>
+      <Box sx ={{pb: 2}}>
+        <Box>Pattern Length</Box>
+        <TextField
+                   disabled = {patterns !== null}
+                   value = {patternLength}
+                   onChange = {(e) => setPatternLength(parseInt(e.target.value, 10))}
+                   sx={{width:"100%"}}
+                   type="number"
+                   inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+        />
+      </Box>
+      <Box sx ={{pb: 2, display:'flex', flexDirection:'column'}}>
+        <Box>Number of Neighbors</Box>
+        <Box sx = {{display:'flex', flexDirection:'row'}}>
+          <TextField
+                    disabled = {patterns !== null}
+                    value = {minNeighbors}
+                    label = "Min."
+                    onChange = {(e) => setMinNeighbors(parseInt(e.target.value, 10))}
+                    sx={{flexBasis:"50%", pr:1}}
+                     type="number"
+                     inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' , max: maxNeighbors}}
+          />
+          <TextField sx={{flexBasis:"50%", pl:1}}
+                     disabled = {patterns !== null}
+                     value = {maxNeighbors}
+                     label = "Max."
+                     onChange = {(e) => setMaxNeighbors(parseInt(e.target.value, 10))}
+                     type="number"
+                     inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' , min: minNeighbors}}
+          />
+        </Box>
+      </Box>
+      <Box sx ={{display:'flex', flexDirection:'row'}}>
+        <Button
+            disabled= {patterns !== null}
+            sx={{flexBasis:"50%", mr:1}}
+            onClick={e => handleFindPatterns(e)}
+            variant="contained">Find</Button>
+        <Button  sx={{flexBasis:"50%", ml:1}} onClick={e => clearPatterns(e)} variant="contained">Clear</Button>
+      </Box>
+      { patterns &&
+        <PatternResults
+          dataset = {dataset}
+          patterns = {patterns}
+          dimensions = {dimensions}
+          updateSelectedMeasures = {props.updateSelectedMeasures}
+        />
       }
-      {(patterns && selectedPattern && computedPatternLength)
-        &&
-        <Grid item xs={12}>
-            <Chart dataset={dataset} data={data}
-                   from={patterns.patternGroups[selectedPattern - 1].patterns[0].start}
-                   to={patterns.patternGroups[selectedPattern - 1].patterns[0].end} patterns={null}
-                   resampleFreq={resampleFreq} selectedMeasures={selectedMeasures}
-                   updateQueryResults={updateQueryResults} changeChart={changeChart}
-                   folder = {folder}/>
-            {selectedMeasures.length > 1 &&
-            <VisCorrection patterns={patterns} dataset={dataset}
-                           updateSelectedMeasures={props.updateSelectedMeasures} />}
-        </Grid>
-      }
-    </Grid>
+
+    </Box>
   )};
 
 

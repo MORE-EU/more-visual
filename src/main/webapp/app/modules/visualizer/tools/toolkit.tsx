@@ -20,7 +20,11 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch'; // changepoint
 import TimelineIcon from '@mui/icons-material/Timeline'; // segmentation
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ActiveTool from "app/modules/visualizer/tools/active-tool";
-import {Dispatch, SetStateAction} from "react"; // filter
+import {Dispatch, SetStateAction} from "react";
+import {IDataset} from "app/shared/model/dataset.model";
+import {IQueryResults} from "app/shared/model/query-results.model"; // filter
+import {  updateSelectedMeasures, updateQueryResults, updatePatternLength, updateComputedPatternLength, updatePatterns, updateSelectedPattern, getPatterns } from '../visualizer.reducer';
+import {IPatterns} from "app/shared/model/patterns.model";
 
 const drawerWidth = 300;
 
@@ -77,14 +81,34 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 export interface IToolkitProps {
   open?: boolean,
   setOpen: Dispatch<SetStateAction<boolean>>,
+  dataset: IDataset,
+  data: any,
+  selectedMeasures: number[],
+  patternLength: number,
+  computedPatternLength: number,
+  resampleFreq: string,
+  patterns: IPatterns,
+  topPatterns: number,
+  selectedPattern: number,
+  updateQueryResults: typeof updateQueryResults,
+  updatePatternLength: typeof updatePatternLength,
+  updateComputedPatternLength: typeof updateComputedPatternLength,
+  updateSelectedMeasures: typeof updateSelectedMeasures,
+  updatePatterns: typeof updatePatterns,
+  updateSelectedPattern: typeof updateSelectedPattern,
+  getPatterns: typeof getPatterns,
+  changeChart: boolean,
+  folder: string,
 }
 
 const Toolkit = (props: IToolkitProps) => {
-  const {open} = props;
+  const {open, dataset, data, selectedMeasures, patternLength, patterns,
+    topPatterns, computedPatternLength, selectedPattern, resampleFreq, folder} = props;
   const [activeTool, setActiveTool] = React.useState(-1);
 
   const handleDrawer = () => {
     props.setOpen(!open);
+    setActiveTool(-1);
   };
 
   const handleToolClick = (key) => {
@@ -137,7 +161,13 @@ const Toolkit = (props: IToolkitProps) => {
         }
         <ActiveTool
           activeTool = {activeTool}
-          setActiveTool={setActiveTool}/>
+          setActiveTool={setActiveTool}
+          dataset={dataset} data={data} selectedMeasures={selectedMeasures} patternLength={patternLength}
+          computedPatternLength={computedPatternLength} resampleFreq={resampleFreq} patterns={patterns} topPatterns={topPatterns}
+          selectedPattern={selectedPattern} updateQueryResults={props.updateQueryResults} updatePatternLength={props.updatePatternLength}
+          updateComputedPatternLength={props.updateComputedPatternLength}  updateSelectedMeasures={props.updateSelectedMeasures}
+          updatePatterns={props.updatePatterns} updateSelectedPattern={props.updateSelectedPattern} getPatterns={props.getPatterns}
+          changeChart={props.changeChart} folder={folder}/>
       </Drawer>
     </Box>
   );

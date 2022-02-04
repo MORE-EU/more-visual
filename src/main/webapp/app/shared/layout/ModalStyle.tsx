@@ -18,8 +18,8 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(1),
   },
   formControlMulti: {
-    margin: theme.spacing(1),
-    width: 200
+    paddingBottom: '1em',
+    width: '100%'
   },
   indeterminateColor: {
     color: "#f50057"

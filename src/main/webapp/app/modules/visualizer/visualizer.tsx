@@ -46,7 +46,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
     patternLength, computedPatternLength,
-    patternNav, folder, from, to, changePointDates,
+    resampleFreq, folder, patterns, topPatterns, selectedPattern,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -105,8 +105,13 @@ export const Visualizer = (props: IVisualizerProps) => {
             </Paper>
           </Box >
           <Toolkit
-            open = {open}
-            setOpen = {setOpen}/>
+            open = {open} setOpen = {setOpen}
+            dataset={dataset} data={data} selectedMeasures={selectedMeasures} patternLength={patternLength}
+            computedPatternLength={computedPatternLength} resampleFreq={resampleFreq} patterns={patterns} topPatterns={topPatterns}
+            selectedPattern={selectedPattern} updateQueryResults={props.updateQueryResults} updatePatternLength={props.updatePatternLength}
+            updateComputedPatternLength={props.updateComputedPatternLength}  updateSelectedMeasures={props.updateSelectedMeasures}
+            updatePatterns={props.updatePatterns} updateSelectedPattern={props.updateSelectedPattern} getPatterns={props.getPatterns}
+            changeChart={props.changeChart} folder={folder}/>
       </Box>
     </ThemeProvider>
     </div>;
