@@ -11,6 +11,7 @@ import annotationsAdvanced from "highcharts/modules/annotations-advanced";
 import priceIndicator from "highcharts/modules/price-indicator";
 import fullScreen from "highcharts/modules/full-screen";
 import stockTools from "highcharts/modules/stock-tools";
+import {useScrollBlock} from "app/shared/util/useScrollBlock";
 
 Highcharts.setOptions({
   time: {
@@ -40,6 +41,8 @@ fullScreen(Highcharts);
 
 export const Chart = (props: IChartProps) => {
   const {dataset, data, selectedMeasures, from, to, patterns, changeChart, folder, graphZoom} = props;
+  const [blockScroll, allowScroll] = useScrollBlock();
+
   const setZones = () => {
     let zones = []
 
@@ -78,8 +81,11 @@ export const Chart = (props: IChartProps) => {
     });
   }(Highcharts));
 
-  return <>
-   <Grid sx={{border: "1px solid rgba(0, 0, 0, .1)"}}>
+  return (
+   <Grid
+     sx={{border: "1px solid rgba(0, 0, 0, .1)"}}
+      onMouseOver={() => blockScroll()}
+      onMouseLeave={() => allowScroll()}>
     {/* <div id="chart-container"> */}
     {data && <HighchartsReact
       highcharts={Highcharts}
@@ -198,7 +204,7 @@ export const Chart = (props: IChartProps) => {
     />}
     {/* </div> */}
   </Grid>
-  </>
+  );
 };
 
 

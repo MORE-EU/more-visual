@@ -73,7 +73,6 @@ export const Visualizer = (props: IVisualizerProps) => {
           backgroundColor: "white",
           display: 'flex',
           flexDirection: 'row',
-          height: '100vh',
           overflow: 'auto',
         }}
       >
