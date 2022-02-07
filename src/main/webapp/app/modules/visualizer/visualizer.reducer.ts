@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { FAILURE, REQUEST, SUCCESS } from 'app/shared/reducers/action-type.util';
 import { IDataset } from 'app/shared/model/dataset.model';
+import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
 import { IQuery } from 'app/shared/model/query.model';
 import _ from 'lodash';
 import { DateObject } from 'react-multi-date-picker';
@@ -47,7 +48,7 @@ const initialState = {
   wdFiles: [],
   patternNav: '0',
   folder: '',
-  changePointDates: [],
+  changePointDates: [] as IChangePointDate[],
   graphZoom: null,
 };
 
@@ -198,11 +199,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         graphZoom: action.payload,
       };
-    case ACTION_TYPES.GET_CHANGEPOINT_DATES:
-      return {
-        ...state,
-        changePointDates: initChangePointDates(action.payload.func, action.payload.col),
-      };
+    // case ACTION_TYPES.GET_CHANGEPOINT_DATES:
+    //   return {
+    //     ...state,
+    //     changePointDates: initChangePointDates(action.payload.func, action.payload.col),
+    //   };
     default:
       return state;
   }

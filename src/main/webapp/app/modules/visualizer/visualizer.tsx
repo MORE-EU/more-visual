@@ -42,7 +42,7 @@ export const Visualizer = (props: IVisualizerProps) => {
   const {
     dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
-    resampleFreq, patterns, graphZoom,
+    resampleFreq, patterns, graphZoom, changePointDates
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -101,7 +101,8 @@ export const Visualizer = (props: IVisualizerProps) => {
                     updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
                     resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart}
                     folder={props.match.params.folder} updateChangeChart = {props.updateChangeChart}
-                    graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}/>
+                    graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles} 
+                    changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates}/>
             </Paper>
           </Box >
           <Toolkit

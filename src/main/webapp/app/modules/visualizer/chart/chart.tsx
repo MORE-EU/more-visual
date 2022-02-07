@@ -3,7 +3,7 @@ import React, {useEffect} from 'react';
 import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official';
 import {IDataset} from "app/shared/model/dataset.model";
-import { updateQueryResults } from '../visualizer.reducer';
+import {updateQueryResults} from '../visualizer.reducer';
 import {IPatterns} from "app/shared/model/patterns.model";
 import { Grid } from '@mui/material';
 import indicatorsAll from "highcharts/indicators/indicators-all";
@@ -110,7 +110,6 @@ export const Chart = (props: IChartProps) => {
           zoneAxis: 'x',
         })),
         chart: {
-          animation: true,
           type: 'line',
           height: "700px",
           marginTop: 10,
@@ -122,19 +121,12 @@ export const Chart = (props: IChartProps) => {
           },
           zoomType: 'x',
         },
-        xAxis: graphZoom === null ? {
+        xAxis: {
           ordinal: false,
           type: 'datetime',
-          min: from.getTime(),
-          max: to.getTime(),
-          range: undefined,
-        } : {
-          ordinal: false,
-          type: 'datetime',
-          range: graphZoom,
-          min: undefined,
-          max: undefined,
-
+          // min: from.getTime(),
+          // max: to.getTime(),
+          range: graphZoom
         },
         yAxis: changeChart ? (selectedMeasures.map((measure,idx) => ({
           title: {

@@ -1,11 +1,13 @@
 import React, { useState, useEffect, SetStateAction, Dispatch } from 'react';
 import { Button, Grid, Typography, Tooltip, Modal, Box, Divider, MenuItem, Select, FormControl, InputLabel, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@material-ui/lab';
+import Highcharts from 'highcharts/highstock'
 
 export interface IChartCompareProps {
   showCompare: boolean;
   wdFiles: any[];
   setCompare: Dispatch<SetStateAction<boolean>>;
+  data: any;
 }
 
 const style = {
@@ -22,7 +24,7 @@ const style = {
 } as const;
 
 export const ChartCompare = (props: IChartCompareProps) => {
-  const { showCompare, wdFiles } = props;
+  const { showCompare, wdFiles, data } = props;
 
   const [selectVal, setSelectVal] = useState('');
   const [tabVal, setTabVal] = useState('1');
@@ -34,6 +36,16 @@ export const ChartCompare = (props: IChartCompareProps) => {
   const handleClose = () => {
     props.setCompare(false);
   };
+
+//   const handleCompareButton = () => {
+//     chart.addSeries({
+//   data: data.map(d => ([new Date(d[0]), parseFloat(d[0])])),
+//   type: undefined
+// })
+//   };
+
+//   const chart = Highcharts.chart('container', {
+//   });
 
   return (
     <>

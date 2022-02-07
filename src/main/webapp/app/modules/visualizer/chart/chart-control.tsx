@@ -1,11 +1,12 @@
 import { Button, Grid, Typography, Tooltip } from '@mui/material';
 import React, { useState } from 'react';
-import { updateChangeChart, updateGraphZoom } from '../visualizer.reducer';
+import { updateChangeChart, updateChangePointDates, updateGraphZoom } from '../visualizer.reducer';
 import TuneIcon from '@mui/icons-material/Tune';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { ChartDatePicker } from './chart-control-buttons/chart-datepicker';
 import { ChartCompare } from './chart-control-buttons/chart-compare';
+import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
 
 interface IChartControlProps {
     from: Date,
@@ -14,10 +15,13 @@ interface IChartControlProps {
     updateChangeChart: typeof updateChangeChart,
     updateGraphZoom: typeof updateGraphZoom,
     changeChart: boolean,
+    data: any,
+    changePointDates: IChangePointDate[],
+    updateChangePointDates: typeof updateChangePointDates,
 }
 
 export const ChartControl = (props: IChartControlProps) => {
-  const {changeChart, from, to, wdFiles} = props;
+  const {changeChart, from, to, wdFiles, data, changePointDates} = props;
 
   const handleZoom = (zoomNum) => {
     props.updateGraphZoom(zoomNum)
@@ -54,8 +58,9 @@ export const ChartControl = (props: IChartControlProps) => {
           props.updateChangeChart(true)
         }} sx={{mr: 1, color: !changeChart ? "#424242" : "#0277bd"}}>ExpandedView</Button>
       </Grid>
-      {showDatePick && <ChartDatePicker showDatePick={showDatePick} setShowDatePick={setShowDatePick} from={from} to={to}/>}
-      {showCompare && <ChartCompare showCompare={showCompare} setCompare={setCompare} wdFiles={wdFiles}/>}
+      {showDatePick && <ChartDatePicker showDatePick={showDatePick} setShowDatePick={setShowDatePick} from={from} to={to} changePointDates={changePointDates} 
+      updateChangePointDates={props.updateChangePointDates}/>}
+      {showCompare && <ChartCompare showCompare={showCompare} setCompare={setCompare} wdFiles={wdFiles} data={data}/>}
     </Grid>
   );
 };

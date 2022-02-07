@@ -3,22 +3,43 @@ import { Button, Grid, Typography, Tooltip, Modal, Box, Divider } from '@mui/mat
 import TimePicker from 'react-multi-date-picker/plugins/time_picker';
 import DatePicker, { Calendar, DateObject } from 'react-multi-date-picker';
 import DatePanel from 'react-multi-date-picker/plugins/date_panel';
-import { fromPairs } from 'lodash';
+import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
+import { updateChangePointDates } from '../../visualizer.reducer';
 
 export interface IChartDatePickerProps {
   from: Date;
   to: Date;
   showDatePick: boolean;
   setShowDatePick?: Dispatch<SetStateAction<any>>;
+  changePointDates: IChangePointDate[];
+  updateChangePointDates: typeof updateChangePointDates;
 }
 
 export const ChartDatePicker = (props: IChartDatePickerProps) => {
-  const { showDatePick, from, to } = props;
+  const { showDatePick, from, to, changePointDates } = props;
 
-  const [value, setValue] = useState([]);
+  const [value, setValue] = useState({ start: null, end: null });
+  const [dateValues, setDateValues] = useState([]);
 
   const handleClose = () => {
     props.setShowDatePick(false);
+  };
+
+  const handleCalendarChange = e => {
+    if(e[1]){
+    const date1 = new Date();
+    const date2 = new Date();
+    date1.setFullYear(e[0].year, e[0].month.number - 1, e[0].day);
+    date1.setHours(e[0].hour, e[0].minute, e[0].second, 0);
+    date2.setFullYear(e[1].year, e[1].month.number - 1, e[1].day);
+    date2.setHours(e[1].hour, e[1].minute, e[1].second, 0);
+    setValue({ start: date1, end: date2 });
+    }
+  };
+
+  const handleAddButton = () => {
+    setDateValues([...dateValues, value]);
+    props.updateChangePointDates([dateValues]);
   };
 
   const style = {
@@ -35,36 +56,47 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
 
   return (
     <div>
+      {console.log(changePointDates)}
       <Modal open={showDatePick} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
         <Box sx={style}>
-          <Grid container alignItems="center">
+          <Grid container flexDirection="row">
             <Grid item>
               <Typography id="modal-modal-title" variant="h6" component="h2">
                 Date Picker
               </Typography>
-              <DatePicker
+              <Calendar
                 range
                 format="MM/DD/YYYY HH:mm:ss"
-                minDate={from}
-                maxDate={to}
+                // minDate={from}
+                // maxDate={to}
                 value={from}
-                onChange={e => {setValue(e as DateObject[])}}
+                onChange={e => {
+                  handleCalendarChange(e as DateObject[]);
+                }}
                 plugins={[<TimePicker position="bottom" />, <DatePanel position="right" markFocused />]}
               />
-            </Grid>
-            <Divider orientation="vertical" />
-            <Grid item>
-            <Typography variant="h6" component="h2">
-                Use a Function
-              </Typography>
-              <Button 
-              size='small'
-              variant="contained"
+              <Button
+                size="small"
+                variant="contained"
                 onClick={() => {
+                  handleAddButton();
                 }}
               >
                 <Typography variant="overline" component="h2">
-                Changepoint detection
+                  Add
+                </Typography>
+              </Button>
+            </Grid>
+            <Divider orientation="vertical" flexItem>
+              OR
+            </Divider>
+            <Grid item>
+              <Typography variant="h6" component="h2">
+                Use a Function
+              </Typography>
+              <Button size="small" variant="contained" onClick={() => {}}>
+                <Typography variant="overline" component="h2">
+                  Changepoint detection
                 </Typography>
               </Button>
             </Grid>

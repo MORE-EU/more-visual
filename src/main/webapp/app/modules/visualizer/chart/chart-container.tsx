@@ -1,8 +1,9 @@
 import { Grid } from '@mui/material';
 import { IDataset } from 'app/shared/model/dataset.model';
 import { IPatterns } from 'app/shared/model/patterns.model';
+import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
 import React, { useEffect } from 'react';
-import { updateChangeChart, updateGraphZoom, updateQueryResults } from '../visualizer.reducer';
+import { updateChangeChart, updateChangePointDates, updateGraphZoom, updateQueryResults } from '../visualizer.reducer';
 import Chart from './chart';
 import {ChartControl} from './chart-control';
 
@@ -20,18 +21,22 @@ export interface IChartContainerProps {
   changeChart: boolean;
   folder: string;
   graphZoom: number;
+  changePointDates: IChangePointDate[]; 
+  updateChangePointDates: typeof updateChangePointDates;
+
   updateChangeChart: typeof updateChangeChart;
   updateGraphZoom: typeof updateGraphZoom;
 }
 
 export const ChartContainer = (props: IChartContainerProps) => {
-  const { dataset, data, selectedMeasures, from, to, wdFiles, changeChart, folder, graphZoom } = props;
+  const { dataset, data, selectedMeasures, from, to, wdFiles, changeChart, folder, graphZoom, changePointDates } = props;
 
   return (
     <Grid container flexDirection="column">
       <Grid item sx={{mb: 1}}>
       <ChartControl updateChangeChart={props.updateChangeChart} changeChart={changeChart} 
-        updateGraphZoom={props.updateGraphZoom} from={from} to={to} wdFiles={wdFiles}/>
+        updateGraphZoom={props.updateGraphZoom} from={from} to={to} wdFiles={wdFiles} data={data}
+        changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates}/>
       </Grid>
       <Grid item>
       <Chart
