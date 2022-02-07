@@ -6,6 +6,7 @@ import PatternExtraction from "app/modules/visualizer/tools/pattern-extraction/p
 import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
 import {getPatterns, updatePatterns, updateSelectedMeasures} from '../visualizer.reducer';
+import ChangepointDetection from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
 
 export interface IActiveToolProps {
   activeTool: number,
@@ -18,12 +19,13 @@ export interface IActiveToolProps {
   updateSelectedMeasures: typeof updateSelectedMeasures,
   updatePatterns: typeof updatePatterns,
   getPatterns: typeof getPatterns,
+  changePointDates: any,
 }
 
 const ActiveTool = (props: IActiveToolProps) => {
   const {
     activeTool, dataset, data, selectedMeasures, patterns,
-    resampleFreq
+    resampleFreq, changePointDates
   } = props;
 
   const goBack = () => {
@@ -43,6 +45,12 @@ const ActiveTool = (props: IActiveToolProps) => {
               updateSelectedMeasures={props.updateSelectedMeasures} updatePatterns={props.updatePatterns}
               getPatterns={props.getPatterns}
             />}
+          {activeTool === 2 &&
+            <ChangepointDetection
+              dataset={dataset}
+              changePointDates={changePointDates} data={data}
+              />
+          }
         </Box>
       }
     </Box>
