@@ -78,12 +78,13 @@ export interface IToolkitProps {
   updateSelectedMeasures: typeof updateSelectedMeasures,
   updatePatterns: typeof updatePatterns,
   getPatterns: typeof getPatterns,
+  changePointDates: any,
 }
 
 const Toolkit = (props: IToolkitProps) => {
   const {
     open, dataset, data, selectedMeasures, patterns,
-    resampleFreq
+    resampleFreq, changePointDates
   } = props;
   const [activeTool, setActiveTool] = React.useState(-1);
 
@@ -145,7 +146,7 @@ const Toolkit = (props: IToolkitProps) => {
           setActiveTool={setActiveTool}
           dataset={dataset} data={data} selectedMeasures={selectedMeasures}
           resampleFreq={resampleFreq} patterns={patterns} updateSelectedMeasures={props.updateSelectedMeasures}
-          updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}
+          updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} changePointDates={changePointDates}
         />
       </Drawer>
     </Box>

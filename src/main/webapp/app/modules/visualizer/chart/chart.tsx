@@ -57,9 +57,9 @@ export const Chart = (props: IChartProps) => {
     props.updateQueryResults(folder,dataset.id);
   }, [dataset]);
 
- 
 
-  // CHART: ZOOM FUNCTION 
+
+  // CHART: ZOOM FUNCTION
   // TODO: DISABLE PAGE SCROLL WHEN HOVERING OVER CHART
   (function(H) {
     const step = 2000 * 200;
@@ -108,6 +108,7 @@ export const Chart = (props: IChartProps) => {
           name: dataset.header[measure],
           yAxis: changeChart ? index : 0,
           zoneAxis: 'x',
+          zones: zones,
         })),
         chart: {
           animation: true,
@@ -166,7 +167,7 @@ export const Chart = (props: IChartProps) => {
             type: 'minute',
             count: 1,
             text: '1m'
-          }, 
+          },
              {
             type: 'minute',
             count: 30,

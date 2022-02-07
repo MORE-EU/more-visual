@@ -16,11 +16,12 @@ import {
 import ToolStyles from "app/shared/layout/ToolStyle";
 import Scores from "app/modules/visualizer/tools/changepoint-detection/scores";
 import {DateObject} from "react-multi-date-picker";
+import DimensionSelector from "app/shared/layout/DimensionSelector";
 
 
 export interface IChangepointModelProps {
   dataset: IDataset,
-  changePointDates: DateObject[],
+  changePointDates: any,
 }
 
 
@@ -47,38 +48,28 @@ export const ChangepointModel = (props: IChangepointModelProps) => {
   }
 
   return (
-    <Grid container>
-      <Grid item container xs={8}>
-        <Box className={classes.infoBox}>
-          <p style={{padding: "10px 0 0 10px"}}>
+    <Box>
+      <Box>
+        <Box >
+          <p>
             <b>Training Parameters</b>
           </p>
           <Box>
-            <FormControl className={classes.formControlMulti}>
-              <InputLabel id="features">Features</InputLabel>
-              <Select
-                labelId="select-features"
-                multiple
-                value={features}
-                label="Choose Columns to be Included"
-                onChange={e => setFeatures(e.target.value as number[])}
-                renderValue={(selected) => renderFeatures(selected)}>
-                {measures.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    <ListItemIcon>
-                      <Checkbox checked={features.includes(option)}/>
-                    </ListItemIcon>
-                    <ListItemText primary={header[option]}/>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl className={classes.formControlMulti}>
+            <DimensionSelector
+              dimensions={features}
+              setDimensions={setFeatures}
+              header={dataset.header} measures={dataset.measures}
+              disabled={isTrained}
+              label="Features"/>
+          </Box>
+          <Box sx={{pt: 2}}>
+            <FormControl fullWidth>
               <InputLabel id="train">Predictor</InputLabel>
               <Select
                 labelId="select-train"
                 value={trainColumn}
                 label="Choose Columns to be Included"
+                disabled={isTrained}
                 onChange={e => setTrainColumn(e.target.value as number)}
                 renderValue={(selected) => header[selected]}
               >
@@ -93,18 +84,26 @@ export const ChangepointModel = (props: IChangepointModelProps) => {
               </Select>
             </FormControl>
           </Box>
-
-          <Box style={{float: "right", padding: 5}}>
-            <Button
-              onClick={e => runModel(e)} variant="contained">Train</Button>
-          </Box>
-
         </Box>
-      </Grid>
+
+        <Box sx={{display: 'flex', alignItems: 'center',  justifyContent: 'center', flexDirection: 'row', pt:2}}>
+           <Button
+             disabled={(features.length === 0 || trainColumn === -1) || isTrained}
+             sx={{flexBasis: "50%", mr: 1}}
+             onClick={e => runModel(e)} variant="contained">Train</Button>
+          <Button
+            disabled={!isTrained}
+            sx={{flexBasis: "50%", ml: 1}}
+            onClick={e => setIsTrained(false)}
+            variant="contained">Clear</Button>
+        </Box>
+      </Box>
       {isTrained &&
-        <Scores scores={scores} changePointDates={changePointDates}/>
+      <Scores
+        scores={scores}
+        changePointDates={changePointDates}/>
       }
-    </Grid>
+    </Box>
   );
 }
 

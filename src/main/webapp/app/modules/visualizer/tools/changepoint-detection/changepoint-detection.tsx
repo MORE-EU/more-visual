@@ -13,16 +13,12 @@ import {DateObject} from "react-multi-date-picker";
 export interface IChangepointDetectionProps {
   dataset: IDataset,
   data: any,
-  from: Date,
-  to: Date,
-  changePointDates: DateObject[],
-  updateChangePointDates: typeof updateChangePointDates,
-  getChangePointDates: typeof getChangePointDates,
+  changePointDates: any,
 }
 
 
 export const ChangepointDetection = (props: IChangepointDetectionProps) => {
-  const {dataset, to, from, changePointDates} = props;
+  const {dataset,  changePointDates} = props;
   const [features, setFeatures] = React.useState([]);
   const [trainColumn, setTrainColumn] = React.useState(0);
   const [selectedDates, setSelectedDates] = useState([]);
@@ -81,54 +77,29 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
     return false;
   }
 
+  console.log(changePointDates);
   return (
-    <Box sx={{width: '100%'}}>
-      <Stepper activeStep={activeStep} sx={{padding: "20px 0 20px 0"}}>
-        <Step key={0}>
-          <StepLabel>Choose Dates</StepLabel>
-        </Step>
-        <Step key={1}>
-          <StepLabel>Train Model</StepLabel>
-        </Step>
-        <Step key={2}>
-          <StepLabel>Make Predictions</StepLabel>
-        </Step>
-      </Stepper>
-
-      {activeStep === steps.length && (
-        <React.Fragment>
-          <Typography sx={{mt: 2, mb: 1}}>
-            All steps completed - you&apos;re finished
-          </Typography>
-          <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
-            <Box sx={{flex: '1 1 auto'}}/>
-            <Button onClick={handleReset}>Reset</Button>
-          </Box>
-        </React.Fragment>
-      )}
-      <React.Fragment>
-        {activeStep === 0 && <ChangepointPicker dataset={dataset} from={from} to={to}
-                                                changePointDates={changePointDates}
-                                                updateChangePointDates={props.updateChangePointDates}
-                                                getChangePointDates={props.getChangePointDates}/>}
-        {activeStep === 1 && <ChangepointModel dataset={dataset} changePointDates={changePointDates}/>}
-        <Box sx={{display: 'block', flexDirection: 'row', pt: 2}}>
-          <Button
-            color="inherit"
-            disabled={activeStep === 0}
-            onClick={handleBack}
-            sx={{mr: 1, float: "left"}}
-          >
-            Back
-          </Button>
-          <Button
-            sx={{float: "right"}}
-            onClick={handleNext}
-            disabled={checkFinished()}>
-            {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-          </Button>
+    <Box sx={{pl:2}}>
+      <Box>
+        <Typography variant="h6" gutterBottom>
+          Changepoint Detection
+        </Typography>
+      </Box>
+      {(changePointDates.length === 0)
+        &&
+        <Box sx={{whiteSpace:"normal"}}>
+          <b>No Intervals selected</b><br></br>Select Intervals to get started.
         </Box>
-      </React.Fragment>
+      }
+      {/*{(changePointDates.length === 0)*/}
+      {/*  &&*/}
+      {/*  <Box sx={{whiteSpace:"normal"}}>*/}
+      {/*   <ChangepointModel dataset={dataset}*/}
+      {/*                     changePointDates={["2018-01-01"]}*/}
+      {/*   />*/}
+      {/*  </Box>*/}
+      {/*}*/}
+
     </Box>
   );
 }
