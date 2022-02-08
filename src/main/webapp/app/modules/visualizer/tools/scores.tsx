@@ -6,11 +6,10 @@ import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts/highstock";
-import {DateObject} from "react-multi-date-picker";
 
 export interface IScoresProps {
   scores: {},
-  changePointDates: DateObject[],
+  changePointDates: any,
 }
 
 
@@ -26,8 +25,7 @@ export const Scores = (props: IScoresProps) => {
       const func = functions[i];
       const score = [];
       for (let j = 0; j < changePointDates.length; j++) {
-
-        score.push({x: new Date(changePointDates[j].format()).getTime(), y: Math.random()});
+        score.push({name: changePointDates[j].start, y: Math.random()});
       }
       scores[func] = score;
     }
@@ -45,6 +43,11 @@ export const Scores = (props: IScoresProps) => {
   const options = {
     title: {
       text: 'Scores'
+    },
+    stockTools: {
+      gui: {
+        enabled: false // disable the built-in toolbar
+      }
     },
     series: [
       {

@@ -8,13 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.*;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,10 +54,10 @@ public class DataRepositoryImpl implements DatasetRepository {
             FileReader reader = new FileReader(metadataFile);
             allDatasets = Arrays.asList(mapper.readValue(reader, Dataset[].class));
         }
-        for(Dataset d : allDatasets){
-            if(d.getId().equals(id)){
-            dataset = d;
-            break;
+        for (Dataset d : allDatasets) {
+            if (d.getId().equals(id)) {
+                dataset = d;
+                break;
             }
         }
         return Optional.ofNullable(dataset);
@@ -78,14 +75,14 @@ public class DataRepositoryImpl implements DatasetRepository {
 
     @Override
     public List<String> findFiles(String folder) throws IOException {
-    File file = new File(applicationProperties.getWorkspacePath() + "/" + folder);
-    FileFilter fileFilter = f -> !f.isDirectory() && f.getName().endsWith(".csv");
-    File[] fileNames = file.listFiles(fileFilter);
-    List<String> fileList = new ArrayList<>();
-    for (File newFile : fileNames){
-        fileList.add(newFile.getName().toString());
-    }
-    return fileList;
+        File file = new File(applicationProperties.getWorkspacePath() + "/" + folder);
+        FileFilter fileFilter = f -> !f.isDirectory() && f.getName().endsWith(".csv");
+        File[] fileNames = file.listFiles(fileFilter);
+        List<String> fileList = new ArrayList<>();
+        for (File newFile : fileNames) {
+            fileList.add(newFile.getName().toString());
+        }
+        return fileList;
     }
 
     @Override

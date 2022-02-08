@@ -7,6 +7,7 @@ import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
 import {getPatterns, updatePatterns, updateSelectedMeasures} from '../visualizer.reducer';
 import ChangepointDetection from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
+import DeviationDetection from "app/modules/visualizer/tools/deviation-detection/deviation-detection";
 
 export interface IActiveToolProps {
   activeTool: number,
@@ -45,11 +46,17 @@ const ActiveTool = (props: IActiveToolProps) => {
               updateSelectedMeasures={props.updateSelectedMeasures} updatePatterns={props.updatePatterns}
               getPatterns={props.getPatterns}
             />}
+          {activeTool === 1 &&
+            <DeviationDetection
+              dataset={dataset}
+              changePointDates={changePointDates} data={data}
+            />
+          }
           {activeTool === 2 &&
             <ChangepointDetection
               dataset={dataset}
               changePointDates={changePointDates} data={data}
-              />
+            />
           }
         </Box>
       }

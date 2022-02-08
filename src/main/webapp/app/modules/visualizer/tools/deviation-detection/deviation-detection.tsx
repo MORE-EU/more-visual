@@ -1,23 +1,22 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import {Box, Typography,} from "@mui/material";
-import ChangepointModel from "app/modules/visualizer/tools/changepoint-detection/changepoint-model";
+import DeviationModel from "app/modules/visualizer/tools/deviation-detection/deviation-model";
 
-export interface IChangepointDetectionProps {
+export interface IDeviationDetectionProps {
   dataset: IDataset,
   data: any,
   changePointDates: any,
 }
 
 
-export const ChangepointDetection = (props: IChangepointDetectionProps) => {
+export const DeviationDetection = (props: IDeviationDetectionProps) => {
   const {dataset, changePointDates} = props;
-
   return (
     <Box sx={{pl: 2}}>
       <Box>
         <Typography variant="h6" gutterBottom>
-          Changepoint Detection
+          Deviation Detection
         </Typography>
       </Box>
       {(changePointDates.length === 0)
@@ -29,9 +28,9 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
       {(changePointDates.length === 0)
         &&
         <Box sx={{whiteSpace: "normal"}}>
-          <ChangepointModel dataset={dataset}
-                            changePointDates={[{"start": "2018-01-01 00:00:00", "end": "2018-01-01 10:00:00"},
-                              {"start": "2018-02-01 00:00:00", "end": "2018-02-01 10:00:00"}]}
+          <DeviationModel dataset={dataset}
+                          changePointDates={[{"start": "2018-01-01 00:00:00", "end": "2018-01-01 10:00:00"},
+                            {"start": "2018-02-01 00:00:00", "end": "2018-02-01 10:00:00"}]}
           />
         </Box>
       }
@@ -40,5 +39,5 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   );
 }
 
-export default ChangepointDetection;
+export default DeviationDetection;
 

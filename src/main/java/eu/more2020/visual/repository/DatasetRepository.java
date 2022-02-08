@@ -2,7 +2,6 @@ package eu.more2020.visual.repository;
 
 import eu.more2020.visual.domain.Dataset;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;

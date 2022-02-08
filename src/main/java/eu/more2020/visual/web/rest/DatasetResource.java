@@ -108,7 +108,7 @@ public class DatasetResource {
     public ResponseEntity<Dataset> getDataset(@PathVariable String folder, @PathVariable String id) throws IOException {
         log.debug("REST request to get Dataset : {}", id);
         log.debug("REST request to get Dataset : {}", folder);
-        Optional<Dataset> dataset = datasetRepository.findById(id,folder);
+        Optional<Dataset> dataset = datasetRepository.findById(id, folder);
         dataset.ifPresent(d -> {
             CsvParserSettings parserSettings = new CsvParserSettings();
             parserSettings.getFormat().setDelimiter(',');
@@ -125,7 +125,7 @@ public class DatasetResource {
         log.debug(dataset.toString());
         return ResponseUtil.wrapOrNotFound(dataset);
     }
-    
+
     @GetMapping("/datasets/{folder}")
     public List<String> getFolder(@PathVariable String folder) throws IOException {
         log.debug("REST request to get Available Files");
@@ -149,9 +149,9 @@ public class DatasetResource {
      * POST executeQuery
      */
     @PostMapping("/datasets/{folder}/{id}/query")
-    public ResponseEntity<QueryResults> executeQuery(@PathVariable String folder,@PathVariable String id, @Valid @RequestBody Query query) throws IOException {
+    public ResponseEntity<QueryResults> executeQuery(@PathVariable String folder, @PathVariable String id, @Valid @RequestBody Query query) throws IOException {
         log.debug("REST request to execute Query: {}", query);
-        Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id,folder).map(dataset -> csvDataService.executeQuery(folder, dataset, query));
+        Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id, folder).map(dataset -> csvDataService.executeQuery(folder, dataset, query));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 

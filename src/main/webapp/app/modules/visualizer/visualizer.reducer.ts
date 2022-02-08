@@ -38,7 +38,7 @@ const initialState = {
   data: null,
   queryResultsLoading: true,
   selectedMeasures: [],
-  resampleFreq: 'second',
+  resampleFreq: 'minute',
   from: null as Date,
   to: null as Date,
   filters: {},

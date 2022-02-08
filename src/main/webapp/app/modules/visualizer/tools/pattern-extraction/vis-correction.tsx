@@ -30,7 +30,7 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
 
 
   const getAVName = () => {
-    if(correctedAv)
+    if (correctedAv)
       switch (patterns.corrected.annotationVector.func) {
         case 0:
           return "Complexity";
@@ -74,7 +74,7 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
             <Box sx={{pr: 1}}>
               <FontAwesomeIcon icon={faExclamationTriangle}/>
             </Box>
-            <Box  sx={{whiteSpace:"normal"}}>
+            <Box sx={{whiteSpace: "normal"}}>
               <Typography variant='body1'>These Patterns may contain uneeded dimensions</Typography>
             </Box>
           </Box>
@@ -85,7 +85,7 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
       }
       {correctedAv &&
         <Box>
-          <Box sx={{whiteSpace:"normal"}}>
+          <Box sx={{whiteSpace: "normal"}}>
             A {avName} Annotation Vector has been applied
           </Box>
           <Box>
@@ -99,7 +99,8 @@ export const VisCorrection = (props: IVisCorrectionProps) => {
               <FontAwesomeIcon icon={faExclamationTriangle}/>
             </Box>
             <Box>
-              <Typography  sx={{whiteSpace:"normal"}} variant='body1'>Improve these patterns through the use of an Annotation Vector</Typography>
+              <Typography sx={{whiteSpace: "normal"}} variant='body1'>Improve these patterns through the use of an
+                Annotation Vector</Typography>
             </Box>
           </Box>
           <Box sx={{float: 'right'}}>

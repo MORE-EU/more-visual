@@ -77,7 +77,7 @@ export const AnnotationVector = (props: IAnnotationVectorProps) => {
       {/* </Grid> */}
       <Grid item spacing={2} container xs={12}>
         <Grid item xs={6}>
-          <FormControl fullWidth >
+          <FormControl fullWidth>
             <InputLabel id="av-func-label">Choose an Annotation Vector Function</InputLabel>
             <Select
               labelId="av-func-select-label"

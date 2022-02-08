@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import {Box, Button, FormControl, InputLabel, ListItemIcon, ListItemText, MenuItem, Radio, Select} from "@mui/material";
+import ToolStyles from "app/shared/layout/ToolStyle";
 import Scores from "app/modules/visualizer/tools/scores";
 import DimensionSelector from "app/shared/layout/DimensionSelector";
 
@@ -11,7 +12,7 @@ export interface IChangepointModelProps {
 }
 
 
-export const ChangepointModel = (props: IChangepointModelProps) => {
+export const DeviationModel = (props: IChangepointModelProps) => {
   const {dataset, changePointDates} = props;
   const [features, setFeatures] = React.useState([]);
   const [trainColumn, setTrainColumn] = React.useState(-1);
@@ -20,6 +21,7 @@ export const ChangepointModel = (props: IChangepointModelProps) => {
 
   const measures = dataset.measures;
   const header = dataset.header;
+  const classes = ToolStyles();
 
   const runModel = (e) => {
     setIsTrained(true);
@@ -92,4 +94,4 @@ export const ChangepointModel = (props: IChangepointModelProps) => {
   );
 }
 
-export default ChangepointModel;
+export default DeviationModel;

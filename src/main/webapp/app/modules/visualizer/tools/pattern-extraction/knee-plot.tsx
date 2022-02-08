@@ -47,8 +47,8 @@ export const KneePlot = (props: IKneePlotProps) => {
 
   const createData = () => {
     const data = [];
-    for (let i = 0; i < patterns.knee.length; i ++){
-      data.push([(i+1), patterns.knee[i]]);
+    for (let i = 0; i < patterns.knee.length; i++) {
+      data.push([(i + 1), patterns.knee[i]]);
     }
     return data;
   }
@@ -130,7 +130,7 @@ export const KneePlot = (props: IKneePlotProps) => {
           </Grid>
           <Grid item xs={4}>
             <DimensionSelector
-              label = "Choose Dimensions"
+              label="Choose Dimensions"
               dimensions={selectedDimensions}
               header={header}
               measures={measures}

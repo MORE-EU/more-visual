@@ -1,7 +1,6 @@
 package eu.more2020.visual.aop.logging;
 
 import io.github.jhipster.config.JHipsterConstants;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -17,7 +16,7 @@ import java.util.Arrays;
 
 /**
  * Aspect for logging execution of service and repository Spring components.
- *
+ * <p>
  * By default, it only runs with the "dev" profile.
  */
 @Aspect
@@ -42,8 +41,8 @@ public class LoggingAspect {
     /**
      * Pointcut that matches all Spring beans in the application's main packages.
      */
-    @Pointcut("within(eu.more2020.visual.tool.repository..*)"+
-        " || within(eu.more2020.visual.tool.service..*)"+
+    @Pointcut("within(eu.more2020.visual.tool.repository..*)" +
+        " || within(eu.more2020.visual.tool.service..*)" +
         " || within(eu.more2020.visual.tool.web.rest..*)")
     public void applicationPackagePointcut() {
         // Method is empty as this is just a Pointcut, the implementations are in the advices.
@@ -63,7 +62,7 @@ public class LoggingAspect {
      * Advice that logs methods throwing exceptions.
      *
      * @param joinPoint join point for advice.
-     * @param e exception.
+     * @param e         exception.
      */
     @AfterThrowing(pointcut = "applicationPackagePointcut() && springBeanPointcut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {

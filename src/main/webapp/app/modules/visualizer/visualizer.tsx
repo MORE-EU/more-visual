@@ -19,18 +19,18 @@ import {
   updateDatasetChoice,
   updateFilters,
   updateFrom,
+  updateGraphZoom,
   updatePatternNav,
   updatePatterns,
   updateQueryResults,
   updateResampleFreq,
   updateSelectedMeasures,
   updateTo,
-  updateGraphZoom,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
 import Toolkit from "app/modules/visualizer/tools/toolkit";
-import {Divider} from "@mui/material";
+import {Divider, Grid, Typography} from "@mui/material";
 
 const mdTheme = createTheme();
 
@@ -90,30 +90,30 @@ export const Visualizer = (props: IVisualizerProps) => {
           </Paper>
         </Box>
         <Box
-          sx={{flexBasis: "80%", pl: 2, flexGrow: 1}}>
+          sx={{maxWidth: open ? "70%" : "80%", pl: 2, flexGrow: 1}}>
           <Paper sx={{
             p: 2,
             display: 'flex',
             flexDirection: 'column',
 
-            }}>
-              <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures}
-                    updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
-                    resampleFreq={props.resampleFreq} patterns = {props.patterns} changeChart = {changeChart}
-                    folder={props.match.params.folder} updateChangeChart = {props.updateChangeChart}
-                    graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles} 
-                    changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates}/>
-            </Paper>
-          </Box >
-          <Toolkit
-            open={open}
-            setOpen={setOpen} dataset={dataset}
-            data={data} selectedMeasures={selectedMeasures}
-            resampleFreq={resampleFreq} patterns={patterns}
-            updateSelectedMeasures={props.updateSelectedMeasures}
-            updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}
-            changePointDates={changePointDates}
-               />
+          }}>
+            <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+                            updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
+                            resampleFreq={props.resampleFreq} patterns={props.patterns} changeChart={changeChart}
+                            folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}
+                            graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}
+                            changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates}/>
+          </Paper>
+        </Box>
+        <Toolkit
+          open={open}
+          setOpen={setOpen} dataset={dataset}
+          data={data} selectedMeasures={selectedMeasures}
+          resampleFreq={resampleFreq} patterns={patterns}
+          updateSelectedMeasures={props.updateSelectedMeasures}
+          updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}
+          changePointDates={changePointDates}
+        />
       </Box>
     </ThemeProvider>
   </div>;

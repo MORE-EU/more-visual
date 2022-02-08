@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import {useRef} from "react"
 
 const useScrollBlock = () => {
   const scroll = useRef(false)
@@ -7,7 +7,7 @@ const useScrollBlock = () => {
     if (typeof document === "undefined") return
 
     const html = document.documentElement
-    const { body } = document
+    const {body} = document
 
     if (!body || !body.style || scroll.current) return
 
@@ -38,7 +38,7 @@ const useScrollBlock = () => {
     if (typeof document === "undefined") return
 
     const html = document.documentElement
-    const { body } = document
+    const {body} = document
 
     if (!body || !body.style || !scroll.current) return
 
@@ -54,4 +54,4 @@ const useScrollBlock = () => {
   return [blockScroll, allowScroll]
 }
 
-export { useScrollBlock }
+export {useScrollBlock}
