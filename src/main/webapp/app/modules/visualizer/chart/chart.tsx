@@ -60,9 +60,7 @@ export const Chart = (props: IChartProps) => {
     props.updateQueryResults(folder, dataset.id);
   }, [dataset]);
 
-
   // CHART: ZOOM FUNCTION
-  // TODO: DISABLE PAGE SCROLL WHEN HOVERING OVER CHART
   (function (H) {
     const step = 2000 * 200;
     H.addEvent(H.Chart, 'load', (e) => {

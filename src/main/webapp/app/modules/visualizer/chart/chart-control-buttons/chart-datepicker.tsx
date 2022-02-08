@@ -1,10 +1,11 @@
-import React, {Dispatch, SetStateAction, useState} from 'react';
-import {Box, Button, Divider, Grid, Modal, Typography} from '@mui/material';
+import React, { useState, useEffect, SetStateAction, Dispatch } from 'react';
+import { Button, Grid, Typography, Tooltip, Modal, Box, Divider, List, ListItem, ListItemText, IconButton } from '@mui/material';
 import TimePicker from 'react-multi-date-picker/plugins/time_picker';
 import {Calendar, DateObject} from 'react-multi-date-picker';
 import DatePanel from 'react-multi-date-picker/plugins/date_panel';
-import {IChangePointDate} from 'app/shared/model/changepoint-date.model';
-import {updateChangePointDates} from '../../visualizer.reducer';
+import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
+import { updateChangePointDates } from '../../visualizer.reducer';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface IChartDatePickerProps {
   from: Date;
@@ -42,6 +43,10 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
     props.updateChangePointDates([dateValues]);
   };
 
+  const handleDeleteButton = (idx) => {
+    setDateValues(dateValues => dateValues.filter((date, i ) => i !== idx));
+  }
+
   const style = {
     position: 'absolute',
     top: '50%',
@@ -60,8 +65,8 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
       <Modal open={showDatePick} onClose={handleClose} aria-labelledby="modal-modal-title"
              aria-describedby="modal-modal-description">
         <Box sx={style}>
-          <Grid container flexDirection="row">
-            <Grid item>
+          <Grid container alignItems="center" flexDirection="column">
+            <Grid item sx={{textAlign: "center"}}>
               <Typography id="modal-modal-title" variant="h6" component="h2">
                 Date Picker
               </Typography>
@@ -87,11 +92,35 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
                   Add
                 </Typography>
               </Button>
+              <List dense>
+                {dateValues.map((val,idx) => {
+                  return (
+                    <>
+                    <Divider variant="inset" component="li" />
+                    <ListItem 
+                    key={idx}
+                    disableGutters
+                    secondaryAction={
+                      <IconButton>
+                        <DeleteIcon onClick={() => {handleDeleteButton(idx)}}/>
+                      </IconButton>
+                    }
+                  > 
+                      <ListItemText
+                        primary={`${val.start.toString().substring(0, val.start.toString().indexOf('G'))} - ${val.end
+                          .toString()
+                          .substring(0, val.end.toString().indexOf('G'))}`}
+                      />
+                    </ListItem>
+                      </>
+                  );
+                })}
+              </List>
             </Grid>
-            <Divider orientation="vertical" flexItem>
+            <Divider orientation="horizontal" flexItem>
               OR
             </Divider>
-            <Grid item>
+            <Grid item sx={{textAlign: "center"}}>
               <Typography variant="h6" component="h2">
                 Use a Function
               </Typography>
