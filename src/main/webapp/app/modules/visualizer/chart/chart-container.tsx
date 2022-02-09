@@ -2,8 +2,8 @@ import {Box} from '@mui/material';
 import {IDataset} from 'app/shared/model/dataset.model';
 import {IPatterns} from 'app/shared/model/patterns.model';
 import {IChangePointDate} from 'app/shared/model/changepoint-date.model';
-import React from 'react';
-import {updateChangeChart, updateChangePointDates, updateGraphZoom, updateQueryResults} from '../visualizer.reducer';
+import React, {Dispatch, SetStateAction, useState} from 'react';
+import {updateActiveTool, updateChangeChart, updateChangePointDates, updateGraphZoom, updateQueryResults} from '../visualizer.reducer';
 import Chart from './chart';
 import {ChartControl} from './chart-control';
 
@@ -12,7 +12,6 @@ export interface IChartContainerProps {
   dataset: IDataset;
   wdFiles: any[];
   data: any;
-  updateQueryResults: typeof updateQueryResults;
   selectedMeasures: number[];
   from: Date;
   to: Date;
@@ -22,10 +21,12 @@ export interface IChartContainerProps {
   folder: string;
   graphZoom: number;
   changePointDates: IChangePointDate[];
+  updateQueryResults: typeof updateQueryResults;
   updateChangePointDates: typeof updateChangePointDates;
-
   updateChangeChart: typeof updateChangeChart;
   updateGraphZoom: typeof updateGraphZoom;
+  updateActiveTool: typeof updateActiveTool;
+  setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const ChartContainer = (props: IChartContainerProps) => {
@@ -35,7 +36,8 @@ export const ChartContainer = (props: IChartContainerProps) => {
     <Box sx={{display:'flex',flexDirection:"column"}} >
         <ChartControl updateChangeChart={props.updateChangeChart} changeChart={changeChart}
                       updateGraphZoom={props.updateGraphZoom} from={from} to={to} wdFiles={wdFiles} data={data}
-                      changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates}/>
+                      changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
+                      updateActiveTool={props.updateActiveTool}/>
         <Chart
           dataset={dataset}
           data={data}

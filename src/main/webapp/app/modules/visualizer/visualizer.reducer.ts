@@ -28,6 +28,7 @@ export const ACTION_TYPES = {
   GET_CHANGEPOINT_DATES: 'visualizer/GET_CHANGEPOINT_DATES',
   UPDATE_CHANGEPOINT_DATES: 'visualizer/UPDATE_CHANGEPOINTS_DATES',
   UPDATE_GRAPHZOOM: 'visualizer/UPDATE_GRAPHZOOM',
+  UPDATE_ACTIVETOOL: 'visualizer/UPDATE_ACTIVETOOL',
 };
 
 const initialState = {
@@ -50,6 +51,7 @@ const initialState = {
   folder: '',
   changePointDates: [] as IChangePointDate[],
   graphZoom: null,
+  activeTool: -1,
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
@@ -199,6 +201,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         graphZoom: action.payload,
       };
+    case ACTION_TYPES.UPDATE_ACTIVETOOL:
+      return {
+        ...state,
+        activeTool: action.payload,
+      };
     // case ACTION_TYPES.GET_CHANGEPOINT_DATES:
     //   return {
     //     ...state,
@@ -285,6 +292,11 @@ export const updateGraphZoom = data => ({
 
 export const updateChangePointDates = data => ({
   type: ACTION_TYPES.UPDATE_CHANGEPOINT_DATES,
+  payload: data,
+});
+
+export const updateActiveTool = data => ({
+  type: ACTION_TYPES.UPDATE_ACTIVETOOL,
   payload: data,
 });
 

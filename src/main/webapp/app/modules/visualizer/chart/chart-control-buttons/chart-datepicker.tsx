@@ -4,7 +4,7 @@ import TimePicker from 'react-multi-date-picker/plugins/time_picker';
 import {Calendar, DateObject} from 'react-multi-date-picker';
 import DatePanel from 'react-multi-date-picker/plugins/date_panel';
 import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
-import { updateChangePointDates } from '../../visualizer.reducer';
+import { updateActiveTool, updateChangePointDates } from '../../visualizer.reducer';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface IChartDatePickerProps {
@@ -14,6 +14,8 @@ export interface IChartDatePickerProps {
   setShowDatePick?: Dispatch<SetStateAction<any>>;
   changePointDates: IChangePointDate[];
   updateChangePointDates: typeof updateChangePointDates;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  updateActiveTool: typeof updateActiveTool;
 }
 
 export const ChartDatePicker = (props: IChartDatePickerProps) => {
@@ -124,7 +126,7 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
               <Typography variant="h6" component="h2">
                 Use a Function
               </Typography>
-              <Button size="small" variant="contained" onClick={() => {
+              <Button size="small" variant="contained" onClick={() => {props.setShowDatePick(false),props.setOpen(true),props.updateActiveTool(2)
               }}>
                 <Typography variant="overline" component="h2">
                   Changepoint detection

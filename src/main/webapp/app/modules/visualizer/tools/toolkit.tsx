@@ -13,7 +13,7 @@ import TimelineIcon from '@mui/icons-material/Timeline'; // segmentation
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ActiveTool from "app/modules/visualizer/tools/active-tool";
 import {IDataset} from "app/shared/model/dataset.model";
-import {getPatterns, updatePatterns, updateSelectedMeasures} from '../visualizer.reducer';
+import {getPatterns, updateActiveTool, updatePatterns, updateSelectedMeasures} from '../visualizer.reducer';
 import {IPatterns} from "app/shared/model/patterns.model";
 
 const drawerWidth = 300;
@@ -79,23 +79,24 @@ export interface IToolkitProps {
   updatePatterns: typeof updatePatterns,
   getPatterns: typeof getPatterns,
   changePointDates: any,
+  updateActiveTool: typeof updateActiveTool,
+  activeTool: number,
 }
 
 const Toolkit = (props: IToolkitProps) => {
   const {
     open, dataset, data, selectedMeasures, patterns,
-    resampleFreq, changePointDates
+    resampleFreq, changePointDates, activeTool
   } = props;
-  const [activeTool, setActiveTool] = React.useState(-1);
 
   const handleDrawer = () => {
     props.setOpen(!open);
-    setActiveTool(-1);
+    props.updateActiveTool(-1);
   };
 
   const handleToolClick = (key) => {
     props.setOpen(true);
-    setActiveTool(key);
+    props.updateActiveTool(key);
   }
   return (
     <Box>
@@ -143,7 +144,7 @@ const Toolkit = (props: IToolkitProps) => {
         }
         <ActiveTool
           activeTool={activeTool}
-          setActiveTool={setActiveTool}
+          updateActiveTool={props.updateActiveTool}
           dataset={dataset} data={data} selectedMeasures={selectedMeasures}
           resampleFreq={resampleFreq} patterns={patterns} updateSelectedMeasures={props.updateSelectedMeasures}
           updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} changePointDates={changePointDates}

@@ -5,13 +5,12 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import PatternExtraction from "app/modules/visualizer/tools/pattern-extraction/pattern-extraction";
 import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
-import {getPatterns, updatePatterns, updateSelectedMeasures} from '../visualizer.reducer';
+import {getPatterns, updateActiveTool, updatePatterns, updateSelectedMeasures} from '../visualizer.reducer';
 import ChangepointDetection from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
 import DeviationDetection from "app/modules/visualizer/tools/deviation-detection/deviation-detection";
 
 export interface IActiveToolProps {
   activeTool: number,
-  setActiveTool: Dispatch<SetStateAction<number>>,
   dataset: IDataset,
   data: any,
   selectedMeasures: number[],
@@ -20,6 +19,7 @@ export interface IActiveToolProps {
   updateSelectedMeasures: typeof updateSelectedMeasures,
   updatePatterns: typeof updatePatterns,
   getPatterns: typeof getPatterns,
+  updateActiveTool: typeof updateActiveTool,
   changePointDates: any,
 }
 
@@ -30,7 +30,7 @@ const ActiveTool = (props: IActiveToolProps) => {
   } = props;
 
   const goBack = () => {
-    props.setActiveTool(-1);
+    props.updateActiveTool(-1);
   }
   return (
     <Box>

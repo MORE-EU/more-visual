@@ -1,6 +1,6 @@
 import {Button, Grid, Tooltip, Typography} from '@mui/material';
-import React, {useState} from 'react';
-import {updateChangeChart, updateChangePointDates, updateGraphZoom} from '../visualizer.reducer';
+import React, {Dispatch, SetStateAction, useState} from 'react';
+import {updateActiveTool, updateChangeChart, updateChangePointDates, updateGraphZoom} from '../visualizer.reducer';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {ChartDatePicker} from './chart-control-buttons/chart-datepicker';
@@ -17,6 +17,8 @@ interface IChartControlProps {
   data: any,
   changePointDates: IChangePointDate[],
   updateChangePointDates: typeof updateChangePointDates,
+  setOpen: Dispatch<SetStateAction<boolean>>,
+  updateActiveTool: typeof updateActiveTool,
 }
 
 export const ChartControl = (props: IChartControlProps) => {
@@ -74,7 +76,8 @@ export const ChartControl = (props: IChartControlProps) => {
       {showDatePick &&
         <ChartDatePicker showDatePick={showDatePick} setShowDatePick={setShowDatePick} from={from} to={to}
                          changePointDates={changePointDates}
-                         updateChangePointDates={props.updateChangePointDates}/>}
+                         updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
+                         updateActiveTool={props.updateActiveTool}/>}
       {showCompare && <ChartCompare showCompare={showCompare} setCompare={setCompare} wdFiles={wdFiles} data={data}/>}
     </Grid>
   );
