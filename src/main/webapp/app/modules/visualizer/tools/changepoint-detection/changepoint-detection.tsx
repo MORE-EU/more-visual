@@ -14,7 +14,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   const {dataset, changePointDates} = props;
 
   return (
-    <Box sx={{pl: 2}}>
+    <Box sx={{pl: 2, pr: 2}}>
       <Box>
         <Typography variant="h6" gutterBottom>
           Changepoint Detection
