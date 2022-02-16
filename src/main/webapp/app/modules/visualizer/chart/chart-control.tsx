@@ -54,7 +54,8 @@ export const ChartControl = (props: IChartControlProps) => {
         {/* <Tooltip title="Indicators">
         <Button variant="text" size="small"><TuneIcon color='action'/></Button>
         </Tooltip> */}
-        <Tooltip title="Intervals">
+
+        <Tooltip title="Pick Intervals">
           <Button variant="text" size="small" onClick={() => {
             setShowDatePick(true)
           }}><EventNoteIcon color='action'/></Button>

@@ -1,9 +1,9 @@
 import "../visualizer.scss"
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official';
 import {IDataset} from "app/shared/model/dataset.model";
-import {updateQueryResults} from '../visualizer.reducer';
+import {updateChangePointDates, updateQueryResults, updateActiveTool} from '../visualizer.reducer';
 import {IPatterns} from "app/shared/model/patterns.model";
 import {Grid} from '@mui/material';
 import indicatorsAll from "highcharts/indicators/indicators-all";
@@ -12,11 +12,25 @@ import priceIndicator from "highcharts/modules/price-indicator";
 import fullScreen from "highcharts/modules/full-screen";
 import stockTools from "highcharts/modules/stock-tools";
 import {useScrollBlock} from "app/shared/util/useScrollBlock";
+import EventNoteIcon from "@mui/icons-material/EventNote";
+import {ChartDatePicker} from "app/modules/visualizer/chart/chart-control-buttons/chart-datepicker";
+import {IChangePointDate} from "app/shared/model/changepoint-date.model";
+
 
 Highcharts.setOptions({
   time: {
     useUTC: false
-  }
+  },
+  lang: {
+    stockTools: {
+      gui: {
+        // @ts-ignore
+        highlightIntervals: 'Highlight Intervals',
+        pickIntervals: 'Use a Calendar',
+        functionIntervals: 'Use a Function',
+      }
+    }
+  },
 });
 
 export interface IChartProps {
@@ -31,6 +45,10 @@ export interface IChartProps {
   changeChart: boolean,
   folder: string,
   graphZoom: number,
+  changePointDates: IChangePointDate[],
+  updateChangePointDates: typeof updateChangePointDates,
+  updateActiveTool: typeof updateActiveTool,
+
 }
 
 stockTools(Highcharts);
@@ -40,9 +58,12 @@ priceIndicator(Highcharts);
 fullScreen(Highcharts);
 
 export const Chart = (props: IChartProps) => {
-  const {dataset, data, selectedMeasures, from, to, patterns, changeChart, folder, graphZoom} = props;
+  const {dataset, data, selectedMeasures,
+    from, to, patterns, changeChart, folder, graphZoom,
+    changePointDates, } = props;
   const [blockScroll, allowScroll] = useScrollBlock();
-
+  const [showDatePick, setShowDatePick] = useState(false);
+  const [open, setOpen] = useState(false);
   const setZones = () => {
     let zones = []
 
@@ -111,7 +132,7 @@ export const Chart = (props: IChartProps) => {
             name: dataset.header[measure],
             yAxis: changeChart ? index : 0,
             zoneAxis: 'x',
-            zones: zones,
+            zones,
           })),
           chart: {
             type: 'line',
@@ -193,13 +214,59 @@ export const Chart = (props: IChartProps) => {
           },
           stockTools: {
             gui: {
+              enabled: true,
+              buttons: [ 'indicators', 'highlightIntervals','separator',  'measure', 'toggleAnnotations', 'separator', 'verticalLabels','fullScreen',
+                'typeChange', 'separator', 'saveChart'  ],
               className: "highcharts-bindings-wrapper",
-              toolbarClassName: "stocktools-toolbar"
+              toolbarClassName: "stocktools-toolbar",
+              definitions: {
+                highlightIntervals: {
+                  items: ['highlightIntervals', 'pickIntervals', 'functionIntervals'],
+                  highlightIntervals: {
+                    className: 'highlight-intervals',
+                    symbol: 'measure-x.svg'
+                  },
+                  pickIntervals: {
+                    className: 'pick-intervals',
+                    symbol: ''
+                  },
+                  functionIntervals: {
+                    className: 'function-intervals',
+                    symbol: 'fibonacci.svg'
+                  },
+                },
+              },
             }
-          }
+          },
+          navigation: {
+            bindings: {
+                highlightIntervals: {
+                  className: 'highlight-intervals',
+                  init(e) {
+                  }
+                },
+                pickIntervals: {
+                  className: 'pick-intervals',
+                  init(e) {
+                    setShowDatePick(true);
+                  }
+                },
+                functionIntervals: {
+                  className: 'function-intervals',
+                  init(e) {
+                    setShowDatePick(true);
+                  }
+                }
+            }
+          },
         }}
       />}
       {/* </div> */}
+      {showDatePick &&
+        <ChartDatePicker showDatePick={showDatePick} setShowDatePick={setShowDatePick} from={from} to={to}
+                         changePointDates={changePointDates}
+                         updateChangePointDates={props.updateChangePointDates} setOpen={setOpen}
+                         updateActiveTool={props.updateActiveTool}/>}
     </Grid>
   );
 };
