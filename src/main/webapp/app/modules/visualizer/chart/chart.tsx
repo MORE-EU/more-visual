@@ -60,7 +60,6 @@ fullScreen(Highcharts);
 export const Chart = (props: IChartProps) => {
   const {dataset, data, selectedMeasures,
     from, to, patterns, changeChart, folder, graphZoom,
-    changePointDates, compare } = props;
     changePointDates, compare} = props;
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -79,10 +78,19 @@ export const Chart = (props: IChartProps) => {
     })).sort((a, b) => a.value.getTime() - b.value.getTime()));
     setZones(newZones);
   }, [patterns]);
+
+  useEffect(() => {
     let newPlotBands = [];
     newPlotBands = (changePointDates !== null && [].concat(...changePointDates.map(date => {
+      return {
+        color: 'blue',
+        from: date.start,
+        to: date.end,
+      };
+    })));
+    setPlotBands(newPlotBands);
+  }, [changePointDates]);
 
-  const zones = setZones();
   useEffect(() => {
     props.updateQueryResults(folder, dataset.id);
   }, [dataset]);
