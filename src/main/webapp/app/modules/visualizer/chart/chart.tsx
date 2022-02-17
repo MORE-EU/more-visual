@@ -26,6 +26,7 @@ Highcharts.setOptions({
         highlightIntervals: 'Highlight Intervals',
         pickIntervals: 'Use a Calendar',
         functionIntervals: 'Compare Files',
+        compareFiles: 'Compare Files'
       }
     }
   },
@@ -226,7 +227,7 @@ export const Chart = (props: IChartProps) => {
             gui: {
               enabled: true,
               buttons: [ 'indicators', 'highlightIntervals','separator',  'measure', 'toggleAnnotations', 'separator', 'verticalLabels','fullScreen',
-                'typeChange', 'separator', 'saveChart'  ],
+                'typeChange', 'separator', 'saveChart', 'compareFiles' ],
               className: "highcharts-bindings-wrapper",
               toolbarClassName: "stocktools-toolbar",
               definitions: {
@@ -242,10 +243,14 @@ export const Chart = (props: IChartProps) => {
                   },
                   functionIntervals: {
                     className: 'function-intervals',
-                    symbol: 'add_circle.png'
-                    
+                    symbol: 'measure-y.svg'
                   },
                 },
+                compareFiles: {
+                className: "compare-files",
+                symbol: 'add_circle.png'
+                }
+              
               },
             }
           },
@@ -265,6 +270,11 @@ export const Chart = (props: IChartProps) => {
                 },
                 functionIntervals: {
                   className: 'function-intervals',
+                  init(e) {
+                  }
+                },
+                compareFiles: {
+                  className: 'compare-files',
                   init(e) {
                     props.setCompare(true);
                   }
