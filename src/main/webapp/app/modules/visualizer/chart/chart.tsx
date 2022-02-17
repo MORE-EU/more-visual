@@ -61,18 +61,26 @@ export const Chart = (props: IChartProps) => {
   const {dataset, data, selectedMeasures,
     from, to, patterns, changeChart, folder, graphZoom,
     changePointDates, compare } = props;
-  const [blockScroll, allowScroll] = useScrollBlock();
-  const setZones = () => {
-    let zones = []
+    changePointDates, compare} = props;
 
-    zones = (patterns !== null && [].concat(...patterns.patternGroups.map(patternGroup => {
+  const [blockScroll, allowScroll] = useScrollBlock();
+  const [zones, setZones] = useState([]);
+  const [plotBands, setPlotBands] =  useState([]);
+  const [showDatePick, setShowDatePick] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    let newZones = [];
+    newZones = (patterns !== null && [].concat(...patterns.patternGroups.map(patternGroup => {
       const zone = [].concat(...patternGroup.patterns.map(pattern => {
         return [{value: pattern.start}, {value: pattern.end, color: patternGroup.color}]
       }));
       return zone;
     })).sort((a, b) => a.value.getTime() - b.value.getTime()));
-    return zones;
-  }
+    setZones(newZones);
+  }, [patterns]);
+    let newPlotBands = [];
+    newPlotBands = (changePointDates !== null && [].concat(...changePointDates.map(date => {
 
   const zones = setZones();
   useEffect(() => {
@@ -161,7 +169,8 @@ export const Chart = (props: IChartProps) => {
             type: 'datetime',
             // min: from.getTime(),
             // max: to.getTime(),
-            range: graphZoom
+            range: graphZoom,
+            plotBands,
           },
           yAxis: changeChart ? (selectedMeasures.map((measure, idx) => ({
             title: {
@@ -243,7 +252,7 @@ export const Chart = (props: IChartProps) => {
                   functionIntervals: {
                     className: 'function-intervals',
                     symbol: 'add_circle.png'
-                    
+
                   },
                 },
               },
@@ -252,9 +261,13 @@ export const Chart = (props: IChartProps) => {
           navigation: {
             iconsURL: "../../../../content/images/stock-icons/",
             bindings: {
-                highlightIntervals: {
+                highlightIntervals:
+                {
                   className: 'highlight-intervals',
-                  init(e) {
+                  start(event) {
+                      const chart = this.chart;
+                      const x = chart.xAxis[0].toValue(event.chartX);
+                      const y = chart.yAxis[0].toValue(event.chartY);
                   }
                 },
                 pickIntervals: {
