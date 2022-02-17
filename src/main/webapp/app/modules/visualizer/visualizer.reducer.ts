@@ -29,6 +29,7 @@ export const ACTION_TYPES = {
   UPDATE_CHANGEPOINT_DATES: 'visualizer/UPDATE_CHANGEPOINTS_DATES',
   UPDATE_GRAPHZOOM: 'visualizer/UPDATE_GRAPHZOOM',
   UPDATE_ACTIVETOOL: 'visualizer/UPDATE_ACTIVETOOL',
+  UPDATE_COMPARE: 'visualizer/UPDATE_COMPARE',
 };
 
 const initialState = {
@@ -52,6 +53,7 @@ const initialState = {
   changePointDates: [] as IChangePointDate[],
   graphZoom: null,
   activeTool: -1,
+  compare: '',
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
@@ -206,6 +208,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         activeTool: action.payload,
       };
+    case ACTION_TYPES.UPDATE_COMPARE:
+      return {
+        ...state,
+        compare: action.payload,
+      };
     // case ACTION_TYPES.GET_CHANGEPOINT_DATES:
     //   return {
     //     ...state,
@@ -297,6 +304,11 @@ export const updateChangePointDates = data => ({
 
 export const updateActiveTool = data => ({
   type: ACTION_TYPES.UPDATE_ACTIVETOOL,
+  payload: data,
+});
+
+export const updateCompare = (data: string) => ({
+  type: ACTION_TYPES.UPDATE_COMPARE,
   payload: data,
 });
 

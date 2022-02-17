@@ -1,6 +1,6 @@
 import {Button, Grid, Tooltip, Typography} from '@mui/material';
 import React, {Dispatch, SetStateAction, useState} from 'react';
-import {updateActiveTool, updateChangeChart, updateChangePointDates, updateGraphZoom} from '../visualizer.reducer';
+import {updateActiveTool, updateChangeChart, updateChangePointDates, updateCompare, updateGraphZoom,} from '../visualizer.reducer';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {ChartDatePicker} from './chart-control-buttons/chart-datepicker';
@@ -16,21 +16,26 @@ interface IChartControlProps {
   changeChart: boolean,
   data: any,
   changePointDates: IChangePointDate[],
+  compare: string,
+  showDatePick: boolean,
+  showCompare: boolean,
+  updateCompare: typeof updateCompare,
   updateChangePointDates: typeof updateChangePointDates,
   setOpen: Dispatch<SetStateAction<boolean>>,
+  setShowDatePick: Dispatch<SetStateAction<boolean>>,
+  setCompare: Dispatch<SetStateAction<boolean>>,
   updateActiveTool: typeof updateActiveTool,
+
 }
 
 export const ChartControl = (props: IChartControlProps) => {
-  const {changeChart, from, to, wdFiles, data, changePointDates} = props;
+  const {changeChart, from, to, wdFiles, data, changePointDates, compare, showDatePick, showCompare} = props;
 
   const handleZoom = (zoomNum) => {
     props.updateGraphZoom(zoomNum)
   }
 
   const [timeBut, setTimeBut] = useState(4);
-  const [showDatePick, setShowDatePick] = useState(false);
-  const [showCompare, setCompare] = useState(false);
 
   return (
     <Grid container direction="row">
@@ -55,16 +60,16 @@ export const ChartControl = (props: IChartControlProps) => {
         <Button variant="text" size="small"><TuneIcon color='action'/></Button>
         </Tooltip> */}
 
-        <Tooltip title="Pick Intervals">
+        {/* <Tooltip title="Pick Intervals">
           <Button variant="text" size="small" onClick={() => {
-            setShowDatePick(true)
+            props.setShowDatePick(true)
           }}><EventNoteIcon color='action'/></Button>
         </Tooltip>
         <Tooltip title="Compare">
           <Button variant="text" size="small" onClick={() => {
-            setCompare(true)
+            props.setCompare(true)
           }}><AddCircleIcon color='action'/></Button>
-        </Tooltip>
+        </Tooltip> */}
       </Grid>
       <Grid item>
         <Button variant="text" size="small" onClick={() => {
@@ -75,11 +80,11 @@ export const ChartControl = (props: IChartControlProps) => {
         }} sx={{mr: 1, color: !changeChart ? "#424242" : "#0277bd"}}>ExpandedView</Button>
       </Grid>
       {showDatePick &&
-        <ChartDatePicker showDatePick={showDatePick} setShowDatePick={setShowDatePick} from={from} to={to}
+        <ChartDatePicker showDatePick={showDatePick} setShowDatePick={props.setShowDatePick} from={from} to={to}
                          changePointDates={changePointDates}
                          updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
                          updateActiveTool={props.updateActiveTool}/>}
-      {showCompare && <ChartCompare showCompare={showCompare} setCompare={setCompare} wdFiles={wdFiles} data={data}/>}
+      {showCompare && <ChartCompare showCompare={showCompare} setCompare={props.setCompare} compare={compare} updateCompare={props.updateCompare} wdFiles={wdFiles} data={data}/>}
     </Grid>
   );
 };

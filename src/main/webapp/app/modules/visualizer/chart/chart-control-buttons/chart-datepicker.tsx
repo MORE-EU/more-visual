@@ -46,7 +46,7 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
   };
 
   const handleDeleteButton = (idx) => {
-    setDateValues(dateValues => dateValues.filter((date, i ) => i !== idx));
+    setDateValues(oldDateValues => oldDateValues.filter((date, i ) => i !== idx));
   }
 
   const style = {
@@ -81,16 +81,17 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
                 onChange={e => {
                   handleCalendarChange(e as DateObject[]);
                 }}
-                plugins={[<TimePicker position="bottom"/>, <DatePanel position="right" markFocused/>]}
+                plugins={[<DatePanel position="right" markFocused/>, <TimePicker position="bottom"/>]}
               />
               <Button
+                sx={{mt: 1}}
                 size="small"
                 variant="contained"
                 onClick={() => {
                   handleAddButton();
                 }}
               >
-                <Typography variant="overline" component="h2">
+                <Typography variant="overline" component="h2" >
                   Add
                 </Typography>
               </Button>
@@ -103,9 +104,9 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
                     key={idx}
                     disableGutters
                     secondaryAction={
-                      <IconButton>
-                        <DeleteIcon onClick={() => {handleDeleteButton(idx)}}/>
-                      </IconButton>
+                      <Button>
+                        <DeleteIcon color={"action"} onClick={() => {handleDeleteButton(idx)}}/>
+                      </Button>
                     }
                   > 
                       <ListItemText

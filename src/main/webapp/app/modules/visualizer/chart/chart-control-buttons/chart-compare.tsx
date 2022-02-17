@@ -1,10 +1,14 @@
 import React, {Dispatch, SetStateAction, useState} from 'react';
 import {Box, Button, FormControl, Grid, InputLabel, MenuItem, Modal, Select, Tab} from '@mui/material';
 import {TabContext, TabList, TabPanel} from '@material-ui/lab';
+import Highcharts from 'highcharts/highstock'
+import { updateCompare } from '../../visualizer.reducer';
 
 export interface IChartCompareProps {
   showCompare: boolean;
   wdFiles: any[];
+  compare: string;
+  updateCompare: typeof updateCompare;
   setCompare: Dispatch<SetStateAction<boolean>>;
   data: any;
 }
@@ -23,7 +27,7 @@ const style = {
 } as const;
 
 export const ChartCompare = (props: IChartCompareProps) => {
-  const {showCompare, wdFiles, data} = props;
+  const {showCompare, wdFiles, data, compare} = props;
 
   const [selectVal, setSelectVal] = useState('');
   const [tabVal, setTabVal] = useState('1');
@@ -74,9 +78,8 @@ export const ChartCompare = (props: IChartCompareProps) => {
                 <MenuItem value={`${file}`} key={idx}>{file}</MenuItem>
               ))}
             </Select>
-            <div id='addButtonCompare' >
-            <Button variant="contained" sx={{textTransform: "none"}} onClick={() => {props.setCompare(false)}}>Add</Button>
-            </div>
+            <Button variant="contained" sx={{textTransform: "none"}} onClick={() => {props.setCompare(false), props.updateCompare(selectVal)}}>Add</Button>
+            <Button variant="contained" sx={{textTransform: "none"}} onClick={() => {props.setCompare(false), props.updateCompare('')}}>Reset</Button>
             </Grid>
           </FormControl>
           </TabPanel>

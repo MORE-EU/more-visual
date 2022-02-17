@@ -27,6 +27,7 @@ import {
   updateSelectedMeasures,
   updateTo,
   updateActiveTool,
+  updateCompare,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
@@ -44,7 +45,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
     resampleFreq, patterns, graphZoom, changePointDates,
-    activeTool
+    activeTool, compare
 
   } = props;
   const [open, setOpen] = React.useState(false);
@@ -105,7 +106,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                             folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}
                             graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}
                             changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates}
-                            setOpen={setOpen} updateActiveTool={props.updateActiveTool}/>
+                            setOpen={setOpen} updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare}/>
           </Paper>
         </Box>
         <Toolkit
@@ -141,6 +142,7 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   changePointDates: visualizer.changePointDates,
   graphZoom: visualizer.graphZoom,
   activeTool: visualizer.activeTool,
+  compare: visualizer.compare,
 });
 
 const mapDispatchToProps = {
@@ -149,7 +151,7 @@ const mapDispatchToProps = {
   updateResampleFreq, updateFilters, filterData,
   updatePatterns, getPatterns, updateChangeChart, updateDatasetChoice,
   getWdFiles, updatePatternNav, updateChangePointDates, getChangePointDates,
-  updateGraphZoom, updateActiveTool
+  updateGraphZoom, updateActiveTool, updateCompare,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;
