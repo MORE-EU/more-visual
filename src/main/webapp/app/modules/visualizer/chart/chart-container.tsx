@@ -42,27 +42,27 @@ export const ChartContainer = (props: IChartContainerProps) => {
         <ChartControl updateChangeChart={props.updateChangeChart} changeChart={changeChart}
                       updateGraphZoom={props.updateGraphZoom} from={from} to={to} wdFiles={wdFiles} data={data}
                       changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
-                      updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare} setShowDatePick={setShowDatePick} 
+                      updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare} setShowDatePick={setShowDatePick}
                       setCompare={setCompare} showDatePick={showDatePick} showCompare={showCompare}/>
         <Chart
-        dataset={dataset}
-        data={data}
-        selectedMeasures={selectedMeasures}
-        updateQueryResults={props.updateQueryResults}
-        from={from}
-        to={to}
-        resampleFreq={props.resampleFreq}
-        patterns={props.patterns}
-        changeChart={changeChart}
-        folder={folder}
-        graphZoom={graphZoom}
-        compare={compare} 
-        changePointDates={changePointDates} 
-        updateChangePointDates={props.updateChangePointDates} 
-        updateActiveTool={props.updateActiveTool}
-        setCompare={setCompare}   
-        setShowDatePick={setShowDatePick}
+          dataset={dataset}
+          data={data}
+          selectedMeasures={selectedMeasures}
+          updateQueryResults={props.updateQueryResults}
+          from={from}
+          to={to}
+          resampleFreq={props.resampleFreq}
+          patterns={props.patterns}
+          changeChart={changeChart}
+          folder={folder}
+          graphZoom={graphZoom}
+          compare={compare}
+          changePointDates={changePointDates}
+          updateChangePointDates={props.updateChangePointDates}
+          updateActiveTool={props.updateActiveTool}
+          setCompare={setCompare}
+          setShowDatePick={setShowDatePick}
         />
     </Box>
   );
-};
+}
