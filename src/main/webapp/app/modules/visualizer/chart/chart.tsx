@@ -300,11 +300,20 @@ export const Chart = (props: IChartProps) => {
                     props.setCompare(true);
                   }
                 },
-                // measureX: {
-                //   start(e){
-                //     console.log(e);
-                //   }
-                // }
+                measureX: {
+                  end(e, annotation){
+                    let x1 = annotation.startXMin,
+                    x2 = annotation.startXMax,
+                    series = annotation.chart.series[0],
+                    filteredPoints = series.points.filter(
+                      point => point.x > x1 && point.x < x2
+                    ),
+                    firstPoint = filteredPoints[0],
+                    lastPoint = filteredPoints[filteredPoints.length - 1];
+                    console.log(firstPoint.key);
+                    console.log(lastPoint.key);
+                  }
+                }
             }
           },
         }}
