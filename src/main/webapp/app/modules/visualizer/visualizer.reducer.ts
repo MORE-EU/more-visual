@@ -224,6 +224,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
 };
 
 // Actions
+
 export const getDataset = (folder, id) => {
   const requestUrl = `api/datasets/${folder}/${id}`;
   return {

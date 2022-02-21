@@ -243,8 +243,8 @@ export const Chart = (props: IChartProps) => {
           stockTools: {
             gui: {
               enabled: true,
-              buttons: [ 'indicators', 'highlightIntervals','separator',  'measure', 'toggleAnnotations', 'separator', 'verticalLabels','fullScreen',
-                'typeChange', 'separator', 'saveChart', 'compareFiles' ],
+              buttons: [ 'indicators', 'highlightIntervals', 'compareFiles', 'separator',  'measure', 'toggleAnnotations', 'separator', 'verticalLabels','fullScreen',
+                'typeChange', 'separator', 'saveChart' ],
               className: "highcharts-bindings-wrapper",
               toolbarClassName: "stocktools-toolbar",
               definitions: {
@@ -256,7 +256,7 @@ export const Chart = (props: IChartProps) => {
                   },
                   pickIntervals: {
                     className: 'pick-intervals',
-                    symbol: 'event_note.png',
+                    symbol: 'event_note.svg',
                   },
                   functionIntervals: {
                     className: 'function-intervals',
@@ -265,9 +265,9 @@ export const Chart = (props: IChartProps) => {
                 },
                 compareFiles: {
                 className: "compare-files",
-                symbol: 'add_circle.png'
+                symbol: 'comparison.svg'
                 }
-              
+
               },
             }
           },

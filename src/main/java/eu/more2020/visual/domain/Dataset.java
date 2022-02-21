@@ -23,6 +23,10 @@ public class Dataset implements Serializable {
 
     private Integer timeCol;
 
+    private String farmName;
+
+    private String formalName;
+
     private LinkedHashSet<Integer> measures = new LinkedHashSet<>();
 
     public String getId() {
@@ -71,6 +75,16 @@ public class Dataset implements Serializable {
 
     public void setMeasures(LinkedHashSet<Integer> measures) {
         this.measures = measures;
+    }
+
+    public void setFarmName(String farmName) { this.farmName = farmName;}
+
+    public String getFarmName() {
+        return farmName;
+    }
+
+    public String getFormalName() {
+        return formalName;
     }
 
     @Override

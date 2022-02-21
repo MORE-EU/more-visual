@@ -67,7 +67,20 @@ export const Visualizer = (props: IVisualizerProps) => {
 
   return !loading && dataset !== null && <div>
     <ThemeProvider theme={mdTheme}>
-      <Toolbar/>
+      <Toolbar>
+        <Box  sx={{alignItems:'center', display: 'flex',
+        flexDirection: 'row'}}>
+        <Typography variant="h5" noWrap component="div">
+          {dataset.farmName}
+        </Typography>
+          <Typography variant="h5" noWrap component="div">
+           &nbsp;/&nbsp;
+          </Typography>
+          <Typography variant="body1" noWrap component="p">
+          {dataset.formalName}
+        </Typography>
+        </Box>
+      </Toolbar>
       <Divider/>
       <CssBaseline/>
       <Box

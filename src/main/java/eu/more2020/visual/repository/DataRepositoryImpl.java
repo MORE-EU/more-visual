@@ -3,6 +3,7 @@ package eu.more2020.visual.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.Dataset;
+import eu.more2020.visual.domain.Farm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -42,21 +43,37 @@ public class DataRepositoryImpl implements DatasetRepository {
         return datasets;
     }
 
+    public Farm getFarm(String folder) throws IOException {
+        Farm farm = new Farm();
+        ObjectMapper mapper = new ObjectMapper();
+        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + folder, folder + ".meta.json");
+
+        if (metadataFile.exists()) {
+            FileReader reader = new FileReader(metadataFile);
+            farm = mapper.readValue(reader, Farm.class);
+        }
+        return farm;
+    }
+
     @Override
     public Optional<Dataset> findById(String id, String folder) throws IOException {
         Assert.notNull(id, "Id must not be null!");
         ObjectMapper mapper = new ObjectMapper();
         Dataset dataset = new Dataset();
         List<Dataset> allDatasets = null;
+        Farm farm = new Farm();
         File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + folder, folder + ".meta.json");
 
         if (metadataFile.exists()) {
             FileReader reader = new FileReader(metadataFile);
-            allDatasets = Arrays.asList(mapper.readValue(reader, Dataset[].class));
+            farm = mapper.readValue(reader, Farm.class);
         }
+        allDatasets = farm.getData();
+
         for (Dataset d : allDatasets) {
             if (d.getId().equals(id)) {
                 dataset = d;
+                dataset.setFarmName(farm.getName());
                 break;
             }
         }
@@ -84,6 +101,7 @@ public class DataRepositoryImpl implements DatasetRepository {
         }
         return fileList;
     }
+
 
     @Override
     public void deleteById(String id) {
