@@ -35,7 +35,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
   const {dataset, data, selectedMeasures, from, to, wdFiles, changeChart, folder, graphZoom, changePointDates, compare} = props;
 
   const [showDatePick, setShowDatePick] = useState(false);
-  const [showUseFunction, setShowUseFunction] = useState(false);
+  const [showChangePointFunction, setShowChangePointFunction] = useState(false);
   const [showCompare, setCompare] = useState(false);
 
   return (
@@ -44,8 +44,8 @@ export const ChartContainer = (props: IChartContainerProps) => {
                       updateGraphZoom={props.updateGraphZoom} from={from} to={to} wdFiles={wdFiles} data={data}
                       changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
                       updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare} setShowDatePick={setShowDatePick}
-                      setCompare={setCompare} showDatePick={showDatePick} showCompare={showCompare} showUseFunction={showUseFunction} 
-                      setShowUseFunction={setShowUseFunction}/>
+                      setCompare={setCompare} showDatePick={showDatePick} showCompare={showCompare} showChangePointFunction={showChangePointFunction} 
+                      setShowChangePointFunction={setShowChangePointFunction}/>
         <Chart
           dataset={dataset}
           data={data}
@@ -64,7 +64,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
           updateActiveTool={props.updateActiveTool}
           setCompare={setCompare}
           setShowDatePick={setShowDatePick}
-          setShowUseFunction={setShowUseFunction}
+          setShowChangePointFunction={setShowChangePointFunction}
         />
     </Box>
   );

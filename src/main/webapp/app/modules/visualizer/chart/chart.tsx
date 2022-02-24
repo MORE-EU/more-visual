@@ -48,7 +48,7 @@ export interface IChartProps {
   updateChangePointDates: typeof updateChangePointDates,
   updateActiveTool: typeof updateActiveTool,
   setShowDatePick: Dispatch<SetStateAction<boolean>>,
-  setShowUseFunction: Dispatch<SetStateAction<boolean>>,
+  setShowChangePointFunction: Dispatch<SetStateAction<boolean>>,
   setCompare: Dispatch<SetStateAction<boolean>>,
   compare: string,
 }
@@ -291,7 +291,7 @@ export const Chart = (props: IChartProps) => {
                 functionIntervals: {
                   className: 'function-intervals',
                   init(e) {
-                    props.setShowUseFunction(true);
+                    props.setShowChangePointFunction(true);
                   }
                 },
                 compareFiles: {

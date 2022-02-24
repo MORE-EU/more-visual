@@ -8,17 +8,17 @@ import { updateActiveTool, updateChangePointDates } from '../../visualizer.reduc
 import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface IChartDatePickerProps {
-  showUseFunction: boolean;
-  setShowUseFunction?: Dispatch<SetStateAction<boolean>>;
+  showChangePointFunction: boolean;
+  setShowChangePointFunction?: Dispatch<SetStateAction<boolean>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
   updateActiveTool: typeof updateActiveTool;
 }
 
-export const ChartUseFunctions = (props: IChartDatePickerProps) => {
-  const { showUseFunction } = props;
+export const ChartChangePointFunctions = (props: IChartDatePickerProps) => {
+  const { showChangePointFunction } = props;
 
   const handleClose = () => {
-    props.setShowUseFunction(false);
+    props.setShowChangePointFunction(false);
   };
 
   const style = {
@@ -35,7 +35,7 @@ export const ChartUseFunctions = (props: IChartDatePickerProps) => {
 
   return (
     <>
-      <Modal open={showUseFunction} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+      <Modal open={showChangePointFunction} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
         <Box sx={style}>
           <Grid item sx={{ textAlign: 'center' }}>
             <Typography variant="h6" component="h2">
@@ -45,7 +45,7 @@ export const ChartUseFunctions = (props: IChartDatePickerProps) => {
               size="small"
               variant="contained"
               onClick={() => {
-                props.setShowUseFunction(false), props.setOpen(true), props.updateActiveTool(2);
+                props.setShowChangePointFunction(false), props.setOpen(true), props.updateActiveTool(2);
               }}
             >
               <Typography variant="overline" component="h2">
