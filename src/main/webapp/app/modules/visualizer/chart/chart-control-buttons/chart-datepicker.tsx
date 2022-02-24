@@ -63,7 +63,6 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
 
   return (
     <div>
-      {console.log(changePointDates)}
       <Modal open={showDatePick} onClose={handleClose} aria-labelledby="modal-modal-title"
              aria-describedby="modal-modal-description">
         <Box sx={style}>
@@ -81,7 +80,7 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
                 onChange={e => {
                   handleCalendarChange(e as DateObject[]);
                 }}
-                plugins={[<DatePanel position="right" markFocused/>, <TimePicker position="bottom"/>]}
+                plugins={[<DatePanel key={"DatePanel"} position="right" markFocused/>, <TimePicker key={"TimePicker"} position="bottom"/>]}
               />
               <Button
                 sx={{mt: 1}}

@@ -66,8 +66,6 @@ export const Chart = (props: IChartProps) => {
   const [blockScroll, allowScroll] = useScrollBlock();
   const [zones, setZones] = useState([]);
   const [plotBands, setPlotBands] =  useState([]);
-  const [showDatePick, setShowDatePick] = useState(false);
-  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     let newZones = [];
@@ -96,6 +94,15 @@ export const Chart = (props: IChartProps) => {
     props.updateQueryResults(folder, dataset.id);
   }, [dataset]);
 
+  const handleDelete = (id) => {
+    console.log(changePointDates);
+    const filtered =  (changePointDates.filter((date, i) => date.id !== id));
+    console.log(filtered);
+
+    props.updateChangePointDates(filtered);
+
+  }
+
   // CHART: ZOOM FUNCTION
   (function (H) {
     const step = 2000 * 200;
@@ -119,7 +126,6 @@ export const Chart = (props: IChartProps) => {
       sx={{border: "1px solid rgba(0, 0, 0, .1)"}}
       onMouseOver={() => blockScroll()}
       onMouseLeave={() => allowScroll()}>
-      {/* <div id="chart-container"> */}
       {data && <HighchartsReact
         highcharts={Highcharts}
         constructorType={'stockChart'}
@@ -176,9 +182,7 @@ export const Chart = (props: IChartProps) => {
           xAxis: {
             ordinal: false,
             type: 'datetime',
-            // min: from.getTime(),
-            // max: to.getTime(),
-            range: graphZoom,
+            range: graphZoom !== null ? graphZoom : 1000000000,
             plotBands,
           },
           yAxis: changeChart ? (selectedMeasures.map((measure, idx) => ({
@@ -228,7 +232,7 @@ export const Chart = (props: IChartProps) => {
             selected: 4
           },
           navigator: {
-            enabled: false
+            enabled: false,
           },
           scrollbar: {
             enabled: true,
@@ -272,6 +276,13 @@ export const Chart = (props: IChartProps) => {
             }
           },
           navigation: {
+            // annotationsOptions: {
+            //   events: {
+            //     remove: function (ev) {
+            //       console.log(ev.target);
+            //     }
+            //   }
+            // },
             iconsURL: "../../../../content/images/stock-icons/",
             bindings: {
                 highlightIntervals:
@@ -301,24 +312,35 @@ export const Chart = (props: IChartProps) => {
                   }
                 },
                 measureX: {
-                  end(e, annotation){
-                    let x1 = annotation.startXMin,
+                  annotationsOptions: {
+                      id: changePointDates.length,
+                      events: {
+                        remove: function (event) {
+                          console.log(changePointDates);
+                          console.log(event.target.userOptions);
+                          console.log(event.target.userOptions.id);
+                          handleDelete(event.target.userOptions.id);
+                        }
+                      }
+                    },
+                    end(e, annotation){
+                    const x1 = annotation.startXMin,
                     x2 = annotation.startXMax,
                     series = annotation.chart.series[0],
                     filteredPoints = series.points.filter(
                       point => point.x > x1 && point.x < x2
                     ),
-                    firstPoint = filteredPoints[0],
-                    lastPoint = filteredPoints[filteredPoints.length - 1];
-                    console.log(firstPoint.key);
-                    console.log(lastPoint.key);
+                    startPoint = new Date(filteredPoints[0].key),
+                    endPoint = new Date(filteredPoints[filteredPoints.length - 1].key);
+                    const allChangePointDates = changePointDates.concat({start: startPoint, end: endPoint, id: changePointDates.length});
+                    props.updateChangePointDates(allChangePointDates);
                   }
                 }
-            }
-          },
-        }}
-      />}
-      {/* </div> */}
+              }
+            },
+          }}
+          />}
+          {console.log(changePointDates)}
     </Grid>
   );
 };

@@ -17,7 +17,7 @@ export const PatternResults = (props: IPatternsResultsProps) => {
   const {patterns, dimensions, dataset} = props;
   return (
     <Box>
-      {/*<Typography>Found {patterns.patternGroups.length} Patterns</Typography>*/}
+      {/* <Typography>Found {patterns.patternGroups.length} Patterns</Typography> */}
       {dimensions.length > 1 &&
         <VisCorrection patterns={patterns} dataset={dataset}
                        updateSelectedMeasures={props.updateSelectedMeasures}/>}
