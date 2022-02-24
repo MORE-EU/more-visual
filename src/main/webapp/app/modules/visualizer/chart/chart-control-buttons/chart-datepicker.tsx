@@ -119,20 +119,6 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
                 })}
               </List>
             </Grid>
-            <Divider orientation="horizontal" flexItem>
-              OR
-            </Divider>
-            <Grid item sx={{textAlign: "center"}}>
-              <Typography variant="h6" component="h2">
-                Use a Function
-              </Typography>
-              <Button size="small" variant="contained" onClick={() => {props.setShowDatePick(false),props.setOpen(true),props.updateActiveTool(2)
-              }}>
-                <Typography variant="overline" component="h2">
-                  Changepoint detection
-                </Typography>
-              </Button>
-            </Grid>
           </Grid>
         </Box>
       </Modal>

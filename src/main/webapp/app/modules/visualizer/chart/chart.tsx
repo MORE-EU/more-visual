@@ -48,6 +48,7 @@ export interface IChartProps {
   updateChangePointDates: typeof updateChangePointDates,
   updateActiveTool: typeof updateActiveTool,
   setShowDatePick: Dispatch<SetStateAction<boolean>>,
+  setShowChangePointFunction: Dispatch<SetStateAction<boolean>>,
   setCompare: Dispatch<SetStateAction<boolean>>,
   compare: string,
 }
@@ -96,11 +97,7 @@ export const Chart = (props: IChartProps) => {
 
   const handleDelete = (id) => {
     console.log(changePointDates);
-    const filtered =  (changePointDates.filter((date, i) => date.id !== id));
-    console.log(filtered);
-
-    props.updateChangePointDates(filtered);
-
+    props.updateChangePointDates(changePointDates.filter((date, i) => date.id !== id));
   }
 
   // CHART: ZOOM FUNCTION
@@ -247,15 +244,15 @@ export const Chart = (props: IChartProps) => {
           stockTools: {
             gui: {
               enabled: true,
-              buttons: [ 'indicators', 'highlightIntervals', 'compareFiles', 'separator',  'measure', 'toggleAnnotations', 'separator', 'verticalLabels','fullScreen',
+              buttons: [ 'indicators', 'highlightIntervals', 'compareFiles', 'separator', 'toggleAnnotations', 'separator', 'verticalLabels','fullScreen',
                 'typeChange', 'separator', 'saveChart' ],
               className: "highcharts-bindings-wrapper",
               toolbarClassName: "stocktools-toolbar",
               definitions: {
                 highlightIntervals: {
-                  items: ['highlightIntervals', 'pickIntervals', 'functionIntervals'],
-                  highlightIntervals: {
-                    className: 'highlight-intervals',
+                  items: ['measure', 'pickIntervals', 'functionIntervals'],
+                  measure: {
+                    className: 'highcharts-measure-x',
                     symbol: 'measure-x.svg'
                   },
                   pickIntervals: {
@@ -285,15 +282,6 @@ export const Chart = (props: IChartProps) => {
             // },
             iconsURL: "../../../../content/images/stock-icons/",
             bindings: {
-                highlightIntervals:
-                {
-                  className: 'highlight-intervals',
-                  start(event) {
-                      const chart = this.chart;
-                      const x = chart.xAxis[0].toValue(event.chartX);
-                      const y = chart.yAxis[0].toValue(event.chartY);
-                  }
-                },
                 pickIntervals: {
                   className: 'pick-intervals',
                   init(e) {
@@ -303,6 +291,7 @@ export const Chart = (props: IChartProps) => {
                 functionIntervals: {
                   className: 'function-intervals',
                   init(e) {
+                    props.setShowChangePointFunction(true);
                   }
                 },
                 compareFiles: {
@@ -316,8 +305,6 @@ export const Chart = (props: IChartProps) => {
                       id: changePointDates.length,
                       events: {
                         remove: function (event) {
-                          console.log(changePointDates);
-                          console.log(event.target.userOptions);
                           console.log(event.target.userOptions.id);
                           handleDelete(event.target.userOptions.id);
                         }
