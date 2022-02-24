@@ -20,12 +20,22 @@ export const Scores = (props: IScoresProps) => {
   const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
 
+
+  const getLabels = () => {
+    const labels = [];
+    for (let j = 0; j < changePointDates.length; j++) {
+      const name = changePointDates[j].start.concat(" -<br>", changePointDates[j].end)
+      labels.push(name);
+    }
+    return labels;
+  }
+
   const createScores = () => {
     for (let i = 0; i < functions.length; i++) {
       const func = functions[i];
       const score = [];
       for (let j = 0; j < changePointDates.length; j++) {
-        score.push({name: changePointDates[j].start, y: Math.random()});
+        score.push({name: "Interval".concat(" ", (j + 1).toString(10)), y:  Math.random()});
       }
       scores[func] = score;
     }
@@ -55,9 +65,12 @@ export const Scores = (props: IScoresProps) => {
         name: "Score"
       }
     ],
-    chart: {},
+    chart: {
+      type: 'bar'
+    },
     xAxis: {
-      type: 'datetime'
+      type: 'datetime',
+      categories: getLabels()
     },
     yAxis: {
       title: {

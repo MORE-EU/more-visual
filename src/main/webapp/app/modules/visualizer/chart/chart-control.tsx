@@ -74,10 +74,10 @@ export const ChartControl = (props: IChartControlProps) => {
       <Grid item>
         <Button variant="text" size="small" onClick={() => {
           props.updateChangeChart(false)
-        }} sx={{mr: 1, color: changeChart ? "#424242" : "#0277bd"}}>Original</Button>
+        }} sx={{mr: 1, color: changeChart ? "#424242" : "#0277bd"}}>Overlay</Button>
         <Button variant="text" size='small' onClick={() => {
           props.updateChangeChart(true)
-        }} sx={{mr: 1, color: !changeChart ? "#424242" : "#0277bd"}}>ExpandedView</Button>
+        }} sx={{mr: 1, color: !changeChart ? "#424242" : "#0277bd"}}>Stacked</Button>
       </Grid>
       {showDatePick &&
         <ChartDatePicker showDatePick={showDatePick} setShowDatePick={props.setShowDatePick} from={from} to={to}
