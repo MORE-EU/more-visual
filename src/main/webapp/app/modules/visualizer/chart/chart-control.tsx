@@ -6,6 +6,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {ChartDatePicker} from './chart-control-buttons/chart-datepicker';
 import {ChartCompare} from './chart-control-buttons/chart-compare';
 import {IChangePointDate} from 'app/shared/model/changepoint-date.model';
+import { ChartUseFunctions } from './chart-control-buttons/chart-use-functions';
 
 interface IChartControlProps {
   from: Date,
@@ -19,17 +20,19 @@ interface IChartControlProps {
   compare: string,
   showDatePick: boolean,
   showCompare: boolean,
+  showUseFunction: boolean,
   updateCompare: typeof updateCompare,
   updateChangePointDates: typeof updateChangePointDates,
   setOpen: Dispatch<SetStateAction<boolean>>,
   setShowDatePick: Dispatch<SetStateAction<boolean>>,
+  setShowUseFunction: Dispatch<SetStateAction<boolean>>,
   setCompare: Dispatch<SetStateAction<boolean>>,
   updateActiveTool: typeof updateActiveTool,
 
 }
 
 export const ChartControl = (props: IChartControlProps) => {
-  const {changeChart, from, to, wdFiles, data, changePointDates, compare, showDatePick, showCompare} = props;
+  const {changeChart, from, to, wdFiles, data, changePointDates, compare, showDatePick, showCompare, showUseFunction} = props;
 
   const handleZoom = (zoomNum) => {
     props.updateGraphZoom(zoomNum)
@@ -85,6 +88,7 @@ export const ChartControl = (props: IChartControlProps) => {
                          updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
                          updateActiveTool={props.updateActiveTool}/>}
       {showCompare && <ChartCompare showCompare={showCompare} setCompare={props.setCompare} compare={compare} updateCompare={props.updateCompare} wdFiles={wdFiles} data={data}/>}
+      {showUseFunction && <ChartUseFunctions showUseFunction={showUseFunction} setShowUseFunction={props.setShowUseFunction} setOpen={props.setOpen} updateActiveTool={props.updateActiveTool}/>}
     </Grid>
   );
 };
