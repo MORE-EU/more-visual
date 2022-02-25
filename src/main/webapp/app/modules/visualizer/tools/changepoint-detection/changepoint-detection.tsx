@@ -26,12 +26,11 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
           <b>No Intervals selected</b><br></br>Select Intervals to get started.
         </Box>
       }
-      {(changePointDates.length === 0)
+      {(changePointDates.length !== 0)
         &&
         <Box sx={{whiteSpace: "normal"}}>
           <ChangepointModel dataset={dataset}
-                            changePointDates={[{"start": "2018-01-01 00:00:00", "end": "2018-01-01 10:00:00"},
-                              {"start": "2018-02-01 00:00:00", "end": "2018-02-01 10:00:00"}]}
+                            changePointDates={changePointDates}
           />
         </Box>
       }

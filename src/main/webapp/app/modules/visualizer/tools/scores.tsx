@@ -24,7 +24,7 @@ export const Scores = (props: IScoresProps) => {
   const getLabels = () => {
     const labels = [];
     for (let j = 0; j < changePointDates.length; j++) {
-      const name = changePointDates[j].start.concat(" -<br>", changePointDates[j].end)
+      const name = changePointDates[j].start.toUTCString().concat(" -<br>", changePointDates[j].end.toUTCString())
       labels.push(name);
     }
     return labels;

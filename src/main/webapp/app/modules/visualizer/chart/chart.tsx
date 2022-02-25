@@ -95,9 +95,22 @@ export const Chart = (props: IChartProps) => {
     props.updateQueryResults(folder, dataset.id);
   }, [dataset]);
 
-  const handleDelete = (id) => {
-    console.log(changePointDates);
-    props.updateChangePointDates(changePointDates.filter((date, i) => date.id !== id));
+  const handleDelete = (id, dates) => {
+    console.log(dates)
+    //props.updateChangePointDates(dates.filter((date, i) => date.id !== id));
+    props.updateChangePointDates(dates);
+  }
+
+  const annotationToDate = (annotation, len) => {
+    const x1 = annotation.startXMin,
+      x2 = annotation.startXMax,
+      series = annotation.chart.series[0],
+      filteredPoints = series.points.filter(
+        point => point.x > x1 && point.x < x2
+      ),
+      startPoint = new Date(filteredPoints[0].key),
+      endPoint = new Date(filteredPoints[filteredPoints.length - 1].key);
+    return {start: startPoint, end: endPoint, id: len}
   }
 
   // CHART: ZOOM FUNCTION
@@ -258,10 +271,12 @@ export const Chart = (props: IChartProps) => {
                   pickIntervals: {
                     className: 'pick-intervals',
                     symbol: 'event_note.svg',
+                    width: 10,
                   },
                   functionIntervals: {
                     className: 'function-intervals',
-                    symbol: 'measure-y.svg'
+                    symbol: 'elliott-5.svg',
+
                   },
                 },
                 compareFiles: {
@@ -305,29 +320,22 @@ export const Chart = (props: IChartProps) => {
                       id: changePointDates.length,
                       events: {
                         remove: function (event) {
-                          console.log(event.target.userOptions.id);
-                          handleDelete(event.target.userOptions.id);
+                          // get annotations
+                          const annotations = this.chart.annotations.filter(a => a.userOptions.id !== event.target.userOptions.id);
+                          // convert annotations to dates
+                          props.updateChangePointDates(annotations.map((a, id) => annotationToDate(a, id)));
+
                         }
                       }
                     },
-                    end(e, annotation){
-                    const x1 = annotation.startXMin,
-                    x2 = annotation.startXMax,
-                    series = annotation.chart.series[0],
-                    filteredPoints = series.points.filter(
-                      point => point.x > x1 && point.x < x2
-                    ),
-                    startPoint = new Date(filteredPoints[0].key),
-                    endPoint = new Date(filteredPoints[filteredPoints.length - 1].key);
-                    const allChangePointDates = changePointDates.concat({start: startPoint, end: endPoint, id: changePointDates.length});
-                    props.updateChangePointDates(allChangePointDates);
+                    end() {
+                      props.updateChangePointDates(this.chart.annotations.map((a, id) => annotationToDate(a, id)));
                   }
                 }
               }
             },
           }}
           />}
-          {console.log(changePointDates)}
     </Grid>
   );
 };
