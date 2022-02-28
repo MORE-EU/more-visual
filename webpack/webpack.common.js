@@ -67,13 +67,29 @@ module.exports = options => ({
       {
         enforce: 'pre',
         test: /\.jsx?$/,
-        loader: 'source-map-loader'
+        loader: 'babel-loader',
+        options:{
+        plugins: [
+          '@babel/plugin-proposal-nullish-coalescing-operator',
+          '@babel/plugin-proposal-optional-chaining',
+        ],
+      }
       },
       {
         test: /\.(j|t)sx?$/,
         enforce: 'pre',
         loader: 'eslint-loader',
         exclude: [utils.root('node_modules')]
+      },
+      {
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        }
       }
     ]
   },
