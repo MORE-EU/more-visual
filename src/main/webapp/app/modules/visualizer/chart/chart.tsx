@@ -95,12 +95,6 @@ export const Chart = (props: IChartProps) => {
     props.updateQueryResults(folder, dataset.id);
   }, [dataset]);
 
-  const handleDelete = (id, dates) => {
-    console.log(dates)
-    //props.updateChangePointDates(dates.filter((date, i) => date.id !== id));
-    props.updateChangePointDates(dates);
-  }
-
   const annotationToDate = (annotation, len) => {
     const x1 = annotation.startXMin,
       x2 = annotation.startXMax,

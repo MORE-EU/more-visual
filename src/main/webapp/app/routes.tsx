@@ -5,7 +5,7 @@ import Home from 'app/modules/home/home';
 import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
 import PageNotFound from 'app/shared/error/page-not-found';
 import Visualizer from "app/modules/visualizer/visualizer";
-import { FarmMap } from 'app/modules/map/farm-map';
+import { FarmMap } from 'app/modules/home/map/farm-map';
 
 
 const Routes = () => (
