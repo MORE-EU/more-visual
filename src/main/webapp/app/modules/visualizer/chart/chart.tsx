@@ -79,17 +79,17 @@ export const Chart = (props: IChartProps) => {
     setZones(newZones);
   }, [patterns]);
 
-  useEffect(() => {
-    let newPlotBands = [];
-    newPlotBands = (changePointDates !== null && [].concat(...changePointDates.map(date => {
-      return {
-        color: 'blue',
-        from: date.start,
-        to: date.end,
-      };
-    })));
-    setPlotBands(newPlotBands);
-  }, [changePointDates]);
+  // useEffect(() => {
+  //   let newPlotBands = [];
+  //   newPlotBands = (changePointDates !== null && [].concat(...changePointDates.map(date => {
+  //     return {
+  //       color: 'blue',
+  //       from: date.start,
+  //       to: date.end,
+  //     };
+  //   })));
+  //   setPlotBands(newPlotBands);
+  // }, [changePointDates]);
 
   useEffect(() => {
     props.updateQueryResults(folder, dataset.id);
@@ -102,8 +102,8 @@ export const Chart = (props: IChartProps) => {
       filteredPoints = series.points.filter(
         point => point.x > x1 && point.x < x2
       ),
-      startPoint = new Date(filteredPoints[0].key),
-      endPoint = new Date(filteredPoints[filteredPoints.length - 1].key);
+      startPoint = new Date(filteredPoints[0].x),
+      endPoint = new Date(filteredPoints[filteredPoints.length - 1].x);
     return {start: startPoint, end: endPoint, id: len}
   }
 
@@ -157,19 +157,19 @@ export const Chart = (props: IChartProps) => {
             name: dataset.header[measure],
             yAxis: changeChart ? index : 0,
             zoneAxis: 'x',
-            zones: zones,
+            zones,
           })).concat(selectedMeasures.map((measure, index) => ({
             data: data.map(d => ([new Date(d[0]), parseFloat(d[measure]) + 10])),
             name: dataset.header[measure] + " " + compare,
             yAxis: changeChart ? index : 0,
             zoneAxis: 'x',
-            zones: zones,
+            zones,
           }))) : selectedMeasures.map((measure, index) => ({
             data: data.map(d => ([new Date(d[0]), parseFloat(d[measure])])),
             name: dataset.header[measure],
             yAxis: changeChart ? index : 0,
             zoneAxis: 'x',
-            zones: zones,
+            zones,
           })),
           chart: {
             type: 'line',
@@ -251,8 +251,8 @@ export const Chart = (props: IChartProps) => {
           stockTools: {
             gui: {
               enabled: true,
-              buttons: [ 'indicators', 'highlightIntervals', 'compareFiles', 'separator', 'toggleAnnotations', 'separator', 'verticalLabels','fullScreen',
-                'typeChange', 'separator', 'saveChart' ],
+              buttons: [ 'typeChange','indicators', 'verticalLabels', 'highlightIntervals',  'separator', 'compareFiles', 'fullScreen',
+                 ],
               className: "highcharts-bindings-wrapper",
               toolbarClassName: "stocktools-toolbar",
               definitions: {
@@ -313,7 +313,7 @@ export const Chart = (props: IChartProps) => {
                   annotationsOptions: {
                       id: changePointDates.length,
                       events: {
-                        remove: function (event) {
+                        remove(event) {
                           // get annotations
                           const annotations = this.chart.annotations.filter(a => a.userOptions.id !== event.target.userOptions.id);
                           // convert annotations to dates

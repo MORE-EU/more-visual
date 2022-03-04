@@ -28,6 +28,10 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
     props.setShowDatePick(false);
   };
 
+  useEffect(() => {
+      props.updateChangePointDates(dateValues);
+  }, [dateValues]);
+
   const handleCalendarChange = e => {
     if (e[1]) {
       const date1 = new Date();
@@ -42,7 +46,6 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
 
   const handleAddButton = () => {
     setDateValues([...dateValues, value]);
-    props.updateChangePointDates([dateValues]);
   };
 
   const handleDeleteButton = (idx) => {
@@ -97,9 +100,9 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
               <List dense>
                 {dateValues.map((val,idx) => {
                   return (
-                    <>
-                    <Divider variant="inset" component="li" />
-                    <ListItem 
+                    <div key={idx}>
+                    <Divider variant="inset" component="li"  key={"d" + idx}/>
+                    <ListItem
                     key={idx}
                     disableGutters
                     secondaryAction={
@@ -107,14 +110,14 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
                         <DeleteIcon color={"action"} onClick={() => {handleDeleteButton(idx)}}/>
                       </Button>
                     }
-                  > 
+                  >
                       <ListItemText
                         primary={`${val.start.toString().substring(0, val.start.toString().indexOf('G'))} - ${val.end
                           .toString()
                           .substring(0, val.end.toString().indexOf('G'))}`}
                       />
                     </ListItem>
-                      </>
+                      </div>
                   );
                 })}
               </List>
