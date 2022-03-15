@@ -37,6 +37,10 @@ export const ChangepointModel = (props: IChangepointModelProps) => {
       <Box>
         <Box>
           <p>
+            <i>Trains a Model on the selected intervals to learn the behavior of a specific measure<br/>
+              <b>Goal: </b>Score intervals based on the probability of containing a changepoint</i>
+          </p>
+          <p>
             <b>Training Parameters</b>
           </p>
           <Box>

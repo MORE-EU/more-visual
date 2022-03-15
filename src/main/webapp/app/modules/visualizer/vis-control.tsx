@@ -7,11 +7,9 @@ import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import {Box, FormControl, Grid, InputLabel, MenuItem, Select, Slider, Stack, Typography} from "@mui/material";
 import {
-  filterData,
   getDataset,
   updateChangeChart,
   updateDatasetChoice,
-  updateFilters,
   updateFrom,
   updateResampleFreq,
   updateSelectedMeasures,
@@ -29,7 +27,6 @@ export interface IVisControlProps {
   selectedMeasures: number[],
   from: Date,
   to: Date,
-  filters: any,
   queryResults: IQueryResults,
   resampleFreq: string,
   wdFiles: any[],
@@ -40,15 +37,13 @@ export interface IVisControlProps {
   updateTo: typeof updateTo,
   updateSelectedMeasures: typeof updateSelectedMeasures,
   updateResampleFreq: typeof updateResampleFreq,
-  updateFilters: typeof updateFilters,
-  filterData: typeof filterData,
   updateChangeChart: typeof updateChangeChart,
   getDataset: typeof getDataset,
 }
 
 
 export const VisControl = (props: IVisControlProps) => {
-  const {dataset, selectedMeasures, from, to, queryResults, filters, wdFiles, folder} = props;
+  const {dataset, selectedMeasures, from, to, wdFiles, folder} = props;
 
 
   const handleToggle = (col) => () => {
@@ -167,42 +162,6 @@ export const VisControl = (props: IVisControlProps) => {
           );
         })}
       </List></Grid>
-    <Grid item xs={12}>
-      <Typography variant="h6" gutterBottom>
-        Filters
-      </Typography>
-      <List dense sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
-        {queryResults && dataset.measures.map((col) => {
-          const stats = queryResults.measureStats[col];
-          return <Box key={col} sx={{width: '80%'}}>
-            <Typography gutterBottom>
-              {dataset.header[col]}
-            </Typography>
-            <Slider
-              value={filters[col] || [stats.min, stats.max]}
-              min={stats.min} max={stats.max}
-              onChange={(e, newRange) => {
-                props.updateFilters(col, newRange);
-              }}
-              onChangeCommitted={props.filterData}
-              valueLabelDisplay="auto"
-            />
-            <Stack direction="row" spacing={2}>
-              <TextField id="outlined-basic" label="Min-Value" variant="outlined" size="small"
-                         value={filters[col] ? filters[col][0] : stats.min} onChange={(e) => {
-                props.updateFilters(col, [e.target.value, filters[col] ? filters[col][1] : stats.max]);
-                props.filterData();
-              }}/>
-              <TextField id="outlined-basic" label="Max-Value" variant="outlined" size="small"
-                         value={filters[col] ? filters[col][1] : stats.max} onChange={(e) => {
-                props.updateFilters(col, [filters[col] ? filters[col][0] : stats.min, e.target.value]);
-                props.filterData();
-              }}/>
-            </Stack>
-          </Box>
-        })}
-      </List>
-    </Grid>
   </Grid>;
 };
 

@@ -39,6 +39,10 @@ export const DeviationModel = (props: IChangepointModelProps) => {
       <Box>
         <Box>
           <p>
+            <i>Trains a Model on the selected intervals to learn the behavior of a specific measure<br/>
+              <b>Goal: </b>Find intervals that deviate from that behavior</i>
+          </p>
+          <p>
             <b>Training Parameters</b>
           </p>
           <Box>

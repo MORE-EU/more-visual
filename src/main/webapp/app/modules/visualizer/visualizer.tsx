@@ -45,8 +45,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
     resampleFreq, patterns, graphZoom, changePointDates,
-    activeTool, compare
-
+    activeTool, compare, filters,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -98,8 +97,7 @@ export const Visualizer = (props: IVisualizerProps) => {
             <VisControl dataset={dataset} selectedMeasures={props.selectedMeasures} queryResults={queryResults}
                         updateSelectedMeasures={props.updateSelectedMeasures} from={props.from} to={props.to}
                         resampleFreq={props.resampleFreq} updateFrom={props.updateFrom} updateTo={props.updateTo}
-                        updateResampleFreq={props.updateResampleFreq} updateFilters={props.updateFilters}
-                        filterData={props.filterData} filters={props.filters}
+                        updateResampleFreq={props.updateResampleFreq}
                         updateChangeChart={props.updateChangeChart} wdFiles={wdFiles}
                         updateDatasetChoice={props.updateDatasetChoice} datasetChoice={datasetChoice}
                         getDataset={props.getDataset} folder={props.match.params.folder}/>
@@ -127,6 +125,8 @@ export const Visualizer = (props: IVisualizerProps) => {
           setOpen={setOpen} dataset={dataset}
           data={data} selectedMeasures={selectedMeasures}
           resampleFreq={resampleFreq} patterns={patterns}
+          filters = {filters} filterData={props.filterData}
+          updateFilters={props.updateFilters} queryResults={queryResults}
           updateSelectedMeasures={props.updateSelectedMeasures}
           updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}
           changePointDates={changePointDates} activeTool={activeTool} updateActiveTool={props.updateActiveTool}

@@ -25,7 +25,7 @@ export const DeviationDetection = (props: IDeviationDetectionProps) => {
           <b>No Intervals selected</b><br></br>Select Intervals to get started.
         </Box>
       }
-      {(changePointDates.length === 0)
+      {(changePointDates.length !== 0)
         &&
         <Box sx={{whiteSpace: "normal"}}>
           <DeviationModel dataset={dataset}

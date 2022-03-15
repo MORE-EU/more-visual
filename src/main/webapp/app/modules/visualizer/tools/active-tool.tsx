@@ -5,9 +5,11 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import PatternExtraction from "app/modules/visualizer/tools/pattern-extraction/pattern-extraction";
 import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
-import {getPatterns, updateActiveTool, updatePatterns, updateSelectedMeasures} from '../visualizer.reducer';
+import {getPatterns, updateActiveTool, updatePatterns, updateSelectedMeasures, updateFilters, filterData} from '../visualizer.reducer';
 import ChangepointDetection from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
 import DeviationDetection from "app/modules/visualizer/tools/deviation-detection/deviation-detection";
+import {IQueryResults} from "app/shared/model/query-results.model";
+import Filter from "app/modules/visualizer/tools/filter/filter";
 
 export interface IActiveToolProps {
   activeTool: number,
@@ -21,12 +23,16 @@ export interface IActiveToolProps {
   getPatterns: typeof getPatterns,
   updateActiveTool: typeof updateActiveTool,
   changePointDates: any,
+  filters: any,
+  queryResults: IQueryResults,
+  updateFilters: typeof updateFilters,
+  filterData: typeof filterData,
 }
 
 const ActiveTool = (props: IActiveToolProps) => {
   const {
     activeTool, dataset, data, selectedMeasures, patterns,
-    resampleFreq, changePointDates
+    resampleFreq, changePointDates, filters, queryResults,
   } = props;
 
   const goBack = () => {
@@ -56,6 +62,13 @@ const ActiveTool = (props: IActiveToolProps) => {
             <ChangepointDetection
               dataset={dataset}
               changePointDates={changePointDates} data={data}
+            />
+          }
+          {activeTool === 4 &&
+            <Filter
+              dataset={dataset}
+              filters = {filters} filterData={props.filterData}
+              updateFilters={props.updateFilters} queryResults={queryResults}
             />
           }
         </Box>
