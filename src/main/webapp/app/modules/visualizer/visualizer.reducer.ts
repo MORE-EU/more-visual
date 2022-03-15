@@ -8,6 +8,7 @@ import { DateObject } from 'react-multi-date-picker';
 
 export const ACTION_TYPES = {
   FETCH_DATASET: 'visualizer/FETCH_DATASET',
+  FETCH_SAMPLEFILE: 'visualizer/FETCH_SAMPLEFILE',
   FETCH_WDFILES: 'visualizer/FETCH_WDFILES',
   FETCH_QUERY_RESULTS: 'visualizer/FETCH_QUERY_RESULTS',
   UPDATE_SELECTED_MEASURES: 'visualizer/UPDATE_SELECTED_MEASURES',
@@ -50,6 +51,7 @@ const initialState = {
   wdFiles: [],
   patternNav: '0',
   folder: '',
+  sampleFile: [],
   changePointDates: [] as IChangePointDate[],
   graphZoom: null,
   activeTool: -1,
@@ -94,6 +96,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
   switch (action.type) {
     case REQUEST(ACTION_TYPES.FETCH_WDFILES):
     case REQUEST(ACTION_TYPES.FETCH_DATASET):
+    case REQUEST(ACTION_TYPES.FETCH_SAMPLEFILE):
       return {
         ...state,
         errorMessage: null,
@@ -101,6 +104,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
       };
     case FAILURE(ACTION_TYPES.FETCH_WDFILES):
     case FAILURE(ACTION_TYPES.FETCH_DATASET):
+    case FAILURE(ACTION_TYPES.FETCH_SAMPLEFILE):
       return {
         ...state,
         loading: false,
@@ -111,6 +115,12 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         loading: false,
         wdFiles: action.payload.data,
+      };
+    case SUCCESS(ACTION_TYPES.FETCH_SAMPLEFILE):
+      return {
+        ...state,
+        loading: false,
+        sampleFile: action.payload.data,
       };
     case SUCCESS(ACTION_TYPES.FETCH_DATASET):
       return {
@@ -237,6 +247,13 @@ export const getWdFiles = folder => {
   return {
     type: ACTION_TYPES.FETCH_WDFILES,
     payload: axios.get(`api/datasets/${folder}`),
+  };
+};
+
+export const getSampleFile = id => {
+  return {
+    type: ACTION_TYPES.FETCH_SAMPLEFILE,
+    payload: axios.get(`api/datasets/${id}/sample`),
   };
 };
 

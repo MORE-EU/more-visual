@@ -5,6 +5,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Query;
 import eu.more2020.visual.domain.QueryResults;
+import eu.more2020.visual.domain.Sample;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.service.CsvDataService;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
@@ -130,6 +131,12 @@ public class DatasetResource {
     public List<String> getFolder(@PathVariable String folder) throws IOException {
         log.debug("REST request to get Available Files");
         return datasetRepository.findFiles(folder);
+    }
+    
+    @GetMapping("/datasets/{id}/sample")
+    public List<Sample> getSample(@PathVariable String id) throws IOException {
+        log.debug("REST request to get Sample File");
+        return datasetRepository.findSample(id);
     }
 
     /**

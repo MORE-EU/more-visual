@@ -1,9 +1,16 @@
 package eu.more2020.visual.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.univocity.parsers.csv.CsvFormat;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
+
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Farm;
+import eu.more2020.visual.domain.Sample;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -14,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -100,6 +108,13 @@ public class DataRepositoryImpl implements DatasetRepository {
             fileList.add(newFile.getName().toString());
         }
         return fileList;
+    }
+    
+    @Override
+    public List<Sample> findSample(String id) throws IOException {
+        List<Sample> beans = new CsvToBeanBuilder(new FileReader(applicationProperties.getWorkspacePath() + "/" + id + ".csv"))
+        .withType(Sample.class).build().parse();
+        return beans;
     }
 
 
