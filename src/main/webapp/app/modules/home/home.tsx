@@ -5,24 +5,23 @@ import { IRootState } from 'app/shared/reducers';
 import { connect } from 'react-redux';
 import { getSampleFile, getWdFiles } from 'app/modules/visualizer/visualizer.reducer';
 import { RouteComponentProps } from 'react-router-dom';
-import Highcharts from 'highcharts/highstock';
-import HighchartsReact from 'highcharts-react-official';
-import { Avatar, Button, List, ListItem, ListItemAvatar, ListItemText, ListSubheader, Paper, Tooltip, Typography } from '@mui/material';
-import FactoryIcon from '@mui/icons-material/Factory';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import MapIcon from '@mui/icons-material/Map';
 import { LatLng } from 'leaflet';
+import { HomeLeftMenu } from './home-left-menu';
+import { HomeRightPanel } from './home-right-panel';
+import { Box } from '@mui/material';
 
 export interface IHomeProps extends StateProps, DispatchProps, RouteComponentProps<{ folder: string; id: string }> {}
 
 export const Home = (props: IHomeProps) => {
-  const { wdFiles, sampleFile } = props;
+  const { sampleFile } = props;
 
   const [fly, setFly] = useState(new LatLng(51.505, -0.09));
   const [bounds, setBounds] = useState({ _southWest: { lat: 0, lng: 0 }, _northEast: { lat: 0, lng: 0 } });
   const [counter, setCounter] = useState(0);
   const [filSamples, setFilSamples] = useState([]);
+  const [allFilters, setAllFilters] = useState([]);
   const [items, setItems] = useState([]);
+  const [selected, setSelected] = useState([]);
 
   useEffect(() => {
     props.getWdFiles('bbz');
@@ -30,15 +29,33 @@ export const Home = (props: IHomeProps) => {
   }, []);
 
   useEffect(() => {
+    // Map Markers Creation
     let latlngs = [];
     let info = [];
     const farms = [];
     for (let i = 0; i < sampleFile.length; i++) {
       latlngs.push([sampleFile[i].lat, sampleFile[i].lng]);
       info.push(sampleFile[i]);
-      (i + 1) % 10 === 0 && (farms.push({ name: `Farm ${(i + 1)/10}`, fly: latlngs[0], locations: latlngs, farmInfo: info }), (latlngs = []), (info = []));
+      (i + 1) % 10 === 0 &&
+        (farms.push({ name: `Farm ${(i + 1) / 10}`, fly: latlngs[0], locations: latlngs, farmInfo: info }), (latlngs = []), (info = []));
     }
     setItems(farms);
+
+    // Filter Array Creation 
+    if (sampleFile.length !== 0) {
+      const filters = [];
+      const nofilters = ["lat", "lng", "capturedExceptions"];
+      Object.getOwnPropertyNames(sampleFile[0]).forEach(prop => (!nofilters.includes(`${[prop]}`) && filters.push({category: `${prop}`, values: []})));
+      filters.map(filter => {
+        sampleFile.map(sample => {
+          for (const [key, value] of Object.entries(sample)) {
+          (filter.category === key && !filter.values.includes(value)) && filter.values.push(value);
+        }
+      });
+      filter.values.sort();
+      });
+      setAllFilters(filters);
+    }
   }, [sampleFile]);
 
   useEffect(() => {
@@ -71,102 +88,11 @@ export const Home = (props: IHomeProps) => {
     setFilSamples(filteredSamples);
   }, [bounds]);
 
-  const handleStats = (val) => {
-    let newVals;
-    if (val === "min"){
-      newVals = filSamples.map(sample => {return parseInt(sample.power, 10)})
-      newVals.length !== 0 ? newVals = Math.min(...newVals) : newVals = "N/A"
-    }else if(val === "max"){
-      newVals = filSamples.map(sample => {return parseInt(sample.power, 10)})
-      newVals.length !== 0 ? newVals = Math.max(...newVals) : newVals = "N/A"
-    }
-    return newVals;
-  }
-
-  const options = {
-    title: {
-      text: 'Stats',
-    },
-    series: [
-      {
-        data: [counter],
-      },
-    ],
-    stockTools: {
-      gui: {
-        enabled: false,
-      },
-    },
-    legend: {
-      enabled: false,
-    },
-    credits: {
-      enabled: false,
-    },
-    chart: {
-      height: 200,
-      type: 'bar',
-    },
-  };
-
   return (
     <div>
-      <Paper sx={{ position: 'fixed', top: 10, left: 10, width: 'auto', height: 'auto', zIndex: 999 , maxHeight: "400px"}}>
-        <List
-          sx={{ width: '100%', overflowY: "scroll", maxHeight: "390px" }}
-          dense={true}
-          subheader={
-            <ListSubheader component="div" id="nested-list-subheader" sx={{backgroundColor: "#eeeeee"}}>
-              Available Farms
-            </ListSubheader>
-          }
-        >
-          {items.map((item, idx) => {
-            return (
-              <ListItem key={idx}>
-                <ListItemAvatar>
-                  <Avatar sx={{ width: 30, height: 30 }}>
-                    <FactoryIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText primary={item.name} sx={{ mr: 2 }} />
-                <Tooltip title="Open Dashboard" placement="right">
-                  <Button sx={{ mr: 1, width: 'auto' }} size="small" color="secondary">
-                    <DashboardIcon />
-                  </Button>
-                </Tooltip>
-                <Tooltip title="Show on Map" placement="right">
-                  <Button
-                    size="small"
-                    color="info"
-                    sx={{ width: 'auto' }}
-                    onClick={() => {
-                      setFly(new LatLng(item.fly[0], item.fly[1]));
-                    }}
-                  >
-                    <MapIcon />
-                  </Button>
-                </Tooltip>
-              </ListItem>
-            );
-          })}
-        </List>
-      </Paper>
-      <Paper sx={{ position: 'fixed', bottom: 10, right: 10, width: '300px', height: 'auto', zIndex: 999 }}>
-        <Paper sx={{textAlign: "center"}}>
-          <Typography variant="overline">
-            power <br />
-            min:
-            {handleStats("min")}
-            <br />
-            max:
-            {handleStats("max")}
-            <br />
-          </Typography>
-        </Paper>
-        <HighchartsReact highcharts={Highcharts} constructorType={'chart'} options={options} />
-      </Paper>
-      <FarmMap fly={fly} setBounds={setBounds} items={items} />
+      <HomeLeftMenu setFly={setFly} items={items} selected={selected} allFilters={allFilters} setSelected={setSelected}/>
+      <HomeRightPanel filSamples={filSamples} counter={counter} />
+      <FarmMap fly={fly} setBounds={setBounds} items={items} selected={selected} />
     </div>
   );
 };

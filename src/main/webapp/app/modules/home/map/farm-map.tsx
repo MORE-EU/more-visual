@@ -13,6 +13,7 @@ export interface IFarmMap {
   fly: LatLng;
   setBounds?: Dispatch<SetStateAction<{}>>;
   items: any[];
+  selected: any[];
 }
 
 const FlyComponent = props => {
@@ -33,7 +34,7 @@ const FlyComponent = props => {
 };
 
 export const FarmMap = (props: IFarmMap) => {
-  const { fly, items } = props;
+  const { fly, items, selected } = props;
 
   const icon = new L.Icon({
     iconUrl: '../../../content/images/leaflet-icons/marker-icon.png',
@@ -58,7 +59,19 @@ export const FarmMap = (props: IFarmMap) => {
           <MarkerClusterGroup showCoverageOnHover={true} key={itemIdx}>
           {item.farmInfo.map((info, locIdx) => {
             const rand = Math.floor((Math.random() * 3) + 1);
+            let rendItem = true;
+            if(selected.length > 0){
+            for (const [key, value] of Object.entries(info)) {
+                if(selected.includes(value)){
+                  rendItem = true;
+                  break;
+                }else{
+                  rendItem = false;
+                }
+              }
+          }
             return(
+            rendItem === true && (
             <Marker
             position={[info.lat, info.lng]}
             icon={icon}
@@ -87,7 +100,7 @@ export const FarmMap = (props: IFarmMap) => {
               
               </Popup>
             {/* </Tooltip> */}
-          </Marker>
+          </Marker>)
           )})}
           </MarkerClusterGroup>))}
       </MapContainer>

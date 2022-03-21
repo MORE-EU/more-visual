@@ -9,20 +9,11 @@ import java.util.Objects;
  */
 public class Sample extends CsvToBean {
 
-    @CsvBindByName(column = "ID")
-    private String ID;
-
     @CsvBindByName(column = "Continent")
     private String continent;
-
-    @CsvBindByName(column = "ISO code")
-    private String IsoCode;
     
     @CsvBindByName(column = "Country")
     private String country;
-    
-    @CsvBindByName(column = "State code")
-    private String stateCode;
    
     @CsvBindByName(column = "Area")
     private String area;
@@ -33,23 +24,11 @@ public class Sample extends CsvToBean {
     @CsvBindByName(column = "Name")
     private String name;
     
-    @CsvBindByName(column = "2nd name")
-    private String secName;
-    
     @CsvBindByName(column = "Latitude")
     private String lat;
     
     @CsvBindByName(column = "Longitude")
     private String lng;
-    
-    @CsvBindByName(column = "Altitude/Depth")
-    private String AltDepth;
-    
-    @CsvBindByName(column = "Location accuracy")
-    private String locAcc;
-    
-    @CsvBindByName(column = "Offshore Shore distance")
-    private String shoreDist;
     
     @CsvBindByName(column = "Manufacturer")
     private String manufacturer;
@@ -78,20 +57,6 @@ public class Sample extends CsvToBean {
     @CsvBindByName(column = "Commissioning date")
     private String ComDate;
 
-    @CsvBindByName(column = "Decommissioning date")
-    private String decDate;
-
-    @CsvBindByName(column = "Update")
-    private String update;
-
-
-    public String getID() {
-        return this.ID;
-    }
-
-    public void setID(String ID) {
-        this.ID = ID;
-    }
 
     public String getContinent() {
         return this.continent;
@@ -101,28 +66,12 @@ public class Sample extends CsvToBean {
         this.continent = continent;
     }
 
-    public String getIsoCode() {
-        return this.IsoCode;
-    }
-
-    public void setIsoCode(String IsoCode) {
-        this.IsoCode = IsoCode;
-    }
-
     public String getCountry() {
         return this.country;
     }
 
     public void setCountry(String country) {
         this.country = country;
-    }
-
-    public String getStateCode() {
-        return this.stateCode;
-    }
-
-    public void setStateCode(String stateCode) {
-        this.stateCode = stateCode;
     }
 
     public String getArea() {
@@ -149,14 +98,6 @@ public class Sample extends CsvToBean {
         this.name = name;
     }
 
-    public String getSecName() {
-        return this.secName;
-    }
-
-    public void setSecName(String secName) {
-        this.secName = secName;
-    }
-
     public String getLat() {
         return this.lat;
     }
@@ -171,30 +112,6 @@ public class Sample extends CsvToBean {
 
     public void setLng(String lng) {
         this.lng = lng;
-    }
-
-    public String getAltDepth() {
-        return this.AltDepth;
-    }
-
-    public void setAltDepth(String AltDepth) {
-        this.AltDepth = AltDepth;
-    }
-
-    public String getLocAcc() {
-        return this.locAcc;
-    }
-
-    public void setLocAcc(String locAcc) {
-        this.locAcc = locAcc;
-    }
-
-    public String getShoreDist() {
-        return this.shoreDist;
-    }
-
-    public void setShoreDist(String shoreDist) {
-        this.shoreDist = shoreDist;
     }
 
     public String getManufacturer() {
@@ -269,22 +186,6 @@ public class Sample extends CsvToBean {
         this.ComDate = ComDate;
     }
 
-    public String getDecDate() {
-        return this.decDate;
-    }
-
-    public void setDecDate(String decDate) {
-        this.decDate = decDate;
-    }
-
-    public String getUpdate() {
-        return this.update;
-    }
-
-    public void setUpdate(String update) {
-        this.update = update;
-    }
-
 
     @Override
     public boolean equals(Object o) {
@@ -294,14 +195,13 @@ public class Sample extends CsvToBean {
             return false;
         }
         Sample sample = (Sample) o;
-        return Objects.equals(ID, sample.ID) && Objects.equals(continent, sample.continent) && Objects.equals(IsoCode, sample.IsoCode) && Objects.equals(country, sample.country) && Objects.equals(stateCode, sample.stateCode) && Objects.equals(area, sample.area) && Objects.equals(city, sample.city) && Objects.equals(name, sample.name) && Objects.equals(secName, sample.secName) && Objects.equals(lat, sample.lat) && Objects.equals(lng, sample.lng) && Objects.equals(AltDepth, sample.AltDepth) && Objects.equals(locAcc, sample.locAcc) && Objects.equals(shoreDist, sample.shoreDist) && Objects.equals(manufacturer, sample.manufacturer) && Objects.equals(turbine, sample.turbine) && Objects.equals(hubHeight, sample.hubHeight) && Objects.equals(noOfTurbines, sample.noOfTurbines) && Objects.equals(power, sample.power) && Objects.equals(dev, sample.dev) && Objects.equals(operator, sample.operator) && Objects.equals(owner, sample.owner) && Objects.equals(ComDate, sample.ComDate) && Objects.equals(decDate, sample.decDate) && Objects.equals(update, sample.update);
+        return Objects.equals(continent, sample.continent) && Objects.equals(country, sample.country) && Objects.equals(area, sample.area) && Objects.equals(city, sample.city) && Objects.equals(name, sample.name) && Objects.equals(lat, sample.lat) && Objects.equals(lng, sample.lng) && Objects.equals(manufacturer, sample.manufacturer) && Objects.equals(turbine, sample.turbine) && Objects.equals(hubHeight, sample.hubHeight) && Objects.equals(noOfTurbines, sample.noOfTurbines) && Objects.equals(power, sample.power) && Objects.equals(dev, sample.dev) && Objects.equals(operator, sample.operator) && Objects.equals(owner, sample.owner) && Objects.equals(ComDate, sample.ComDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ID, continent, IsoCode, country, stateCode, area, city, name, secName, lat, lng, AltDepth, locAcc, shoreDist, manufacturer, turbine, hubHeight, noOfTurbines, power, dev, operator, owner, ComDate, decDate, update);
+        return Objects.hash(continent, country, area, city, name, lat, lng, manufacturer, turbine, hubHeight, noOfTurbines, power, dev, operator, owner, ComDate);
     }
-    
 
 }
 
