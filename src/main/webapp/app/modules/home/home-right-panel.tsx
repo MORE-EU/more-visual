@@ -17,12 +17,12 @@ export const HomeRightPanel = (props: IHomeRightPanel) => {
 
   useEffect(() => {
     const stCat = [];
-    if(filSamples.length !== 0){
-    for (const [key, value] of Object.entries(filSamples[0])) {
+    if (filSamples.length !== 0) {
+      for (const [key, value] of Object.entries(filSamples[0])) {
         !isNaN(Number(value)) && stCat.push(key);
       }
     }
-    setStatCateg(stCat.filter(st => st !== "capturedExceptions" && st !== "hubHeight"));
+    setStatCateg(stCat.filter(st => st !== 'capturedExceptions' && st !== 'hubHeight'));
   }, [filSamples]);
 
   const handleChange = event => {
@@ -55,7 +55,7 @@ export const HomeRightPanel = (props: IHomeRightPanel) => {
     },
   };
 
-  const handleStats = (val) => {
+  const handleStats = val => {
     let newVals;
     newVals = filSamples.map(sample => {
       return parseInt(sample[`${statSelect}`], 10);
@@ -77,44 +77,53 @@ export const HomeRightPanel = (props: IHomeRightPanel) => {
 
   return (
     <>
-    <Paper sx={{ position: 'fixed', bottom: 250, right: 10, width: '400px', height: 'auto', zIndex: 999 }}>
-      <Typography variant="h6" sx={{ backgroundColor: '#e0e0e0', fontSize: 14, fontWeight: 400, paddingLeft: 1 }}>Statistics Panel</Typography>
-      <Paper sx={{ textAlign: 'center' }}>
-        <Box sx={{ textAlign: 'center', alignItems: 'center', display: 'flex' }}>
-          <Typography textAlign="center" variant="h6" sx={{ fontSize: 16, flex: 1 }}>
-            Statistics for Field:
-          </Typography>
-          <FormControl variant="standard" sx={{ m: 1, minWidth: 120, flex: 1 }}>
-            <Select value={statSelect} onChange={handleChange} displayEmpty inputProps={{ 'aria-label': 'Without label' }}>
-              {statCateg.map(categ => {return <MenuItem key={categ} value={categ}>{categ}</MenuItem>})}
-            </Select>
-          </FormControl>
-        </Box>
-        <Box sx={{display: 'flex', width: "100%"}} >
-        <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
-          <br />
-          {handleStats('min')} <br />
-          min <br />
+      <Paper elevation={3} sx={{ position: 'fixed', bottom: 250, right: 10, width: '400px', height: 'auto', zIndex: 999 }}>
+        <Typography variant="h6" sx={{ backgroundColor: '#e0e0e0', fontSize: 14, fontWeight: 400, paddingLeft: 1 }}>
+          Statistics Panel
         </Typography>
-        <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
-          <br />
-          {handleStats('max')}<br />
-          max <br />
-        </Typography>
-        <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
-          <br />
-          {handleStats('mean')} <br />
-          mean <br />
-        </Typography>
-        </Box>
+        <Paper sx={{ textAlign: 'center' }}>
+          <Box sx={{ textAlign: 'center', alignItems: 'center', display: 'flex' }}>
+            <Typography textAlign="center" variant="h6" sx={{ fontSize: 16, flex: 1 }}>
+              Statistics for Field:
+            </Typography>
+            <FormControl variant="standard" sx={{ m: 1, minWidth: 120, flex: 1 }}>
+              <Select value={statSelect} onChange={handleChange} displayEmpty inputProps={{ 'aria-label': 'Without label' }}>
+                {statCateg.map(categ => {
+                  return (
+                    <MenuItem key={categ} value={categ}>
+                      {categ}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          </Box>
+          <Box sx={{ display: 'flex', width: '100%' }}>
+            <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
+              <br />
+              {handleStats('min')} <br />
+              min <br />
+            </Typography>
+            <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
+              <br />
+              {handleStats('max')}
+              <br />
+              max <br />
+            </Typography>
+            <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
+              <br />
+              {handleStats('mean')} <br />
+              mean <br />
+            </Typography>
+          </Box>
+        </Paper>
       </Paper>
-    </Paper>
-    <div>
-    <Paper sx={{ position: 'fixed', bottom: 10, right: 10, width: '400px', height: 'auto', zIndex: 999 }}>
-      <Typography sx={{ backgroundColor: '#e0e0e0', fontSize: 14, fontWeight: 400, paddingLeft: 1 }}>Number of Items on map</Typography>
-    <HighchartsReact highcharts={Highcharts} constructorType={'chart'} options={options} />
-    </Paper>
-    </div>
+      <div>
+        <Paper elevation={3} sx={{ position: 'fixed', bottom: 10, right: 10, width: '400px', height: 'auto', zIndex: 999 }}>
+          <Typography sx={{ backgroundColor: '#e0e0e0', fontSize: 14, fontWeight: 400, paddingLeft: 1 }}>Number of Items on map</Typography>
+          <HighchartsReact highcharts={Highcharts} constructorType={'chart'} options={options} />
+        </Paper>
+      </div>
     </>
   );
 };

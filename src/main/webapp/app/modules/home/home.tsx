@@ -8,7 +8,6 @@ import { RouteComponentProps } from 'react-router-dom';
 import { LatLng } from 'leaflet';
 import { HomeLeftMenu } from './home-left-menu';
 import { HomeRightPanel } from './home-right-panel';
-import { Box } from '@mui/material';
 
 export interface IHomeProps extends StateProps, DispatchProps, RouteComponentProps<{ folder: string; id: string }> {}
 
@@ -41,18 +40,20 @@ export const Home = (props: IHomeProps) => {
     }
     setItems(farms);
 
-    // Filter Array Creation 
+    // Filter Array Creation
     if (sampleFile.length !== 0) {
       const filters = [];
-      const nofilters = ["lat", "lng", "capturedExceptions"];
-      Object.getOwnPropertyNames(sampleFile[0]).forEach(prop => (!nofilters.includes(`${[prop]}`) && filters.push({category: `${prop}`, values: []})));
+      const nofilters = ['lat', 'lng', 'capturedExceptions'];
+      Object.getOwnPropertyNames(sampleFile[0]).forEach(
+        prop => !nofilters.includes(`${[prop]}`) && filters.push({ category: `${prop}`, values: [] })
+      );
       filters.map(filter => {
         sampleFile.map(sample => {
           for (const [key, value] of Object.entries(sample)) {
-          (filter.category === key && !filter.values.includes(value)) && filter.values.push(value);
-        }
-      });
-      filter.values.sort();
+            filter.category === key && !filter.values.includes(value) && filter.values.push(value);
+          }
+        });
+        filter.values.sort();
       });
       setAllFilters(filters);
     }
@@ -90,7 +91,7 @@ export const Home = (props: IHomeProps) => {
 
   return (
     <div>
-      <HomeLeftMenu setFly={setFly} items={items} selected={selected} allFilters={allFilters} setSelected={setSelected}/>
+      <HomeLeftMenu setFly={setFly} items={items} selected={selected} allFilters={allFilters} setSelected={setSelected} />
       <HomeRightPanel filSamples={filSamples} counter={counter} />
       <FarmMap fly={fly} setBounds={setBounds} items={items} selected={selected} />
     </div>
