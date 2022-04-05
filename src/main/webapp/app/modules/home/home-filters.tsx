@@ -49,7 +49,7 @@ export const HomeFilters = (props: IHomeFilters) => {
     if (bol === false) {
       props.setSelected(old => [...old, [filter.category,filt]]);
     } else {
-      props.setSelected(old => old.filter(item => { console.log(item); return item[1] !== filt}));
+      props.setSelected(old => old.filter(item => {return item[1] !== filt}));
     }
     ;
   }
@@ -69,7 +69,7 @@ export const HomeFilters = (props: IHomeFilters) => {
       >
         Select Filters
       </Button>
-      <Popper className="popper-filter" placement="right" id={id} open={open} anchorEl={anchorEl}>
+      <Popper className="popper-filter" placement="bottom" id={id} open={open} anchorEl={anchorEl}>
         <ClickAwayListener
           onClickAway={() => {
             setAnchorEl(null);
@@ -91,7 +91,7 @@ export const HomeFilters = (props: IHomeFilters) => {
                             <ListItemIcon>
                               <Checkbox
                                 edge="start"
-                                checked={JSON.stringify(selected).indexOf(JSON.stringify([filter.category, filt])) !== -1}
+                                checked={JSON.stringify(selected).includes(JSON.stringify([filter.category, filt]))}
                                 tabIndex={-1}
                                 disableRipple
                                 icon={<RadioButtonUncheckedIcon fontSize="small" />}

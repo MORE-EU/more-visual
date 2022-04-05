@@ -60,7 +60,7 @@ export const FarmMap = (props: IFarmMap) => {
           {item.farmInfo.map((info, locIdx) => {
             const rand = Math.floor((Math.random() * 3) + 1);
             let count = 0;
-            let count1 = [];
+            const count1 = [];
             selected.map(sele => {!count1.includes(sele[0]) && count1.push(sele[0])});
             let rendItem = true;
             if(selected.length > 0){

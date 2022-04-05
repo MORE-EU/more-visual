@@ -34,7 +34,7 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
     <>
       <Paper elevation={3} sx={{ position: 'fixed', top: 10, left: 10, width: 'auto', height: 'auto', zIndex: 999 }}>
         <Grid>
-          <Typography variant="h6" sx={{ backgroundColor: '#e0e0e0', fontSize: 16, fontWeight: 400, paddingLeft: 1, textAlign: 'center' }}>
+          <Typography variant="h6" sx={{ backgroundColor: '#78909c', fontSize: 16, fontWeight: 400, paddingLeft: 1, textAlign: 'center' }}>
             Available Farms
           </Typography>
           <List sx={{ width: '100%', overflowY: 'scroll', maxHeight: '300px' }} dense={true}>

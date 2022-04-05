@@ -16,7 +16,6 @@ export const Home = (props: IHomeProps) => {
 
   const [fly, setFly] = useState(new LatLng(51.505, -0.09));
   const [bounds, setBounds] = useState({ _southWest: { lat: 0, lng: 0 }, _northEast: { lat: 0, lng: 0 } });
-  const [counter, setCounter] = useState(0);
   const [filSamples, setFilSamples] = useState([]);
   const [allFilters, setAllFilters] = useState([]);
   const [items, setItems] = useState([]);
@@ -73,7 +72,6 @@ export const Home = (props: IHomeProps) => {
         }
       });
     });
-    setCounter(cnt);
 
     const filteredSamples = [];
     sampleFile.map(sample => {
@@ -92,7 +90,7 @@ export const Home = (props: IHomeProps) => {
   return (
     <div>
       <HomeLeftMenu setFly={setFly} items={items} selected={selected} allFilters={allFilters} setSelected={setSelected} />
-      <HomeRightPanel filSamples={filSamples} counter={counter} />
+      <HomeRightPanel filSamples={filSamples} />
       <FarmMap fly={fly} setBounds={setBounds} items={items} selected={selected} />
     </div>
   );
