@@ -102,7 +102,6 @@ export const Chart = (props: IChartProps) => {
   useEffect(() => {
     props.updateQueryResults(folder, dataset.id);
   }, [dataset]);
-
   const annotationToDate = (annotation, len) => {
     const x1 = annotation.startXMin,
       x2 = annotation.startXMax,
@@ -189,6 +188,8 @@ export const Chart = (props: IChartProps) => {
               }
             },
             series: {
+              connectNulls: false,
+              connectorAllowed: false,
               maxPointWidth: 80,
               dataGrouping: {
                 units: [
@@ -213,7 +214,10 @@ export const Chart = (props: IChartProps) => {
             zoneAxis: 'x',
             zones,
           }))) : selectedMeasures.map((measure, index) => ({
-            data: data.map(d => ([new Date(d[0]), parseFloat(d[measure])])),
+            data: data.map(d => {
+              const val = parseFloat(d[measure]);
+              return [new Date(d[0]), isNaN(val) ? null : val];
+            }),
             name: dataset.header[measure],
             yAxis: changeChart ? index : 0,
             zoneAxis: 'x',
