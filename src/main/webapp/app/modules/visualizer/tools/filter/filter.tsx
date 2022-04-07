@@ -1,4 +1,4 @@
-import {Box, Grid, Slider, Stack, Typography} from "@mui/material";
+import {Box, Checkbox, Grid, Slider, Stack, Typography} from "@mui/material";
 import List from "@mui/material/List";
 import TextField from "@mui/material/TextField";
 import React from "react";
@@ -13,8 +13,6 @@ export interface IFilterProps {
   queryResults: IQueryResults,
   updateFilters: typeof updateFilters,
   filterData: typeof filterData,
-
-
 }
 
 export const Filter = (props: IFilterProps) => {
@@ -26,6 +24,12 @@ export const Filter = (props: IFilterProps) => {
       <Typography variant="h6" gutterBottom>
         Filters
       </Typography>
+      <Box>
+        <Typography  gutterBottom>
+          Remove filtered points
+        </Typography>
+      <Checkbox/>
+      </Box>
       <List dense sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
         {queryResults && dataset.measures.map((col) => {
           const stats = queryResults.measureStats[col];

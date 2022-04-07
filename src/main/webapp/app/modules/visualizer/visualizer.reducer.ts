@@ -332,19 +332,36 @@ export const updateCompare = (data: string) => ({
 
 export const filterData = () => (dispatch, getState) => {
   const { queryResults, filters } = getState().visualizer;
+  const clone = items => items.map(item => (Array.isArray(item) ? clone(item) : item));
+  const d = clone(queryResults.data);
   dispatch({
     type: ACTION_TYPES.FILTER_DATA,
-    payload: queryResults.data.filter(row => {
+    // payload: queryResults.data.filter(row => {
+    //   const filteredCols = Object.keys(filters);
+    //   for (let i = 0; i < filteredCols.length; i++) {
+    //     const col = filteredCols[i],
+    //       filter = filters[col];
+    //     const value = parseFloat(row[col]);
+    //     if (value < filter[0] || value > filter[1]) {
+    //       return false;
+    //     }
+    //   }
+    //   return true;
+    // }),
+    payload: d.map(row => {
       const filteredCols = Object.keys(filters);
       for (let i = 0; i < filteredCols.length; i++) {
         const col = filteredCols[i],
           filter = filters[col];
-        const value = parseFloat(row[col]);
+        let value = parseFloat(row[col]);
         if (value < filter[0] || value > filter[1]) {
-          return false;
+          for (let j = 1; j < row.length; j++) {
+            row[j] = null;
+          }
+          break;
         }
       }
-      return true;
+      return row;
     }),
   });
 };
