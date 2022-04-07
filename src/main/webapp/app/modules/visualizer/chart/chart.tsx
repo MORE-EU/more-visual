@@ -148,7 +148,7 @@ export const Chart = (props: IChartProps) => {
           plotOptions: {
             arearange: {
               dataGrouping:{
-                approximation: function (_, groupData) {
+                approximation(_, groupData) {
                   const asc = arr => arr.sort((a, b) => a - b);
                   return  [asc(groupData)[0], asc(groupData)[groupData.length - 1] ];
                 }
@@ -156,7 +156,7 @@ export const Chart = (props: IChartProps) => {
             },
             boxplot: {
               dataGrouping: {
-                approximation: function (_, groupData) {
+                approximation(_, groupData) {
                   // sort array ascending
                   const asc = arr => arr.sort((a, b) => a - b);
                   const sum = arr => arr.reduce((a, b) => a + b, 0);

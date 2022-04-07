@@ -59,16 +59,19 @@ export const FarmMap = (props: IFarmMap) => {
           <MarkerClusterGroup showCoverageOnHover={true} key={itemIdx}>
           {item.farmInfo.map((info, locIdx) => {
             const rand = Math.floor((Math.random() * 3) + 1);
+            let count = 0;
+            const count1 = [];
+            selected.map(sele => {!count1.includes(sele[0]) && count1.push(sele[0])});
             let rendItem = true;
             if(selected.length > 0){
             for (const [key, value] of Object.entries(info)) {
-                if(selected.includes(value)){
-                  rendItem = true;
-                  break;
-                }else{
-                  rendItem = false;
+              selected.map(sel => {
+                if(sel[0] === key && sel[1] === value){
+                  count++;
                 }
+              })
               }
+            count === count1.length ? rendItem = true : rendItem = false;
           }
             return(
             rendItem === true && (
