@@ -83,6 +83,10 @@ export const HomeRightPanel = (props: IHomeRightPanel) => {
       Object.keys(boundItems).map((item) => {
         boundItems[`${item}`] = boundItems[item].reduce((prevVal, nextVal) => Number(prevVal) + Number(nextVal), 0);
       });
+    }else if (operation === 'COUNT'){
+      Object.keys(boundItems).map((item) => {
+        boundItems[`${item}`] = boundItems[item].length;
+      });
     }
     setChartCateg([]);
     setChartData([]);
@@ -147,7 +151,7 @@ export const HomeRightPanel = (props: IHomeRightPanel) => {
       });
       mean = Math.floor(newVals.reduce((prevVal, nextVal) => prevVal + nextVal, 0) / newVals.length);
       newVals = sd.map(value => {
-        return Math.pow(value - mean, 2);
+        return Math.pow(Number(value) - Number(mean), 2);
       });
       newVals.forEach(va => (sd2 = sd2 + parseInt(va, 10)));
       sd2 = Math.floor((sd2 / newVals.length - 1) * 100) / 100;
@@ -161,9 +165,6 @@ export const HomeRightPanel = (props: IHomeRightPanel) => {
   return (
     <>
       <Paper elevation={3} sx={{ position: 'fixed', bottom: 320, right: 10, width: '400px', height: 'auto', zIndex: 999 }}>
-        <Typography variant="h6" sx={{ backgroundColor: '#78909c', fontSize: 14, fontWeight: 400, paddingLeft: 1 }}>
-          Statistics Panel
-        </Typography>
         <Paper sx={{ textAlign: 'center' }}>
           <Box sx={{ textAlign: 'center', alignItems: 'center', display: 'flex' }}>
             <Typography textAlign="center" variant="h6" sx={{ fontSize: 16, flex: 1 }}>
@@ -237,7 +238,7 @@ export const HomeRightPanel = (props: IHomeRightPanel) => {
             </Button>
           </Box>
           <HighchartsReact highcharts={Highcharts} constructorType={'chart'} options={options} />
-          <Box sx={{ textAlign: 'center', alignItems: 'center', display: "flex", mt: 1, mb: 1, mr: 1, ml: 1, fontSize: 20 }}>
+          <Box sx={{ textAlign: 'center', alignItems: 'center', display: "flex", mt: 1, mb: 1, mr: 1, ml: 1, fontSize: 16 }}>
               {`Find `} 
               <FormControl variant="standard" sx={{flex: 1}}>
                 <Select value={option1} onChange={e => {setOption1(e.target.value)}}>
