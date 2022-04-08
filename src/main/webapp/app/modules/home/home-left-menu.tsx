@@ -7,17 +7,20 @@ import {
   List,
   ListItem,
   ListItemAvatar,
+  ListItemButton,
+  ListItemIcon,
   ListItemText,
-  ListSubheader,
   Paper,
   Tooltip,
   Typography,
 } from '@mui/material';
-import FactoryIcon from '@mui/icons-material/Factory';
+import WindPowerIcon from '@mui/icons-material/WindPower';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MapIcon from '@mui/icons-material/Map';
 import { HomeFilters } from './home-filters';
 import { LatLng } from 'leaflet';
+import CloseIcon from '@mui/icons-material/Close';
+import { grey } from '@mui/material/colors';
 
 export interface IHomeLeftMenu {
   setFly?: Dispatch<SetStateAction<LatLng>>;
@@ -32,6 +35,7 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
 
   return (
     <>
+      {console.log(selected)}
       <Paper elevation={3} sx={{ position: 'fixed', top: 10, left: 10, width: 'auto', height: 'auto', zIndex: 999 }}>
         <Grid>
           <List sx={{ width: '100%', overflowY: 'scroll', maxHeight: '300px' }} dense={true}>
@@ -40,8 +44,8 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
                 <>
                   <ListItem key={idx}>
                     <ListItemAvatar>
-                      <Avatar sx={{ width: 30, height: 30 }}>
-                        <FactoryIcon />
+                      <Avatar variant="rounded" sx={{ width: 30, height: 30, bgcolor: grey[800] }}>
+                        <WindPowerIcon />
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText primary={item.name} sx={{ mr: 2 }} />
@@ -69,6 +73,20 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
             })}
           </List>
         </Grid>
+        <List disablePadding dense>
+          {selected.map(sel => (
+            <ListItem dense key={sel}>
+              <ListItemIcon
+                onClick={() => {props.setSelected(selected.filter(fil => fil !== sel))}}
+              >
+                <ListItemButton>
+                  <CloseIcon />
+                </ListItemButton>
+              </ListItemIcon>
+              <ListItemText primary={`${sel[0]} / ${sel[1]}`} />
+            </ListItem>
+          ))}
+        </List>
         <Grid>
           <HomeFilters allFilters={allFilters} setSelected={props.setSelected} selected={selected} />
         </Grid>

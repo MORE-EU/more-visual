@@ -7,7 +7,8 @@ import { getSampleFile, getWdFiles } from 'app/modules/visualizer/visualizer.red
 import { RouteComponentProps } from 'react-router-dom';
 import { LatLng } from 'leaflet';
 import { HomeLeftMenu } from './home-left-menu';
-import { HomeRightPanel } from './home-right-panel';
+import { HomeRightStatsPanel } from './home-right-stats-panel';
+import { HomeRightChartPanel } from './home-right-chart-panel';
 
 export interface IHomeProps extends StateProps, DispatchProps, RouteComponentProps<{ folder: string; id: string }> {}
 
@@ -90,7 +91,8 @@ export const Home = (props: IHomeProps) => {
   return (
     <div>
       <HomeLeftMenu setFly={setFly} items={items} selected={selected} allFilters={allFilters} setSelected={setSelected} />
-      <HomeRightPanel filSamples={filSamples} />
+      <HomeRightStatsPanel filSamples={filSamples} />
+      <HomeRightChartPanel filSamples={filSamples} selected={selected} />
       <FarmMap fly={fly} setBounds={setBounds} items={items} selected={selected} />
     </div>
   );

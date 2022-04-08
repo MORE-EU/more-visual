@@ -1,21 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Button,
-  Checkbox,
-  ClickAwayListener,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Paper,
-  Popper,
-  Typography,
-} from '@mui/material';
+import {Accordion,AccordionDetails,AccordionSummary,Button,Checkbox,ClickAwayListener,List,ListItem,ListItemButton,ListItemIcon,ListItemText,Paper,Popper,Typography} from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
@@ -62,7 +46,7 @@ export const HomeFilters = (props: IHomeFilters) => {
     <>
       <Button
         variant="text"
-        sx={{ backgroundColor: '#e0e0e0', color: 'black' }}
+        sx={{ bgcolor: '#e0e0e0', color: 'black' }}
         onClick={handleClick}
         startIcon={<FilterAltIcon color="action" />}
         fullWidth={true}
