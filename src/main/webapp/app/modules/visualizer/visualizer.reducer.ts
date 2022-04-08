@@ -353,7 +353,7 @@ export const filterData = () => (dispatch, getState) => {
       for (let i = 0; i < filteredCols.length; i++) {
         const col = filteredCols[i],
           filter = filters[col];
-        let value = parseFloat(row[col]);
+        const value = parseFloat(row[col]);
         if (value < filter[0] || value > filter[1]) {
           for (let j = 1; j < row.length; j++) {
             row[j] = null;
