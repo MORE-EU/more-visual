@@ -36,7 +36,7 @@ export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
   const handleStatsPanel = val => {
     let sd, mean, newVals;
     let sd2 = 0;
-    let filtSample = [];
+    const filtSample = [];
     newVals = filSamples.map(sample => {
       if (selected.length !== 0) {
         Object.keys(sample).map(fil => {

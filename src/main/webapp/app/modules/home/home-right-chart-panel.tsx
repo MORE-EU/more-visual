@@ -5,6 +5,7 @@ import HighchartsReact from 'highcharts-react-official';
 import Heatmap from 'highcharts/modules/heatmap.js';
 import { BarChart, ShowChart, TableChart } from '@material-ui/icons';
 import GridViewIcon from '@mui/icons-material/GridView';
+import { ConstructionOutlined } from '@mui/icons-material';
 
 Heatmap(Highcharts);
 
@@ -114,9 +115,7 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
         Object.keys(fil).map(f => {
           if (selected.length !== 0) {
             if (JSON.stringify(selected).includes(JSON.stringify([f, fil[f]]))) {
-              if (f === option3) {
-                xCateg[`${fil[f]}`] = [];
-              }
+              xCateg[`${fil[option3]}`] = [];
             }
           } else {
             if (f === option3) {
@@ -128,24 +127,25 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
           }
         });
       });
-
+      console.log(xCateg);
       filSamples.map(fil => {
-        for (const [key, value] of Object.entries(fil)) {
+        Object.keys(fil).map(f => {
           if(selected.length !== 0){
-            if (key.toString() === option3 && JSON.stringify(selected).includes(JSON.stringify([key, value]))) {
-              xCateg[`${value}`].push(fil[`${option2}`]);
+            if (JSON.stringify(selected).includes(JSON.stringify([f, fil[f]]))) {
+              console.log(f, fil[f]);
+            xCateg[fil[option3]].push(fil[option2]);
             }
           }else{
-            if (key.toString() === option3) {
-              xCateg[`${value}`].push(fil[`${option2}`]);
+            if (f === option3) {
+              xCateg[fil[f]].push(fil[option2]);
             }
           }
-          if (chartType === 'heatmap' && key.toString() === option4) {
+          if (chartType === 'heatmap' && f === option4) {
             Object.hasOwnProperty.call(yCateg, fil[option4]) &&
-              !yCateg[`${value}`].includes(fil[option3]) &&
-              yCateg[`${value}`].push(fil[option3]);
+              !yCateg[fil[f]].includes(fil[option3]) &&
+              yCateg[fil[f]].push(fil[option3]);
           }
-        }
+        })
       });
     }
 
