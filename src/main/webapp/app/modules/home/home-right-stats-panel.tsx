@@ -52,7 +52,6 @@ export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
     if(selected.length !== 0){
       newVals = filtSample;
     }
-    console.log(newVals);
     if (val === 'min') {
       newVals.length !== 0 ? (newVals = Math.min(...newVals)) : (newVals = 'N/A');
     } else if (val === 'max') {
