@@ -35,7 +35,6 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
 
   return (
     <>
-      {console.log(selected)}
       <Paper elevation={3} sx={{ position: 'fixed', top: 10, left: 10, width: 'auto', height: 'auto', zIndex: 999 }}>
         <Grid>
           <List sx={{ width: '100%', overflowY: 'scroll', maxHeight: '300px' }} dense={true}>

@@ -91,7 +91,7 @@ export const Home = (props: IHomeProps) => {
   return (
     <div>
       <HomeLeftMenu setFly={setFly} items={items} selected={selected} allFilters={allFilters} setSelected={setSelected} />
-      <HomeRightStatsPanel filSamples={filSamples} />
+      <HomeRightStatsPanel filSamples={filSamples} selected={selected} />
       <HomeRightChartPanel filSamples={filSamples} selected={selected} />
       <FarmMap fly={fly} setBounds={setBounds} items={items} selected={selected} />
     </div>

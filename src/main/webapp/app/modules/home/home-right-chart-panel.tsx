@@ -111,20 +111,34 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
     const yCateg = {};
     if (filSamples.length !== 0) {
       filSamples.map(fil => {
-        for (const [key, value] of Object.entries(fil)) {
-            if (key.toString() === option3) {
-              xCateg[`${value}`] = [];
+        Object.keys(fil).map(f => {
+          if (selected.length !== 0) {
+            if (JSON.stringify(selected).includes(JSON.stringify([f, fil[f]]))) {
+              if (f === option3) {
+                xCateg[`${fil[f]}`] = [];
+              }
             }
-          if (key.toString() === option4) {
-            yCateg[`${value}`] = [];
+          } else {
+            if (f === option3) {
+              xCateg[`${fil[f]}`] = [];
+            }
           }
-        }
+          if (f === option4) {
+            yCateg[`${fil[f]}`] = [];
+          }
+        });
       });
 
       filSamples.map(fil => {
         for (const [key, value] of Object.entries(fil)) {
-          if (key.toString() === option3) {
-            xCateg[`${value}`].push(fil[`${option2}`]);
+          if(selected.length !== 0){
+            if (key.toString() === option3 && JSON.stringify(selected).includes(JSON.stringify([key, value]))) {
+              xCateg[`${value}`].push(fil[`${option2}`]);
+            }
+          }else{
+            if (key.toString() === option3) {
+              xCateg[`${value}`].push(fil[`${option2}`]);
+            }
           }
           if (chartType === 'heatmap' && key.toString() === option4) {
             Object.hasOwnProperty.call(yCateg, fil[option4]) &&
@@ -139,7 +153,7 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
       setChartCategYaxis(old => [...old, key]);
     });
     handleBoundStats(option1, xCateg, yCateg);
-  }, [option1, option2, option3, option4, filSamples]);
+  }, [option1, option2, option3, option4, filSamples, selected]);
 
   return (
     <div>

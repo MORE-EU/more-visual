@@ -7,12 +7,13 @@ Heatmap(Highcharts);
 
 export interface IHomeRightPanel {
   filSamples: any[];
+  selected: any[];
 }
 
 // TODO: fix stat panel data when filters are selected
 
 export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
-  const { filSamples } = props;
+  const { filSamples, selected } = props;
 
   const [statSelect, setStatSelect] = useState('noOfTurbines');
   const [statCateg, setStatCateg] = useState([]);
@@ -35,9 +36,23 @@ export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
   const handleStatsPanel = val => {
     let sd, mean, newVals;
     let sd2 = 0;
+    let filtSample = [];
     newVals = filSamples.map(sample => {
+      if (selected.length !== 0) {
+        Object.keys(sample).map(fil => {
+          if (JSON.stringify(selected).includes(JSON.stringify([fil, sample[fil]]))) {
+            console.log("mpika");
+            filtSample.push(parseInt(sample[`${statSelect}`], 10));
+          }
+        });
+      }else{
       return parseInt(sample[`${statSelect}`], 10);
+      }
     });
+    if(selected.length !== 0){
+      newVals = filtSample;
+    }
+    console.log(newVals);
     if (val === 'min') {
       newVals.length !== 0 ? (newVals = Math.min(...newVals)) : (newVals = 'N/A');
     } else if (val === 'max') {
