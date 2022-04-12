@@ -14,7 +14,7 @@ export interface IHomeRightChartPanel {
   selected: any[];
 }
 
-// TODO: fix chart data when filters are selected
+// TODO: Fix tooltip when heatmap is used
 
 export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
   const { filSamples, selected } = props;
@@ -127,12 +127,10 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
           }
         });
       });
-      console.log(xCateg);
       filSamples.map(fil => {
         Object.keys(fil).map(f => {
           if(selected.length !== 0){
             if (JSON.stringify(selected).includes(JSON.stringify([f, fil[f]]))) {
-              console.log(f, fil[f]);
             xCateg[fil[option3]].push(fil[option2]);
             }
           }else{

@@ -10,8 +10,6 @@ export interface IHomeRightPanel {
   selected: any[];
 }
 
-// TODO: fix stat panel data when filters are selected
-
 export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
   const { filSamples, selected } = props;
 

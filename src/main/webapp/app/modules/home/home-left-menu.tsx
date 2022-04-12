@@ -10,6 +10,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  ListSubheader,
   Paper,
   Tooltip,
   Typography,
@@ -41,7 +42,7 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
             {items.map((item, idx) => {
               return (
                 <>
-                  <ListItem key={idx}>
+                  <ListItem key={`${item}-${idx}`}>
                     <ListItemAvatar>
                       <Avatar variant="rounded" sx={{ width: 30, height: 30, bgcolor: grey[800] }}>
                         <WindPowerIcon />
@@ -72,23 +73,27 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
             })}
           </List>
         </Grid>
-        <List disablePadding dense>
-          {selected.map(sel => (
-            <ListItem dense key={sel}>
-              <ListItemIcon
-                onClick={() => {props.setSelected(selected.filter(fil => fil !== sel))}}
-              >
-                <ListItemButton>
-                  <CloseIcon />
-                </ListItemButton>
-              </ListItemIcon>
-              <ListItemText primary={`${sel[0]} / ${sel[1]}`} />
-            </ListItem>
-          ))}
-        </List>
         <Grid>
           <HomeFilters allFilters={allFilters} setSelected={props.setSelected} selected={selected} />
         </Grid>
+        {selected.length !== 0 && (
+          <List disablePadding dense subheader={<ListSubheader>Active Filters:</ListSubheader>}>
+            {selected.map(sel => (
+              <ListItem dense disablePadding key={sel}>
+                <ListItemIcon
+                  onClick={() => {
+                    props.setSelected(selected.filter(fil => fil !== sel));
+                  }}
+                >
+                  <ListItemButton>
+                    <CloseIcon />
+                  </ListItemButton>
+                </ListItemIcon>
+                <ListItemText primary={`${sel[0]} / ${sel[1]}`} />
+              </ListItem>
+            ))}
+          </List>
+        )}
       </Paper>
     </>
   );
