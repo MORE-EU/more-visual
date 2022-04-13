@@ -39,7 +39,6 @@ export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
       if (selected.length !== 0) {
         Object.keys(sample).map(fil => {
           if (JSON.stringify(selected).includes(JSON.stringify([fil, sample[fil]]))) {
-            console.log("mpika");
             filtSample.push(parseInt(sample[`${statSelect}`], 10));
           }
         });

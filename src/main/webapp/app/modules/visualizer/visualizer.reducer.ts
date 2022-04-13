@@ -9,6 +9,7 @@ import { DateObject } from 'react-multi-date-picker';
 export const ACTION_TYPES = {
   FETCH_DATASET: 'visualizer/FETCH_DATASET',
   FETCH_SAMPLEFILE: 'visualizer/FETCH_SAMPLEFILE',
+  FETCH_DIRECTORIES: 'visualizer/FETCH_DIRECTORIES',
   FETCH_WDFILES: 'visualizer/FETCH_WDFILES',
   FETCH_QUERY_RESULTS: 'visualizer/FETCH_QUERY_RESULTS',
   UPDATE_SELECTED_MEASURES: 'visualizer/UPDATE_SELECTED_MEASURES',
@@ -56,6 +57,7 @@ const initialState = {
   graphZoom: null,
   activeTool: -1,
   compare: '',
+  directories: [],
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
@@ -95,6 +97,7 @@ const initPatterns = (data, length, frequency) => {
 export default (state: VisualizerState = initialState, action): VisualizerState => {
   switch (action.type) {
     case REQUEST(ACTION_TYPES.FETCH_WDFILES):
+    case REQUEST(ACTION_TYPES.FETCH_DIRECTORIES):
     case REQUEST(ACTION_TYPES.FETCH_DATASET):
     case REQUEST(ACTION_TYPES.FETCH_SAMPLEFILE):
       return {
@@ -103,6 +106,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         loading: true,
       };
     case FAILURE(ACTION_TYPES.FETCH_WDFILES):
+    case FAILURE(ACTION_TYPES.FETCH_DIRECTORIES):
     case FAILURE(ACTION_TYPES.FETCH_DATASET):
     case FAILURE(ACTION_TYPES.FETCH_SAMPLEFILE):
       return {
@@ -121,6 +125,12 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         loading: false,
         sampleFile: action.payload.data,
+      };
+    case SUCCESS(ACTION_TYPES.FETCH_DIRECTORIES):
+      return {
+        ...state,
+        loading: false,
+        directories: action.payload.data,
       };
     case SUCCESS(ACTION_TYPES.FETCH_DATASET):
       return {
@@ -247,6 +257,13 @@ export const getWdFiles = folder => {
   return {
     type: ACTION_TYPES.FETCH_WDFILES,
     payload: axios.get(`api/datasets/${folder}`),
+  };
+};
+
+export const getDirectories = () => {
+  return {
+    type: ACTION_TYPES.FETCH_DIRECTORIES,
+    payload: axios.get(`api/datasets/directories`),
   };
 };
 

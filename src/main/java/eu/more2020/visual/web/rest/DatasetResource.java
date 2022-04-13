@@ -133,10 +133,16 @@ public class DatasetResource {
         return datasetRepository.findFiles(folder);
     }
     
-    @GetMapping("/datasets/{id}/sample")
-    public List<Sample> getSample(@PathVariable String id) throws IOException {
+    @GetMapping("/datasets/{folder}/sample")
+    public List<Sample> getSample(@PathVariable String folder) throws IOException {
         log.debug("REST request to get Sample File");
-        return datasetRepository.findSample(id);
+        return datasetRepository.findSample(folder);
+    }
+    
+    @GetMapping("/datasets/directories")
+    public List<String> getDirectories() throws IOException {
+        log.debug("REST request to get Directories");
+        return datasetRepository.findDirectories();
     }
 
     /**
