@@ -1,4 +1,4 @@
-import {Box, Checkbox, Grid, Slider, Stack, Typography} from "@mui/material";
+import {Box, Checkbox, Divider, Grid, Slider, Stack, Typography} from "@mui/material";
 import List from "@mui/material/List";
 import TextField from "@mui/material/TextField";
 import React from "react";
@@ -31,10 +31,10 @@ export const Filter = (props: IFilterProps) => {
       <Checkbox/>
       </Box>
       <List dense sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
-        {queryResults && dataset.measures.map((col) => {
+        {queryResults && dataset.measures.map((col,idx) => {
           const stats = queryResults.measureStats[col];
-          return <Box key={col} sx={{width: '80%'}}>
-            <Typography gutterBottom>
+          return <Box key={col} sx={{width: '80%', mt: idx > 0 ? 1 : 0}}>
+            <Typography gutterBottom variant="overline" sx={{textAlign: "center", fontWeight: 900, display: "block"}}>
               {dataset.header[col]}
             </Typography>
             <Slider
@@ -48,16 +48,17 @@ export const Filter = (props: IFilterProps) => {
             />
             <Stack direction="row" spacing={2}>
               <TextField id="outlined-basic" label="Min-Value" variant="outlined" size="small"
-                         value={filters[col] ? filters[col][0] : stats.min} onChange={(e) => {
+                         value={filters[col] ? parseFloat(filters[col][0]).toFixed(2) : parseFloat(stats.min).toFixed(2)} onChange={(e) => {
                 props.updateFilters(col, [e.target.value, filters[col] ? filters[col][1] : stats.max]);
                 props.filterData();
               }}/>
               <TextField id="outlined-basic" label="Max-Value" variant="outlined" size="small"
-                         value={filters[col] ? filters[col][1] : stats.max} onChange={(e) => {
+                         value={filters[col] ? parseFloat(filters[col][1]).toFixed(2) : parseFloat(stats.max).toFixed(2)} onChange={(e) => {
                 props.updateFilters(col, [filters[col] ? filters[col][0] : stats.min, e.target.value]);
                 props.filterData();
               }}/>
             </Stack>
+            <Divider sx={{mt: 2}}/>
           </Box>
         })}
       </List>

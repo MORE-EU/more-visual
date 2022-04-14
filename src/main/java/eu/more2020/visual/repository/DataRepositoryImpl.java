@@ -96,7 +96,7 @@ public class DataRepositoryImpl implements DatasetRepository {
     @Override
     public List<String> findFiles(String folder) throws IOException {
         File file = new File(applicationProperties.getWorkspacePath() + "/" + folder);
-        FileFilter fileFilter = f -> !f.isDirectory() && f.getName().endsWith(".csv");
+        FileFilter fileFilter = f -> !f.isDirectory() && f.getName().endsWith(".csv") && f.getName().contains("sample");
         File[] fileNames = file.listFiles(fileFilter);
         List<String> fileList = new ArrayList<>();
         for (File newFile : fileNames) {

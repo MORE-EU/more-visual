@@ -5,7 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import {Box, FormControl, Grid, InputLabel, MenuItem, Select, Slider, Stack, Typography} from "@mui/material";
+import {Box, FormControl, Grid, InputLabel, ListItemIcon, MenuItem, Select, Slider, Stack, Tooltip, Typography} from "@mui/material";
 import {
   getDataset,
   updateChangeChart,
@@ -17,6 +17,7 @@ import {
 } from "app/modules/visualizer/visualizer.reducer";
 import TextField from '@mui/material/TextField';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import {IQueryResults} from "app/shared/model/query-results.model";
@@ -32,6 +33,7 @@ export interface IVisControlProps {
   wdFiles: any[],
   folder: string,
   datasetChoice: number,
+  compare: string,
   updateDatasetChoice: typeof updateDatasetChoice,
   updateFrom: typeof updateFrom,
   updateTo: typeof updateTo,
@@ -43,7 +45,7 @@ export interface IVisControlProps {
 
 
 export const VisControl = (props: IVisControlProps) => {
-  const {dataset, selectedMeasures, from, to, wdFiles, folder} = props;
+  const {dataset, selectedMeasures, from, to, wdFiles, folder, compare} = props;
 
 
   const handleToggle = (col) => () => {
@@ -128,6 +130,12 @@ export const VisControl = (props: IVisControlProps) => {
                 divider
               >
                 <ListItemText primary={`${file}`} sx={{pl: 4}}/>
+                {compare === file && 
+                <Tooltip title="Currently comparing this file">
+                <ListItemIcon>
+                  <CompareArrowsIcon />
+                </ListItemIcon>
+                </Tooltip>}
               </ListItemButton>
             );
           })}

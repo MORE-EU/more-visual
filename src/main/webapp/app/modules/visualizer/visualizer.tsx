@@ -8,31 +8,15 @@ import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
 import {Redirect, RouteComponentProps} from 'react-router-dom';
 import {IRootState} from "app/shared/reducers";
-import {
-  filterData,
-  getChangePointDates,
-  getDataset,
-  getPatterns,
-  getWdFiles,
-  updateChangeChart,
-  updateChangePointDates,
-  updateDatasetChoice,
-  updateFilters,
-  updateFrom,
-  updateGraphZoom,
-  updatePatternNav,
-  updatePatterns,
-  updateQueryResults,
-  updateResampleFreq,
-  updateSelectedMeasures,
-  updateTo,
-  updateActiveTool,
-  updateCompare,
+import {filterData,getChangePointDates,getDataset,getPatterns,getWdFiles,updateChangeChart,updateChangePointDates,
+updateDatasetChoice,updateFilters,updateFrom,updateGraphZoom,updatePatternNav,updatePatterns,
+updateQueryResults,updateResampleFreq,updateSelectedMeasures,updateTo,updateActiveTool,updateCompare,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
 import Toolkit from "app/modules/visualizer/tools/toolkit";
-import {Divider, Grid, Typography} from "@mui/material";
+import HomeIcon from '@mui/icons-material/Home';
+import {Breadcrumbs, Divider, Grid, Link, Typography} from "@mui/material";
 
 const mdTheme = createTheme();
 
@@ -65,19 +49,37 @@ export const Visualizer = (props: IVisualizerProps) => {
   }, [props.match.params.id !== undefined]);
 
   return !loading && dataset !== null && <div>
+    {console.log(compare)}
     <ThemeProvider theme={mdTheme}>
       <Toolbar>
         <Box  sx={{alignItems:'center', display: 'flex',
         flexDirection: 'row'}}>
-        <Typography variant="h5" noWrap component="div">
-          {dataset.farmName}
+        <Breadcrumbs aria-label="breadcrumb">
+        <Link
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+          href="/"
+        >
+          <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+          Home
+        </Link>
+        <Link
+          underline="hover"
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="inherit"
+        >
+         
+         {dataset.farmName}
+        </Link>
+        <Typography
+          sx={{ display: 'flex', alignItems: 'center' }}
+          color="text.primary"
+        >
+         
+         {dataset.formalName}
         </Typography>
-          <Typography variant="h5" noWrap component="div">
-           &nbsp;/&nbsp;
-          </Typography>
-          <Typography variant="body1" noWrap component="p">
-          {dataset.formalName}
-        </Typography>
+      </Breadcrumbs>
         </Box>
       </Toolbar>
       <Divider/>
@@ -100,7 +102,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                         updateResampleFreq={props.updateResampleFreq}
                         updateChangeChart={props.updateChangeChart} wdFiles={wdFiles}
                         updateDatasetChoice={props.updateDatasetChoice} datasetChoice={datasetChoice}
-                        getDataset={props.getDataset} folder={props.match.params.folder}/>
+                        getDataset={props.getDataset} folder={props.match.params.folder} compare={compare}/>
           </Paper>
         </Box>
         <Box
