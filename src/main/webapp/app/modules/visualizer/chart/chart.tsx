@@ -4,7 +4,7 @@ import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsMore from 'highcharts/highcharts-more';
 import {IDataset} from "app/shared/model/dataset.model";
-import {updateChangePointDates, updateQueryResults, updateActiveTool} from '../visualizer.reducer';
+import {updateChangePointDates, updateQueryResults, updateActiveTool, updateCompareQueryResults} from '../visualizer.reducer';
 import {IPatterns} from "app/shared/model/patterns.model";
 import {Grid} from '@mui/material';
 import indicatorsAll from "highcharts/indicators/indicators-all";
@@ -42,6 +42,7 @@ Highcharts.setOptions({
 export interface IChartProps {
   dataset: IDataset,
   data: any,
+  compareData: any[],
   updateQueryResults: typeof updateQueryResults,
   selectedMeasures: number[],
   from: Date,
@@ -69,7 +70,7 @@ fullScreen(Highcharts);
 export const Chart = (props: IChartProps) => {
   const {dataset, data, selectedMeasures,
     from, to, resampleFreq, patterns, changeChart, folder,
-    graphZoom, changePointDates, compare} = props;
+    graphZoom, changePointDates, compare, compareData,} = props;
 
   const [blockScroll, allowScroll] = useScrollBlock();
   const [zones, setZones] = useState([]);
@@ -102,6 +103,7 @@ export const Chart = (props: IChartProps) => {
   useEffect(() => {
     props.updateQueryResults(folder, dataset.id);
   }, [dataset]);
+
   const annotationToDate = (annotation, len) => {
     const x1 = annotation.startXMin,
       x2 = annotation.startXMax,
@@ -201,14 +203,14 @@ export const Chart = (props: IChartProps) => {
               }
             }
           },
-          series: compare.length !== 0 ? selectedMeasures.map((measure, index) => ({
+          series: compare.length !== 0 && compareData !== null ? selectedMeasures.map((measure, index) => ({
             data: data.map(d => ([new Date(d[0]), parseFloat(d[measure])])),
             name: dataset.header[measure],
             yAxis: changeChart ? index : 0,
             zoneAxis: 'x',
             zones,
           })).concat(selectedMeasures.map((measure, index) => ({
-            data: data.map(d => ([new Date(d[0]), parseFloat(d[measure]) + 10])),
+            data: compareData.map(d => ([new Date(d[0]), parseFloat(d[measure]) + 10])),
             name: dataset.header[measure] + " " + compare,
             yAxis: changeChart ? index : 0,
             zoneAxis: 'x',

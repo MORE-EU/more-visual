@@ -10,7 +10,7 @@ import {Redirect, RouteComponentProps} from 'react-router-dom';
 import {IRootState} from "app/shared/reducers";
 import {filterData,getChangePointDates,getDataset,getPatterns,getWdFiles,updateChangeChart,updateChangePointDates,
 updateDatasetChoice,updateFilters,updateFrom,updateGraphZoom,updatePatternNav,updatePatterns,
-updateQueryResults,updateResampleFreq,updateSelectedMeasures,updateTo,updateActiveTool,updateCompare,
+updateQueryResults,updateResampleFreq,updateSelectedMeasures,updateTo,updateActiveTool,updateCompare, updateCompareQueryResults,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
@@ -29,7 +29,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
     resampleFreq, patterns, graphZoom, changePointDates,
-    activeTool, compare, filters,
+    activeTool, compare, filters, compareData, queryResultsLoading,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -119,7 +119,8 @@ export const Visualizer = (props: IVisualizerProps) => {
                             folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}
                             graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}
                             changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates}
-                            setOpen={setOpen} updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare}/>
+                            setOpen={setOpen} updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare}
+                            compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}/>
           </Paper>
         </Box>
         <Toolkit
@@ -158,6 +159,8 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   graphZoom: visualizer.graphZoom,
   activeTool: visualizer.activeTool,
   compare: visualizer.compare,
+  compareData: visualizer.compareData,
+  queryResultsLoading: visualizer.queryResultsLoading,
 });
 
 const mapDispatchToProps = {
@@ -166,7 +169,7 @@ const mapDispatchToProps = {
   updateResampleFreq, updateFilters, filterData,
   updatePatterns, getPatterns, updateChangeChart, updateDatasetChoice,
   getWdFiles, updatePatternNav, updateChangePointDates, getChangePointDates,
-  updateGraphZoom, updateActiveTool, updateCompare,
+  updateGraphZoom, updateActiveTool, updateCompare, updateCompareQueryResults,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

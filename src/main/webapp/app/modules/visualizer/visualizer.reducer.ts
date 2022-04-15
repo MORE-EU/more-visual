@@ -12,6 +12,7 @@ export const ACTION_TYPES = {
   FETCH_DIRECTORIES: 'visualizer/FETCH_DIRECTORIES',
   FETCH_WDFILES: 'visualizer/FETCH_WDFILES',
   FETCH_QUERY_RESULTS: 'visualizer/FETCH_QUERY_RESULTS',
+  FETCH_QUERY_COMPARE_RESULTS: 'visualizer/FETCH_QUERY_COMPARE_RESULTS',
   UPDATE_SELECTED_MEASURES: 'visualizer/UPDATE_SELECTED_MEASURES',
   UPDATE_FROM: 'visualizer/UPDATE_FROM',
   UPDATE_TO: 'visualizer/UPDATE_TO',
@@ -40,6 +41,7 @@ const initialState = {
   dataset: null,
   queryResults: null,
   data: null,
+  compareData: null,
   queryResultsLoading: true,
   selectedMeasures: [],
   resampleFreq: 'minute',
@@ -140,11 +142,13 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         selectedMeasures: [action.payload.data.measures[0]],
       };
     case REQUEST(ACTION_TYPES.FETCH_QUERY_RESULTS):
+    case REQUEST(ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS):
       return {
         ...state,
         queryResultsLoading: true,
       };
     case FAILURE(ACTION_TYPES.FETCH_QUERY_RESULTS):
+    case FAILURE(ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS):
       return {
         ...state,
         queryResultsLoading: false,
@@ -157,6 +161,12 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         data: action.payload.data.data,
         from: _.min(action.payload.data.data.map(row => new Date(row[state.dataset.timeCol]))),
         to: _.max(action.payload.data.data.map(row => new Date(row[state.dataset.timeCol]))),
+      };
+    case SUCCESS(ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS):
+      return {
+        ...state,
+        queryResultsLoading: false,
+        compareData: action.payload.data.data,
       };
     case ACTION_TYPES.UPDATE_SELECTED_MEASURES:
       return {
@@ -278,6 +288,14 @@ export const updateQueryResults = (folder, id) => (dispatch, getState) => {
   const query = {} as IQuery;
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_RESULTS,
+    payload: axios.post(`api/datasets/${folder}/${id}/query`, query),
+  });
+};
+
+export const updateCompareQueryResults = (folder, id) => (dispatch, getState) => {
+  const query = {} as IQuery;
+  dispatch({
+    type: ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS,
     payload: axios.post(`api/datasets/${folder}/${id}/query`, query),
   });
 };
