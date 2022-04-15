@@ -47,7 +47,7 @@ export const Home = (props: IHomeProps) => {
       latlngs.push([sampleFile[i].lat, sampleFile[i].lng]);
       info.push(sampleFile[i]);
       (i + 1) % 10 === 0 &&
-        (farms.push({ name: `Farm ${(i + 1) / 10}`, fly: latlngs[0], locations: latlngs, farmInfo: info }), (latlngs = []), (info = []));
+        (farms.push({ name: `${info[0].country}`, fly: latlngs[0], locations: latlngs, farmInfo: info }), (latlngs = []), (info = []));
     }
     setItems(farms);
 

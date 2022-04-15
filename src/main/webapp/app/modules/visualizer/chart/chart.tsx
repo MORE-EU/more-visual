@@ -4,7 +4,7 @@ import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsMore from 'highcharts/highcharts-more';
 import {IDataset} from "app/shared/model/dataset.model";
-import {updateChangePointDates, updateQueryResults, updateActiveTool, updateCompareQueryResults} from '../visualizer.reducer';
+import {updateChangePointDates, updateQueryResults, updateActiveTool} from '../visualizer.reducer';
 import {IPatterns} from "app/shared/model/patterns.model";
 import {Grid} from '@mui/material';
 import indicatorsAll from "highcharts/indicators/indicators-all";
@@ -61,11 +61,13 @@ export interface IChartProps {
   compare: string,
 }
 
+// TODO: FIX FULLSCREEN
+
 stockTools(Highcharts);
 indicatorsAll(Highcharts);
 annotationsAdvanced(Highcharts);
 priceIndicator(Highcharts);
-fullScreen(Highcharts);
+// fullScreen(Highcharts);
 
 export const Chart = (props: IChartProps) => {
   const {dataset, data, selectedMeasures,
@@ -305,8 +307,9 @@ export const Chart = (props: IChartProps) => {
           stockTools: {
             gui: {
               enabled: true,
-              buttons: ['changeType', 'indicators', 'verticalLabels', 'highlightIntervals',
-                'separator', 'compareFiles', 'fullScreen',],
+              // buttons: ['changeType', 'indicators', 'verticalLabels', 'highlightIntervals',
+              //   'separator', 'compareFiles', 'fullScreen',],
+              buttons: ['changeType', 'indicators', 'verticalLabels', 'highlightIntervals','compareFiles'],
               className: "highcharts-bindings-wrapper",
               toolbarClassName: "stocktools-toolbar",
               definitions: {
