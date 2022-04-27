@@ -6,12 +6,13 @@ import React, {Dispatch, SetStateAction, useState} from 'react';
 import {updateActiveTool, updateChangeChart, updateChangePointDates, updateGraphZoom, updateQueryResults, updateCompare, updateCompareQueryResults} from '../visualizer.reducer';
 import Chart from './chart';
 import {ChartControl} from './chart-control';
+import { IDataPoint } from 'app/shared/model/data-point.model';
 
 
 export interface IChartContainerProps {
   dataset: IDataset;
   wdFiles: any[];
-  data: any;
+  data: IDataPoint[];
   compareData: any[];
   selectedMeasures: number[];
   from: Date;
@@ -46,7 +47,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
                       updateGraphZoom={props.updateGraphZoom} from={from} to={to} wdFiles={wdFiles} data={data}
                       changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
                       updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare} setShowDatePick={setShowDatePick}
-                      setCompare={setCompare} showDatePick={showDatePick} showCompare={showCompare} showChangePointFunction={showChangePointFunction} 
+                      setCompare={setCompare} showDatePick={showDatePick} showCompare={showCompare} showChangePointFunction={showChangePointFunction}
                       setShowChangePointFunction={setShowChangePointFunction} updateCompareQueryResults={props.updateCompareQueryResults} folder={folder}/>
         <Chart
           dataset={dataset}

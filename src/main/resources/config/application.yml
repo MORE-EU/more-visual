@@ -128,4 +128,7 @@ jhipster:
 # ===================================================================
 
 application:
-  workspacePath: /opt/more-workspace
+  workspacePath: C:\Users\stavr\Desktop\projects\more\more-workspace
+  timeFormat: 'yyyy-MM-dd HH:mm:ss'
+  delimiter: ','
+

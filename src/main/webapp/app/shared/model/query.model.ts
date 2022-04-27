@@ -1,6 +1,8 @@
+import { ITimeRange } from './time-range.model';
+
 export interface IQuery {
-  from?: number;
-  to?: number;
+  range?: ITimeRange;
+  frequency: string;
 }
 
-export const defaultValue: Readonly<IQuery> = {};
+export const defaultValue: Readonly<IQuery> = {frequency: 'SECOND'};

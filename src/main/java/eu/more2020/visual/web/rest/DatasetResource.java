@@ -132,13 +132,13 @@ public class DatasetResource {
         log.debug("REST request to get Available Files");
         return datasetRepository.findFiles(folder);
     }
-    
+
     @GetMapping("/datasets/{folder}/sample")
     public List<Sample> getSample(@PathVariable String folder) throws IOException {
         log.debug("REST request to get Sample File");
         return datasetRepository.findSample(folder);
     }
-    
+
     @GetMapping("/datasets/directories")
     public List<String> getDirectories() throws IOException {
         log.debug("REST request to get Directories");

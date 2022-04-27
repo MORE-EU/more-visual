@@ -1,5 +1,7 @@
+import { IDataPoint } from './data-point.model';
+
 export interface IQueryResults {
-  data?: string[];
+  data?: IDataPoint[];
   measureStats?: any;
 }
 

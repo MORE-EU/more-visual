@@ -16,6 +16,7 @@ import {useScrollBlock} from "app/shared/util/useScrollBlock";
 import {IChangePointDate} from "app/shared/model/changepoint-date.model";
 import {doc} from "prettier";
 import group = doc.builders.group;
+import { IDataPoint } from 'app/shared/model/data-point.model';
 
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
@@ -41,7 +42,7 @@ Highcharts.setOptions({
 
 export interface IChartProps {
   dataset: IDataset,
-  data: any,
+  data: IDataPoint[],
   compareData: any[],
   updateQueryResults: typeof updateQueryResults,
   selectedMeasures: number[],
