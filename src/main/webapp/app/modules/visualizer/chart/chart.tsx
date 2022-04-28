@@ -42,6 +42,7 @@ Highcharts.setOptions({
 export interface IChartProps {
   dataset: IDataset,
   data: any,
+  compareData: any[],
   updateQueryResults: typeof updateQueryResults,
   selectedMeasures: number[],
   from: Date,
@@ -60,16 +61,18 @@ export interface IChartProps {
   compare: string,
 }
 
+// TODO: FIX FULLSCREEN
+
 stockTools(Highcharts);
 indicatorsAll(Highcharts);
 annotationsAdvanced(Highcharts);
 priceIndicator(Highcharts);
-fullScreen(Highcharts);
+// fullScreen(Highcharts);
 
 export const Chart = (props: IChartProps) => {
   const {dataset, data, selectedMeasures,
     from, to, resampleFreq, patterns, changeChart, folder,
-    graphZoom, changePointDates, compare} = props;
+    graphZoom, changePointDates, compare, compareData,} = props;
 
   const [blockScroll, allowScroll] = useScrollBlock();
   const [zones, setZones] = useState([]);
@@ -202,14 +205,14 @@ export const Chart = (props: IChartProps) => {
               }
             }
           },
-          series: compare.length !== 0 ? selectedMeasures.map((measure, index) => ({
+          series: compare.length !== 0 && compareData !== null ? selectedMeasures.map((measure, index) => ({
             data: data.map(d => ([new Date(d[0]), parseFloat(d[measure])])),
             name: dataset.header[measure],
             yAxis: changeChart ? index : 0,
             zoneAxis: 'x',
             zones,
           })).concat(selectedMeasures.map((measure, index) => ({
-            data: data.map(d => ([new Date(d[0]), parseFloat(d[measure]) + 10])),
+            data: compareData.map(d => ([new Date(d[0]), parseFloat(d[measure]) + 10])),
             name: dataset.header[measure] + " " + compare,
             yAxis: changeChart ? index : 0,
             zoneAxis: 'x',
@@ -304,8 +307,9 @@ export const Chart = (props: IChartProps) => {
           stockTools: {
             gui: {
               enabled: true,
-              buttons: ['changeType', 'indicators', 'verticalLabels', 'highlightIntervals',
-                'separator', 'compareFiles', 'fullScreen',],
+              // buttons: ['changeType', 'indicators', 'verticalLabels', 'highlightIntervals',
+              //   'separator', 'compareFiles', 'fullScreen',],
+              buttons: ['changeType', 'indicators', 'verticalLabels', 'highlightIntervals','compareFiles'],
               className: "highcharts-bindings-wrapper",
               toolbarClassName: "stocktools-toolbar",
               definitions: {

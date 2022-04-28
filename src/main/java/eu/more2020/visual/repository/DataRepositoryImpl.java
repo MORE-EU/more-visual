@@ -2,9 +2,6 @@ package eu.more2020.visual.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvToBeanBuilder;
-import com.univocity.parsers.csv.CsvFormat;
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.Dataset;
@@ -21,8 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -101,7 +96,7 @@ public class DataRepositoryImpl implements DatasetRepository {
     @Override
     public List<String> findFiles(String folder) throws IOException {
         File file = new File(applicationProperties.getWorkspacePath() + "/" + folder);
-        FileFilter fileFilter = f -> !f.isDirectory() && f.getName().endsWith(".csv");
+        FileFilter fileFilter = f -> !f.isDirectory() && f.getName().endsWith(".csv") && !f.getName().contains("sample");
         File[] fileNames = file.listFiles(fileFilter);
         List<String> fileList = new ArrayList<>();
         for (File newFile : fileNames) {
@@ -111,10 +106,31 @@ public class DataRepositoryImpl implements DatasetRepository {
     }
     
     @Override
-    public List<Sample> findSample(String id) throws IOException {
-        List<Sample> beans = new CsvToBeanBuilder(new FileReader(applicationProperties.getWorkspacePath() + "/" + id + ".csv"))
+    public List<Sample> findSample(String folder) throws IOException {
+        File f = new File(applicationProperties.getWorkspacePath() + "/" + folder);
+        File[] matchingFiles = f.listFiles(new FilenameFilter() {
+        public boolean accept(File dir, String name) {
+        return name.contains("sample") && name.endsWith("csv");
+            }
+        });
+        List<Sample> beans = new CsvToBeanBuilder(new FileReader(matchingFiles[0]))
         .withType(Sample.class).build().parse();
         return beans;
+    }
+    
+    public List<String> findDirectories() throws IOException {
+        File file = new File(applicationProperties.getWorkspacePath());
+        String[] names = file.list();
+        List<String> dirs = new ArrayList<>();
+
+        for(String name : names){
+        
+        if (new File(applicationProperties.getWorkspacePath() + "/" + name).isDirectory()){
+            log.debug(name);
+                dirs.add(name);        
+            }
+        }
+        return dirs;
     }
 
 

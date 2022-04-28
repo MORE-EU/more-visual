@@ -1,6 +1,6 @@
 import {Button, Grid, Tooltip, Typography} from '@mui/material';
 import React, {Dispatch, SetStateAction, useState} from 'react';
-import {updateActiveTool, updateChangeChart, updateChangePointDates, updateCompare, updateGraphZoom,} from '../visualizer.reducer';
+import {updateActiveTool, updateChangeChart, updateChangePointDates, updateCompare, updateCompareQueryResults, updateGraphZoom,} from '../visualizer.reducer';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {ChartDatePicker} from './chart-control-buttons/chart-datepicker';
@@ -21,18 +21,20 @@ interface IChartControlProps {
   showDatePick: boolean,
   showCompare: boolean,
   showChangePointFunction: boolean,
+  folder: string,
   updateCompare: typeof updateCompare,
   updateChangePointDates: typeof updateChangePointDates,
   setOpen: Dispatch<SetStateAction<boolean>>,
   setShowDatePick: Dispatch<SetStateAction<boolean>>,
   setShowChangePointFunction: Dispatch<SetStateAction<boolean>>,
+  updateCompareQueryResults: typeof updateCompareQueryResults,
   setCompare: Dispatch<SetStateAction<boolean>>,
   updateActiveTool: typeof updateActiveTool,
 
 }
 
 export const ChartControl = (props: IChartControlProps) => {
-  const {changeChart, from, to, wdFiles, data, changePointDates, compare, showDatePick, showCompare, showChangePointFunction} = props;
+  const {changeChart, from, to, wdFiles, data, changePointDates, compare, showDatePick, showCompare, showChangePointFunction, folder} = props;
 
   const handleZoom = (zoomNum) => {
     props.updateGraphZoom(zoomNum)
@@ -87,7 +89,8 @@ export const ChartControl = (props: IChartControlProps) => {
                          changePointDates={changePointDates}
                          updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
                          updateActiveTool={props.updateActiveTool}/>}
-      {showCompare && <ChartCompare showCompare={showCompare} setCompare={props.setCompare} compare={compare} updateCompare={props.updateCompare} wdFiles={wdFiles} data={data}/>}
+      {showCompare && <ChartCompare showCompare={showCompare} setCompare={props.setCompare} compare={compare} updateCompare={props.updateCompare} wdFiles={wdFiles} data={data} 
+                        updateCompareQueryResults={props.updateCompareQueryResults} folder={folder}/>}
       {showChangePointFunction && <ChartChangePointFunctions showChangePointFunction={showChangePointFunction} setShowChangePointFunction={props.setShowChangePointFunction} setOpen={props.setOpen} updateActiveTool={props.updateActiveTool}/>}
     </Grid>
   );
