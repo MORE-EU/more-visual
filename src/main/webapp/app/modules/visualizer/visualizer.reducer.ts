@@ -2,11 +2,12 @@ import axios from 'axios';
 import { FAILURE, REQUEST, SUCCESS } from 'app/shared/reducers/action-type.util';
 import { IDataset } from 'app/shared/model/dataset.model';
 import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
-import {defaultValue as defaultQuery, IQuery} from 'app/shared/model/query.model';
+import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
 import _ from 'lodash';
 import { DateObject } from 'react-multi-date-picker';
 import { IQueryResults } from 'app/shared/model/query-results.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
+import { ITimeRange } from 'app/shared/model/time-range.model';
 
 export const ACTION_TYPES = {
   FETCH_DATASET: 'visualizer/FETCH_DATASET',
@@ -286,7 +287,7 @@ export const getSampleFile = id => {
   };
 };
 
-export const updateQueryResults = (folder, id) => (dispatch, getState) => {
+export const updateQueryResults = (folder, id, from, to) => (dispatch, getState) => {
   const query = defaultQuery;
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_RESULTS,
@@ -294,7 +295,7 @@ export const updateQueryResults = (folder, id) => (dispatch, getState) => {
   });
 };
 
-export const updateCompareQueryResults = (folder, id) => (dispatch, getState) => {
+export const updateCompareQueryResults = (folder, id, from, to) => (dispatch, getState) => {
   const query = defaultQuery;
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS,

@@ -104,7 +104,7 @@ export const Chart = (props: IChartProps) => {
   // }, [changePointDates]);
 
   useEffect(() => {
-    props.updateQueryResults(folder, dataset.id);
+    props.updateQueryResults(folder, dataset.id, null, null);
   }, [dataset]);
 
   const annotationToDate = (annotation, len) => {
@@ -135,6 +135,11 @@ export const Chart = (props: IChartProps) => {
       });
     });
   }(Highcharts));
+  
+  // GET EXTREMES EVERYTIME WE PAN (LEFT-RIGHT)
+  // (function (H) {
+    
+  // }(Hightcharts));
 
   return (
     <Grid
@@ -207,21 +212,25 @@ export const Chart = (props: IChartProps) => {
             }
           },
           series: compare.length !== 0 && compareData !== null ? selectedMeasures.map((measure, index) => ({
-            data: data.map(d => ([new Date(d[0]), parseFloat(d[measure])])),
+            data: data.map(d => {
+            const val = d.values[measure];
+            return [new Date(d.timestamp), isNaN(val) ? null : val]}),
             name: dataset.header[measure],
             yAxis: changeChart ? index : 0,
             zoneAxis: 'x',
             zones,
           })).concat(selectedMeasures.map((measure, index) => ({
-            data: compareData.map(d => ([new Date(d[0]), parseFloat(d[measure]) + 10])),
+            data: compareData.map(d => {
+            const val = d.values[measure];
+            return [new Date(d.timestamp), isNaN(val) ? null : val]}),
             name: dataset.header[measure] + " " + compare,
             yAxis: changeChart ? index : 0,
             zoneAxis: 'x',
             zones,
           }))) : selectedMeasures.map((measure, index) => ({
             data: data.map(d => {
-              const val = parseFloat(d[measure]);
-              return [new Date(d[0]), isNaN(val) ? null : val];
+              const val = d.values[measure];
+              return [new Date(d.timestamp), isNaN(val) ? null : val];
             }),
             name: dataset.header[measure],
             yAxis: changeChart ? index : 0,

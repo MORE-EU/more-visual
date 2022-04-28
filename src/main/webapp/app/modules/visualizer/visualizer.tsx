@@ -49,7 +49,6 @@ export const Visualizer = (props: IVisualizerProps) => {
   }, [props.match.params.id !== undefined]);
 
   return !loading && dataset !== null && <div>
-    {console.log(compare)}
     <ThemeProvider theme={mdTheme}>
       <Toolbar>
         <Box  sx={{alignItems:'center', display: 'flex',

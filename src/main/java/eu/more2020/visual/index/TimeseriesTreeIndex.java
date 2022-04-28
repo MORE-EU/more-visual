@@ -119,8 +119,8 @@ public class TimeseriesTreeIndex {
                 to = dateTime;
             }
             Stack<Integer> labels = new Stack<>();
-            int lastIndex = q0.getRange() == null || q0.getRange().contains(dateTime) ? queryFrequencyLevel : queryFrequencyLevel - 1;
-
+            int lastIndex = q0.getRange() != null && q0.getRange().contains(dateTime) ? queryFrequencyLevel : queryFrequencyLevel - 1;
+            
             for (int i = 0; i < lastIndex; i++) {
                 labels.add(dateTime.get(TEMPORAL_HIERARCHY.get(i)));
             }
