@@ -18,6 +18,7 @@ export interface IFilterProps {
 export const Filter = (props: IFilterProps) => {
 
   const {dataset, queryResults, filters} = props;
+  const [removePoints, setRemovePoints] =  React.useState(false);
 
   return (
     <Box sx={{pl: 2, pr: 2}}>
@@ -28,7 +29,10 @@ export const Filter = (props: IFilterProps) => {
         <Typography  gutterBottom>
           Remove filtered points
         </Typography>
-      <Checkbox/>
+      <Checkbox
+        checked={removePoints}
+        onChange={() => setRemovePoints(!removePoints)}
+      />
       </Box>
       <List dense sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
         {queryResults && dataset.measures.map((col) => {
@@ -43,19 +47,19 @@ export const Filter = (props: IFilterProps) => {
               onChange={(e, newRange) => {
                 props.updateFilters(col, newRange);
               }}
-              onChangeCommitted={props.filterData}
+              onChangeCommitted={() => props.filterData(removePoints)}
               valueLabelDisplay="auto"
             />
             <Stack direction="row" spacing={2}>
               <TextField id="outlined-basic" label="Min-Value" variant="outlined" size="small"
                          value={filters[col] ? filters[col][0] : stats.min} onChange={(e) => {
                 props.updateFilters(col, [e.target.value, filters[col] ? filters[col][1] : stats.max]);
-                props.filterData();
+                props.filterData(removePoints);
               }}/>
               <TextField id="outlined-basic" label="Max-Value" variant="outlined" size="small"
                          value={filters[col] ? filters[col][1] : stats.max} onChange={(e) => {
                 props.updateFilters(col, [filters[col] ? filters[col][0] : stats.min, e.target.value]);
-                props.filterData();
+                props.filterData(removePoints);
               }}/>
             </Stack>
           </Box>

@@ -102,6 +102,7 @@ export const Chart = (props: IChartProps) => {
   useEffect(() => {
     props.updateQueryResults(folder, dataset.id);
   }, [dataset]);
+
   const annotationToDate = (annotation, len) => {
     const x1 = annotation.startXMin,
       x2 = annotation.startXMax,
