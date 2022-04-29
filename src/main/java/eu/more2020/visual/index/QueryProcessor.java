@@ -126,6 +126,7 @@ public class QueryProcessor {
             processQueryNodes(child, startLabels, endLabels, childIsFirst, childIsLast, level + 1);
         }
 
+        stack.pop();
 
     }
 

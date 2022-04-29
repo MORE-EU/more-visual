@@ -120,7 +120,6 @@ public class TimeseriesTreeIndex {
             }
             Stack<Integer> labels = new Stack<>();
             int lastIndex = q0.getRange() != null && q0.getRange().contains(dateTime) ? queryFrequencyLevel : queryFrequencyLevel - 1;
-            
             for (int i = 0; i < lastIndex; i++) {
                 labels.add(dateTime.get(TEMPORAL_HIERARCHY.get(i)));
             }
@@ -142,6 +141,8 @@ public class TimeseriesTreeIndex {
             e -> new MeasureStats(e.getValue().mean(), e.getValue().min(), e.getValue().max())));
 
         LOG.debug("Indexing Complete. Total Indexed Objects: " + objectsIndexed);
+
+//        traverse(root);
 
         return this.executeQuery(q0);
     }
