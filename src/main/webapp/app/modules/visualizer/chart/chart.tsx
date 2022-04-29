@@ -104,8 +104,13 @@ export const Chart = (props: IChartProps) => {
   // }, [changePointDates]);
 
   useEffect(() => {
-    props.updateQueryResults(folder, dataset.id, null, null);
+    props.updateQueryResults(folder, dataset.id, from, to);
   }, [dataset]);
+
+  // useEffect(() => {
+  //   from !== null && to !== null && 
+  //   props.updateQueryResults(folder, dataset.id, from, to);
+  // }, [from, to]);
 
   const annotationToDate = (annotation, len) => {
     const x1 = annotation.startXMin,

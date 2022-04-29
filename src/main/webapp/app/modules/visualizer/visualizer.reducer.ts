@@ -162,8 +162,8 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         queryResultsLoading: false,
         queryResults: action.payload.data,
         data: action.payload.data.data,
-        from: _.min(action.payload.data.data.map(row => new Date(row[state.dataset.timeCol]))),
-        to: _.max(action.payload.data.data.map(row => new Date(row[state.dataset.timeCol]))),
+        from: _.min(action.payload.data.data.map(row => new Date(row.timestamp))),
+        to: _.max(action.payload.data.data.map(row => new Date(row.timestamp))),
       };
     case SUCCESS(ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS):
       return {
@@ -287,8 +287,13 @@ export const getSampleFile = id => {
   };
 };
 
-export const updateQueryResults = (folder, id, from, to) => (dispatch, getState) => {
-  const query = defaultQuery;
+export const updateQueryResults = (folder, id, fromDate, toDate) => (dispatch, getState) => {
+  fromDate = '2018-01-03T04:00:00';
+  toDate = '2018-01-03T05:00:00';
+  let query;
+  fromDate !== null && toDate !== null
+    ? (query = { range: { from: fromDate, to: toDate } as ITimeRange, frequency: 'SECOND' } as IQuery)
+    : (query = defaultQuery);
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_RESULTS,
     payload: axios.post(`api/datasets/${folder}/${id}/query`, query),

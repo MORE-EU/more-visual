@@ -1,6 +1,6 @@
 export interface ITimeRange {
-  from?: number;
-  to?: number;
+  from?: Date;
+  to?: Date;
 }
 
 export const defaultValue: Readonly<ITimeRange> = {};
