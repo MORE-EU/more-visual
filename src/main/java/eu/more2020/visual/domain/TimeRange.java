@@ -9,8 +9,11 @@ import java.util.Objects;
 
 public class TimeRange implements Serializable {
 
-    private final LocalDateTime from;
-    private final LocalDateTime to;
+    private LocalDateTime from;
+    private LocalDateTime to;
+
+    public TimeRange() {
+    }
 
     public TimeRange(LocalDateTime from, LocalDateTime to) {
         this.from = from;
