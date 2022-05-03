@@ -39,6 +39,7 @@ public class TreeNode {
         }
         for (int colIndex : dataset.getMeasures()){
             StatsAccumulator statsAcc = stats.computeIfAbsent(colIndex, i -> new StatsAccumulator());
+
             statsAcc.add(Double.parseDouble(row[colIndex]));
         }
     }

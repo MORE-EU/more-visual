@@ -108,7 +108,7 @@ export const Chart = (props: IChartProps) => {
   }, [dataset]);
 
   // useEffect(() => {
-  //   from !== null && to !== null && 
+  //   from !== null && to !== null &&
   //   props.updateQueryResults(folder, dataset.id, from, to);
   // }, [from, to]);
 
@@ -140,10 +140,10 @@ export const Chart = (props: IChartProps) => {
       });
     });
   }(Highcharts));
-  
+
   // GET EXTREMES EVERYTIME WE PAN (LEFT-RIGHT)
   // (function (H) {
-    
+
   // }(Hightcharts));
 
   return (
@@ -218,7 +218,7 @@ export const Chart = (props: IChartProps) => {
           },
           series: compare.length !== 0 && compareData !== null ? selectedMeasures.map((measure, index) => ({
             data: data.map(d => {
-            const val = d.values[measure];
+            const val = d.values[index];
             return [new Date(d.timestamp), isNaN(val) ? null : val]}),
             name: dataset.header[measure],
             yAxis: changeChart ? index : 0,
@@ -226,7 +226,7 @@ export const Chart = (props: IChartProps) => {
             zones,
           })).concat(selectedMeasures.map((measure, index) => ({
             data: compareData.map(d => {
-            const val = d.values[measure];
+            const val = d.values[index];
             return [new Date(d.timestamp), isNaN(val) ? null : val]}),
             name: dataset.header[measure] + " " + compare,
             yAxis: changeChart ? index : 0,
@@ -234,7 +234,7 @@ export const Chart = (props: IChartProps) => {
             zones,
           }))) : selectedMeasures.map((measure, index) => ({
             data: data.map(d => {
-              const val = d.values[measure];
+              const val = d.values[index];
               return [new Date(d.timestamp), isNaN(val) ? null : val];
             }),
             name: dataset.header[measure],

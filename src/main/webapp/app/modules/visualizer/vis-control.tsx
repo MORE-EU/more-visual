@@ -51,7 +51,6 @@ export const VisControl = (props: IVisControlProps) => {
   const handleToggle = (col) => () => {
     const currentIndex = selectedMeasures.indexOf(col);
     const newChecked = [...selectedMeasures];
-
     if (currentIndex === -1) {
       newChecked.push(col);
     } else {
@@ -130,7 +129,7 @@ export const VisControl = (props: IVisControlProps) => {
                 divider
               >
                 <ListItemText primary={`${file}`} sx={{pl: 4}}/>
-                {compare === file && 
+                {compare === file &&
                 <Tooltip title="Currently comparing this file">
                 <ListItemIcon>
                   <CompareArrowsIcon />
