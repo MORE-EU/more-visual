@@ -17,6 +17,7 @@ export interface IChartContainerProps {
   selectedMeasures: number[];
   from: Date;
   to: Date;
+  filters: any,
   resampleFreq: string;
   patterns: IPatterns;
   changeChart: boolean;
@@ -35,7 +36,9 @@ export interface IChartContainerProps {
 }
 
 export const ChartContainer = (props: IChartContainerProps) => {
-  const {dataset, data, selectedMeasures, from, to, wdFiles, changeChart, folder, graphZoom, changePointDates, compare, compareData} = props;
+  const {dataset, data, selectedMeasures, from, to, filters,
+    wdFiles, changeChart, folder, graphZoom, changePointDates,
+    compare, compareData} = props;
 
   const [showDatePick, setShowDatePick] = useState(false);
   const [showChangePointFunction, setShowChangePointFunction] = useState(false);
@@ -57,6 +60,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
           updateQueryResults={props.updateQueryResults}
           from={from}
           to={to}
+          filters={filters}
           resampleFreq={props.resampleFreq}
           patterns={props.patterns}
           changeChart={changeChart}

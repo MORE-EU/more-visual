@@ -68,14 +68,14 @@ export const Visualizer = (props: IVisualizerProps) => {
           sx={{ display: 'flex', alignItems: 'center' }}
           color="inherit"
         >
-         
+
          {dataset.farmName}
         </Link>
         <Typography
           sx={{ display: 'flex', alignItems: 'center' }}
           color="text.primary"
         >
-         
+
          {dataset.formalName}
         </Typography>
       </Breadcrumbs>
@@ -112,7 +112,7 @@ export const Visualizer = (props: IVisualizerProps) => {
             flexDirection: 'column',
 
           }}>
-            <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures}
+            <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures} filters={filters}
                             updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
                             resampleFreq={props.resampleFreq} patterns={props.patterns} changeChart={changeChart}
                             folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}

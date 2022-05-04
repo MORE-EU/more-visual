@@ -67,10 +67,6 @@ const initialState = {
 
 export type VisualizerState = Readonly<typeof initialState>;
 
-const initChangePointDates = (func, col) => {
-  return [new DateObject('2019-01-02'), new DateObject('2019-04-30'), new DateObject('2019-05-13'), new DateObject('2019-09-01')];
-};
-
 const initPatterns = (data, length, frequency) => {
   let pattern1 = { start: new Date(data[500][0]), end: new Date(data[500 + length][0]) };
   let pattern2 = { start: new Date(data[4000][0]), end: new Date(data[4000 + length][0]) };
