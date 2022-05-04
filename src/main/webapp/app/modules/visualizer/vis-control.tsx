@@ -11,6 +11,7 @@ import {
   updateChangeChart,
   updateDatasetChoice,
   updateFrom,
+  updateQueryResults,
   updateResampleFreq,
   updateSelectedMeasures,
   updateTo,
@@ -22,6 +23,7 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import {IQueryResults} from "app/shared/model/query-results.model";
 import {Link} from "react-router-dom";
+import { handleDate } from 'app/shared/util/date-utils';
 
 export interface IVisControlProps {
   dataset: IDataset,
@@ -41,6 +43,7 @@ export interface IVisControlProps {
   updateResampleFreq: typeof updateResampleFreq,
   updateChangeChart: typeof updateChangeChart,
   getDataset: typeof getDataset,
+  updateQueryResults: typeof updateQueryResults,
 }
 
 
@@ -65,21 +68,21 @@ export const VisControl = (props: IVisControlProps) => {
     }
   }
 
-
   return <Grid container spacing={3}>
+    {console.log(from, to)}
     {props.from && <Grid item xs={12} mt={2}><LocalizationProvider dateAdapter={AdapterDateFns}>
       <Stack spacing={3}>
         <DateTimePicker
           renderInput={(p) => <TextField {...p} />}
           label="From"
           value={from}
-          onChange={props.updateFrom}
+          onChange={e => {props.updateFrom(e), props.updateQueryResults(folder, dataset.id, handleDate(e), to)}}
         />
         <DateTimePicker
           renderInput={(p) => <TextField {...p} />}
           label="To"
           value={to}
-          onChange={props.updateTo}
+          onChange={e => {props.updateTo(e), props.updateQueryResults(folder, dataset.id, from, handleDate(e))}}
         /></Stack>
     </LocalizationProvider>
     </Grid>}

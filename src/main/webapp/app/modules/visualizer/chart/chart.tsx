@@ -149,9 +149,10 @@ export const Chart = (props: IChartProps) => {
     props.updateQueryResults(folder, dataset.id, from, to);
   }, [dataset]);
 
+
   // useEffect(() => {
   //   from !== null && to !== null &&
-  //   props.updateQueryResults(folder, dataset.id, from, to);
+  //   props.updateQueryResults(folder, dataset.id, handleDate(from), handleDate(to));
   // }, [from, to]);
 
   // CHART: ZOOM FUNCTION
@@ -163,6 +164,7 @@ export const Chart = (props: IChartProps) => {
         const xAxis = chart.xAxis[0],
           extremes = xAxis.getExtremes(),
           newMin = extremes.min;
+          // console.log(extremes);
         if (event.deltaY < 0) {
           newMin + step < extremes.max
             ? xAxis.setExtremes(newMin + step, extremes.max, true, true)
@@ -177,9 +179,16 @@ export const Chart = (props: IChartProps) => {
   })(Highcharts);
 
   // GET EXTREMES EVERYTIME WE PAN (LEFT-RIGHT)
-  // (function (H) {
+  (function (H) {
+    H.addEvent(H.Chart, "load", (e) => {
+      const chart = e.target;
+      H.addEvent(chart.container, "drag", (event: DragEvent) => {
+        console.log("eixame");
+      });
+      });
+  })(Highcharts);
 
-  // }(Hightcharts));
+
   return (
     <Grid
       sx={{ border: "1px solid rgba(0, 0, 0, .1)" }}

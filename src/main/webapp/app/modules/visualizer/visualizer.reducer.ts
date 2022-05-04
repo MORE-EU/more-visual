@@ -153,14 +153,21 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         queryResultsLoading: false,
       };
     case SUCCESS(ACTION_TYPES.FETCH_QUERY_RESULTS):
-      return {
-        ...state,
-        queryResultsLoading: false,
-        queryResults: action.payload.data,
-        data: action.payload.data.data,
-        from: _.min(action.payload.data.data.map(row => new Date(row.timestamp))),
-        to: _.max(action.payload.data.data.map(row => new Date(row.timestamp))),
-      };
+      return state.from === null && state.to === null
+        ? {
+            ...state,
+            queryResultsLoading: false,
+            queryResults: action.payload.data,
+            data: action.payload.data.data,
+            from: _.min(action.payload.data.data.map(row => new Date(row.timestamp))),
+            to: _.max(action.payload.data.data.map(row => new Date(row.timestamp))),
+          }
+        : {
+            ...state,
+            queryResultsLoading: false,
+            queryResults: action.payload.data,
+            data: action.payload.data.data,
+          };
     case SUCCESS(ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS):
       return {
         ...state,
@@ -284,8 +291,6 @@ export const getSampleFile = id => {
 };
 
 export const updateQueryResults = (folder, id, fromDate, toDate) => (dispatch, getState) => {
-  fromDate = '2018-01-03T04:00:00';
-  toDate = '2018-01-03T05:00:00';
   let query;
   fromDate !== null && toDate !== null
     ? (query = { range: { from: fromDate, to: toDate } as ITimeRange, frequency: 'SECOND' } as IQuery)

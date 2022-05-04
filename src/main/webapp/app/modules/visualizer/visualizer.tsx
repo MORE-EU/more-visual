@@ -98,7 +98,7 @@ export const Visualizer = (props: IVisualizerProps) => {
             <VisControl dataset={dataset} selectedMeasures={props.selectedMeasures} queryResults={queryResults}
                         updateSelectedMeasures={props.updateSelectedMeasures} from={props.from} to={props.to}
                         resampleFreq={props.resampleFreq} updateFrom={props.updateFrom} updateTo={props.updateTo}
-                        updateResampleFreq={props.updateResampleFreq}
+                        updateResampleFreq={props.updateResampleFreq} updateQueryResults={props.updateQueryResults}
                         updateChangeChart={props.updateChangeChart} wdFiles={wdFiles}
                         updateDatasetChoice={props.updateDatasetChoice} datasetChoice={datasetChoice}
                         getDataset={props.getDataset} folder={props.match.params.folder} compare={compare}/>
