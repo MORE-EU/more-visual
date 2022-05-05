@@ -8,6 +8,4 @@ export const convertDateTimeToServer = date => (date ? moment(date, APP_LOCAL_DA
 
 export const displayDefaultDateTime = () => moment().startOf('day').format(APP_LOCAL_DATETIME_FORMAT);
 
-export const handleDate = date => {
-  return new Date(date.setTime(date.getTime() - date.getTimezoneOffset() * 60 * 1000));
-};
+export const handleDate = date => new Date(date.setTime(date.getTime() - date.getTimezoneOffset() * 60 * 1000));

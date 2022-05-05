@@ -21,6 +21,7 @@ import { IChangePointDate } from "app/shared/model/changepoint-date.model";
 import { doc } from "prettier";
 import group = doc.builders.group;
 import { IDataPoint } from "app/shared/model/data-point.model";
+import { ConstructionOutlined } from "@mui/icons-material";
 
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
@@ -149,44 +150,35 @@ export const Chart = (props: IChartProps) => {
     props.updateQueryResults(folder, dataset.id, from, to);
   }, [dataset]);
 
-
-  // useEffect(() => {
-  //   from !== null && to !== null &&
-  //   props.updateQueryResults(folder, dataset.id, handleDate(from), handleDate(to));
-  // }, [from, to]);
-
   // CHART: ZOOM FUNCTION
-  (function (H) {
-    const step = 2000 * 200;
-    H.addEvent(H.Chart, "load", (e) => {
-      const chart = e.target;
-      H.addEvent(chart.container, "wheel", (event: WheelEvent) => {
-        const xAxis = chart.xAxis[0],
-          extremes = xAxis.getExtremes(),
-          newMin = extremes.min;
-          // console.log(extremes);
-        if (event.deltaY < 0) {
-          newMin + step < extremes.max
-            ? xAxis.setExtremes(newMin + step, extremes.max, true, true)
-            : xAxis.setExtremes(extremes.max - 2000, extremes.max, true, true);
-        } else if (event.deltaY > 0) {
-          newMin - step > extremes.dataMin
-            ? xAxis.setExtremes(newMin - step, extremes.max, true, true)
-            : xAxis.setExtremes(extremes.dataMin, extremes.max, true, true);
-        }
+  useEffect(() => {
+    (function (H) {
+      const step = 2000 * 200;
+      H.addEvent(H.Chart, "load", (e) => {
+        const chart = e.target;
+        H.addEvent(chart.container, "wheel", (event: WheelEvent) => {
+          const xAxis = chart.xAxis[0],
+            extremes = xAxis.getExtremes(),
+            newMin = extremes.min;
+          if (event.deltaY < 0) {
+            newMin + step < extremes.max
+              ? xAxis.setExtremes(newMin + step, extremes.max, true, true)
+              : xAxis.setExtremes(extremes.max - 2000, extremes.max, true, true);
+          } else if (event.deltaY > 0) {
+            newMin - step > extremes.dataMin
+              ? xAxis.setExtremes(newMin - step, extremes.max, true, true)
+              : xAxis.setExtremes(extremes.dataMin, extremes.max, true, true);
+          }
+        });
+        H.addEvent(chart.container, 'click', (event: PointerEvent) => {       
+          const xAxis = chart.xAxis[0],
+          extremes = xAxis.getExtremes();
+            console.log(new Date(extremes.min), new Date(extremes.max));
+        });
       });
-    });
-  })(Highcharts);
-
-  // GET EXTREMES EVERYTIME WE PAN (LEFT-RIGHT)
-  (function (H) {
-    H.addEvent(H.Chart, "load", (e) => {
-      const chart = e.target;
-      H.addEvent(chart.container, "drag", (event: DragEvent) => {
-        console.log("eixame");
-      });
-      });
-  })(Highcharts);
+    })(Highcharts);
+  },[]);
+  
 
 
   return (
@@ -314,7 +306,7 @@ export const Chart = (props: IChartProps) => {
               height: "700px",
               marginTop: 10,
               plotBorderWidth: 0,
-              //panKey: "alt",
+              // panKey: "alt",
               panning: {
                 enabled: true,
                 type: "x",
