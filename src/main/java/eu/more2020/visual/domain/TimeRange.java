@@ -18,7 +18,6 @@ public class TimeRange implements Serializable {
     public TimeRange(LocalDateTime from, LocalDateTime to) {
         this.from = from;
         this.to = to;
-
     }
     public LocalDateTime getFrom() {
         return from;

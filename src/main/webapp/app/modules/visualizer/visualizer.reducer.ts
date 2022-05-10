@@ -290,10 +290,10 @@ export const getSampleFile = id => {
   };
 };
 
-export const updateQueryResults = (folder, id, fromDate, toDate) => (dispatch, getState) => {
+export const updateQueryResults = (folder, id, fromDate, toDate, selMeasures) => (dispatch, getState) => {
   let query;
   fromDate !== null && toDate !== null
-    ? (query = { range: { from: fromDate, to: toDate } as ITimeRange, frequency: 'SECOND' } as IQuery)
+    ? (query = { range: { from: fromDate, to: toDate } as ITimeRange, frequency: 'SECOND', measures: selMeasures } as IQuery)
     : (query = defaultQuery);
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_RESULTS,
@@ -301,8 +301,11 @@ export const updateQueryResults = (folder, id, fromDate, toDate) => (dispatch, g
   });
 };
 
-export const updateCompareQueryResults = (folder, id, from, to) => (dispatch, getState) => {
-  const query = defaultQuery;
+export const updateCompareQueryResults = (folder, id, fromDate, toDate, selMeasures) => (dispatch, getState) => {
+  let query;
+  fromDate !== null && toDate !== null
+    ? (query = { range: { from: fromDate, to: toDate } as ITimeRange, frequency: 'SECOND', measures: selMeasures } as IQuery)
+    : (query = defaultQuery);
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS,
     payload: axios.post(`api/datasets/${folder}/${id}/query`, query),

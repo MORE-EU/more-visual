@@ -14,6 +14,7 @@ import { Grid } from "@mui/material";
 import indicatorsAll from "highcharts/indicators/indicators-all";
 import annotationsAdvanced from "highcharts/modules/annotations-advanced";
 import priceIndicator from "highcharts/modules/price-indicator";
+import exporting from "highcharts/modules/exporting";
 import fullScreen from "highcharts/modules/full-screen";
 import stockTools from "highcharts/modules/stock-tools";
 import { useScrollBlock } from "app/shared/util/useScrollBlock";
@@ -147,8 +148,8 @@ export const Chart = (props: IChartProps) => {
   // }, [changePointDates]);
 
   useEffect(() => {
-    props.updateQueryResults(folder, dataset.id, from, to);
-  }, [dataset]);
+    props.updateQueryResults(folder, dataset.id, from, to, selectedMeasures);
+  }, [dataset, selectedMeasures]);
 
   // CHART: ZOOM FUNCTION
   useEffect(() => {
@@ -173,7 +174,10 @@ export const Chart = (props: IChartProps) => {
         H.addEvent(chart.container, 'click', (event: PointerEvent) => {       
           const xAxis = chart.xAxis[0],
           extremes = xAxis.getExtremes();
-            console.log(new Date(extremes.min), new Date(extremes.max));
+          // get 20% right and left of the current extremes
+          const leftSide = extremes.min - (((extremes.min - extremes.dataMin) * 20) / 100);
+          const rightSide = extremes.max + (((extremes.dataMax - extremes.max) * 20) / 100); 
+          console.log(leftSide, rightSide); 
         });
       });
     })(Highcharts);

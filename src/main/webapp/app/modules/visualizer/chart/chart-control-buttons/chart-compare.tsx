@@ -6,9 +6,12 @@ import { updateCompare, updateCompareQueryResults } from '../../visualizer.reduc
 
 export interface IChartCompareProps {
   showCompare: boolean;
+  from: Date;
+  to: Date;
   wdFiles: any[];
   compare: string;
   folder: string;
+  selectedMeasures: number[];
   updateCompare: typeof updateCompare;
   updateCompareQueryResults: typeof updateCompareQueryResults,
   setCompare: Dispatch<SetStateAction<boolean>>;
@@ -29,7 +32,7 @@ const style = {
 } as const;
 
 export const ChartCompare = (props: IChartCompareProps) => {
-  const {showCompare, wdFiles, data, compare, folder} = props;
+  const {showCompare, wdFiles, data, compare, folder, from, to, selectedMeasures} = props;
 
   const [selectVal, setSelectVal] = useState('');
   const [tabVal, setTabVal] = useState('1');
@@ -80,7 +83,7 @@ export const ChartCompare = (props: IChartCompareProps) => {
                 <MenuItem value={`${file}`} key={idx}>{file}</MenuItem>
               ))}
             </Select>
-            <Button variant="contained" sx={{textTransform: "none"}} onClick={() => {props.setCompare(false), props.updateCompare(selectVal), props.updateCompareQueryResults(folder, selectVal.replace('.csv',""))}}>Add</Button>
+            <Button variant="contained" sx={{textTransform: "none"}} onClick={() => {props.setCompare(false), props.updateCompare(selectVal), props.updateCompareQueryResults(folder, selectVal.replace('.csv',""), from, to, selectedMeasures)}}>Add</Button>
             <Button variant="contained" sx={{textTransform: "none"}} onClick={() => {props.setCompare(false), props.updateCompare('')}}>Reset</Button>
             </Grid>
           </FormControl>

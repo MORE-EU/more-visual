@@ -46,7 +46,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
 
   return (
     <Box sx={{display:'flex',flexDirection:"column"}} >
-        <ChartControl updateChangeChart={props.updateChangeChart} changeChart={changeChart}
+        <ChartControl updateChangeChart={props.updateChangeChart} changeChart={changeChart} selectedMeasures={selectedMeasures}
                       updateGraphZoom={props.updateGraphZoom} from={from} to={to} wdFiles={wdFiles} data={data}
                       changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
                       updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare} setShowDatePick={setShowDatePick}

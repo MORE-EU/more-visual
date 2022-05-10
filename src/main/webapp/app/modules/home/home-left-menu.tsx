@@ -58,7 +58,7 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
               sx={{ height: '2rem', bgcolor: "#e0e0e0" }}
             >
               {directories.map(dir => (
-                <MenuItem value={dir}>{dir}</MenuItem>
+                <MenuItem key={`${dir}-key`} value={dir}>{dir}</MenuItem>
               ))}
             </Select>
           </FormControl>

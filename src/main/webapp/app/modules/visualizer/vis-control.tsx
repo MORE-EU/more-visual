@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -48,7 +48,7 @@ export interface IVisControlProps {
 
 
 export const VisControl = (props: IVisControlProps) => {
-  const {dataset, selectedMeasures, from, to, wdFiles, folder, compare} = props;
+  const {dataset, selectedMeasures, from, to, wdFiles, folder, compare, queryResults} = props;
 
 
   const handleToggle = (col) => () => {
@@ -69,20 +69,21 @@ export const VisControl = (props: IVisControlProps) => {
   }
 
   return <Grid container spacing={3}>
-    {console.log(from, to)}
     {props.from && <Grid item xs={12} mt={2}><LocalizationProvider dateAdapter={AdapterDateFns}>
       <Stack spacing={3}>
         <DateTimePicker
           renderInput={(p) => <TextField {...p} />}
           label="From"
           value={from}
-          onChange={e => {props.updateFrom(e), props.updateQueryResults(folder, dataset.id, handleDate(e), to)}}
+          onChange={props.updateFrom}
+          onClose={() => {props.updateQueryResults(folder, dataset.id, from.getTime(), to.getTime(), selectedMeasures)}}
         />
         <DateTimePicker
           renderInput={(p) => <TextField {...p} />}
           label="To"
           value={to}
-          onChange={e => {props.updateTo(e), props.updateQueryResults(folder, dataset.id, from, handleDate(e))}}
+          onChange={props.updateTo}
+          onClose={() => {props.updateQueryResults(folder, dataset.id, from.getTime(), to.getTime(), selectedMeasures)}}
         /></Stack>
     </LocalizationProvider>
     </Grid>}
