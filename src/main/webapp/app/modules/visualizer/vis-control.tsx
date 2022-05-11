@@ -69,7 +69,7 @@ export const VisControl = (props: IVisControlProps) => {
   }
 
   return <Grid container spacing={3}>
-    {props.from && <Grid item xs={12} mt={2}><LocalizationProvider dateAdapter={AdapterDateFns}>
+    {/* {from && <Grid item xs={12} mt={2}><LocalizationProvider dateAdapter={AdapterDateFns}>
       <Stack spacing={3}>
         <DateTimePicker
           renderInput={(p) => <TextField {...p} />}
@@ -86,7 +86,7 @@ export const VisControl = (props: IVisControlProps) => {
           onClose={() => {props.updateQueryResults(folder, dataset.id, from.getTime(), to.getTime(), selectedMeasures)}}
         /></Stack>
     </LocalizationProvider>
-    </Grid>}
+    </Grid>} */}
     <Grid item xs={12}>
       <FormControl variant="standard" sx={{m: 1, minWidth: 180}}>
         <InputLabel>Sample Frequency</InputLabel>

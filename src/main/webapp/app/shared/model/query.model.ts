@@ -6,4 +6,4 @@ export interface IQuery {
   measures?: number[];
 }
 
-export const defaultValue: Readonly<IQuery> = { frequency: 'SECOND' };
+export const defaultValue: Readonly<IQuery> = { range: { from: 1514941200000, to: 1514944800000 }, frequency: 'SECOND' };

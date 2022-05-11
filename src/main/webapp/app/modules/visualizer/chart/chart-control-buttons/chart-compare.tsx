@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useState} from 'react';
+import React, {Dispatch, SetStateAction, useState, useEffect} from 'react';
 import {Box, Button, FormControl, Grid, InputLabel, MenuItem, Modal, Select, Tab} from '@mui/material';
 import {TabContext, TabList, TabPanel} from '@material-ui/lab';
 import Highcharts from 'highcharts/highstock'
@@ -34,7 +34,6 @@ const style = {
 export const ChartCompare = (props: IChartCompareProps) => {
   const {showCompare, wdFiles, data, compare, folder, from, to, selectedMeasures} = props;
 
-  const [selectVal, setSelectVal] = useState('');
   const [tabVal, setTabVal] = useState('1');
 
   const handleChange = (event, newValue) => {
@@ -72,10 +71,10 @@ export const ChartCompare = (props: IChartCompareProps) => {
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={selectVal}
+              value={compare}
               label="file"
               onChange={e => {
-                setSelectVal(e.target.value);
+                props.updateCompare(e.target.value)
               }}
               sx={{flexGrow: 1}}
             >
@@ -83,8 +82,10 @@ export const ChartCompare = (props: IChartCompareProps) => {
                 <MenuItem value={`${file}`} key={idx}>{file}</MenuItem>
               ))}
             </Select>
-            <Button variant="contained" sx={{textTransform: "none"}} onClick={() => {props.setCompare(false), props.updateCompare(selectVal), props.updateCompareQueryResults(folder, selectVal.replace('.csv',""), from, to, selectedMeasures)}}>Add</Button>
-            <Button variant="contained" sx={{textTransform: "none"}} onClick={() => {props.setCompare(false), props.updateCompare('')}}>Reset</Button>
+            <Button variant="contained" sx={{textTransform: "none"}} 
+            onClick={() => {props.setCompare(false), props.updateCompareQueryResults(folder, compare.replace('.csv',""), from.getTime(), to.getTime(), selectedMeasures)}}>Add</Button>
+            <Button variant="contained" sx={{textTransform: "none"}} 
+            onClick={() => {props.setCompare(false), props.updateCompare('')}}>Reset</Button>
             </Grid>
           </FormControl>
           </TabPanel>

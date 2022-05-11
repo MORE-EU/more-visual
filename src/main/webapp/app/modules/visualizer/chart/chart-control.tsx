@@ -1,14 +1,18 @@
-import {Button, Grid, Tooltip, Typography} from '@mui/material';
+import {Button, Grid, TextField, Tooltip, Typography} from '@mui/material';
 import React, {Dispatch, SetStateAction, useState} from 'react';
-import {updateActiveTool, updateChangeChart, updateChangePointDates, updateCompare, updateCompareQueryResults, updateGraphZoom,} from '../visualizer.reducer';
+import {updateActiveTool, updateChangeChart, updateChangePointDates, updateCompare, updateCompareQueryResults, updateFrom, updateGraphZoom, updateQueryResults, updateTo,} from '../visualizer.reducer';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {ChartDatePicker} from './chart-control-buttons/chart-datepicker';
 import {ChartCompare} from './chart-control-buttons/chart-compare';
 import {IChangePointDate} from 'app/shared/model/changepoint-date.model';
 import { ChartChangePointFunctions } from './chart-control-buttons/chart-changepoint-functions';
+import { DateTimePicker, LocalizationProvider } from '@mui/lab';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import { IDataset } from 'app/shared/model/dataset.model';
 
 interface IChartControlProps {
+  dataset: IDataset,
   from: Date,
   to: Date,
   wdFiles: any[],
@@ -30,12 +34,15 @@ interface IChartControlProps {
   setShowChangePointFunction: Dispatch<SetStateAction<boolean>>,
   updateCompareQueryResults: typeof updateCompareQueryResults,
   setCompare: Dispatch<SetStateAction<boolean>>,
+  updateFrom: typeof updateFrom,
+  updateTo: typeof updateTo,
+  updateQueryResults: typeof updateQueryResults,
   updateActiveTool: typeof updateActiveTool,
 
 }
 
 export const ChartControl = (props: IChartControlProps) => {
-  const {changeChart, from, to, wdFiles, data, changePointDates, compare, showDatePick, showCompare, showChangePointFunction, folder, selectedMeasures} = props;
+  const {changeChart, from, to, wdFiles, data, changePointDates, compare, showDatePick, showCompare, showChangePointFunction, folder, selectedMeasures, dataset} = props;
 
   const handleZoom = (zoomNum) => {
     props.updateGraphZoom(zoomNum)
@@ -44,10 +51,10 @@ export const ChartControl = (props: IChartControlProps) => {
   const [timeBut, setTimeBut] = useState(4);
 
   return (
-    <Grid container direction="row">
+    <Grid container direction="row" sx={{mb: 1}}>
       <Grid item alignItems="center" sx={{display: "flex", flexGrow: 1, flexDirection: "row"}}>
-        <Typography variant="body1">Time</Typography>
-        <Button variant="text" size="small" onClick={() => {
+        <Typography variant="body1" sx={{pr: 1}}>Time</Typography>
+        {/* <Button variant="text" size="small" onClick={() => {
           setTimeBut(0), handleZoom(1 * 1000)
         }} sx={{textTransform: "none", color: !(timeBut === 0) ? "#424242" : "#0277bd"}}>1s</Button>
         <Button variant="text" size="small" onClick={() => {
@@ -61,22 +68,26 @@ export const ChartControl = (props: IChartControlProps) => {
         }} sx={{textTransform: "none", color: !(timeBut === 3) ? "#424242" : "#0277bd"}}>1h</Button>
         <Button variant="text" size="small" onClick={() => {
           setTimeBut(4), handleZoom(null)
-        }} sx={{textTransform: "none", color: !(timeBut === 4) ? "#424242" : "#0277bd"}}>ALL</Button>
-        {/* <Tooltip title="Indicators">
-        <Button variant="text" size="small"><TuneIcon color='action'/></Button>
-        </Tooltip> */}
-
-        {/* <Tooltip title="Pick Intervals">
-          <Button variant="text" size="small" onClick={() => {
-            props.setShowDatePick(true)
-          }}><EventNoteIcon color='action'/></Button>
-        </Tooltip>
-        <Tooltip title="Compare">
-          <Button variant="text" size="small" onClick={() => {
-            props.setCompare(true)
-          }}><AddCircleIcon color='action'/></Button>
-        </Tooltip> */}
-      </Grid>
+        }} sx={{textTransform: "none", color: !(timeBut === 4) ? "#424242" : "#0277bd"}}>ALL</Button> */}
+      {from && 
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <DateTimePicker
+          renderInput={(p) => <TextField size="small" {...p} />}
+          label="From"
+          value={from}
+          onChange={props.updateFrom}
+          onClose={() => {props.updateQueryResults(folder, dataset.id, from.getTime(), to.getTime(), selectedMeasures)}}
+        />
+        <Typography variant="body1" sx={{pl: 1, pr: 1}}>{" - "}</Typography>
+        <DateTimePicker
+          renderInput={(p) => <TextField size="small" {...p} />}
+          label="To"
+          value={to}
+          onChange={props.updateTo}
+          onClose={() => {props.updateQueryResults(folder, dataset.id, from.getTime(), to.getTime(), selectedMeasures)}}
+        />
+    </LocalizationProvider>}
+    </Grid>
       <Grid item>
         <Button variant="text" size="small" onClick={() => {
           props.updateChangeChart(false)

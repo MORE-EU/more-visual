@@ -8,6 +8,7 @@ import {
   updateChangePointDates,
   updateQueryResults,
   updateActiveTool,
+  updateCompareQueryResults,
 } from "../visualizer.reducer";
 import { IPatterns } from "app/shared/model/patterns.model";
 import { Grid } from "@mui/material";
@@ -66,6 +67,7 @@ export interface IChartProps {
   setShowDatePick: Dispatch<SetStateAction<boolean>>;
   setShowChangePointFunction: Dispatch<SetStateAction<boolean>>;
   setCompare: Dispatch<SetStateAction<boolean>>;
+  updateCompareQueryResults: typeof updateCompareQueryResults;
   compare: string;
 }
 
@@ -148,7 +150,10 @@ export const Chart = (props: IChartProps) => {
   // }, [changePointDates]);
 
   useEffect(() => {
-    props.updateQueryResults(folder, dataset.id, from, to, selectedMeasures);
+    props.updateQueryResults(folder, dataset.id, from ? from.getTime() : null, to ? to.getTime() : null, selectedMeasures);
+    if(compare !== ""){
+    props.updateCompareQueryResults(folder, compare.replace('.csv',""), from.getTime(), to.getTime(), selectedMeasures);
+    }
   }, [dataset, selectedMeasures]);
 
   // CHART: ZOOM FUNCTION
@@ -177,7 +182,6 @@ export const Chart = (props: IChartProps) => {
           // get 20% right and left of the current extremes
           const leftSide = extremes.min - (((extremes.min - extremes.dataMin) * 20) / 100);
           const rightSide = extremes.max + (((extremes.dataMax - extremes.max) * 20) / 100); 
-          console.log(leftSide, rightSide); 
         });
       });
     })(Highcharts);
@@ -320,7 +324,7 @@ export const Chart = (props: IChartProps) => {
             xAxis: {
               ordinal: false,
               type: "datetime",
-              range: graphZoom !== null ? graphZoom : 1000000000,
+              range: graphZoom !== null ? graphZoom : Number.MAX_SAFE_INTEGER,
               plotBands,
             },
             yAxis: changeChart

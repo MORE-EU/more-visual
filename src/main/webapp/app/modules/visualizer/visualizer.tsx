@@ -48,6 +48,10 @@ export const Visualizer = (props: IVisualizerProps) => {
     props.getDataset(props.match.params.folder, props.match.params.id);
   }, [props.match.params.id !== undefined]);
 
+  useEffect(() => {
+    wdFiles.length !== 0 && props.updateDatasetChoice(wdFiles.indexOf(props.match.params.id + ".csv"));
+  }, [wdFiles])
+
   return !loading && dataset !== null && <div>
     <ThemeProvider theme={mdTheme}>
       <Toolbar>
@@ -119,7 +123,8 @@ export const Visualizer = (props: IVisualizerProps) => {
                             graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}
                             changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates}
                             setOpen={setOpen} updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare}
-                            compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}/>
+                            compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}
+                            updateFrom={props.updateFrom} updateTo={props.updateTo}/>
           </Paper>
         </Box>
         <Toolkit

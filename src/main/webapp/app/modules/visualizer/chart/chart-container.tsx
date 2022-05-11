@@ -3,7 +3,7 @@ import {IDataset} from 'app/shared/model/dataset.model';
 import {IPatterns} from 'app/shared/model/patterns.model';
 import {IChangePointDate} from 'app/shared/model/changepoint-date.model';
 import React, {Dispatch, SetStateAction, useState} from 'react';
-import {updateActiveTool, updateChangeChart, updateChangePointDates, updateGraphZoom, updateQueryResults, updateCompare, updateCompareQueryResults} from '../visualizer.reducer';
+import {updateActiveTool, updateChangeChart, updateChangePointDates, updateGraphZoom, updateQueryResults, updateCompare, updateCompareQueryResults, updateTo, updateFrom} from '../visualizer.reducer';
 import Chart from './chart';
 import {ChartControl} from './chart-control';
 import { IDataPoint } from 'app/shared/model/data-point.model';
@@ -32,6 +32,8 @@ export interface IChartContainerProps {
   updateGraphZoom: typeof updateGraphZoom;
   updateActiveTool: typeof updateActiveTool;
   updateCompareQueryResults: typeof updateCompareQueryResults;
+  updateFrom: typeof updateFrom;
+  updateTo: typeof updateTo;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -51,7 +53,8 @@ export const ChartContainer = (props: IChartContainerProps) => {
                       changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
                       updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare} setShowDatePick={setShowDatePick}
                       setCompare={setCompare} showDatePick={showDatePick} showCompare={showCompare} showChangePointFunction={showChangePointFunction}
-                      setShowChangePointFunction={setShowChangePointFunction} updateCompareQueryResults={props.updateCompareQueryResults} folder={folder}/>
+                      setShowChangePointFunction={setShowChangePointFunction} updateCompareQueryResults={props.updateCompareQueryResults} folder={folder}
+                      updateFrom={props.updateFrom} updateTo={props.updateTo} updateQueryResults={props.updateQueryResults} dataset={dataset}/>
         <Chart
           dataset={dataset}
           data={data}
@@ -73,6 +76,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
           setCompare={setCompare}
           setShowDatePick={setShowDatePick}
           setShowChangePointFunction={setShowChangePointFunction}
+          updateCompareQueryResults={props.updateCompareQueryResults}
         />
     </Box>
   );
