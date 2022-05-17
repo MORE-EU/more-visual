@@ -1,6 +1,7 @@
 package eu.more2020.visual.domain;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,19 @@ public class QueryResults implements Serializable {
 
     private Map<Integer, MeasureStats> measureStats;
 
+    private List<LocalDateTime> timeRange = new ArrayList<>();
+
     private int ioCount = 0;
+
+
+    public List<LocalDateTime> getTimeRange() {
+        return this.timeRange;
+    }
+
+    public void setTimeRange(List<LocalDateTime> timeRange) {
+        this.timeRange = timeRange;
+    }
+
 
     public List<DataPoint> getData() {
         return data;

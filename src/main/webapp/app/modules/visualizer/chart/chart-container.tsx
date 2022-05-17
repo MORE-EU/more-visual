@@ -7,10 +7,12 @@ import {updateActiveTool, updateChangeChart, updateChangePointDates, updateGraph
 import Chart from './chart';
 import {ChartControl} from './chart-control';
 import { IDataPoint } from 'app/shared/model/data-point.model';
+import { IQueryResults } from 'app/shared/model/query-results.model';
 
 
 export interface IChartContainerProps {
   dataset: IDataset;
+  queryResults: IQueryResults;
   wdFiles: any[];
   data: IDataPoint[];
   compareData: any[];
@@ -40,7 +42,7 @@ export interface IChartContainerProps {
 export const ChartContainer = (props: IChartContainerProps) => {
   const {dataset, data, selectedMeasures, from, to, filters,
     wdFiles, changeChart, folder, graphZoom, changePointDates,
-    compare, compareData} = props;
+    compare, compareData, queryResults} = props;
 
   const [showDatePick, setShowDatePick] = useState(false);
   const [showChangePointFunction, setShowChangePointFunction] = useState(false);
@@ -57,6 +59,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
                       updateFrom={props.updateFrom} updateTo={props.updateTo} updateQueryResults={props.updateQueryResults} dataset={dataset}/>
         <Chart
           dataset={dataset}
+          queryResults={queryResults}
           data={data}
           compareData={compareData}
           selectedMeasures={selectedMeasures}
@@ -77,6 +80,8 @@ export const ChartContainer = (props: IChartContainerProps) => {
           setShowDatePick={setShowDatePick}
           setShowChangePointFunction={setShowChangePointFunction}
           updateCompareQueryResults={props.updateCompareQueryResults}
+          updateFrom={props.updateFrom}
+          updateTo={props.updateTo}
         />
     </Box>
   );

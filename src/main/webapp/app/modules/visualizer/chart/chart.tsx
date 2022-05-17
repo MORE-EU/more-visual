@@ -1,5 +1,5 @@
 import "../visualizer.scss";
-import React, { useEffect, useState, Dispatch, SetStateAction } from "react";
+import React, { useEffect, useState, Dispatch, SetStateAction, useRef } from "react";
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
@@ -9,6 +9,8 @@ import {
   updateQueryResults,
   updateActiveTool,
   updateCompareQueryResults,
+  updateFrom,
+  updateTo,
 } from "../visualizer.reducer";
 import { IPatterns } from "app/shared/model/patterns.model";
 import { Grid } from "@mui/material";
@@ -20,10 +22,8 @@ import fullScreen from "highcharts/modules/full-screen";
 import stockTools from "highcharts/modules/stock-tools";
 import { useScrollBlock } from "app/shared/util/useScrollBlock";
 import { IChangePointDate } from "app/shared/model/changepoint-date.model";
-import { doc } from "prettier";
-import group = doc.builders.group;
 import { IDataPoint } from "app/shared/model/data-point.model";
-import { ConstructionOutlined } from "@mui/icons-material";
+import { IQueryResults } from "app/shared/model/query-results.model";
 
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
@@ -49,6 +49,7 @@ Highcharts.setOptions({
 
 export interface IChartProps {
   dataset: IDataset;
+  queryResults: IQueryResults;
   data: IDataPoint[];
   compareData: any[];
   updateQueryResults: typeof updateQueryResults;
@@ -68,6 +69,8 @@ export interface IChartProps {
   setShowChangePointFunction: Dispatch<SetStateAction<boolean>>;
   setCompare: Dispatch<SetStateAction<boolean>>;
   updateCompareQueryResults: typeof updateCompareQueryResults;
+  updateFrom: typeof updateFrom;
+  updateTo: typeof updateTo;
   compare: string;
 }
 
@@ -95,6 +98,7 @@ export const Chart = (props: IChartProps) => {
     changePointDates,
     compare,
     compareData,
+    queryResults,
   } = props;
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -102,6 +106,8 @@ export const Chart = (props: IChartProps) => {
   const [zones, setZones] = useState([]);
   const [plotBands, setPlotBands] = useState([]);
   const [type, setType] = useState("line");
+  const latestMeasures = useRef(selectedMeasures);
+  const latestCompare = useRef(compare);
 
   useEffect(() => {
     let newZones = [];
@@ -150,42 +156,73 @@ export const Chart = (props: IChartProps) => {
   // }, [changePointDates]);
 
   useEffect(() => {
+    latestMeasures.current = selectedMeasures;
     props.updateQueryResults(folder, dataset.id, from ? from.getTime() : null, to ? to.getTime() : null, selectedMeasures);
     if(compare !== ""){
-    props.updateCompareQueryResults(folder, compare.replace('.csv',""), from.getTime(), to.getTime(), selectedMeasures);
+      props.updateCompareQueryResults(folder, compare.replace('.csv',""), from.getTime(), to.getTime(), selectedMeasures);
     }
   }, [dataset, selectedMeasures]);
 
-  // CHART: ZOOM FUNCTION
   useEffect(() => {
-    (function (H) {
+    latestCompare.current = compare;
+  }, [compare]);
+ 
+  const chartFuncts = (e) => {
+
+      const chart = e.target;
+      let currentExtremes;
       const step = 2000 * 200;
-      H.addEvent(H.Chart, "load", (e) => {
-        const chart = e.target;
-        H.addEvent(chart.container, "wheel", (event: WheelEvent) => {
-          const xAxis = chart.xAxis[0],
-            extremes = xAxis.getExtremes(),
-            newMin = extremes.min;
-          if (event.deltaY < 0) {
-            newMin + step < extremes.max
-              ? xAxis.setExtremes(newMin + step, extremes.max, true, true)
-              : xAxis.setExtremes(extremes.max - 2000, extremes.max, true, true);
-          } else if (event.deltaY > 0) {
-            newMin - step > extremes.dataMin
-              ? xAxis.setExtremes(newMin - step, extremes.max, true, true)
-              : xAxis.setExtremes(extremes.dataMin, extremes.max, true, true);
-          }
-        });
-        H.addEvent(chart.container, 'click', (event: PointerEvent) => {       
-          const xAxis = chart.xAxis[0],
-          extremes = xAxis.getExtremes();
-          // get 20% right and left of the current extremes
-          const leftSide = extremes.min - (((extremes.min - extremes.dataMin) * 20) / 100);
-          const rightSide = extremes.max + (((extremes.dataMax - extremes.max) * 20) / 100); 
-        });
+
+      // CHART: INSTRUCTIONS
+      chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
+      Highcharts.addEvent(chart.container, "click", (event: MouseEvent) => {
+        chart.hideLoading();
       });
-    })(Highcharts);
-  },[]);
+
+      // CHART: ZOOM FUNCTION
+      Highcharts.addEvent(chart.container, "wheel", (event: WheelEvent) => {
+        const xAxis = chart.xAxis[0],
+          extremes = xAxis.getExtremes(),
+          newMin = extremes.min;
+        if (event.deltaY < 0) {
+          newMin + step < extremes.max
+            ? xAxis.setExtremes(newMin + step, extremes.max, true, true)
+            : xAxis.setExtremes(extremes.max - 2000, extremes.max, true, true);
+        } else if (event.deltaY > 0) {
+          newMin - step > extremes.dataMin
+            ? xAxis.setExtremes(newMin - step, extremes.max, true, true)
+            : xAxis.setExtremes(extremes.dataMin, extremes.max, true, true);
+          }
+      });
+
+      // CHART: PANNING FETCH DATA FUNCTION
+      setInterval(() => {
+        currentExtremes = chart.xAxis[0].getExtremes();
+        const {dataMax, dataMin, max, min} = currentExtremes;
+        const leftSide = min - (((min - queryResults.timeRange[0]) * 50) / 100);
+        const rightSide = max + (((queryResults.timeRange[1] - max) * 50) / 100); 
+
+        // Conditions for loading new data
+        if (dataMax - max < 2 && dataMax !== queryResults.timeRange[1]) {
+          props.updateQueryResults(folder, dataset.id, dataMin, rightSide, latestMeasures.current);
+          props.updateFrom(new Date(dataMin));
+          props.updateTo(new Date(dataMax));
+          if(latestCompare.current !== ""){
+          props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv',""), dataMin, rightSide, latestMeasures.current);
+          }
+        }
+        if (min - dataMin < 2 && dataMin !== queryResults.timeRange[0]) {
+          props.updateQueryResults(folder, dataset.id, leftSide, dataMax, latestMeasures.current);
+          props.updateFrom(new Date(dataMin));
+          props.updateTo(new Date(dataMax));
+          if(latestCompare.current !== ""){
+            props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv',""), leftSide, dataMax, latestMeasures.current);
+          }
+        }
+      }, 300);
+      // Set initial extremes
+      chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length-2].timestamp);
+    };
   
 
 
@@ -320,11 +357,14 @@ export const Chart = (props: IChartProps) => {
                 type: "x",
               },
               zoomType: false,
+              events: {
+                load: chartFuncts
+              },
             },
             xAxis: {
               ordinal: false,
               type: "datetime",
-              range: graphZoom !== null ? graphZoom : Number.MAX_SAFE_INTEGER,
+              // range: graphZoom !== null ? graphZoom : Number.MAX_SAFE_INTEGER,
               plotBands,
             },
             yAxis: changeChart
@@ -372,39 +412,14 @@ export const Chart = (props: IChartProps) => {
               })),
             rangeSelector: {
               enabled: false,
-              buttons: [
-                {
-                  type: "second",
-                  count: 10,
-                  text: "10s",
-                },
-                {
-                  type: "minute",
-                  count: 1,
-                  text: "1m",
-                },
-                {
-                  type: "minute",
-                  count: 30,
-                  text: "30m",
-                },
-                {
-                  type: "hour",
-                  count: 1,
-                  text: "1h",
-                },
-                {
-                  type: "all",
-                  text: "ALL",
-                },
-              ],
-              selected: 4,
             },
             navigator: {
               enabled: false,
+              adaptToUpdatedData: false,
             },
             scrollbar: {
-              enabled: true,
+              enabled: false,
+              liveRedraw: false
             },
             colorAxis: null,
             legend: {

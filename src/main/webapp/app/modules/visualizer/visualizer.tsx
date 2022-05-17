@@ -124,7 +124,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                             changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates}
                             setOpen={setOpen} updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare}
                             compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}
-                            updateFrom={props.updateFrom} updateTo={props.updateTo}/>
+                            updateFrom={props.updateFrom} updateTo={props.updateTo} queryResults={queryResults}/>
           </Paper>
         </Box>
         <Toolkit

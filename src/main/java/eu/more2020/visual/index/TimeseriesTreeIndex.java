@@ -44,6 +44,7 @@ public class TimeseriesTreeIndex {
     private Map<Integer, MeasureStats> measureStats;
     private Dataset dataset;
     private String csv;
+    private LocalDateTime firstDate,lastDate;
     private int objectsIndexed = 0;
     private boolean isInitialized = false;
     private DateTimeFormatter formatter;
@@ -116,6 +117,11 @@ public class TimeseriesTreeIndex {
         int queryFrequencyLevel = getTemporalLevelIndex(q0.getFrequency()) + 1;
         while ((row = parser.parseNext()) != null) {
             LocalDateTime dateTime = parseStringToDate(row[dataset.getTimeCol()]);
+            if(objectsIndexed == 0){
+            this.firstDate = dateTime;
+            }else{
+            this.lastDate = dateTime;
+            } 
             if (dateTime.isBefore(from)) {
                 from = dateTime;
             } else if (dateTime.isAfter(to)) {
@@ -215,5 +221,12 @@ public class TimeseriesTreeIndex {
 
     public Map<Integer, MeasureStats> getMeasureStats() {
         return measureStats;
+    }
+
+    public List<LocalDateTime> getFirstLastDate() {
+        List<LocalDateTime> timerange = new ArrayList<>();
+        timerange.add(firstDate);
+        timerange.add(lastDate);
+        return timerange;
     }
 }

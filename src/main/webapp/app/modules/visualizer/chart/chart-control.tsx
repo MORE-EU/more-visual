@@ -102,7 +102,7 @@ export const ChartControl = (props: IChartControlProps) => {
                          updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
                          updateActiveTool={props.updateActiveTool}/>}
       {showCompare && <ChartCompare showCompare={showCompare} setCompare={props.setCompare} compare={compare} updateCompare={props.updateCompare} wdFiles={wdFiles} data={data} 
-                        updateCompareQueryResults={props.updateCompareQueryResults} folder={folder} from={from} to={to} selectedMeasures={selectedMeasures}/>}
+                        updateCompareQueryResults={props.updateCompareQueryResults} folder={folder} from={from} to={to} selectedMeasures={selectedMeasures} dataset={dataset}/>}
       {showChangePointFunction && <ChartChangePointFunctions showChangePointFunction={showChangePointFunction} setShowChangePointFunction={props.setShowChangePointFunction} setOpen={props.setOpen} updateActiveTool={props.updateActiveTool}/>}
     </Grid>
   );

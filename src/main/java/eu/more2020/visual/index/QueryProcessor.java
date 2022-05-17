@@ -7,6 +7,8 @@ import eu.more2020.visual.domain.DataPoint;
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Query;
 import eu.more2020.visual.domain.QueryResults;
+import eu.more2020.visual.domain.TimeRange;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,7 +58,7 @@ public class QueryProcessor {
         fileInputStream.close();
 
         queryResults.setMeasureStats(timeseriesTreeIndex.getMeasureStats());
-
+        queryResults.setTimeRange(timeseriesTreeIndex.getFirstLastDate());
         return queryResults;
     }
 

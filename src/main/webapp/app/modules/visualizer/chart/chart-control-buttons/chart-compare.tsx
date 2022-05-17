@@ -3,8 +3,10 @@ import {Box, Button, FormControl, Grid, InputLabel, MenuItem, Modal, Select, Tab
 import {TabContext, TabList, TabPanel} from '@material-ui/lab';
 import Highcharts from 'highcharts/highstock'
 import { updateCompare, updateCompareQueryResults } from '../../visualizer.reducer';
+import { IDataset } from 'app/shared/model/dataset.model';
 
 export interface IChartCompareProps {
+  dataset: IDataset;
   showCompare: boolean;
   from: Date;
   to: Date;
@@ -32,7 +34,7 @@ const style = {
 } as const;
 
 export const ChartCompare = (props: IChartCompareProps) => {
-  const {showCompare, wdFiles, data, compare, folder, from, to, selectedMeasures} = props;
+  const {showCompare, wdFiles, data, compare, folder, from, to, selectedMeasures, dataset} = props;
 
   const [tabVal, setTabVal] = useState('1');
 
@@ -79,7 +81,7 @@ export const ChartCompare = (props: IChartCompareProps) => {
               sx={{flexGrow: 1}}
             >
               {wdFiles.map((file, idx) => (
-                <MenuItem value={`${file}`} key={idx}>{file}</MenuItem>
+               file.replace('.csv',"") !== dataset.id && <MenuItem value={`${file}`} key={idx}>{file}</MenuItem>
               ))}
             </Select>
             <Button variant="contained" sx={{textTransform: "none"}} 
