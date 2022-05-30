@@ -199,24 +199,24 @@ export const Chart = (props: IChartProps) => {
       setInterval(() => {
         currentExtremes = chart.xAxis[0].getExtremes();
         const {dataMax, dataMin, max, min} = currentExtremes;
-        const leftSide = min - (((min - queryResults.timeRange[0]) * 50) / 100);
-        const rightSide = max + (((queryResults.timeRange[1] - max) * 50) / 100); 
+        const leftSide = min - (((min - queryResults.timeRange[0]) * 20) / 100);
+        const rightSide = max + (((queryResults.timeRange[1] - max) * 20) / 100); 
 
         // Conditions for loading new data
         if (dataMax - max < 2 && dataMax !== queryResults.timeRange[1]) {
-          props.updateQueryResults(folder, dataset.id, dataMin, rightSide, latestMeasures.current);
+          props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestMeasures.current);
           props.updateFrom(new Date(dataMin));
           props.updateTo(new Date(dataMax));
           if(latestCompare.current !== ""){
-          props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv',""), dataMin, rightSide, latestMeasures.current);
+            props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv',""), leftSide, rightSide, latestMeasures.current);
           }
         }
         if (min - dataMin < 2 && dataMin !== queryResults.timeRange[0]) {
-          props.updateQueryResults(folder, dataset.id, leftSide, dataMax, latestMeasures.current);
+          props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestMeasures.current);
           props.updateFrom(new Date(dataMin));
           props.updateTo(new Date(dataMax));
           if(latestCompare.current !== ""){
-            props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv',""), leftSide, dataMax, latestMeasures.current);
+            props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv',""), leftSide, rightSide, latestMeasures.current);
           }
         }
       }, 300);
