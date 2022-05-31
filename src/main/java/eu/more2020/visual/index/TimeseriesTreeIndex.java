@@ -118,10 +118,10 @@ public class TimeseriesTreeIndex {
         while ((row = parser.parseNext()) != null) {
             LocalDateTime dateTime = parseStringToDate(row[dataset.getTimeCol()]);
             if(objectsIndexed == 0){
-            this.firstDate = dateTime;
+                this.firstDate = dateTime;
             }else{
-            this.lastDate = dateTime;
-            } 
+                this.lastDate = dateTime;
+            }
             if (dateTime.isBefore(from)) {
                 from = dateTime;
             } else if (dateTime.isAfter(to)) {
@@ -143,8 +143,7 @@ public class TimeseriesTreeIndex {
         }
         parser.stopParsing();
         isInitialized = true;
-
-        timeRange = new TimeRange(from, to);
+        timeRange = new TimeRange(this.firstDate, this.lastDate);
 
         measureStats = statsMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
             e -> new MeasureStats(e.getValue().mean(), e.getValue().min(), e.getValue().max())));

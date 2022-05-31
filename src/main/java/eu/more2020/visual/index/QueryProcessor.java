@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,8 +49,17 @@ public class QueryProcessor {
     }
 
     public QueryResults prepareQueryResults(TreeNode root) throws IOException {
-        LocalDateTime start = query.getRange() != null ? query.getRange().getFrom() : timeseriesTreeIndex.getTimeRange().getFrom();
-        LocalDateTime end = query.getRange() != null ? query.getRange().getTo() : timeseriesTreeIndex.getTimeRange().getTo();
+        LocalDateTime start;
+        LocalDateTime end;
+        if(query.getRange() == null){
+            start = timeseriesTreeIndex.getTimeRange().getTo()
+                .minus(5, ChronoUnit.DAYS);;
+            end = timeseriesTreeIndex.getTimeRange().getTo();
+        }
+        else {
+            start = query.getRange().getFrom();
+            end = query.getRange().getTo();
+        }
         List<Integer> startLabels = getLabels(start);
         List<Integer> endLabels = getLabels(end);
 
@@ -113,7 +123,6 @@ public class QueryProcessor {
         // these are the children's filters
         int start = startLabels.get(level);
         int end = endLabels.get(level);
-
         /* We filter in each level only in the first node and the last. If we are on the first node, we get everything that is from the start filter
          * and after. Else if we are in the last node we get everything before the end filter. Finally, if we re in intermediary nodes we get all children
          * that are below the filtered values of the current node.*/

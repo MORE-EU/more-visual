@@ -166,7 +166,7 @@ export const Chart = (props: IChartProps) => {
   useEffect(() => {
     latestCompare.current = compare;
   }, [compare]);
- 
+
   const chartFuncts = (e) => {
 
       const chart = e.target;
@@ -200,7 +200,7 @@ export const Chart = (props: IChartProps) => {
         currentExtremes = chart.xAxis[0].getExtremes();
         const {dataMax, dataMin, max, min} = currentExtremes;
         const leftSide = min - (((min - queryResults.timeRange[0]) * 20) / 100);
-        const rightSide = max + (((queryResults.timeRange[1] - max) * 20) / 100); 
+        const rightSide = max + (((queryResults.timeRange[1] - max) * 20) / 100);
 
         // Conditions for loading new data
         if (dataMax - max < 2 && dataMax !== queryResults.timeRange[1]) {
@@ -223,7 +223,7 @@ export const Chart = (props: IChartProps) => {
       // Set initial extremes
       chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length-2].timestamp);
     };
-  
+
 
 
   return (
@@ -300,12 +300,12 @@ export const Chart = (props: IChartProps) => {
                 connectNulls: false,
                 connectorAllowed: false,
                 maxPointWidth: 80,
-                dataGrouping: {
-                  units: [[resampleFreq, [1]]],
-                  forced: true,
-                  enabled: resampleFreq !== "none",
-                  groupAll: true,
-                },
+                // dataGrouping: {
+                //   units: [[resampleFreq, [1]]],
+                //   forced: true,
+                //   enabled: resampleFreq !== "none",
+                //   groupAll: true,
+                // },
               },
             },
             series:

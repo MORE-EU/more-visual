@@ -58,7 +58,7 @@ public class TimeRange implements Serializable {
 
     @Override
     public String toString() {
-        return from.toString() + "," + to.toString();
+        return (from != null ? from.toString() : "") + "," + (to != null ?  to.toString() : "");
     }
 
     @Override
