@@ -53,7 +53,7 @@ public class QueryProcessor {
         LocalDateTime end;
         if(query.getRange() == null){
             start = timeseriesTreeIndex.getTimeRange().getTo()
-                .minus(5, ChronoUnit.DAYS);;
+                .minus(7, ChronoUnit.DAYS);;
             end = timeseriesTreeIndex.getTimeRange().getTo();
         }
         else {
