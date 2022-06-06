@@ -168,11 +168,6 @@ export const Chart = (props: IChartProps) => {
 
   const chartFuncts = (e) => {
     const chart = e.target;
-    let currentExtremes = chart.xAxis[0].getExtremes();
-    const {dataMax, dataMin, max, min} = currentExtremes;
-    console.log((dataMax - dataMin )/ 10);
-    const step = (dataMax - dataMin) / 10;
-
     // CHART: INSTRUCTIONS
     chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
     Highcharts.addEvent(chart.container, "click", (event: MouseEvent) => {
@@ -181,6 +176,9 @@ export const Chart = (props: IChartProps) => {
 
     // CHART: ZOOM FUNCTION
     Highcharts.addEvent(chart.container, "wheel", (event: WheelEvent) => {
+      const {dataMax, dataMin, max, min} = chart.xAxis[0].getExtremes();
+      console.log((dataMax - dataMin )/ 100);
+      const step = (dataMax - dataMin) / 100;
       const xAxis = chart.xAxis[0],
         extremes = xAxis.getExtremes(),
         newMin = extremes.min;
@@ -197,7 +195,7 @@ export const Chart = (props: IChartProps) => {
 
     // CHART: PANNING FETCH DATA FUNCTION
     setInterval(() => {
-      currentExtremes = chart.xAxis[0].getExtremes();
+      const currentExtremes = chart.xAxis[0].getExtremes();
       const {dataMax, dataMin, max, min} = currentExtremes;
       const leftSide = min - (((min - queryResults.timeRange[0]) * 20) / 100);
       const rightSide = max + (((queryResults.timeRange[1] - max) * 20) / 100);
