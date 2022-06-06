@@ -167,11 +167,11 @@ export const Chart = (props: IChartProps) => {
   }, [compare]);
 
   const chartFuncts = (e) => {
-
     const chart = e.target;
-    let currentExtremes;
-    //TODO: make this dynamic
-    const step = 2000000 * 200;
+    let currentExtremes = chart.xAxis[0].getExtremes();
+    const {dataMax, dataMin, max, min} = currentExtremes;
+    console.log((dataMax - dataMin )/ 10);
+    const step = (dataMax - dataMin) / 10;
 
     // CHART: INSTRUCTIONS
     chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");

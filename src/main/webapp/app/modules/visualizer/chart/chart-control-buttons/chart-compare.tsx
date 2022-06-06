@@ -1,6 +1,6 @@
 import React, {Dispatch, SetStateAction, useState} from 'react';
 import {Box, Button, FormControl, Grid, InputLabel, MenuItem, Modal, Select, Tab} from '@mui/material';
-import {TabContext, TabList, TabPanel} from '@material-ui/lab';
+import {TabContext, TabList, TabPanel} from '@mui/lab';
 import {updateCompare, updateCompareQueryResults} from '../../visualizer.reducer';
 import {IDataset} from 'app/shared/model/dataset.model';
 
@@ -85,7 +85,7 @@ export const ChartCompare = (props: IChartCompareProps) => {
                   </Select>
                   <Button variant="contained" sx={{textTransform: "none"}}
                           onClick={() => {
-                            props.setCompare(false), props.updateCompareQueryResults(folder, compare.replace('.csv', ""), from.getTime(), to.getTime(), selectedMeasures)
+                            props.setCompare(false), props.updateCompareQueryResults(folder, compare.replace('.csv', ""), from, to, selectedMeasures)
                           }}>Add</Button>
                   <Button variant="contained" sx={{textTransform: "none"}}
                           onClick={() => {

@@ -5,20 +5,20 @@ import HighlightAltIcon from '@mui/icons-material/HighlightAlt';
 import FunctionsIcon from '@mui/icons-material/Functions';
 import {ChartDatePicker} from "app/modules/visualizer/chart/chart-control-buttons/chart-datepicker";
 import {IChangePointDate} from "app/shared/model/changepoint-date.model";
-import {updateActiveTool, updateChangePointDates} from "app/modules/visualizer/visualizer.reducer";
+import {updateActiveTool, updateCustomChangePoints} from "app/modules/visualizer/visualizer.reducer";
 
 interface IIntervalsPickerProps {
   from: Date,
   to: Date,
-  changePointDates: IChangePointDate[],
-  updateChangePointDates: typeof updateChangePointDates,
+  customChangePoints: IChangePointDate[],
+  updateCustomChangePoints: typeof updateCustomChangePoints,
   setOpen: Dispatch<SetStateAction<boolean>>,
   updateActiveTool: typeof updateActiveTool,
 }
 
 
 export const IntervalsPicker = (props: IIntervalsPickerProps) => {
-  const {from, to, changePointDates} = props;
+  const {from, to, customChangePoints} = props;
   const ref = useRef(null);
   const [fixedWidth, setFixedWidth] = React.useState(0);
   const [expand, setExpand] = React.useState(false);
@@ -64,8 +64,8 @@ export const IntervalsPicker = (props: IIntervalsPickerProps) => {
         </Box>}
       {showDatePick &&
         <ChartDatePicker showDatePick={showDatePick} setShowDatePick={setShowDatePick} from={from} to={to}
-                         changePointDates={changePointDates}
-                         updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
+                         customChangePoints={customChangePoints}
+                         updateCustomChangePoints={props.updateCustomChangePoints} setOpen={props.setOpen}
                          updateActiveTool={props.updateActiveTool}/>}
     </Box>
   )

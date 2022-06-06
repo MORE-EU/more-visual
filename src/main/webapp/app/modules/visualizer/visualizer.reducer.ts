@@ -450,7 +450,7 @@ export const applyCpDetection = (id, from, to, customChangePoints, detectAuto, d
   return {
     type: ACTION_TYPES.CHANGEPOINT_DETECTION,
     payload: axios.post(requestUrl, {
-      range: { from: from, to: to } as ITimeRange,
+      range: { from, to } as ITimeRange,
       changepoints: detectIntervals ? customChangePoints : null,
     }),
   };

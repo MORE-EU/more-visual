@@ -20,7 +20,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   const [detectAuto, setDetectAuto] = useState(false);
   const [detectIntervals, setDetectIntervals] = useState(false);
 
-  const applyCpDetection = (id) => {
+  const handleCpDetection = (id) => {
     props.enableCpDetection(true);
     props.applyCpDetection(id, from, to, customChangePoints,
       detectAuto, detectIntervals);
@@ -63,7 +63,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
           }}>
             <Box sx={{pt: 1}}>Intervals on Chart</Box>
             <Tooltip describeChild
-                     title={customChangePoints.length == 0 ? "Use Intervals on Chart" : "Select Intervals on the Chart"}>
+                     title={customChangePoints.length === 0 ? "Use Intervals on Chart" : "Select Intervals on the Chart"}>
               <Switch
                 checked={detectIntervals && customChangePoints.length > 0}
                 onChange={() => setDetectIntervals(!detectIntervals)}
@@ -84,7 +84,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
             >STOP</Button>
             <Button
               disabled={!(detectAuto || detectIntervals) || cpDetectionEnabled}
-              onClick={e => applyCpDetection(dataset.id)}
+              onClick={e => handleCpDetection(dataset.id)}
             >APPLY</Button>
           </Box>
         </Box>
