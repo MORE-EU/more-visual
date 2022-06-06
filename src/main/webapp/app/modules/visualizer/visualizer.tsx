@@ -9,7 +9,7 @@ import Paper from '@mui/material/Paper';
 import {Redirect, RouteComponentProps} from 'react-router-dom';
 import {IRootState} from "app/shared/reducers";
 import {filterData,getChangePointDates,getDataset,getPatterns,getWdFiles,updateChangeChart,updateChangePointDates,
-updateDatasetChoice,updateFilters,updateFrom,updateGraphZoom,updatePatternNav,updatePatterns,
+updateDatasetChoice,updateFilters,updateFrom,updateGraphZoom,updatePatternNav,updatePatterns, cpDetection,
 updateQueryResults,updateResampleFreq,updateSelectedMeasures,updateTo,updateActiveTool,updateCompare, updateCompareQueryResults,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
@@ -30,6 +30,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     loading, queryResults, data, selectedMeasures,
     resampleFreq, patterns, graphZoom, changePointDates,
     activeTool, compare, filters, compareData, queryResultsLoading,
+    from, to,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -128,7 +129,7 @@ export const Visualizer = (props: IVisualizerProps) => {
           </Paper>
         </Box>
         <Toolkit
-          open={open}
+          open={open} from = {from} to = {to}
           setOpen={setOpen} dataset={dataset}
           data={data} selectedMeasures={selectedMeasures}
           resampleFreq={resampleFreq} patterns={patterns}
@@ -137,6 +138,7 @@ export const Visualizer = (props: IVisualizerProps) => {
           updateSelectedMeasures={props.updateSelectedMeasures}
           updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}
           changePointDates={changePointDates} activeTool={activeTool} updateActiveTool={props.updateActiveTool}
+          cpDetection={props.cpDetection}
         />
       </Box>
     </ThemeProvider>
@@ -174,6 +176,7 @@ const mapDispatchToProps = {
   updatePatterns, getPatterns, updateChangeChart, updateDatasetChoice,
   getWdFiles, updatePatternNav, updateChangePointDates, getChangePointDates,
   updateGraphZoom, updateActiveTool, updateCompare, updateCompareQueryResults,
+  cpDetection,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

@@ -20,6 +20,7 @@ import java.util.Collection;
 
 @SpringBootApplication
 @EnableConfigurationProperties({ApplicationProperties.class})
+
 public class MoreVisApp {
 
     private static final Logger log = LoggerFactory.getLogger(MoreVisApp.class);

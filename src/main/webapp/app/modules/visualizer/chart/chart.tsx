@@ -24,6 +24,7 @@ import { useScrollBlock } from "app/shared/util/useScrollBlock";
 import { IChangePointDate } from "app/shared/model/changepoint-date.model";
 import { IDataPoint } from "app/shared/model/data-point.model";
 import { IQueryResults } from "app/shared/model/query-results.model";
+import {ITimeRange} from "app/shared/model/time-range.model";
 
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
@@ -132,15 +133,15 @@ export const Chart = (props: IChartProps) => {
   }, [patterns]);
 
   const annotationToDate = (annotation, len) => {
-    const x1 = annotation.startXMin,
-      x2 = annotation.startXMax,
-      series = annotation.chart.series[0],
-      filteredPoints = series.points.filter(
-        (point) => point.x > x1 && point.x < x2
-      ),
-      startPoint = new Date(filteredPoints[0].x),
-      endPoint = new Date(filteredPoints[filteredPoints.length - 1].x);
-    return { start: startPoint, end: endPoint, id: len };
+    // const x1 = annotation.startXMin,
+    //   x2 = annotation.startXMax,
+    //   series = annotation.chart.series[0],
+    //   filteredPoints = series.points.filter(
+    //     (point) => point.x > x1 && point.x < x2
+    //   ),
+      const startPoint = annotation.startXMin,
+        endPoint = annotation.startXMax;
+    return { range: {from: startPoint, to: endPoint} as ITimeRange, id: len };
   };
 
   // useEffect(() => {

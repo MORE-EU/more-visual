@@ -2,11 +2,9 @@ package eu.more2020.visual.web.rest;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
-import eu.more2020.visual.domain.Dataset;
-import eu.more2020.visual.domain.Query;
-import eu.more2020.visual.domain.QueryResults;
-import eu.more2020.visual.domain.Sample;
+import eu.more2020.visual.domain.*;
 import eu.more2020.visual.repository.DatasetRepository;
+import eu.more2020.visual.repository.ToolsRepository;
 import eu.more2020.visual.service.CsvDataService;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
@@ -16,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.w3c.dom.ranges.Range;
 
 import javax.validation.Valid;
 import java.io.File;
@@ -23,6 +22,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.sql.Time;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +38,7 @@ public class DatasetResource {
     private static final String ENTITY_NAME = "dataset";
     private final Logger log = LoggerFactory.getLogger(DatasetResource.class);
     private final DatasetRepository datasetRepository;
+    private final ToolsRepository toolsRepository;
     private final CsvDataService csvDataService;
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -43,8 +46,11 @@ public class DatasetResource {
     @Value("${application.workspacePath}")
     private String workspacePath;
 
-    public DatasetResource(DatasetRepository datasetRepository, CsvDataService csvDataService) {
+    public DatasetResource(DatasetRepository datasetRepository,
+                           ToolsRepository toolsRepository,
+                           CsvDataService csvDataService) {
         this.datasetRepository = datasetRepository;
+        this.toolsRepository = toolsRepository;
         this.csvDataService = csvDataService;
     }
 
@@ -166,6 +172,14 @@ public class DatasetResource {
         log.debug("REST request to execute Query: {}", query);
         Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id, folder).map(dataset -> csvDataService.executeQuery(folder, dataset, query));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
+    }
+
+
+    @PostMapping("/tools/cp_detection/{id}")
+    public List<String>  cpDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {
+        log.debug("CP for {}", changepoints);
+        toolsRepository.cpDetection(id, changepoints);
+        return new ArrayList<>();
     }
 
 }

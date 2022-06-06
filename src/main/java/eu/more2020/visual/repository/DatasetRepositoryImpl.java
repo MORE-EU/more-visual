@@ -3,8 +3,6 @@ package eu.more2020.visual.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvToBeanBuilder;
 
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Farm;
@@ -13,18 +11,17 @@ import eu.more2020.visual.domain.Sample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -57,6 +54,31 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         return datasets;
     }
 
+    public Boolean hasWashes(String id) {
+        try {
+            URL dataURL = new URL(applicationProperties.getToolApi() + "washes/" + id);
+            HttpURLConnection con = (HttpURLConnection) dataURL.openConnection();
+            con.setRequestMethod("POST");
+            int status = con.getResponseCode();
+            BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer content = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            con.disconnect();
+            return Boolean.parseBoolean(String.valueOf(content));
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
     public Farm getFarm(String folder) throws IOException {
         Farm farm = new Farm();
         ObjectMapper mapper = new ObjectMapper();
@@ -83,11 +105,11 @@ public class DatasetRepositoryImpl implements DatasetRepository {
             farm = mapper.readValue(reader, Farm.class);
         }
         allDatasets = farm.getData();
-
         for (Dataset d : allDatasets) {
             if (d.getId().equals(id)) {
                 dataset = d;
                 dataset.setFarmName(farm.getName());
+                dataset.setWashes(hasWashes(dataset.getId()));
                 if (dataset.getTimeFormat() == null || dataset.getTimeFormat().isEmpty()){
                     dataset.setTimeFormat(timeFormat);
                 }

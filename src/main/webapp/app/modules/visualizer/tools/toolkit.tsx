@@ -13,7 +13,8 @@ import TimelineIcon from '@mui/icons-material/Timeline'; // segmentation
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ActiveTool from "app/modules/visualizer/tools/active-tool";
 import {IDataset} from "app/shared/model/dataset.model";
-import {getPatterns, updateActiveTool, updatePatterns, updateSelectedMeasures, updateFilters, filterData} from '../visualizer.reducer';
+import {getPatterns, updateActiveTool, updatePatterns,
+  updateSelectedMeasures, updateFilters, cpDetection, filterData} from '../visualizer.reducer';
 import {IPatterns} from "app/shared/model/patterns.model";
 import {IQueryResults} from "app/shared/model/query-results.model";
 
@@ -72,6 +73,8 @@ export interface IToolkitProps {
   open?: boolean,
   setOpen: Dispatch<SetStateAction<boolean>>,
   dataset: IDataset,
+  from: Date,
+  to: Date,
   data: any,
   filters: any,
   queryResults: IQueryResults,
@@ -86,13 +89,14 @@ export interface IToolkitProps {
   changePointDates: any,
   updateActiveTool: typeof updateActiveTool,
   activeTool: number,
+  cpDetection: typeof cpDetection,
 }
 
 const Toolkit = (props: IToolkitProps) => {
   const {
     open, dataset, data, selectedMeasures, patterns,
     resampleFreq, changePointDates, activeTool, filters,
-    queryResults
+    queryResults, from, to,
   } = props;
 
   const handleDrawer = () => {
@@ -149,13 +153,14 @@ const Toolkit = (props: IToolkitProps) => {
           </List>
         }
         <ActiveTool
-          activeTool={activeTool}
+          activeTool={activeTool} from = {from} to = {to}
           updateActiveTool={props.updateActiveTool}
           dataset={dataset} data={data} selectedMeasures={selectedMeasures}
           filters = {filters} filterData={props.filterData}
           updateFilters={props.updateFilters} queryResults={queryResults}
           resampleFreq={resampleFreq} patterns={patterns} updateSelectedMeasures={props.updateSelectedMeasures}
           updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} changePointDates={changePointDates}
+          cpDetection = {props.cpDetection}
         />
       </Drawer>
     </Box>

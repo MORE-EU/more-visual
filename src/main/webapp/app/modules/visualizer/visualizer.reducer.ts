@@ -36,6 +36,7 @@ export const ACTION_TYPES = {
   UPDATE_GRAPHZOOM: 'visualizer/UPDATE_GRAPHZOOM',
   UPDATE_ACTIVETOOL: 'visualizer/UPDATE_ACTIVETOOL',
   UPDATE_COMPARE: 'visualizer/UPDATE_COMPARE',
+  CHANGEPOINT_DETECTION: 'visualizer/CHANGEPOINT_DETECTION',
 };
 
 const initialState = {
@@ -174,6 +175,10 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         queryResultsLoading: false,
         compareData: action.payload.data.data,
       };
+    case SUCCESS(ACTION_TYPES.CHANGEPOINT_DETECTION):
+      return {
+        ...state,
+      };
     case ACTION_TYPES.UPDATE_SELECTED_MEASURES:
       return {
         ...state,
@@ -293,7 +298,7 @@ export const getSampleFile = id => {
 export const updateQueryResults = (folder, id, fromDate, toDate, selMeasures) => (dispatch, getState) => {
   let query;
   fromDate !== null && toDate !== null
-    ? (query = { range: { from: fromDate, to: toDate } as ITimeRange, frequency: 'SECOND', measures: selMeasures } as IQuery)
+    ? (query = { range: { from: fromDate, to: toDate } as ITimeRange, frequency: 'MINUTE', measures: selMeasures } as IQuery)
     : (query = defaultQuery);
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_RESULTS,
@@ -425,4 +430,12 @@ export const getChangePointDates = (func, col) => dispatch => {
     type: ACTION_TYPES.GET_CHANGEPOINT_DATES,
     payload: { func, col },
   });
+};
+
+export const cpDetection = (id, from, to, changePointDates) => dispatch => {
+  const requestUrl = `api/tools/cp_detection/${id}`;
+  return {
+    type: ACTION_TYPES.CHANGEPOINT_DETECTION,
+    payload: axios.post(requestUrl, { range: { from: 1357022739000, to: 1391156470000 } as ITimeRange, changepoints: changePointDates }),
+  };
 };

@@ -26,6 +26,14 @@ public class TimeRange implements Serializable {
         return to;
     }
 
+    public void setFrom(LocalDateTime from) {
+        this.from = from;
+    }
+
+    public void setTo(LocalDateTime to) {
+        this.to = to;
+    }
+
     public boolean contains(LocalDateTime x) {
         return from.isBefore(x) && to.isAfter(x);
     }
@@ -57,11 +65,6 @@ public class TimeRange implements Serializable {
 
 
     @Override
-    public String toString() {
-        return (from != null ? from.toString() : "") + "," + (to != null ?  to.toString() : "");
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -73,5 +76,13 @@ public class TimeRange implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(from, to);
+    }
+
+    @Override
+    public String toString() {
+        return "TimeRange{" +
+            "from=" + from +
+            ", to=" + to +
+            '}';
     }
 }

@@ -13,6 +13,7 @@ public class ApplicationProperties {
     String workspacePath;
     String delimiter;
     String timeFormat;
+    String toolApi;
 
     public String getWorkspacePath() {
         return workspacePath;
@@ -36,5 +37,13 @@ public class ApplicationProperties {
 
     public void setTimeFormat(String timeFormat) {
         this.timeFormat = timeFormat;
+    }
+
+    public String getToolApi() {
+        return toolApi;
+    }
+
+    public void setToolApi(String toolApi) {
+        this.toolApi = toolApi;
     }
 }

@@ -23,6 +23,7 @@ public class Dataset implements Serializable {
     private String timeFormat;
     private String farmName;
     private String formalName;
+    private Boolean washes;
     private List<Integer> measures = new ArrayList<>();
 
     public String getId() {
@@ -113,6 +114,10 @@ public class Dataset implements Serializable {
         this.delimiter = delimiter;
     }
 
+    public Boolean getWashes() { return washes; }
+
+    public void setWashes(Boolean washes)  { this.washes = washes; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -143,6 +148,7 @@ public class Dataset implements Serializable {
             ", measures=" + measures +
             ", samplingFreq='" + samplingFreq + '\'' +
             ", delimiter='" + delimiter + '\'' +
+            ", washes=" + washes +
             '}';
     }
 }

@@ -43,6 +43,7 @@ module.exports = (options) => webpackMerge(commonConfig({ env: ENV }), {
     proxy: [{
       context: [
         '/api',
+        '/tools',
         '/services',
         '/management',
         '/v2/api-docs',
