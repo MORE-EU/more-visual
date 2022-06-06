@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { FormControl, Paper, Select, Typography, MenuItem, Box } from '@mui/material';
+import React, {useEffect, useState} from 'react';
+import {Box, FormControl, MenuItem, Paper, Select, Typography} from '@mui/material';
 import Highcharts from 'highcharts';
 import Heatmap from 'highcharts/modules/heatmap.js';
 
@@ -11,7 +11,7 @@ export interface IHomeRightPanel {
 }
 
 export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
-  const { filSamples, selected } = props;
+  const {filSamples, selected} = props;
 
   const [statSelect, setStatSelect] = useState('noOfTurbines');
   const [statCateg, setStatCateg] = useState([]);
@@ -42,11 +42,11 @@ export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
             filtSample.push(parseInt(sample[`${statSelect}`], 10));
           }
         });
-      }else{
-      return parseInt(sample[`${statSelect}`], 10);
+      } else {
+        return parseInt(sample[`${statSelect}`], 10);
       }
     });
-    if(selected.length !== 0){
+    if (selected.length !== 0) {
       newVals = filtSample;
     }
     if (val === 'min') {
@@ -83,14 +83,16 @@ export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
 
   return (
     <>
-      <Paper elevation={3} sx={{ position: 'fixed', bottom: 320, right: 10, width: '400px', height: 'auto', zIndex: 999 }}>
-        <Paper sx={{ textAlign: 'center' }}>
-          <Box sx={{ textAlign: 'center', alignItems: 'center', display: 'flex' }}>
-            <Typography textAlign="center" variant="h6" sx={{ fontSize: 16, flex: 1 }}>
+      <Paper elevation={3}
+             sx={{position: 'fixed', bottom: 320, right: 10, width: '400px', height: 'auto', zIndex: 999}}>
+        <Paper sx={{textAlign: 'center'}}>
+          <Box sx={{textAlign: 'center', alignItems: 'center', display: 'flex'}}>
+            <Typography textAlign="center" variant="h6" sx={{fontSize: 16, flex: 1}}>
               Statistics for Field:
             </Typography>
-            <FormControl variant="standard" sx={{ m: 1, minWidth: 120, flex: 1 }}>
-              <Select value={statSelect} onChange={handleChange} displayEmpty inputProps={{ 'aria-label': 'Without label' }}>
+            <FormControl variant="standard" sx={{m: 1, minWidth: 120, flex: 1}}>
+              <Select value={statSelect} onChange={handleChange} displayEmpty
+                      inputProps={{'aria-label': 'Without label'}}>
                 {statCateg.map(categ => {
                   return (
                     <MenuItem key={categ} value={categ}>
@@ -101,32 +103,32 @@ export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
               </Select>
             </FormControl>
           </Box>
-          <Box sx={{ display: 'flex', width: '100%' }}>
-            <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
-              <br />
-              {handleStatsPanel('min')} <br />
-              min <br />
+          <Box sx={{display: 'flex', width: '100%'}}>
+            <Typography variant="overline" sx={{fontSize: 12, flex: 1}}>
+              <br/>
+              {handleStatsPanel('min')} <br/>
+              min <br/>
             </Typography>
-            <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
-              <br />
+            <Typography variant="overline" sx={{fontSize: 12, flex: 1}}>
+              <br/>
               {handleStatsPanel('max')}
-              <br />
-              max <br />
+              <br/>
+              max <br/>
             </Typography>
-            <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
-              <br />
-              {handleStatsPanel('mean')} <br />
-              mean <br />
+            <Typography variant="overline" sx={{fontSize: 12, flex: 1}}>
+              <br/>
+              {handleStatsPanel('mean')} <br/>
+              mean <br/>
             </Typography>
-            <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
-              <br />
-              {handleStatsPanel('SD')} <br />
-              SD <br />
+            <Typography variant="overline" sx={{fontSize: 12, flex: 1}}>
+              <br/>
+              {handleStatsPanel('SD')} <br/>
+              SD <br/>
             </Typography>
-            <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
-              <br />
-              {handleStatsPanel('VAR')} <br />
-              VAR <br />
+            <Typography variant="overline" sx={{fontSize: 12, flex: 1}}>
+              <br/>
+              {handleStatsPanel('VAR')} <br/>
+              VAR <br/>
             </Typography>
           </Box>
         </Paper>

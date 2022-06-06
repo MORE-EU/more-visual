@@ -7,8 +7,6 @@ import eu.more2020.visual.domain.DataPoint;
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Query;
 import eu.more2020.visual.domain.QueryResults;
-import eu.more2020.visual.domain.TimeRange;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalField;
 import java.util.*;
@@ -51,12 +48,11 @@ public class QueryProcessor {
     public QueryResults prepareQueryResults(TreeNode root) throws IOException {
         LocalDateTime start;
         LocalDateTime end;
-        if(query.getRange() == null){
+        if (query.getRange() == null) {
             start = timeseriesTreeIndex.getTimeRange().getTo()
-                .minus(7, ChronoUnit.DAYS);;
+                .minus(7, ChronoUnit.DAYS);
             end = timeseriesTreeIndex.getTimeRange().getTo();
-        }
-        else {
+        } else {
             start = query.getRange().getFrom();
             end = query.getRange().getTo();
         }

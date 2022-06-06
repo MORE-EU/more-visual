@@ -1,15 +1,20 @@
 package eu.more2020.visual.domain;
 
-public class Changepoint {
+import java.io.Serializable;
+
+public class Changepoint implements Serializable {
 
     private Integer id;
     private TimeRange range;
+    private double score;
 
-    public Changepoint(){}
+    public Changepoint() {
+    }
 
-    public Changepoint(Integer id, TimeRange range) {
+    public Changepoint(Integer id, TimeRange range, double score) {
         this.id = id;
         this.range = range;
+        this.score = score;
     }
 
     public Integer getId() {
@@ -33,6 +38,7 @@ public class Changepoint {
         return "Changepoint{" +
             "id=" + id +
             ", range=" + range +
+            ", score=" + score +
             '}';
     }
 }

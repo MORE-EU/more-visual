@@ -1,11 +1,19 @@
 import * as React from 'react';
-import {Dispatch, SetStateAction} from 'react';
 import {Box, IconButton} from "@mui/material";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import PatternExtraction from "app/modules/visualizer/tools/pattern-extraction/pattern-extraction";
 import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
-import {getPatterns, updateActiveTool, updatePatterns, updateSelectedMeasures, cpDetection, updateFilters, filterData} from '../visualizer.reducer';
+import {
+  applyCpDetection,
+  enableCpDetection,
+  filterData,
+  getPatterns,
+  updateActiveTool,
+  updateFilters,
+  updatePatterns,
+  updateSelectedMeasures
+} from '../visualizer.reducer';
 import ChangepointDetection from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
 import DeviationDetection from "app/modules/visualizer/tools/deviation-detection/deviation-detection";
 import {IQueryResults} from "app/shared/model/query-results.model";
@@ -24,18 +32,21 @@ export interface IActiveToolProps {
   updatePatterns: typeof updatePatterns,
   getPatterns: typeof getPatterns,
   updateActiveTool: typeof updateActiveTool,
-  changePointDates: any,
+  customChangePoints: any,
   filters: any,
   queryResults: IQueryResults,
   updateFilters: typeof updateFilters,
   filterData: typeof filterData,
-  cpDetection: typeof cpDetection,
+  applyCpDetection: typeof applyCpDetection,
+  cpDetectionEnabled: boolean,
+  enableCpDetection: typeof enableCpDetection,
 }
 
 const ActiveTool = (props: IActiveToolProps) => {
   const {
     activeTool, dataset, data, from, to, selectedMeasures, patterns,
-    resampleFreq, changePointDates, filters, queryResults,
+    resampleFreq, customChangePoints,
+    filters, queryResults, cpDetectionEnabled,
   } = props;
 
   const goBack = () => {
@@ -58,23 +69,25 @@ const ActiveTool = (props: IActiveToolProps) => {
           {activeTool === 1 &&
             <DeviationDetection
               dataset={dataset}
-              changePointDates={changePointDates} data={data}
+              customChangePoints={customChangePoints} data={data}
             />
           }
           {activeTool === 2 &&
             <ChangepointDetection
               dataset={dataset}
-              from = {from}
-              to = {to}
-              cpDetection={props.cpDetection}
-              changePointDates={changePointDates}
+              from={from}
+              to={to}
+              applyCpDetection={props.applyCpDetection}
+              customChangePoints={customChangePoints}
               data={data}
+              enableCpDetection={props.enableCpDetection}
+              cpDetectionEnabled={cpDetectionEnabled}
             />
           }
           {activeTool === 4 &&
             <Filter
               dataset={dataset}
-              filters = {filters} filterData={props.filterData}
+              filters={filters} filterData={props.filterData}
               updateFilters={props.updateFilters} queryResults={queryResults}
             />
           }

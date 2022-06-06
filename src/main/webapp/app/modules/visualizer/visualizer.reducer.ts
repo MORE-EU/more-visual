@@ -3,8 +3,6 @@ import { FAILURE, REQUEST, SUCCESS } from 'app/shared/reducers/action-type.util'
 import { IDataset } from 'app/shared/model/dataset.model';
 import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
 import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
-import _ from 'lodash';
-import { DateObject } from 'react-multi-date-picker';
 import { IQueryResults } from 'app/shared/model/query-results.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
 import { ITimeRange } from 'app/shared/model/time-range.model';
@@ -32,11 +30,12 @@ export const ACTION_TYPES = {
   UPDATE_DATASETCHOICE: 'visualizer/UPDATE_DATASETCHOICE',
   UPDATE_PATTERNNAV: 'visualizer/UPDATE_PATTERNNAV',
   GET_CHANGEPOINT_DATES: 'visualizer/GET_CHANGEPOINT_DATES',
-  UPDATE_CHANGEPOINT_DATES: 'visualizer/UPDATE_CHANGEPOINTS_DATES',
+  UPDATE_CUSTOM_CHANGEPOINTS: 'visualizer/UPDATE_CUSTOM_CHANGEPOINTS',
   UPDATE_GRAPHZOOM: 'visualizer/UPDATE_GRAPHZOOM',
   UPDATE_ACTIVETOOL: 'visualizer/UPDATE_ACTIVETOOL',
   UPDATE_COMPARE: 'visualizer/UPDATE_COMPARE',
   CHANGEPOINT_DETECTION: 'visualizer/CHANGEPOINT_DETECTION',
+  ENABLE_CP_DETECTION: 'visualizer/ENABLE_CP_DETECTION',
 };
 
 const initialState = {
@@ -59,11 +58,12 @@ const initialState = {
   patternNav: '0',
   folder: '',
   sampleFile: [],
-  changePointDates: [] as IChangePointDate[],
+  customChangePoints: [] as IChangePointDate[],
   graphZoom: null,
   activeTool: -1,
   compare: '',
   directories: [],
+  cpDetectionEnabled: false,
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
@@ -194,6 +194,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         to: action.payload,
       };
+    case ACTION_TYPES.ENABLE_CP_DETECTION:
+      return {
+        ...state,
+        cpDetectionEnabled: action.payload,
+      };
     case ACTION_TYPES.UPDATE_PATTERNS:
       return {
         ...state,
@@ -234,10 +239,10 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         patterns: initPatterns(action.payload.data, action.payload.length, action.payload.frequency),
       };
-    case ACTION_TYPES.UPDATE_CHANGEPOINT_DATES:
+    case ACTION_TYPES.UPDATE_CUSTOM_CHANGEPOINTS:
       return {
         ...state,
-        changePointDates: action.payload,
+        customChangePoints: action.payload,
       };
     case ACTION_TYPES.UPDATE_GRAPHZOOM:
       return {
@@ -254,11 +259,6 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         compare: action.payload,
       };
-    // case ACTION_TYPES.GET_CHANGEPOINT_DATES:
-    //   return {
-    //     ...state,
-    //     changePointDates: initChangePointDates(action.payload.func, action.payload.col),
-    //   };
     default:
       return state;
   }
@@ -298,7 +298,11 @@ export const getSampleFile = id => {
 export const updateQueryResults = (folder, id, fromDate, toDate, selMeasures) => (dispatch, getState) => {
   let query;
   fromDate !== null && toDate !== null
-    ? (query = { range: { from: fromDate, to: toDate } as ITimeRange, frequency: 'MINUTE', measures: selMeasures } as IQuery)
+    ? (query = {
+        range: { from: fromDate, to: toDate } as ITimeRange,
+        frequency: 'MINUTE',
+        measures: selMeasures,
+      } as IQuery)
     : (query = defaultQuery);
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_RESULTS,
@@ -309,7 +313,11 @@ export const updateQueryResults = (folder, id, fromDate, toDate, selMeasures) =>
 export const updateCompareQueryResults = (folder, id, fromDate, toDate, selMeasures) => (dispatch, getState) => {
   let query;
   fromDate !== null && toDate !== null
-    ? (query = { range: { from: fromDate, to: toDate } as ITimeRange, frequency: 'SECOND', measures: selMeasures } as IQuery)
+    ? (query = {
+        range: { from: fromDate, to: toDate } as ITimeRange,
+        frequency: 'SECOND',
+        measures: selMeasures,
+      } as IQuery)
     : (query = defaultQuery);
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS,
@@ -367,8 +375,8 @@ export const updateGraphZoom = data => ({
   payload: data,
 });
 
-export const updateChangePointDates = data => ({
-  type: ACTION_TYPES.UPDATE_CHANGEPOINT_DATES,
+export const updateCustomChangePoints = data => ({
+  type: ACTION_TYPES.UPDATE_CUSTOM_CHANGEPOINTS,
   payload: data,
 });
 
@@ -432,10 +440,18 @@ export const getChangePointDates = (func, col) => dispatch => {
   });
 };
 
-export const cpDetection = (id, from, to, changePointDates) => dispatch => {
+export const enableCpDetection = (bool: boolean) => ({
+  type: ACTION_TYPES.ENABLE_CP_DETECTION,
+  payload: bool,
+});
+
+export const applyCpDetection = (id, from, to, customChangePoints, detectAuto, detectIntervals) => dispatch => {
   const requestUrl = `api/tools/cp_detection/${id}`;
   return {
     type: ACTION_TYPES.CHANGEPOINT_DETECTION,
-    payload: axios.post(requestUrl, { range: { from: 1357022739000, to: 1391156470000 } as ITimeRange, changepoints: changePointDates }),
+    payload: axios.post(requestUrl, {
+      range: { from: from, to: to } as ITimeRange,
+      changepoints: detectIntervals ? customChangePoints : null,
+    }),
   };
 };

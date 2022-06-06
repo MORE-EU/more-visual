@@ -2,6 +2,7 @@ package eu.more2020.visual.domain;
 
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvToBean;
+
 import java.util.Objects;
 
 /**
@@ -11,43 +12,43 @@ public class Sample extends CsvToBean {
 
     @CsvBindByName(column = "Continent")
     private String continent;
-    
+
     @CsvBindByName(column = "Country")
     private String country;
-   
+
     @CsvBindByName(column = "Area")
     private String area;
-   
+
     @CsvBindByName(column = "City")
     private String city;
-  
+
     @CsvBindByName(column = "Name")
     private String name;
-    
+
     @CsvBindByName(column = "Latitude")
     private String lat;
-    
+
     @CsvBindByName(column = "Longitude")
     private String lng;
-    
+
     @CsvBindByName(column = "Manufacturer")
     private String manufacturer;
-    
+
     @CsvBindByName(column = "Turbine")
     private String turbine;
-    
+
     @CsvBindByName(column = "Hub height")
     private String hubHeight;
-    
+
     @CsvBindByName(column = "Number of turbines")
     private String noOfTurbines;
-    
+
     @CsvBindByName(column = "Total power")
     private String power;
-    
+
     @CsvBindByName(column = "Developer")
     private String dev;
-   
+
     @CsvBindByName(column = "Operator")
     private String operator;
 

@@ -114,9 +114,13 @@ public class Dataset implements Serializable {
         this.delimiter = delimiter;
     }
 
-    public Boolean getWashes() { return washes; }
+    public Boolean getWashes() {
+        return washes;
+    }
 
-    public void setWashes(Boolean washes)  { this.washes = washes; }
+    public void setWashes(Boolean washes) {
+        this.washes = washes;
+    }
 
     @Override
     public boolean equals(Object o) {

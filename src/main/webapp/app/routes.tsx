@@ -1,5 +1,5 @@
 import React from 'react';
-import {Route, Switch} from 'react-router-dom';
+import {Switch} from 'react-router-dom';
 
 import Home from 'app/modules/home/home';
 import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';

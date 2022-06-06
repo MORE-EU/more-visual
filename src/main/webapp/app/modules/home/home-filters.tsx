@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, {Dispatch, SetStateAction, useState} from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -30,10 +30,10 @@ export interface IHomeFilters {
 
 const AccordionSummary = styled((props) => (
   <MuiAccordionSummary
-    expandIcon={<ArrowRightIcon sx={{ fontSize: '0.9rem' }} />}
+    expandIcon={<ArrowRightIcon sx={{fontSize: '0.9rem'}}/>}
     {...props}
   />
-))(({ theme }) => ({
+))(({theme}) => ({
   backgroundColor:
     theme.palette.mode === 'dark'
       ? 'rgba(255, 255, 255, .05)'
@@ -48,7 +48,7 @@ const AccordionSummary = styled((props) => (
 }));
 
 export const HomeFilters = (props: IHomeFilters) => {
-  const { allFilters, selected } = props;
+  const {allFilters, selected} = props;
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -84,15 +84,15 @@ export const HomeFilters = (props: IHomeFilters) => {
   return (
     <>
       <Grid sx={{padding: 1}}>
-      <Button
-        variant="text"
-        sx={{ bgcolor: '#e0e0e0', color: 'black', height: '1.5rem' }}
-        onClick={handleClick}
-        startIcon={<FilterAltIcon color="action" />}
-        fullWidth
-      >
-        Select Filters
-      </Button>
+        <Button
+          variant="text"
+          sx={{bgcolor: '#e0e0e0', color: 'black', height: '1.5rem'}}
+          onClick={handleClick}
+          startIcon={<FilterAltIcon color="action"/>}
+          fullWidth
+        >
+          Select Filters
+        </Button>
       </Grid>
       <Popper className="popper-filter" placement="bottom" id={id} open={open} anchorEl={anchorEl}>
         <ClickAwayListener
@@ -100,7 +100,8 @@ export const HomeFilters = (props: IHomeFilters) => {
             setAnchorEl(null);
           }}
         >
-          <Paper elevation={3} sx={{ bgcolor: 'background.paper', width: '310px', overflowY: 'scroll', maxHeight: '350px' }}>
+          <Paper elevation={3}
+                 sx={{bgcolor: 'background.paper', width: '310px', overflowY: 'scroll', maxHeight: '350px'}}>
             {allFilters.map((filter, index) => (
               <Accordion
                 key={`accordion-${index}`}
@@ -109,12 +110,12 @@ export const HomeFilters = (props: IHomeFilters) => {
                 }}
               >
                 <AccordionSummary aria-controls="panel1a-content">
-                  <Typography variant="body1" sx={{ fontSize: 12, fontWeight: 900 }}>
+                  <Typography variant="body1" sx={{fontSize: 12, fontWeight: 900}}>
                     {filter.category}
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                  <List dense sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
                     {filter.values.map((filt, idx) => {
                       const labelId = `checkbox-list-label-${idx}`;
                       return (
@@ -126,16 +127,16 @@ export const HomeFilters = (props: IHomeFilters) => {
                                 checked={JSON.stringify(selected).includes(JSON.stringify([filter.category, filt]))}
                                 tabIndex={-1}
                                 disableRipple
-                                icon={<RadioButtonUncheckedIcon fontSize="small" />}
-                                checkedIcon={<CircleIcon fontSize="small" />}
-                                inputProps={{ 'aria-labelledby': labelId }}
+                                icon={<RadioButtonUncheckedIcon fontSize="small"/>}
+                                checkedIcon={<CircleIcon fontSize="small"/>}
+                                inputProps={{'aria-labelledby': labelId}}
                               />
                             </ListItemIcon>
                             <ListItemText
                               disableTypography
                               id={labelId}
                               primary={
-                                <Typography variant="body2" sx={{ fontSize: 12 }}>
+                                <Typography variant="body2" sx={{fontSize: 12}}>
                                   {filt}
                                 </Typography>
                               }

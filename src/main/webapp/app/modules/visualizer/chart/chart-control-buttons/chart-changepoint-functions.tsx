@@ -1,11 +1,6 @@
-import React, { useState, useEffect, SetStateAction, Dispatch } from 'react';
-import { Button, Grid, Typography, Tooltip, Modal, Box, Divider, List, ListItem, ListItemText, IconButton } from '@mui/material';
-import TimePicker from 'react-multi-date-picker/plugins/time_picker';
-import { Calendar, DateObject } from 'react-multi-date-picker';
-import DatePanel from 'react-multi-date-picker/plugins/date_panel';
-import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
-import { updateActiveTool, updateChangePointDates } from '../../visualizer.reducer';
-import DeleteIcon from '@mui/icons-material/Delete';
+import React, {Dispatch, SetStateAction} from 'react';
+import {Box, Button, Grid, Modal, Typography} from '@mui/material';
+import {updateActiveTool} from '../../visualizer.reducer';
 
 export interface IChartDatePickerProps {
   showChangePointFunction: boolean;
@@ -15,7 +10,7 @@ export interface IChartDatePickerProps {
 }
 
 export const ChartChangePointFunctions = (props: IChartDatePickerProps) => {
-  const { showChangePointFunction } = props;
+  const {showChangePointFunction} = props;
 
   const handleClose = () => {
     props.setShowChangePointFunction(false);
@@ -35,9 +30,10 @@ export const ChartChangePointFunctions = (props: IChartDatePickerProps) => {
 
   return (
     <>
-      <Modal open={showChangePointFunction} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+      <Modal open={showChangePointFunction} onClose={handleClose} aria-labelledby="modal-modal-title"
+             aria-describedby="modal-modal-description">
         <Box sx={style}>
-          <Grid item sx={{ textAlign: 'center' }}>
+          <Grid item sx={{textAlign: 'center'}}>
             <Typography variant="h6" component="h2">
               Use a Function
             </Typography>

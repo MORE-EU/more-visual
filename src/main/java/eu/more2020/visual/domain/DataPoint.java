@@ -32,8 +32,8 @@ public class DataPoint {
     @Override
     public String toString() {
         return "DataPoint{" +
-                "timestamp=" + timestamp +
-                ", values=" + values +
-                '}';
+            "timestamp=" + timestamp +
+            ", values=" + values +
+            '}';
     }
 }

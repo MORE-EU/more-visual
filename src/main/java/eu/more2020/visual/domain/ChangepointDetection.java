@@ -1,10 +1,6 @@
 package eu.more2020.visual.domain;
 
-import java.sql.Time;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ChangepointDetection {
 
@@ -12,10 +8,10 @@ public class ChangepointDetection {
 
     List<Changepoint> changepoints;
 
-    protected ArrayList<LocalDateTime> cStarts;
-    protected ArrayList<LocalDateTime> cEnd;
 
-    public ChangepointDetection() {}
+    public ChangepointDetection() {
+    }
+
     public ChangepointDetection(TimeRange range, List<Changepoint> changepoints) {
         this.range = range;
         this.changepoints = changepoints;
@@ -36,6 +32,7 @@ public class ChangepointDetection {
     public void setChangepoints(List<Changepoint> changepoints) {
         this.changepoints = changepoints;
     }
+
 
     @Override
     public String toString() {

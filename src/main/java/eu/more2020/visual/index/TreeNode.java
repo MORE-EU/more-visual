@@ -37,7 +37,7 @@ public class TreeNode {
         if (stats == null) {
             stats = new HashMap<>();
         }
-        for (int colIndex : dataset.getMeasures()){
+        for (int colIndex : dataset.getMeasures()) {
             StatsAccumulator statsAcc = stats.computeIfAbsent(colIndex, i -> new StatsAccumulator());
 
             statsAcc.add(Double.parseDouble(row[colIndex]));
@@ -100,11 +100,11 @@ public class TreeNode {
     @Override
     public String toString() {
         return "TreeNode{" +
-                "label=" + label +
-                ", level=" + level +
-                ", fileOffsetStart=" + fileOffsetStart +
-                ", dataPointCount=" + dataPointCount +
-                ", stats = " + (stats == null ? null : "{" + stats.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue().mean()).collect(Collectors.joining(", ")) + "}") +
-                "}";
+            "label=" + label +
+            ", level=" + level +
+            ", fileOffsetStart=" + fileOffsetStart +
+            ", dataPointCount=" + dataPointCount +
+            ", stats = " + (stats == null ? null : "{" + stats.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue().mean()).collect(Collectors.joining(", ")) + "}") +
+            "}";
     }
 }

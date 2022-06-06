@@ -1,29 +1,27 @@
 import "../visualizer.scss";
-import React, { useEffect, useState, Dispatch, SetStateAction, useRef } from "react";
+import React, {Dispatch, SetStateAction, useEffect, useRef, useState} from "react";
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
-import { IDataset } from "app/shared/model/dataset.model";
+import {IDataset} from "app/shared/model/dataset.model";
 import {
-  updateChangePointDates,
-  updateQueryResults,
   updateActiveTool,
   updateCompareQueryResults,
+  updateCustomChangePoints,
   updateFrom,
+  updateQueryResults,
   updateTo,
 } from "../visualizer.reducer";
-import { IPatterns } from "app/shared/model/patterns.model";
-import { Grid } from "@mui/material";
+import {IPatterns} from "app/shared/model/patterns.model";
+import {Grid} from "@mui/material";
 import indicatorsAll from "highcharts/indicators/indicators-all";
 import annotationsAdvanced from "highcharts/modules/annotations-advanced";
 import priceIndicator from "highcharts/modules/price-indicator";
-import exporting from "highcharts/modules/exporting";
-import fullScreen from "highcharts/modules/full-screen";
 import stockTools from "highcharts/modules/stock-tools";
-import { useScrollBlock } from "app/shared/util/useScrollBlock";
-import { IChangePointDate } from "app/shared/model/changepoint-date.model";
-import { IDataPoint } from "app/shared/model/data-point.model";
-import { IQueryResults } from "app/shared/model/query-results.model";
+import {useScrollBlock} from "app/shared/util/useScrollBlock";
+import {IChangePointDate} from "app/shared/model/changepoint-date.model";
+import {IDataPoint} from "app/shared/model/data-point.model";
+import {IQueryResults} from "app/shared/model/query-results.model";
 import {ITimeRange} from "app/shared/model/time-range.model";
 
 HighchartsMore(Highcharts);
@@ -63,8 +61,8 @@ export interface IChartProps {
   folder: string;
   filters: any;
   graphZoom: number;
-  changePointDates: IChangePointDate[];
-  updateChangePointDates: typeof updateChangePointDates;
+  customChangePoints: IChangePointDate[];
+  updateCustomChangePoints: typeof updateCustomChangePoints;
   updateActiveTool: typeof updateActiveTool;
   setShowDatePick: Dispatch<SetStateAction<boolean>>;
   setShowChangePointFunction: Dispatch<SetStateAction<boolean>>;
@@ -96,7 +94,7 @@ export const Chart = (props: IChartProps) => {
     changeChart,
     folder,
     graphZoom,
-    changePointDates,
+    customChangePoints,
     compare,
     compareData,
     queryResults,
@@ -120,8 +118,8 @@ export const Chart = (props: IChartProps) => {
             const zone = [].concat(
               ...patternGroup.patterns.map((pattern) => {
                 return [
-                  { value: pattern.start },
-                  { value: pattern.end, color: patternGroup.color },
+                  {value: pattern.start},
+                  {value: pattern.end, color: patternGroup.color},
                 ];
               })
             );
@@ -139,9 +137,9 @@ export const Chart = (props: IChartProps) => {
     //   filteredPoints = series.points.filter(
     //     (point) => point.x > x1 && point.x < x2
     //   ),
-      const startPoint = annotation.startXMin,
-        endPoint = annotation.startXMax;
-    return { range: {from: startPoint, to: endPoint} as ITimeRange, id: len };
+    const startPoint = annotation.startXMin,
+      endPoint = annotation.startXMax;
+    return {range: {from: startPoint, to: endPoint} as ITimeRange, id: len};
   };
 
   // useEffect(() => {
@@ -159,8 +157,8 @@ export const Chart = (props: IChartProps) => {
   useEffect(() => {
     latestMeasures.current = selectedMeasures;
     props.updateQueryResults(folder, dataset.id, from ? from.getTime() : null, to ? to.getTime() : null, selectedMeasures);
-    if(compare !== ""){
-      props.updateCompareQueryResults(folder, compare.replace('.csv',""), from.getTime(), to.getTime(), selectedMeasures);
+    if (compare !== "") {
+      props.updateCompareQueryResults(folder, compare.replace('.csv', ""), from.getTime(), to.getTime(), selectedMeasures);
     }
   }, [dataset, selectedMeasures]);
 
@@ -170,66 +168,58 @@ export const Chart = (props: IChartProps) => {
 
   const chartFuncts = (e) => {
 
-      const chart = e.target;
-      let currentExtremes;
-      const step = 2000 * 200;
+    const chart = e.target;
+    let currentExtremes;
+    //TODO: make this dynamic
+    const step = 2000000 * 200;
 
-      // CHART: INSTRUCTIONS
-      chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
-      Highcharts.addEvent(chart.container, "click", (event: MouseEvent) => {
-        chart.hideLoading();
-      });
+    // CHART: INSTRUCTIONS
+    chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
+    Highcharts.addEvent(chart.container, "click", (event: MouseEvent) => {
+      chart.hideLoading();
+    });
 
-      // CHART: ZOOM FUNCTION
-      Highcharts.addEvent(chart.container, "wheel", (event: WheelEvent) => {
-        const xAxis = chart.xAxis[0],
-          extremes = xAxis.getExtremes(),
-          newMin = extremes.min;
-        if (event.deltaY < 0) {
-          newMin + step < extremes.max
-            ? xAxis.setExtremes(newMin + step, extremes.max, true, true)
-            : xAxis.setExtremes(extremes.max - 2000, extremes.max, true, true);
-        } else if (event.deltaY > 0) {
-          newMin - step > extremes.dataMin
-            ? xAxis.setExtremes(newMin - step, extremes.max, true, true)
-            : xAxis.setExtremes(extremes.dataMin, extremes.max, true, true);
-          }
-      });
+    // CHART: ZOOM FUNCTION
+    Highcharts.addEvent(chart.container, "wheel", (event: WheelEvent) => {
+      const xAxis = chart.xAxis[0],
+        extremes = xAxis.getExtremes(),
+        newMin = extremes.min;
+      if (event.deltaY < 0) {
+        newMin + step < extremes.max
+          ? xAxis.setExtremes(newMin + step, extremes.max, true, true)
+          : xAxis.setExtremes(extremes.max - 2000, extremes.max, true, true);
+      } else if (event.deltaY > 0) {
+        newMin - step > extremes.dataMin
+          ? xAxis.setExtremes(newMin - step, extremes.max, true, true)
+          : xAxis.setExtremes(extremes.dataMin, extremes.max, true, true);
+      }
+    });
 
-      // CHART: PANNING FETCH DATA FUNCTION
-      setInterval(() => {
-        currentExtremes = chart.xAxis[0].getExtremes();
-        const {dataMax, dataMin, max, min} = currentExtremes;
-        const leftSide = min - (((min - queryResults.timeRange[0]) * 20) / 100);
-        const rightSide = max + (((queryResults.timeRange[1] - max) * 20) / 100);
-
-        // Conditions for loading new data
-        if (dataMax - max < 2 && dataMax !== queryResults.timeRange[1]) {
-          props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestMeasures.current);
-          props.updateFrom(new Date(dataMin));
-          props.updateTo(new Date(dataMax));
-          if(latestCompare.current !== ""){
-            props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv',""), leftSide, rightSide, latestMeasures.current);
-          }
+    // CHART: PANNING FETCH DATA FUNCTION
+    setInterval(() => {
+      currentExtremes = chart.xAxis[0].getExtremes();
+      const {dataMax, dataMin, max, min} = currentExtremes;
+      const leftSide = min - (((min - queryResults.timeRange[0]) * 20) / 100);
+      const rightSide = max + (((queryResults.timeRange[1] - max) * 20) / 100);
+      // Conditions for loading new data
+      if ((dataMax - max < 2 && dataMax !== queryResults.timeRange[1]) ||
+        (min - dataMin < 2 && dataMin !== queryResults.timeRange[0])) {
+        props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestMeasures.current);
+        props.updateFrom(leftSide);
+        props.updateTo(rightSide);
+        if (latestCompare.current !== "") {
+          props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv', ""), leftSide, rightSide, latestMeasures.current);
         }
-        if (min - dataMin < 2 && dataMin !== queryResults.timeRange[0]) {
-          props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestMeasures.current);
-          props.updateFrom(new Date(dataMin));
-          props.updateTo(new Date(dataMax));
-          if(latestCompare.current !== ""){
-            props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv',""), leftSide, rightSide, latestMeasures.current);
-          }
-        }
-      }, 300);
-      // Set initial extremes
-      chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length-2].timestamp);
-    };
-
+      }
+    }, 300);
+    // Set initial extremes
+    chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
+  };
 
 
   return (
     <Grid
-      sx={{ border: "1px solid rgba(0, 0, 0, .1)" }}
+      sx={{border: "1px solid rgba(0, 0, 0, .1)"}}
       onMouseOver={() => blockScroll()}
       onMouseLeave={() => allowScroll()}
     >
@@ -237,7 +227,7 @@ export const Chart = (props: IChartProps) => {
         <HighchartsReact
           highcharts={Highcharts}
           constructorType={"stockChart"}
-          containerProps={{ className: "chartContainer" }}
+          containerProps={{className: "chartContainer"}}
           allowChartUpdate={true}
           immutable={false}
           updateArgs={[true, true, true]}
@@ -538,7 +528,7 @@ export const Chart = (props: IChartProps) => {
                 },
                 measureX: {
                   annotationsOptions: {
-                    id: changePointDates.length,
+                    id: customChangePoints.length,
                     events: {
                       remove(event) {
                         // get annotations
@@ -547,7 +537,7 @@ export const Chart = (props: IChartProps) => {
                             a.userOptions.id !== event.target.userOptions.id
                         );
                         // convert annotations to dates
-                        props.updateChangePointDates(
+                        props.updateCustomChangePoints(
                           annotations.map((a, id) => annotationToDate(a, id))
                         );
                       },
@@ -555,7 +545,7 @@ export const Chart = (props: IChartProps) => {
                         // convert annotations to dates
                         if (event.target.cancelClick !== undefined) {
                           const annotations = this.chart.annotations;
-                          props.updateChangePointDates(
+                          props.updateCustomChangePoints(
                             annotations.map((a, id) => annotationToDate(a, id))
                           );
                         }
@@ -563,7 +553,7 @@ export const Chart = (props: IChartProps) => {
                     },
                   },
                   end() {
-                    props.updateChangePointDates(
+                    props.updateCustomChangePoints(
                       this.chart.annotations.map((a, id) =>
                         annotationToDate(a, id)
                       )

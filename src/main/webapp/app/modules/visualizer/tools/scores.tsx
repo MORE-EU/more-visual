@@ -35,7 +35,7 @@ export const Scores = (props: IScoresProps) => {
       const func = functions[i];
       const score = [];
       for (let j = 0; j < changePointDates.length; j++) {
-        score.push({name: "Interval".concat(" ", (j + 1).toString(10)), y:  Math.random()});
+        score.push({name: "Interval".concat(" ", (j + 1).toString(10)), y: Math.random()});
       }
       scores[func] = score;
     }

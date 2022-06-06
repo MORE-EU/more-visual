@@ -1,9 +1,8 @@
-import React, {Dispatch, SetStateAction, useState, useEffect} from 'react';
+import React, {Dispatch, SetStateAction, useState} from 'react';
 import {Box, Button, FormControl, Grid, InputLabel, MenuItem, Modal, Select, Tab} from '@mui/material';
 import {TabContext, TabList, TabPanel} from '@material-ui/lab';
-import Highcharts from 'highcharts/highstock'
-import { updateCompare, updateCompareQueryResults } from '../../visualizer.reducer';
-import { IDataset } from 'app/shared/model/dataset.model';
+import {updateCompare, updateCompareQueryResults} from '../../visualizer.reducer';
+import {IDataset} from 'app/shared/model/dataset.model';
 
 export interface IChartCompareProps {
   dataset: IDataset;
@@ -59,41 +58,45 @@ export const ChartCompare = (props: IChartCompareProps) => {
       <Modal open={showCompare} onClose={handleClose} aria-labelledby="modal-modal-title"
              aria-describedby="modal-modal-description">
         <Box sx={style}>
-        <TabContext value={tabVal}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleChange} aria-label="lab API tabs example">
-            <Tab label="Compare" value="1" />
-            <Tab label="Date compare" value="2" />
-          </TabList>
-        </Box>
-        <TabPanel value="1"> 
-        <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">File</InputLabel>
-            <Grid container flexDirection="row" >
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={compare}
-              label="file"
-              onChange={e => {
-                props.updateCompare(e.target.value)
-              }}
-              sx={{flexGrow: 1}}
-            >
-              {wdFiles.map((file, idx) => (
-               file.replace('.csv',"") !== dataset.id && <MenuItem value={`${file}`} key={idx}>{file}</MenuItem>
-              ))}
-            </Select>
-            <Button variant="contained" sx={{textTransform: "none"}} 
-            onClick={() => {props.setCompare(false), props.updateCompareQueryResults(folder, compare.replace('.csv',""), from.getTime(), to.getTime(), selectedMeasures)}}>Add</Button>
-            <Button variant="contained" sx={{textTransform: "none"}} 
-            onClick={() => {props.setCompare(false), props.updateCompare('')}}>Reset</Button>
-            </Grid>
-          </FormControl>
-          </TabPanel>
-        <TabPanel value="2">Date compare</TabPanel>
-      </TabContext> 
-         
+          <TabContext value={tabVal}>
+            <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+              <TabList onChange={handleChange} aria-label="lab API tabs example">
+                <Tab label="Compare" value="1"/>
+                <Tab label="Date compare" value="2"/>
+              </TabList>
+            </Box>
+            <TabPanel value="1">
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">File</InputLabel>
+                <Grid container flexDirection="row">
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={compare}
+                    label="file"
+                    onChange={e => {
+                      props.updateCompare(e.target.value)
+                    }}
+                    sx={{flexGrow: 1}}
+                  >
+                    {wdFiles.map((file, idx) => (
+                      file.replace('.csv', "") !== dataset.id && <MenuItem value={`${file}`} key={idx}>{file}</MenuItem>
+                    ))}
+                  </Select>
+                  <Button variant="contained" sx={{textTransform: "none"}}
+                          onClick={() => {
+                            props.setCompare(false), props.updateCompareQueryResults(folder, compare.replace('.csv', ""), from.getTime(), to.getTime(), selectedMeasures)
+                          }}>Add</Button>
+                  <Button variant="contained" sx={{textTransform: "none"}}
+                          onClick={() => {
+                            props.setCompare(false), props.updateCompare('')
+                          }}>Reset</Button>
+                </Grid>
+              </FormControl>
+            </TabPanel>
+            <TabPanel value="2">Date compare</TabPanel>
+          </TabContext>
+
         </Box>
       </Modal>
     </>

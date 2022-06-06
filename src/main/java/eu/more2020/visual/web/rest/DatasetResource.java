@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.w3c.dom.ranges.Range;
 
 import javax.validation.Valid;
 import java.io.File;
@@ -22,9 +21,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.sql.Time;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -176,10 +172,9 @@ public class DatasetResource {
 
 
     @PostMapping("/tools/cp_detection/{id}")
-    public List<String>  cpDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {
+    public ResponseEntity<List<Changepoint>> cpDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {
         log.debug("CP for {}", changepoints);
-        toolsRepository.cpDetection(id, changepoints);
-        return new ArrayList<>();
+        return ResponseEntity.ok(toolsRepository.cpDetection(id, changepoints));
     }
 
 }

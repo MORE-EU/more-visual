@@ -135,7 +135,7 @@ public class RandomAccessReader extends RandomAccessFile {
 
         if (newPosition > length()) // it is save to call length() in read-only mode
             throw new EOFException(String.format("unable to seek to position %d in %s (%d bytes) in read-only mode",
-                    newPosition, getPath(), length()));
+                newPosition, getPath(), length()));
 
         current = newPosition;
 
@@ -183,11 +183,11 @@ public class RandomAccessReader extends RandomAccessFile {
             reBuffer();
 
         assert current >= bufferOffset && current < bufferOffset + validBufferBytes
-                : String.format("File (%s), current offset %d, buffer offset %d, buffer limit %d",
-                getPath(),
-                current,
-                bufferOffset,
-                validBufferBytes);
+            : String.format("File (%s), current offset %d, buffer offset %d, buffer limit %d",
+            getPath(),
+            current,
+            bufferOffset,
+            validBufferBytes);
 
         int toCopy = Math.min(length, validBufferBytes - bufferCursor());
 

@@ -19,9 +19,11 @@ public class TimeRange implements Serializable {
         this.from = from;
         this.to = to;
     }
+
     public LocalDateTime getFrom() {
         return from;
     }
+
     public LocalDateTime getTo() {
         return to;
     }
@@ -59,7 +61,7 @@ public class TimeRange implements Serializable {
         return list;
     }
 
-    public double distanceFrom(TimeRange other){
+    public double distanceFrom(TimeRange other) {
         return 0.0;
     }
 
@@ -70,7 +72,7 @@ public class TimeRange implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         TimeRange range = (TimeRange) o;
         return Objects.equals(from, range.from) &&
-                Objects.equals(to, range.to);
+            Objects.equals(to, range.to);
     }
 
     @Override

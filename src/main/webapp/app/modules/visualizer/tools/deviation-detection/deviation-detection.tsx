@@ -6,12 +6,12 @@ import DeviationModel from "app/modules/visualizer/tools/deviation-detection/dev
 export interface IDeviationDetectionProps {
   dataset: IDataset,
   data: any,
-  changePointDates: any,
+  customChangePoints: any,
 }
 
 
 export const DeviationDetection = (props: IDeviationDetectionProps) => {
-  const {dataset, changePointDates} = props;
+  const {dataset, customChangePoints} = props;
   return (
     <Box sx={{pl: 2, pr: 2}}>
       <Box>
@@ -19,13 +19,13 @@ export const DeviationDetection = (props: IDeviationDetectionProps) => {
           Deviation Detection
         </Typography>
       </Box>
-      {(changePointDates.length === 0)
+      {(customChangePoints.length === 0)
         &&
         <Box sx={{whiteSpace: "normal"}}>
           <b>No Intervals selected</b><br></br>Select Intervals to get started.
         </Box>
       }
-      {(changePointDates.length !== 0)
+      {(customChangePoints.length !== 0)
         &&
         <Box sx={{whiteSpace: "normal"}}>
           <DeviationModel dataset={dataset}

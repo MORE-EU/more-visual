@@ -3,7 +3,6 @@ package eu.more2020.visual.repository;
 import eu.more2020.visual.domain.Changepoint;
 import eu.more2020.visual.domain.ChangepointDetection;
 
-
 import java.io.IOException;
 import java.util.List;
 

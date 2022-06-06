@@ -2,16 +2,13 @@ package eu.more2020.visual.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvToBeanBuilder;
-
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Farm;
 import eu.more2020.visual.domain.Sample;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
@@ -21,7 +18,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -71,8 +70,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
             con.disconnect();
             return Boolean.parseBoolean(String.valueOf(content));
 
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
@@ -110,10 +108,10 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 dataset = d;
                 dataset.setFarmName(farm.getName());
                 dataset.setWashes(hasWashes(dataset.getId()));
-                if (dataset.getTimeFormat() == null || dataset.getTimeFormat().isEmpty()){
+                if (dataset.getTimeFormat() == null || dataset.getTimeFormat().isEmpty()) {
                     dataset.setTimeFormat(timeFormat);
                 }
-                if (dataset.getDelimiter() == null || dataset.getDelimiter().isEmpty()){
+                if (dataset.getDelimiter() == null || dataset.getDelimiter().isEmpty()) {
                     dataset.setDelimiter(delimiter);
                 }
                 break;
@@ -148,12 +146,12 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     public List<Sample> findSample(String folder) throws IOException {
         File f = new File(applicationProperties.getWorkspacePath() + "/" + folder);
         File[] matchingFiles = f.listFiles(new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-        return name.contains("sample") && name.endsWith("csv");
+            public boolean accept(File dir, String name) {
+                return name.contains("sample") && name.endsWith("csv");
             }
         });
         List<Sample> beans = new CsvToBeanBuilder(new FileReader(matchingFiles[0]))
-        .withType(Sample.class).build().parse();
+            .withType(Sample.class).build().parse();
         return beans;
     }
 
@@ -162,10 +160,10 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         String[] names = file.list();
         List<String> dirs = new ArrayList<>();
 
-        for(String name : names){
+        for (String name : names) {
 
-        if (new File(applicationProperties.getWorkspacePath() + "/" + name).isDirectory()){
-            log.debug(name);
+            if (new File(applicationProperties.getWorkspacePath() + "/" + name).isDirectory()) {
+                log.debug(name);
                 dirs.add(name);
             }
         }

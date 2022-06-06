@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import {Box, FormControl, Grid, InputLabel, ListItemIcon, MenuItem, Select, Slider, Stack, Tooltip, Typography} from "@mui/material";
+import {FormControl, Grid, InputLabel, ListItemIcon, MenuItem, Select, Tooltip, Typography} from "@mui/material";
 import {
   getDataset,
   updateChangeChart,
@@ -16,14 +16,9 @@ import {
   updateSelectedMeasures,
   updateTo,
 } from "app/modules/visualizer/visualizer.reducer";
-import TextField from '@mui/material/TextField';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import DateTimePicker from '@mui/lab/DateTimePicker';
 import {IQueryResults} from "app/shared/model/query-results.model";
 import {Link} from "react-router-dom";
-import { handleDate } from 'app/shared/util/date-utils';
 
 export interface IVisControlProps {
   dataset: IDataset,
@@ -134,11 +129,11 @@ export const VisControl = (props: IVisControlProps) => {
               >
                 <ListItemText primary={`${file}`} sx={{pl: 4}}/>
                 {compare === file &&
-                <Tooltip title="Currently comparing this file">
-                <ListItemIcon>
-                  <CompareArrowsIcon />
-                </ListItemIcon>
-                </Tooltip>}
+                  <Tooltip title="Currently comparing this file">
+                    <ListItemIcon>
+                      <CompareArrowsIcon/>
+                    </ListItemIcon>
+                  </Tooltip>}
               </ListItemButton>
             );
           })}

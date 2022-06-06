@@ -68,12 +68,12 @@ module.exports = options => ({
         enforce: 'pre',
         test: /\.jsx?$/,
         loader: 'babel-loader',
-        options:{
-        plugins: [
-          '@babel/plugin-proposal-nullish-coalescing-operator',
-          '@babel/plugin-proposal-optional-chaining',
-        ],
-      }
+        options: {
+          plugins: [
+            '@babel/plugin-proposal-nullish-coalescing-operator',
+            '@babel/plugin-proposal-optional-chaining',
+          ],
+        }
       },
       {
         test: /\.(j|t)sx?$/,
@@ -121,11 +121,11 @@ module.exports = options => ({
         SERVER_API_URL: `''`
       }
     }),
-    new ForkTsCheckerWebpackPlugin({ eslint: true }),
+    new ForkTsCheckerWebpackPlugin({eslint: true}),
     new CopyWebpackPlugin([
-      { from: './src/main/webapp/content/', to: 'content' },
-      { from: './src/main/webapp/favicon.ico', to: 'favicon.ico' },
-      { from: './src/main/webapp/manifest.webapp', to: 'manifest.webapp' },
+      {from: './src/main/webapp/content/', to: 'content'},
+      {from: './src/main/webapp/favicon.ico', to: 'favicon.ico'},
+      {from: './src/main/webapp/manifest.webapp', to: 'manifest.webapp'},
       // jhipster-needle-add-assets-to-webpack - JHipster will add/remove third-party resources in this array
     ]),
     new HtmlWebpackPlugin({

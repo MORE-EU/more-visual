@@ -46,9 +46,9 @@ public class Query {
     @Override
     public String toString() {
         return "Query{" +
-                "range=" + range +
-                ", measures=" + measures +
-                ", frequency='" + frequency + '\'' +
-                '}';
+            "range=" + range +
+            ", measures=" + measures +
+            ", frequency='" + frequency + '\'' +
+            '}';
     }
 }

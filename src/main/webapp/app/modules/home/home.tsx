@@ -1,22 +1,23 @@
 import './home.scss';
-import React, { useEffect, useState } from 'react';
-import { FarmMap } from './map/farm-map';
-import { IRootState } from 'app/shared/reducers';
-import { connect } from 'react-redux';
-import { getDirectories, getSampleFile, getWdFiles } from 'app/modules/visualizer/visualizer.reducer';
-import { RouteComponentProps } from 'react-router-dom';
-import { LatLng } from 'leaflet';
-import { HomeLeftMenu } from './home-left-menu';
-import { HomeRightStatsPanel } from './home-right-stats-panel';
-import { HomeRightChartPanel } from './home-right-chart-panel';
+import React, {useEffect, useState} from 'react';
+import {FarmMap} from './map/farm-map';
+import {IRootState} from 'app/shared/reducers';
+import {connect} from 'react-redux';
+import {getDirectories, getSampleFile, getWdFiles} from 'app/modules/visualizer/visualizer.reducer';
+import {RouteComponentProps} from 'react-router-dom';
+import {LatLng} from 'leaflet';
+import {HomeLeftMenu} from './home-left-menu';
+import {HomeRightStatsPanel} from './home-right-stats-panel';
+import {HomeRightChartPanel} from './home-right-chart-panel';
 
-export interface IHomeProps extends StateProps, DispatchProps, RouteComponentProps<{ folder: string; id: string }> {}
+export interface IHomeProps extends StateProps, DispatchProps, RouteComponentProps<{ folder: string; id: string }> {
+}
 
 export const Home = (props: IHomeProps) => {
-  const { sampleFile, directories } = props;
+  const {sampleFile, directories} = props;
 
   const [fly, setFly] = useState(new LatLng(51.505, -0.09));
-  const [bounds, setBounds] = useState({ _southWest: { lat: 0, lng: 0 }, _northEast: { lat: 0, lng: 0 } });
+  const [bounds, setBounds] = useState({_southWest: {lat: 0, lng: 0}, _northEast: {lat: 0, lng: 0}});
   const [filSamples, setFilSamples] = useState([]);
   const [allFilters, setAllFilters] = useState([]);
   const [items, setItems] = useState([]);
@@ -29,8 +30,8 @@ export const Home = (props: IHomeProps) => {
   }, []);
 
   useEffect(() => {
-    if(directories.length !== 0){
-    setSelectedDir(directories[0]);
+    if (directories.length !== 0) {
+      setSelectedDir(directories[0]);
     }
   }, [directories])
 
@@ -47,7 +48,12 @@ export const Home = (props: IHomeProps) => {
       latlngs.push([sampleFile[i].lat, sampleFile[i].lng]);
       info.push(sampleFile[i]);
       (i + 1) % 10 === 0 &&
-        (farms.push({ name: `${info[0].country}`, fly: latlngs[0], locations: latlngs, farmInfo: info }), (latlngs = []), (info = []));
+      (farms.push({
+        name: `${info[0].country}`,
+        fly: latlngs[0],
+        locations: latlngs,
+        farmInfo: info
+      }), (latlngs = []), (info = []));
     }
     setItems(farms);
 
@@ -56,7 +62,7 @@ export const Home = (props: IHomeProps) => {
       const filters = [];
       const nofilters = ['lat', 'lng', 'capturedExceptions'];
       Object.getOwnPropertyNames(sampleFile[0]).forEach(
-        prop => !nofilters.includes(`${[prop]}`) && filters.push({ category: `${prop}`, values: [] })
+        prop => !nofilters.includes(`${[prop]}`) && filters.push({category: `${prop}`, values: []})
       );
       filters.map(filter => {
         sampleFile.map(sample => {
@@ -101,19 +107,19 @@ export const Home = (props: IHomeProps) => {
 
   return (
     sampleFile.length !== 0 && (
-    <div>
-      <HomeLeftMenu setFly={setFly} items={items} selected={selected} 
-        allFilters={allFilters} setSelected={setSelected} directories={directories} 
-        selectedDir={selectedDir} setSelectedDir={setSelectedDir}/>
-      <HomeRightStatsPanel filSamples={filSamples} selected={selected} />
-      <HomeRightChartPanel filSamples={filSamples} selected={selected} />
-      <FarmMap fly={fly} setBounds={setBounds} items={items} selected={selected} />
-    </div>
+      <div>
+        <HomeLeftMenu setFly={setFly} items={items} selected={selected}
+                      allFilters={allFilters} setSelected={setSelected} directories={directories}
+                      selectedDir={selectedDir} setSelectedDir={setSelectedDir}/>
+        <HomeRightStatsPanel filSamples={filSamples} selected={selected}/>
+        <HomeRightChartPanel filSamples={filSamples} selected={selected}/>
+        <FarmMap fly={fly} setBounds={setBounds} items={items} selected={selected}/>
+      </div>
     )
   );
 };
 
-const mapStateToProps = ({ visualizer }: IRootState) => ({
+const mapStateToProps = ({visualizer}: IRootState) => ({
   wdFiles: visualizer.wdFiles,
   sampleFile: visualizer.sampleFile,
   directories: visualizer.directories,
