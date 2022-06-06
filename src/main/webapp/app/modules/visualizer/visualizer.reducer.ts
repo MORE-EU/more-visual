@@ -160,8 +160,8 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
             queryResultsLoading: false,
             queryResults: action.payload.data,
             data: action.payload.data.data,
-            from: _.min(action.payload.data.data.map(row => new Date(row.timestamp))),
-            to: _.max(action.payload.data.data.map(row => new Date(row.timestamp))),
+            from: new Date(action.payload.data.timeRange[0]),
+            to: new Date(action.payload.data.timeRange[1]),
           }
         : {
             ...state,

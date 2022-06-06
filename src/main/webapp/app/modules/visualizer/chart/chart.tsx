@@ -315,7 +315,7 @@ export const Chart = (props: IChartProps) => {
                   .map((measure, index) => ({
                     data: data.map((d) => {
                       const val = d.values[index];
-                      return [new Date(d.timestamp), isNaN(val) ? null : val];
+                      return [d.timestamp, isNaN(val) ? null : val];
                     }),
                     name: dataset.header[measure],
                     yAxis: changeChart ? index : 0,
@@ -327,7 +327,7 @@ export const Chart = (props: IChartProps) => {
                       data: compareData.map((d) => {
                         const val = d.values[index];
                         return [
-                          new Date(d.timestamp),
+                          d.timestamp,
                           isNaN(val) ? null : val,
                         ];
                       }),
@@ -340,7 +340,7 @@ export const Chart = (props: IChartProps) => {
                 : selectedMeasures.map((measure, index) => ({
                   data: data.map((d) => {
                     const val = d.values[index];
-                    return [new Date(d.timestamp), isNaN(val) ? null : val];
+                    return [d.timestamp, isNaN(val) ? null : val];
                   }),
                   name: dataset.header[measure],
                   yAxis: changeChart ? index : 0,

@@ -75,6 +75,8 @@ export const ChartControl = (props: IChartControlProps) => {
           renderInput={(p) => <TextField size="small" {...p} />}
           label="From"
           value={from}
+          minDateTime={from}
+          maxDateTime={to}
           onChange={props.updateFrom}
           onClose={() => {props.updateQueryResults(folder, dataset.id, from.getTime(), to.getTime(), selectedMeasures)}}
         />
@@ -83,6 +85,8 @@ export const ChartControl = (props: IChartControlProps) => {
           renderInput={(p) => <TextField size="small" {...p} />}
           label="To"
           value={to}
+          minDateTime={from}
+          maxDateTime={to}
           onChange={props.updateTo}
           onClose={() => {props.updateQueryResults(folder, dataset.id, from.getTime(), to.getTime(), selectedMeasures)}}
         />
