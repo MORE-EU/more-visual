@@ -159,8 +159,8 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
             queryResultsLoading: false,
             queryResults: action.payload.data,
             data: action.payload.data.data,
-            from: _.min(action.payload.data.data.map(row => new Date(row.timestamp))),
-            to: _.max(action.payload.data.data.map(row => new Date(row.timestamp))),
+            from: new Date(action.payload.data.timeRange[0]),
+            to: new Date(action.payload.data.timeRange[1]),
           }
         : {
             ...state,
@@ -293,7 +293,7 @@ export const getSampleFile = id => {
 export const updateQueryResults = (folder, id, fromDate, toDate, selMeasures) => (dispatch, getState) => {
   let query;
   fromDate !== null && toDate !== null
-    ? (query = { range: { from: fromDate, to: toDate } as ITimeRange, frequency: 'SECOND', measures: selMeasures } as IQuery)
+    ? (query = { range: { from: fromDate, to: toDate } as ITimeRange, frequency: 'MINUTE', measures: selMeasures } as IQuery)
     : (query = defaultQuery);
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_RESULTS,
