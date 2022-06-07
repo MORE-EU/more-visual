@@ -68,6 +68,7 @@ module.exports = options => ({
         enforce: 'pre',
         test: /\.jsx?$/,
         loader: 'babel-loader',
+        include: [utils.root('node_modules/@react-leaflet')],
         options: {
           plugins: [
             '@babel/plugin-proposal-nullish-coalescing-operator',
@@ -81,16 +82,6 @@ module.exports = options => ({
         loader: 'eslint-loader',
         exclude: [utils.root('node_modules')]
       },
-      {
-        test: /\.m?js$/,
-        exclude: /(node_modules|bower_components)/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env']
-          }
-        }
-      }
     ]
   },
   stats: {

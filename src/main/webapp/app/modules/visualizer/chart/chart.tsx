@@ -167,7 +167,10 @@ export const Chart = (props: IChartProps) => {
   }, [compare]);
 
   const chartFuncts = (e) => {
+
     const chart = e.target;
+    
+
     // CHART: INSTRUCTIONS
     chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
     Highcharts.addEvent(chart.container, "click", (event: MouseEvent) => {
@@ -195,10 +198,12 @@ export const Chart = (props: IChartProps) => {
 
     // CHART: PANNING FETCH DATA FUNCTION
     setInterval(() => {
+
       const currentExtremes = chart.xAxis[0].getExtremes();
       const {dataMax, dataMin, max, min} = currentExtremes;
       const leftSide = min - (((min - queryResults.timeRange[0]) * 20) / 100);
       const rightSide = max + (((queryResults.timeRange[1] - max) * 20) / 100);
+
       // Conditions for loading new data
       if ((dataMax - max < 2 && dataMax !== queryResults.timeRange[1]) ||
         (min - dataMin < 2 && dataMin !== queryResults.timeRange[0])) {
