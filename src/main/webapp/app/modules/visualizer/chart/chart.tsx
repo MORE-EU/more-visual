@@ -111,6 +111,7 @@ export const Chart = (props: IChartProps) => {
   const latestCompare = useRef(compare);
   const latestFreq = useRef(resampleFreq);
 
+
   useEffect(() => {
     let newZones = [];
     newZones =
@@ -180,7 +181,6 @@ export const Chart = (props: IChartProps) => {
 
     const chart = e.target;
     let maxFreqDate: number, minFreqDate: number;
-
     // CHART: INSTRUCTIONS
     chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
     Highcharts.addEvent(chart.container, "click", (event: MouseEvent) => {

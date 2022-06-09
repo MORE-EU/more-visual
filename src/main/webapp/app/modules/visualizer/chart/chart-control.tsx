@@ -18,6 +18,7 @@ import {ChartChangePointFunctions} from './chart-control-buttons/chart-changepoi
 import {DateTimePicker, LocalizationProvider} from '@mui/lab';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import {IDataset} from 'app/shared/model/dataset.model';
+import Highcharts from 'highcharts';
 
 interface IChartControlProps {
   dataset: IDataset,
@@ -63,22 +64,18 @@ export const ChartControl = (props: IChartControlProps) => {
   // }
 
   // const [timeBut, setTimeBut] = useState(4);
-  const cFrom = useRef(null);
-  const cTo = useRef(null);
 
-  const handleOnClose = () => {
-    if(cFrom.current === null) {
-      props.updateQueryResults(folder, dataset.id, from.getTime(), cTo.current, resampleFreq, selectedMeasures);
-      chartRef.xAxis[0].setExtremes(from.getTime()+200, cTo.current-200);
-    }else if(cTo.current === null) {
-      props.updateQueryResults(folder, dataset.id, cFrom.current, to.getTime(), resampleFreq, selectedMeasures);
-      chartRef.xAxis[0].setExtremes(cFrom.current+200, to.getTime()-200);
+  const handleOnAccept = (e, category) => {
+    if(category === "from"){
+    props.updateQueryResults(folder, dataset.id, e.getTime(), to.getTime(), resampleFreq, selectedMeasures);
+    chartRef.xAxis[0].setExtremes(e.getTime()+200, to.getTime()-200);
     }else{
-      props.updateQueryResults(folder, dataset.id, cFrom.current, cTo.current, resampleFreq, selectedMeasures);
-      chartRef.xAxis[0].setExtremes(cFrom.current+200, cTo.current-200);
+    props.updateQueryResults(folder, dataset.id, from.getTime(), e.getTime(), resampleFreq, selectedMeasures);
+    chartRef.xAxis[0].setExtremes(from.getTime()+200, e.getTime()-200);
     }
+    
   }
-
+ 
   return (
     <Grid container direction="row" sx={{mb: 1}}>
       <Grid item alignItems="center" sx={{display: "flex", flexGrow: 1, flexDirection: "row"}}>
@@ -106,8 +103,8 @@ export const ChartControl = (props: IChartControlProps) => {
               value={from}
               minDateTime={queryResults.timeRange[0]}
               maxDateTime={queryResults.timeRange[1]}
-              onChange={(e) => {cFrom.current = e.getTime()}}
-              onClose={handleOnClose}
+              onAccept={(e) => {handleOnAccept(e, "from")}}
+              onChange={(e) => {}}
               />
             <Typography variant="body1" sx={{pl: 1, pr: 1}}>{" - "}</Typography>
             <DateTimePicker
@@ -116,8 +113,8 @@ export const ChartControl = (props: IChartControlProps) => {
               value={to}
               minDateTime={queryResults.timeRange[0]}
               maxDateTime={queryResults.timeRange[1]}
-              onChange={(e) => {cTo.current = e.getTime()}}
-              onClose={handleOnClose}
+              onAccept={(e) => {handleOnAccept(e, "to")}}
+              onChange={(e) => {}}
             />
           </LocalizationProvider>}
       </Grid>
