@@ -31,6 +31,7 @@ import {
   updateResampleFreq,
   updateSelectedMeasures,
   updateTo,
+  updateChartRef,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
@@ -50,7 +51,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     loading, queryResults, data, selectedMeasures,
     resampleFreq, patterns, graphZoom, customChangePoints,
     activeTool, compare, filters, compareData, queryResultsLoading,
-    from, to, cpDetectionEnabled,
+    from, to, cpDetectionEnabled, chartRef,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -147,7 +148,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                             customChangePoints={customChangePoints}
                             updateCustomChangePoints={props.updateCustomChangePoints}
                             setOpen={setOpen} updateActiveTool={props.updateActiveTool} compare={compare}
-                            updateCompare={props.updateCompare}
+                            updateCompare={props.updateCompare} chartRef={chartRef} updateChartRef={props.updateChartRef}
                             compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}
                             updateFrom={props.updateFrom} updateTo={props.updateTo} queryResults={queryResults}/>
           </Paper>
@@ -193,6 +194,7 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   compareData: visualizer.compareData,
   queryResultsLoading: visualizer.queryResultsLoading,
   cpDetectionEnabled: visualizer.cpDetectionEnabled,
+  chartRef: visualizer.chartRef,
 });
 
 const mapDispatchToProps = {
@@ -202,7 +204,7 @@ const mapDispatchToProps = {
   updatePatterns, getPatterns, updateChangeChart, updateDatasetChoice,
   getWdFiles, updatePatternNav, updateCustomChangePoints, getChangePointDates,
   updateGraphZoom, updateActiveTool, updateCompare, updateCompareQueryResults,
-  applyCpDetection, enableCpDetection,
+  applyCpDetection, enableCpDetection, updateChartRef
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

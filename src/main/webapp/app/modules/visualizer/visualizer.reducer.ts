@@ -6,6 +6,7 @@ import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.mod
 import { IQueryResults } from 'app/shared/model/query-results.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
 import { ITimeRange } from 'app/shared/model/time-range.model';
+import _ from 'lodash';
 
 export const ACTION_TYPES = {
   FETCH_DATASET: 'visualizer/FETCH_DATASET',
@@ -33,6 +34,7 @@ export const ACTION_TYPES = {
   UPDATE_CUSTOM_CHANGEPOINTS: 'visualizer/UPDATE_CUSTOM_CHANGEPOINTS',
   UPDATE_GRAPHZOOM: 'visualizer/UPDATE_GRAPHZOOM',
   UPDATE_ACTIVETOOL: 'visualizer/UPDATE_ACTIVETOOL',
+  UPDATE_CHARTREF: 'visualizer/UPDATE_CHARTREF',
   UPDATE_COMPARE: 'visualizer/UPDATE_COMPARE',
   CHANGEPOINT_DETECTION: 'visualizer/CHANGEPOINT_DETECTION',
   ENABLE_CP_DETECTION: 'visualizer/ENABLE_CP_DETECTION',
@@ -64,6 +66,7 @@ const initialState = {
   compare: '',
   directories: [],
   cpDetectionEnabled: false,
+  chartRef: null,
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
@@ -154,21 +157,14 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         queryResultsLoading: false,
       };
     case SUCCESS(ACTION_TYPES.FETCH_QUERY_RESULTS):
-      return state.from === null && state.to === null
-        ? {
-            ...state,
-            queryResultsLoading: false,
-            queryResults: action.payload.data,
-            data: action.payload.data.data,
-            from: new Date(action.payload.data.timeRange[0]),
-            to: new Date(action.payload.data.timeRange[1]),
-          }
-        : {
-            ...state,
-            queryResultsLoading: false,
-            queryResults: action.payload.data,
-            data: action.payload.data.data,
-          };
+      return {
+        ...state,
+        queryResultsLoading: false,
+        queryResults: action.payload.data,
+        data: action.payload.data.data,
+        from: _.min(action.payload.data.data.map(row => new Date(row.timestamp))),
+        to: _.max(action.payload.data.data.map(row => new Date(row.timestamp))),
+      };
     case SUCCESS(ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS):
       return {
         ...state,
@@ -254,6 +250,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         activeTool: action.payload,
       };
+    case ACTION_TYPES.UPDATE_CHARTREF:
+      return {
+        ...state,
+        chartRef: action.payload,
+      };
     case ACTION_TYPES.UPDATE_COMPARE:
       return {
         ...state,
@@ -295,12 +296,12 @@ export const getSampleFile = id => {
   };
 };
 
-export const updateQueryResults = (folder, id, fromDate, toDate, selMeasures) => (dispatch, getState) => {
+export const updateQueryResults = (folder, id, fromDate, toDate, freq, selMeasures) => (dispatch, getState) => {
   let query;
   fromDate !== null && toDate !== null
     ? (query = {
         range: { from: fromDate, to: toDate } as ITimeRange,
-        frequency: 'MINUTE',
+        frequency: freq.toUpperCase(),
         measures: selMeasures,
       } as IQuery)
     : (query = defaultQuery);
@@ -372,6 +373,11 @@ export const updatePatternNav = data => ({
 
 export const updateGraphZoom = data => ({
   type: ACTION_TYPES.UPDATE_GRAPHZOOM,
+  payload: data,
+});
+
+export const updateChartRef = data => ({
+  type: ACTION_TYPES.UPDATE_CHARTREF,
   payload: data,
 });
 

@@ -6,6 +6,7 @@ import React, {Dispatch, SetStateAction, useState} from 'react';
 import {
   updateActiveTool,
   updateChangeChart,
+  updateChartRef,
   updateCompare,
   updateCompareQueryResults,
   updateCustomChangePoints,
@@ -29,7 +30,7 @@ export interface IChartContainerProps {
   selectedMeasures: number[];
   from: Date;
   to: Date;
-  filters: any,
+  filters: any;
   resampleFreq: string;
   patterns: IPatterns;
   changeChart: boolean;
@@ -37,6 +38,7 @@ export interface IChartContainerProps {
   graphZoom: number;
   customChangePoints: IChangePointDate[];
   compare: string;
+  chartRef: any;
   updateCompare: typeof updateCompare;
   updateQueryResults: typeof updateQueryResults;
   updateCustomChangePoints: typeof updateCustomChangePoints;
@@ -46,6 +48,7 @@ export interface IChartContainerProps {
   updateCompareQueryResults: typeof updateCompareQueryResults;
   updateFrom: typeof updateFrom;
   updateTo: typeof updateTo;
+  updateChartRef: typeof updateChartRef;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -53,7 +56,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
   const {
     dataset, data, selectedMeasures, from, to, filters,
     wdFiles, changeChart, folder, graphZoom, customChangePoints,
-    compare, compareData, queryResults
+    compare, compareData, queryResults, resampleFreq, chartRef
   } = props;
 
   const [showDatePick, setShowDatePick] = useState(false);
@@ -66,14 +69,14 @@ export const ChartContainer = (props: IChartContainerProps) => {
                     selectedMeasures={selectedMeasures}
                     updateGraphZoom={props.updateGraphZoom} from={from} to={to} wdFiles={wdFiles} data={data}
                     customChangePoints={customChangePoints} updateCustomChangePoints={props.updateCustomChangePoints}
-                    setOpen={props.setOpen}
+                    setOpen={props.setOpen} chartRef={chartRef}
                     updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare}
                     setShowDatePick={setShowDatePick}
                     setCompare={setCompare} showDatePick={showDatePick} showCompare={showCompare}
-                    showChangePointFunction={showChangePointFunction}
+                    showChangePointFunction={showChangePointFunction} queryResults={queryResults}
                     setShowChangePointFunction={setShowChangePointFunction}
                     updateCompareQueryResults={props.updateCompareQueryResults} folder={folder}
-                    updateFrom={props.updateFrom} updateTo={props.updateTo}
+                    updateFrom={props.updateFrom} updateTo={props.updateTo} resampleFreq={resampleFreq}
                     updateQueryResults={props.updateQueryResults} dataset={dataset}/>
       <Chart
         dataset={dataset}
@@ -100,6 +103,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
         updateCompareQueryResults={props.updateCompareQueryResults}
         updateFrom={props.updateFrom}
         updateTo={props.updateTo}
+        updateChartRef={props.updateChartRef}
       />
     </Box>
   );
