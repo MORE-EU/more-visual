@@ -36,6 +36,8 @@ export interface IChartContainerProps {
   folder: string;
   graphZoom: number;
   customChangePoints: IChangePointDate[];
+  detectedChangePoints: IChangePointDate[];
+  cpDetectionEnabled: boolean;
   compare: string;
   updateCompare: typeof updateCompare;
   updateQueryResults: typeof updateQueryResults;
@@ -53,7 +55,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
   const {
     dataset, data, selectedMeasures, from, to, filters,
     wdFiles, changeChart, folder, graphZoom, customChangePoints,
-    compare, compareData, queryResults
+    detectedChangePoints, cpDetectionEnabled, compare, compareData, queryResults,
   } = props;
 
   const [showDatePick, setShowDatePick] = useState(false);
@@ -92,6 +94,8 @@ export const ChartContainer = (props: IChartContainerProps) => {
         graphZoom={graphZoom}
         compare={compare}
         customChangePoints={customChangePoints}
+        detectedChangePoints={detectedChangePoints}
+        cpDetectionEnabled={cpDetectionEnabled}
         updateCustomChangePoints={props.updateCustomChangePoints}
         updateActiveTool={props.updateActiveTool}
         setCompare={setCompare}

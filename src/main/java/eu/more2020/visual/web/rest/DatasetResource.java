@@ -12,6 +12,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -174,7 +175,10 @@ public class DatasetResource {
     @PostMapping("/tools/cp_detection/{id}")
     public ResponseEntity<List<Changepoint>> cpDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {
         log.debug("CP for {}", changepoints);
-        return ResponseEntity.ok(toolsRepository.cpDetection(id, changepoints));
+        List<Changepoint> detectedChangepoints = toolsRepository.cpDetection(id, changepoints);
+        log.debug("Detected CP for {}", detectedChangepoints);
+
+        return new ResponseEntity<>(detectedChangepoints, HttpStatus.OK);
     }
 
 }

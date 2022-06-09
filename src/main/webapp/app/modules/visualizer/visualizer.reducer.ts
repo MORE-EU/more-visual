@@ -59,11 +59,12 @@ const initialState = {
   folder: '',
   sampleFile: [],
   customChangePoints: [] as IChangePointDate[],
+  detectedChangePoints: [] as IChangePointDate[],
+  cpDetectionEnabled: false,
   graphZoom: null,
   activeTool: -1,
   compare: '',
   directories: [],
-  cpDetectionEnabled: false,
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
@@ -160,8 +161,8 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
             queryResultsLoading: false,
             queryResults: action.payload.data,
             data: action.payload.data.data,
-            from: new Date(action.payload.data.timeRange[0]),
-            to: new Date(action.payload.data.timeRange[1]),
+            from: action.payload.data.data[0].timestamp,
+            to: action.payload.data.data[action.payload.data.data.length - 1].timestamp,
           }
         : {
             ...state,
@@ -178,6 +179,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
     case SUCCESS(ACTION_TYPES.CHANGEPOINT_DETECTION):
       return {
         ...state,
+        detectedChangePoints: action.payload.data,
       };
     case ACTION_TYPES.UPDATE_SELECTED_MEASURES:
       return {
@@ -447,11 +449,11 @@ export const enableCpDetection = (bool: boolean) => ({
 
 export const applyCpDetection = (id, from, to, customChangePoints, detectAuto, detectIntervals) => dispatch => {
   const requestUrl = `api/tools/cp_detection/${id}`;
-  return {
+  dispatch({
     type: ACTION_TYPES.CHANGEPOINT_DETECTION,
     payload: axios.post(requestUrl, {
       range: { from, to } as ITimeRange,
       changepoints: detectIntervals ? customChangePoints : null,
     }),
-  };
+  });
 };

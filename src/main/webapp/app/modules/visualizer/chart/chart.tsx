@@ -62,6 +62,8 @@ export interface IChartProps {
   filters: any;
   graphZoom: number;
   customChangePoints: IChangePointDate[];
+  detectedChangePoints: IChangePointDate[];
+  cpDetectionEnabled: boolean;
   updateCustomChangePoints: typeof updateCustomChangePoints;
   updateActiveTool: typeof updateActiveTool;
   setShowDatePick: Dispatch<SetStateAction<boolean>>;
@@ -94,7 +96,9 @@ export const Chart = (props: IChartProps) => {
     changeChart,
     folder,
     graphZoom,
+    detectedChangePoints,
     customChangePoints,
+    cpDetectionEnabled,
     compare,
     compareData,
     queryResults,
@@ -131,28 +135,27 @@ export const Chart = (props: IChartProps) => {
   }, [patterns]);
 
   const annotationToDate = (annotation, len) => {
-    // const x1 = annotation.startXMin,
-    //   x2 = annotation.startXMax,
-    //   series = annotation.chart.series[0],
-    //   filteredPoints = series.points.filter(
-    //     (point) => point.x > x1 && point.x < x2
-    //   ),
     const startPoint = annotation.startXMin,
       endPoint = annotation.startXMax;
     return {range: {from: startPoint, to: endPoint} as ITimeRange, id: len};
   };
 
-  // useEffect(() => {
-  //   let newPlotBands = [];
-  //   newPlotBands = (changePointDates !== null && [].concat(...changePointDates.map(date => {
-  //     return {
-  //       color: 'blue',
-  //       from: date.start,
-  //       to: date.end,
-  //     };
-  //   })));
-  //   setPlotBands(newPlotBands);
-  // }, [changePointDates]);
+  useEffect(() => {
+    let newPlotBands = [];
+    newPlotBands = (detectedChangePoints !== null && [].concat(...detectedChangePoints.map(date => {
+      return {
+        color: '#1e90ff',
+        from: date.range.from,
+        to: date.range.to,
+      };
+    })));
+    setPlotBands(newPlotBands);
+  }, [detectedChangePoints]);
+
+  useEffect(() => {
+
+  }, [cpDetectionEnabled]);
+
 
   useEffect(() => {
     latestMeasures.current = selectedMeasures;
@@ -169,7 +172,7 @@ export const Chart = (props: IChartProps) => {
   const chartFuncts = (e) => {
 
     const chart = e.target;
-    
+
 
     // CHART: INSTRUCTIONS
     chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
@@ -177,36 +180,41 @@ export const Chart = (props: IChartProps) => {
       chart.hideLoading();
     });
 
+
     // CHART: ZOOM FUNCTION
     Highcharts.addEvent(chart.container, "wheel", (event: WheelEvent) => {
-      const {dataMax, dataMin, max, min} = chart.xAxis[0].getExtremes();
-      console.log((dataMax - dataMin )/ 100);
-      const step = (dataMax - dataMin) / 100;
       const xAxis = chart.xAxis[0],
         extremes = xAxis.getExtremes(),
         newMin = extremes.min;
-      if (event.deltaY < 0) {
-        newMin + step < extremes.max
-          ? xAxis.setExtremes(newMin + step, extremes.max, true, true)
-          : xAxis.setExtremes(extremes.max - 2000, extremes.max, true, true);
-      } else if (event.deltaY > 0) {
-        newMin - step > extremes.dataMin
-          ? xAxis.setExtremes(newMin - step, extremes.max, true, true)
-          : xAxis.setExtremes(extremes.dataMin, extremes.max, true, true);
+      const step = (extremes.max - extremes.min) / 10;
+
+      if (event.deltaY < 0) { // in
+        // newMin + step < extremes.max
+        //   ? xAxis.setExtremes(newMin + step, extremes.max - step, true, true)
+        //   : xAxis.setExtremes(extremes.max - 2000, extremes.max, true, true);
+        let x = chart.hoverPoint ? chart.hoverPoint.category : 0;
+        console.log(x);
+        xAxis.setExtremes(newMin + step, extremes.max - step, true, true)
+      } else if (event.deltaY > 0) { // out
+        xAxis.setExtremes(Math.max(newMin - step, extremes.dataMin),
+          Math.min(Math.max(extremes.max + step, extremes.max), queryResults.timeRange[1]), true, true)
       }
     });
 
-    // CHART: PANNING FETCH DATA FUNCTION
-    setInterval(() => {
+    const getSides = (max, min, p) => {
+      const pad = (max - min) + ((max - min) * p);
+      const leftSide = Math.max(Math.min(min - pad, (queryResults.timeRange[0] + min - pad)), queryResults.timeRange[0]);
+      const rightSide = Math.min(max + pad, queryResults.timeRange[1]);
+      return {leftSide, rightSide};
+    }
 
-      const currentExtremes = chart.xAxis[0].getExtremes();
-      const {dataMax, dataMin, max, min} = currentExtremes;
-      const leftSide = min - (((min - queryResults.timeRange[0]) * 20) / 100);
-      const rightSide = max + (((queryResults.timeRange[1] - max) * 20) / 100);
+  setInterval(() => {
+    const currentExtremes = chart.xAxis[0].getExtremes();
+    const {dataMax, dataMin, max, min} = currentExtremes;
 
       // Conditions for loading new data
-      if ((dataMax - max < 2 && dataMax !== queryResults.timeRange[1]) ||
-        (min - dataMin < 2 && dataMin !== queryResults.timeRange[0])) {
+      if ((dataMax - max < 2 || min - dataMin < 2)) {
+        const {leftSide, rightSide} = getSides(max, min, 0.25);
         props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestMeasures.current);
         props.updateFrom(leftSide);
         props.updateTo(rightSide);

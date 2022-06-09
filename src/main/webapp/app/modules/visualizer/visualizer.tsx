@@ -49,8 +49,8 @@ export const Visualizer = (props: IVisualizerProps) => {
     dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
     resampleFreq, patterns, graphZoom, customChangePoints,
-    activeTool, compare, filters, compareData, queryResultsLoading,
-    from, to, cpDetectionEnabled,
+    detectedChangePoints, activeTool, compare, filters, compareData,
+    queryResultsLoading, from, to, cpDetectionEnabled,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -144,8 +144,8 @@ export const Visualizer = (props: IVisualizerProps) => {
                             resampleFreq={props.resampleFreq} patterns={props.patterns} changeChart={changeChart}
                             folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}
                             graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}
-                            customChangePoints={customChangePoints}
-                            updateCustomChangePoints={props.updateCustomChangePoints}
+                            customChangePoints={customChangePoints} cpDetectionEnabled={cpDetectionEnabled}
+                            detectedChangePoints = {detectedChangePoints} updateCustomChangePoints={props.updateCustomChangePoints}
                             setOpen={setOpen} updateActiveTool={props.updateActiveTool} compare={compare}
                             updateCompare={props.updateCompare}
                             compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}
@@ -187,6 +187,7 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   patternNav: visualizer.patternNav,
   folder: visualizer.folder,
   customChangePoints: visualizer.customChangePoints,
+  detectedChangePoints: visualizer.detectedChangePoints,
   graphZoom: visualizer.graphZoom,
   activeTool: visualizer.activeTool,
   compare: visualizer.compare,

@@ -33,6 +33,14 @@ public class Changepoint implements Serializable {
         this.range = range;
     }
 
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
     @Override
     public String toString() {
         return "Changepoint{" +
