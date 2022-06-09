@@ -6,6 +6,7 @@ import HighchartsMore from "highcharts/highcharts-more";
 import {IDataset} from "app/shared/model/dataset.model";
 import {
   updateActiveTool,
+  updateChartRef,
   updateCompareQueryResults,
   updateCustomChangePoints,
   updateFrom,
@@ -72,6 +73,7 @@ export interface IChartProps {
   updateCompareQueryResults: typeof updateCompareQueryResults;
   updateFrom: typeof updateFrom;
   updateTo: typeof updateTo;
+  updateChartRef: typeof updateChartRef;
   compare: string;
 }
 
@@ -111,6 +113,8 @@ export const Chart = (props: IChartProps) => {
   const [type, setType] = useState("line");
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
+  const latestFreq = useRef(resampleFreq);
+
 
   useEffect(() => {
     let newZones = [];
@@ -157,23 +161,31 @@ export const Chart = (props: IChartProps) => {
   }, [cpDetectionEnabled]);
 
 
+  const getChartRef = (chart) => {
+    props.updateChartRef(chart);
+  }
+
   useEffect(() => {
     latestMeasures.current = selectedMeasures;
-    props.updateQueryResults(folder, dataset.id, from ? from.getTime() : null, to ? to.getTime() : null, selectedMeasures);
+    props.updateQueryResults(folder, dataset.id, from ? from.getTime() : null, to ? to.getTime() : null, resampleFreq, selectedMeasures);
     if (compare !== "") {
       props.updateCompareQueryResults(folder, compare.replace('.csv', ""), from.getTime(), to.getTime(), selectedMeasures);
     }
-  }, [dataset, selectedMeasures]);
+  }, [dataset, selectedMeasures, resampleFreq]);
 
   useEffect(() => {
     latestCompare.current = compare;
-  }, [compare]);
+    latestFreq.current = resampleFreq;
+  }, [compare, resampleFreq]);
+
+
 
   const chartFuncts = (e) => {
 
     const chart = e.target;
 
 
+    let maxFreqDate: number, minFreqDate: number;
     // CHART: INSTRUCTIONS
     chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
     Highcharts.addEvent(chart.container, "click", (event: MouseEvent) => {
@@ -183,21 +195,34 @@ export const Chart = (props: IChartProps) => {
 
     // CHART: ZOOM FUNCTION
     Highcharts.addEvent(chart.container, "wheel", (event: WheelEvent) => {
-      const xAxis = chart.xAxis[0],
-        extremes = xAxis.getExtremes(),
-        newMin = extremes.min;
-      const step = (extremes.max - extremes.min) / 10;
+      // const xAxis = chart.xAxis[0],
+      //   extremes = xAxis.getExtremes(),
+      //   newMin = extremes.min;
+      // const step = (extremes.max - extremes.min) / 10;
 
-      if (event.deltaY < 0) { // in
-        // newMin + step < extremes.max
-        //   ? xAxis.setExtremes(newMin + step, extremes.max - step, true, true)
-        //   : xAxis.setExtremes(extremes.max - 2000, extremes.max, true, true);
-        let x = chart.hoverPoint ? chart.hoverPoint.category : 0;
-        console.log(x);
-        xAxis.setExtremes(newMin + step, extremes.max - step, true, true)
-      } else if (event.deltaY > 0) { // out
-        xAxis.setExtremes(Math.max(newMin - step, extremes.dataMin),
-          Math.min(Math.max(extremes.max + step, extremes.max), queryResults.timeRange[1]), true, true)
+      // if (event.deltaY < 0) { // in
+      //   // newMin + step < extremes.max
+      //   //   ? xAxis.setExtremes(newMin + step, extremes.max - step, true, true)
+      //   //   : xAxis.setExtremes(extremes.max - 2000, extremes.max, true, true);
+      //   let x = chart.hoverPoint ? chart.hoverPoint.category : 0;
+      //   console.log(x);
+      //   xAxis.setExtremes(newMin + step, extremes.max - step, true, true)
+      // } else if (event.deltaY > 0) { // out
+      //   xAxis.setExtremes(Math.max(newMin - step, extremes.dataMin),
+      //     Math.min(Math.max(extremes.max + step, extremes.max), queryResults.timeRange[1]), true, true)
+
+      const {dataMax, dataMin, max, min} = chart.xAxis[0].getExtremes();
+      const step = (dataMax - dataMin) / 100;
+      const xAxis = chart.xAxis[0]
+
+      if (event.deltaY < 0) {
+        min + step < max
+          ? xAxis.setExtremes(min + step, max - step, true, true)
+          : xAxis.setExtremes(max - 2000, max, true, true);
+      } else if (event.deltaY > 0) {
+        min - step > dataMin && max + step < dataMax && xAxis.setExtremes(min - step, max + step, true, false);
+        min - step < dataMin && max + step < dataMax && xAxis.setExtremes(dataMin + 200, max + step, true, false);
+        min - step > dataMin && max + step > dataMax && xAxis.setExtremes(min - step, dataMax - 200, true, false);      
       }
     });
 
@@ -208,14 +233,48 @@ export const Chart = (props: IChartProps) => {
       return {leftSide, rightSide};
     }
 
+    // setInterval(() => {
+    //   const currentExtremes = chart.xAxis[0].getExtremes();
+    //   const {dataMax, dataMin, max, min} = currentExtremes;
+  
+    //     // Conditions for loading new data
+    //     if ((dataMax - max < 2 || min - dataMin < 2)) {
+    //       const {leftSide, rightSide} = getSides(max, min, 0.25);
+    //       props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestMeasures.current);
+    //       props.updateFrom(leftSide);
+    //       props.updateTo(rightSide);
+    //       if (latestCompare.current !== "") {
+    //         props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv', ""), leftSide, rightSide, latestMeasures.current);
+    //       }
+    //     }
+    //   }, 300);
+    //   // Set initial extremes
+    //   chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
+    // };
   setInterval(() => {
     const currentExtremes = chart.xAxis[0].getExtremes();
     const {dataMax, dataMin, max, min} = currentExtremes;
 
+      if(latestFreq.current === 'minute') {
+        minFreqDate = new Date(queryResults.timeRange[0]).setSeconds(0,0);
+        maxFreqDate = new Date(queryResults.timeRange[1]).setSeconds(0,0);
+      }else if (latestFreq.current === 'hour') {
+        minFreqDate = new Date(queryResults.timeRange[0]).setMinutes(0,0,0);
+        maxFreqDate = new Date(queryResults.timeRange[1]).setMinutes(0,0,0);
+      }else{
+        minFreqDate = queryResults.timeRange[0];
+        maxFreqDate = queryResults.timeRange[1];
+      }
+
       // Conditions for loading new data
-      if ((dataMax - max < 2 || min - dataMin < 2)) {
+
+      // if ((dataMax - max < 2 || min - dataMin < 2)) {
         const {leftSide, rightSide} = getSides(max, min, 0.25);
-        props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestMeasures.current);
+        // props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestMeasures.current);
+
+      if ((dataMax - max < 2 && dataMax !== maxFreqDate) ||
+        (min - dataMin < 2 && dataMin !== minFreqDate)) {
+        props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestFreq.current, latestMeasures.current);
         props.updateFrom(leftSide);
         props.updateTo(rightSide);
         if (latestCompare.current !== "") {
@@ -223,6 +282,7 @@ export const Chart = (props: IChartProps) => {
         }
       }
     }, 300);
+    
     // Set initial extremes
     chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
   };
@@ -241,6 +301,7 @@ export const Chart = (props: IChartProps) => {
           containerProps={{className: "chartContainer"}}
           allowChartUpdate={true}
           immutable={false}
+          callback={getChartRef}
           updateArgs={[true, true, true]}
           options={{
             title: null,

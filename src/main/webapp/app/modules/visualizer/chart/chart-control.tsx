@@ -1,5 +1,5 @@
 import {Button, Grid, TextField, Typography} from '@mui/material';
-import React, {Dispatch, SetStateAction, useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
 import {
   updateActiveTool,
   updateChangeChart,
@@ -18,6 +18,7 @@ import {ChartChangePointFunctions} from './chart-control-buttons/chart-changepoi
 import {DateTimePicker, LocalizationProvider} from '@mui/lab';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import {IDataset} from 'app/shared/model/dataset.model';
+import Highcharts from 'highcharts';
 
 interface IChartControlProps {
   dataset: IDataset,
@@ -28,6 +29,8 @@ interface IChartControlProps {
   updateGraphZoom: typeof updateGraphZoom,
   changeChart: boolean,
   data: any,
+  resampleFreq: any,
+  queryResults: any,
   customChangePoints: IChangePointDate[],
   compare: string,
   showDatePick: boolean,
@@ -35,6 +38,7 @@ interface IChartControlProps {
   showChangePointFunction: boolean,
   folder: string,
   selectedMeasures: number[],
+  chartRef: any,
   updateCompare: typeof updateCompare,
   updateCustomChangePoints: typeof updateCustomChangePoints,
   setOpen: Dispatch<SetStateAction<boolean>>,
@@ -51,15 +55,27 @@ interface IChartControlProps {
 
 export const ChartControl = (props: IChartControlProps) => {
   const {
-    changeChart, from, to, wdFiles, data, customChangePoints, compare, showDatePick,
-    showCompare, showChangePointFunction, folder, selectedMeasures, dataset
+    changeChart, from, to, wdFiles, data, customChangePoints, compare, showDatePick, chartRef,
+    showCompare, showChangePointFunction, folder, selectedMeasures, dataset, resampleFreq, queryResults
   } = props;
 
-  const handleZoom = (zoomNum) => {
-    props.updateGraphZoom(zoomNum)
-  }
+  // const handleZoom = (zoomNum) => {
+  //   props.updateGraphZoom(zoomNum)
+  // }
 
-  const [timeBut, setTimeBut] = useState(4);
+  // const [timeBut, setTimeBut] = useState(4);
+
+  const handleOnAccept = (e, category) => {
+    if(category === "from"){
+    props.updateQueryResults(folder, dataset.id, e.getTime(), to.getTime(), resampleFreq, selectedMeasures);
+    chartRef.xAxis[0].setExtremes(e.getTime()+200, to.getTime()-200);
+    }else{
+    props.updateQueryResults(folder, dataset.id, from.getTime(), e.getTime(), resampleFreq, selectedMeasures);
+    chartRef.xAxis[0].setExtremes(from.getTime()+200, e.getTime()-200);
+    }
+    
+  }
+ 
   return (
     <Grid container direction="row" sx={{mb: 1}}>
       <Grid item alignItems="center" sx={{display: "flex", flexGrow: 1, flexDirection: "row"}}>
@@ -85,24 +101,20 @@ export const ChartControl = (props: IChartControlProps) => {
               renderInput={(p) => <TextField size="small" {...p} />}
               label="From"
               value={from}
-              minDateTime={from}
-              maxDateTime={to}
-              onChange={props.updateFrom}
-              onClose={() => {
-                props.updateQueryResults(folder, dataset.id, from.getTime(), to.getTime(), selectedMeasures)
-              }}
-            />
+              minDateTime={queryResults.timeRange[0]}
+              maxDateTime={queryResults.timeRange[1]}
+              onAccept={(e) => {handleOnAccept(e, "from")}}
+              onChange={(e) => {}}
+              />
             <Typography variant="body1" sx={{pl: 1, pr: 1}}>{" - "}</Typography>
             <DateTimePicker
               renderInput={(p) => <TextField size="small" {...p} />}
               label="To"
               value={to}
-              minDateTime={from}
-              maxDateTime={to}
-              onChange={props.updateTo}
-              onClose={() => {
-                props.updateQueryResults(folder, dataset.id, from.getTime(), to.getTime(), selectedMeasures)
-              }}
+              minDateTime={queryResults.timeRange[0]}
+              maxDateTime={queryResults.timeRange[1]}
+              onAccept={(e) => {handleOnAccept(e, "to")}}
+              onChange={(e) => {}}
             />
           </LocalizationProvider>}
       </Grid>
