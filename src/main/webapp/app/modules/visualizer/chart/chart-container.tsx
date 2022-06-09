@@ -58,7 +58,8 @@ export const ChartContainer = (props: IChartContainerProps) => {
   const {
     dataset, data, selectedMeasures, from, to, filters,
     wdFiles, changeChart, folder, graphZoom, customChangePoints,
-    detectedChangePoints, cpDetectionEnabled,  resampleFreq, chartRef
+    detectedChangePoints, cpDetectionEnabled,  resampleFreq, chartRef,
+    queryResults, compare, compareData,
   } = props;
 
   const [showDatePick, setShowDatePick] = useState(false);

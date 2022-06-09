@@ -163,8 +163,8 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         queryResultsLoading: false,
         queryResults: action.payload.data,
         data: action.payload.data.data,
-        from: _.min(action.payload.data.data.map(row => row.timestamp)),
-        to: _.max(action.payload.data.data.map(row => row.timestamp)),
+        from: action.payload.data.data[0].timestamp,
+        to: action.payload.data.data[action.payload.data.data.length - 1].timestamp,
       };
     case SUCCESS(ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS):
       return {
