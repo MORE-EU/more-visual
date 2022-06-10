@@ -48,6 +48,7 @@ Highcharts.setOptions({
 
 export interface IChartProps {
   dataset: IDataset;
+  loading: boolean;
   queryResults: IQueryResults;
   data: IDataPoint[];
   compareData: any[];
@@ -100,6 +101,7 @@ export const Chart = (props: IChartProps) => {
     compare,
     compareData,
     queryResults,
+    loading,
   } = props;
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -109,6 +111,7 @@ export const Chart = (props: IChartProps) => {
   const [type, setType] = useState("line");
 
 
+  const latestLoading = useRef(loading);
   const latestLeftSide = useRef(null);
   const latestRightSide = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
@@ -165,6 +168,10 @@ export const Chart = (props: IChartProps) => {
   }
 
   useEffect(() => {
+    latestLoading.current = loading;
+  }, [loading])
+
+  useEffect(() => {
     latestMeasures.current = selectedMeasures;
     props.updateQueryResults(folder, dataset.id, from ? from : null, to ? to : null, resampleFreq, selectedMeasures);
     if (compare !== "") {
@@ -187,7 +194,7 @@ export const Chart = (props: IChartProps) => {
     }
     latestLeftSide.current = leftSide;
     latestRightSide.current = rightSide;
-    chart.hideLoading();
+    !latestLoading.current && chart.hideLoading();
   }
 
 
