@@ -17,23 +17,21 @@ export interface IChangepointDetectionProps {
 
 export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   const {dataset, customChangePoints, from, to, cpDetectionEnabled} = props;
-  const [detectAuto, setDetectAuto] = useState(false);
   const [detectIntervals, setDetectIntervals] = useState(false);
 
-  const handleCpDetection = (id) => {
-    props.enableCpDetection(true);
-    props.applyCpDetection(id, from, to, customChangePoints,
-      detectAuto, detectIntervals);
+  const handleCpDetection = () => {
+    const action = !cpDetectionEnabled;
+    props.enableCpDetection(action);
+    if(action)
+      props.applyCpDetection(dataset.id, from, to,
+        customChangePoints, detectIntervals);
   }
 
   return (
     <Box sx={{pl: 2, pr: 2}}>
       <Box>
         <Typography variant="h6" gutterBottom>
-          Changepoint Detection
-        </Typography>
-        <Typography gutterBottom sx={{fontWeight: 'bold'}}>
-          Select Dates
+          Changepoints
         </Typography>
         <Divider orientation="horizontal" flexItem>
         </Divider>
@@ -46,12 +44,12 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}>
-            <Box sx={{pt: 1}}>Detect Automatically</Box>
-            <Tooltip describeChild title={dataset.washes ? "Use Existing Data" : "No Data Found"}>
+            <Box sx={{pt: 1}}>Show</Box>
+            <Tooltip describeChild title={dataset.washes ? "Show Changepoints" : "No Data Found"}>
               <Switch
-                checked={detectAuto}
-                onChange={() => setDetectAuto(!detectAuto)}
-                disabled={cpDetectionEnabled}
+                checked={cpDetectionEnabled}
+                onChange={() => handleCpDetection()}
+                disabled={!dataset.washes}
                 inputProps={{'aria-label': 'controlled'}}
               />
             </Tooltip>
@@ -61,7 +59,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}>
-            <Box sx={{pt: 1}}>Intervals on Chart</Box>
+            <Box sx={{pt: 1}}>Use Annotations</Box>
             <Tooltip describeChild
                      title={customChangePoints.length === 0 ? "Use Intervals on Chart" : "Select Intervals on the Chart"}>
               <Switch
@@ -71,21 +69,6 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
                 inputProps={{'aria-label': 'controlled'}}
               />
             </Tooltip>
-          </Box>
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'roffrw',
-            pt: 2,
-            justifyContent: 'flex-end',
-          }}>
-            <Button
-              disabled={!cpDetectionEnabled}
-              onClick={e => props.enableCpDetection(false)}
-            >STOP</Button>
-            <Button
-              disabled={!(detectAuto || detectIntervals) || cpDetectionEnabled}
-              onClick={e => handleCpDetection(dataset.id)}
-            >APPLY</Button>
           </Box>
         </Box>
 

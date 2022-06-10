@@ -453,7 +453,7 @@ export const enableCpDetection = (bool: boolean) => ({
   payload: bool,
 });
 
-export const applyCpDetection = (id, from, to, customChangePoints, detectAuto, detectIntervals) => dispatch => {
+export const applyCpDetection = (id, from, to, customChangePoints, detectIntervals) => dispatch => {
   const requestUrl = `api/tools/cp_detection/${id}`;
   dispatch({
     type: ACTION_TYPES.CHANGEPOINT_DETECTION,

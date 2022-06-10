@@ -109,7 +109,6 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 dataset.setFarmName(farm.getName());
                 dataset.setWashes(hasWashes(dataset.getId()));
                 //dataset.setWashes(null);
-
                 if (dataset.getTimeFormat() == null || dataset.getTimeFormat().isEmpty()) {
                     dataset.setTimeFormat(timeFormat);
                 }

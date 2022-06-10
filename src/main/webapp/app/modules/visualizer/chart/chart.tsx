@@ -111,6 +111,10 @@ export const Chart = (props: IChartProps) => {
   const [zones, setZones] = useState([]);
   const [plotBands, setPlotBands] = useState([]);
   const [type, setType] = useState("line");
+
+
+  const latestLeftSide = useRef(null);
+  const latestRightSide = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
   const latestFreq = useRef(resampleFreq);
@@ -157,9 +161,8 @@ export const Chart = (props: IChartProps) => {
   }, [detectedChangePoints]);
 
   useEffect(() => {
-
+    if(!cpDetectionEnabled) setPlotBands([]);
   }, [cpDetectionEnabled]);
-
 
   const getChartRef = (chart) => {
     props.updateChartRef(chart);
@@ -178,7 +181,16 @@ export const Chart = (props: IChartProps) => {
     latestFreq.current = resampleFreq;
   }, [compare, resampleFreq]);
 
-
+  const fetchData = (leftSide, rightSide) => {
+    props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestFreq.current, latestMeasures.current);
+    props.updateFrom(leftSide);
+    props.updateTo(rightSide);
+    if (latestCompare.current !== "") {
+      props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv', ""), leftSide, rightSide, latestMeasures.current);
+    }
+    latestLeftSide.current = leftSide;
+    latestRightSide.current = rightSide;
+  }
 
   const chartFuncts = (e) => {
 
@@ -201,7 +213,6 @@ export const Chart = (props: IChartProps) => {
       const step = (extremes.max - extremes.min) / 10;
 
       if (event.deltaY < 0) { // in
-        let x = chart.hoverPoint ? chart.hoverPoint.category : 0;
         xAxis.setExtremes(newMin + step, extremes.max - step, true, false)
       } else if (event.deltaY > 0) { // out
         xAxis.setExtremes(Math.max(newMin - step, queryResults.timeRange[0]),
@@ -216,56 +227,22 @@ export const Chart = (props: IChartProps) => {
       return {leftSide, rightSide};
     }
 
-    // setInterval(() => {
-    //   const currentExtremes = chart.xAxis[0].getExtremes();
-    //   const {dataMax, dataMin, max, min} = currentExtremes;
-
-    //     // Conditions for loading new data
-    //     if ((dataMax - max < 2 || min - dataMin < 2)) {
-    //       const {leftSide, rightSide} = getSides(max, min, 0.25);
-    //       props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestMeasures.current);
-    //       props.updateFrom(leftSide);
-    //       props.updateTo(rightSide);
-    //       if (latestCompare.current !== "") {
-    //         props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv', ""), leftSide, rightSide, latestMeasures.current);
-    //       }
-    //     }
-    //   }, 300);
-    //   // Set initial extremes
-    //   chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
-    // };
-  setInterval(() => {
-    const currentExtremes = chart.xAxis[0].getExtremes();
-    const {dataMax, dataMin, max, min} = currentExtremes;
-
-    // TODO: Generalize
-    if(latestFreq.current === 'minute') {
-      minFreqDate = new Date(queryResults.timeRange[0]).setSeconds(0,0);
-      maxFreqDate = new Date(queryResults.timeRange[1]).setSeconds(0,0);
-    }else if (latestFreq.current === 'hour') {
-      minFreqDate = new Date(queryResults.timeRange[0]).setMinutes(0,0,0);
-      maxFreqDate = new Date(queryResults.timeRange[1]).setMinutes(0,0,0);
-    }else{
-      minFreqDate = queryResults.timeRange[0];
-      maxFreqDate = queryResults.timeRange[1];
-    }
-
-    // Conditions for loading new data
-    if ((dataMax - max < 2 && dataMax !== maxFreqDate) ||
-      (min - dataMin < 2 && dataMin !== minFreqDate)) {
-      const {leftSide, rightSide} = getSides(max, min, 0.25);
-      props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestFreq.current, latestMeasures.current);
-      props.updateFrom(leftSide);
-      props.updateTo(rightSide);
-      if (latestCompare.current !== "") {
-        props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv', ""), leftSide, rightSide, latestMeasures.current);
-      }
-    }}, 300);
-
-    // Set initial extremes
-    chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
-  };
-
+    setInterval(() => {
+        const currentExtremes = chart.xAxis[0].getExtremes();
+        const {dataMax, dataMin, max, min} = currentExtremes;
+        // Conditions for loading new data
+        if ((dataMax - max < 2  || min - dataMin < 2)) {
+          const {leftSide, rightSide} = getSides(max, min, 0.25);
+          latestLeftSide.current = latestLeftSide.current === null ? leftSide : latestLeftSide.current;
+          latestRightSide.current = latestRightSide.current === null ? rightSide : latestRightSide.current;
+          if ((leftSide !== latestLeftSide.current || rightSide != latestRightSide.current)) {
+            fetchData(leftSide, rightSide);
+          }
+        }
+      }, 300);
+      // Set initial extremes
+      chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
+    };
 
   return (
     <Grid
