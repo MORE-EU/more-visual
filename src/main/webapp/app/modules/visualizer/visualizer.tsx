@@ -141,8 +141,8 @@ export const Visualizer = (props: IVisualizerProps) => {
 
           }}>
             <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures} filters={filters}
-                            updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
-                            resampleFreq={props.resampleFreq} patterns={props.patterns} changeChart={changeChart}
+                            updateQueryResults={props.updateQueryResults} from={from} to={to}
+                            resampleFreq={resampleFreq} updateResampleFreq ={props.updateResampleFreq} patterns={patterns} changeChart={changeChart}
                             folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}
                             graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}
                             customChangePoints={customChangePoints} cpDetectionEnabled={cpDetectionEnabled}

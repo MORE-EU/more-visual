@@ -11,6 +11,7 @@ import {
   updateCustomChangePoints,
   updateFrom,
   updateQueryResults,
+  updateResampleFreq,
   updateTo,
 } from "../visualizer.reducer";
 import {IPatterns} from "app/shared/model/patterns.model";
@@ -73,6 +74,7 @@ export interface IChartProps {
   updateFrom: typeof updateFrom;
   updateTo: typeof updateTo;
   updateChartRef: typeof updateChartRef;
+  updateResampleFreq: typeof updateResampleFreq;
   compare: string;
 }
 
@@ -113,8 +115,6 @@ export const Chart = (props: IChartProps) => {
   const latestRightSide = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
-  const latestFreq = useRef(resampleFreq);
-
 
   useEffect(() => {
     let newZones = [];
@@ -174,12 +174,13 @@ export const Chart = (props: IChartProps) => {
 
   useEffect(() => {
     latestCompare.current = compare;
-    latestFreq.current = resampleFreq;
-  }, [compare, resampleFreq]);
+  }, [compare]);
 
   const fetchData = (chart, leftSide, rightSide) => {
     chart.showLoading();
-    props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestFreq.current, latestMeasures.current);
+    const chartFrequency = chart.series[0].currentDataGrouping ? chart.series[0].currentDataGrouping.unitName : resampleFreq;
+    props.updateResampleFreq(chartFrequency);
+    props.updateQueryResults(folder, dataset.id, leftSide, rightSide, chartFrequency, latestMeasures.current);
     props.updateFrom(leftSide);
     props.updateTo(rightSide);
     if (latestCompare.current !== "") {
@@ -188,13 +189,13 @@ export const Chart = (props: IChartProps) => {
     latestLeftSide.current = leftSide;
     latestRightSide.current = rightSide;
     chart.hideLoading();
+
   }
 
 
   const chartFuncts = (e) => {
 
     const chart = e.target;
-
     // CHART: INSTRUCTIONS
     chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
     Highcharts.addEvent(chart.container, "click", (event: MouseEvent) => {

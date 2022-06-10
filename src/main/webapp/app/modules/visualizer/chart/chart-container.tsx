@@ -13,7 +13,8 @@ import {
   updateFrom,
   updateGraphZoom,
   updateQueryResults,
-  updateTo
+  updateTo,
+  updateResampleFreq,
 } from '../visualizer.reducer';
 import Chart from './chart';
 import {ChartControl} from './chart-control';
@@ -48,6 +49,7 @@ export interface IChartContainerProps {
   updateGraphZoom: typeof updateGraphZoom;
   updateActiveTool: typeof updateActiveTool;
   updateCompareQueryResults: typeof updateCompareQueryResults;
+  updateResampleFreq: typeof updateResampleFreq;
   updateFrom: typeof updateFrom;
   updateTo: typeof updateTo;
   updateChartRef: typeof updateChartRef;
@@ -92,6 +94,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
         to={to}
         filters={filters}
         resampleFreq={props.resampleFreq}
+        updateResampleFreq = {props.updateResampleFreq}
         patterns={props.patterns}
         changeChart={changeChart}
         folder={folder}
