@@ -1,5 +1,5 @@
 import "../visualizer.scss";
-import React, {Dispatch, SetStateAction, useEffect, useRef, useState} from "react";
+import React, {Dispatch, SetStateAction, useEffect, useRef, useState, useCallback} from "react";
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
@@ -17,13 +17,16 @@ import {
 import {IPatterns} from "app/shared/model/patterns.model";
 import {Grid} from "@mui/material";
 import annotationsAdvanced from "highcharts/modules/annotations-advanced";
-import priceIndicator from "highcharts/modules/price-indicator";
 import stockTools from "highcharts/modules/stock-tools";
 import {useScrollBlock} from "app/shared/util/useScrollBlock";
 import {IChangePointDate} from "app/shared/model/changepoint-date.model";
 import {IDataPoint} from "app/shared/model/data-point.model";
 import {IQueryResults} from "app/shared/model/query-results.model";
 import {ITimeRange} from "app/shared/model/time-range.model";
+import {Simulate} from "react-dom/test-utils";
+import _debounce from "lodash/debounce";
+
+import load = Simulate.load;
 
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
@@ -50,6 +53,7 @@ Highcharts.setOptions({
 export interface IChartProps {
   dataset: IDataset;
   loading: boolean;
+  queryResultsLoading: boolean;
   queryResults: IQueryResults;
   data: IDataPoint[];
   compareData: any[];
@@ -103,6 +107,7 @@ export const Chart = (props: IChartProps) => {
     compare,
     compareData,
     queryResults,
+    queryResultsLoading,
     loading,
   } = props;
 
@@ -113,7 +118,7 @@ export const Chart = (props: IChartProps) => {
   const [type, setType] = useState("line");
 
 
-  const latestLoading = useRef(loading);
+  const latestLoading = useRef(queryResultsLoading);
   const latestLeftSide = useRef(null);
   const latestRightSide = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
@@ -168,8 +173,8 @@ export const Chart = (props: IChartProps) => {
   }
 
   useEffect(() => {
-    latestLoading.current = loading;
-  }, [loading])
+    latestLoading.current = queryResultsLoading;
+  }, [queryResultsLoading])
 
   useEffect(() => {
     latestMeasures.current = selectedMeasures;
@@ -185,9 +190,7 @@ export const Chart = (props: IChartProps) => {
 
   const fetchData = (chart, leftSide, rightSide) => {
     chart.showLoading();
-    const chartFrequency = chart.series[0].currentDataGrouping ? chart.series[0].currentDataGrouping.unitName : resampleFreq;
-    props.updateResampleFreq(chartFrequency);
-    props.updateQueryResults(folder, dataset.id, leftSide, rightSide, chartFrequency, latestMeasures.current);
+    props.updateQueryResults(folder, dataset.id, leftSide, rightSide, resampleFreq, latestMeasures.current);
     props.updateFrom(leftSide);
     props.updateTo(rightSide);
     if (latestCompare.current !== "") {
@@ -195,9 +198,10 @@ export const Chart = (props: IChartProps) => {
     }
     latestLeftSide.current = leftSide;
     latestRightSide.current = rightSide;
-    !latestLoading.current && chart.hideLoading();
+    latestLoading.current && chart.hideLoading();
   }
 
+  const debounceFetchData = _debounce(fetchData, 500);
 
   const chartFuncts = (e) => {
 
@@ -224,7 +228,7 @@ export const Chart = (props: IChartProps) => {
         latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
         latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
         if ((leftSide !== latestLeftSide.current || rightSide !== latestRightSide.current)) {
-          fetchData(chart, leftSide, rightSide);
+          debounceFetchData(chart, leftSide, rightSide);
         }
       }
     }
@@ -234,10 +238,9 @@ export const Chart = (props: IChartProps) => {
       const xAxis = chart.xAxis[0],
         extremes = xAxis.getExtremes(),
         newMin = extremes.min;
-      const step = (extremes.max - extremes.min) / 10;
-
+      const step = (extremes.max - extremes.min) / 100;
       if (event.deltaY < 0) { // in
-        xAxis.setExtremes(newMin + step, extremes.max - step, true, false)
+        xAxis.setExtremes( newMin + step, extremes.max - step, true, false)
       } else if (event.deltaY > 0) { // out
         xAxis.setExtremes(Math.max(newMin - step, queryResults.timeRange[0]),
           Math.min(Math.max(extremes.max + step, extremes.max), queryResults.timeRange[1]), true, false)
@@ -250,6 +253,7 @@ export const Chart = (props: IChartProps) => {
       proceed.apply(this, [].slice.call(arguments, 1));
       checkForData();
     });
+
     // Set initial extremes
     chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
     };
@@ -259,6 +263,7 @@ export const Chart = (props: IChartProps) => {
       sx={{border: "1px solid rgba(0, 0, 0, .1)"}}
       onMouseOver={() => blockScroll()}
       onMouseLeave={() => allowScroll()}
+
     >
       {data && (
         <HighchartsReact

@@ -25,6 +25,7 @@ import {IQueryResults} from 'app/shared/model/query-results.model';
 export interface IChartContainerProps {
   dataset: IDataset;
   loading: boolean;
+  queryResultsLoading: boolean;
   queryResults: IQueryResults;
   wdFiles: any[];
   data: IDataPoint[];
@@ -62,7 +63,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
     dataset, data, selectedMeasures, from, to, filters,
     wdFiles, changeChart, folder, graphZoom, customChangePoints,
     detectedChangePoints, cpDetectionEnabled,  resampleFreq, chartRef,
-    queryResults, compare, compareData, loading,
+    queryResults, compare, compareData, loading, queryResultsLoading,
   } = props;
 
   const [showDatePick, setShowDatePick] = useState(false);
@@ -94,6 +95,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
         from={from}
         to={to}
         loading={loading}
+        queryResultsLoading={queryResultsLoading}
         filters={filters}
         resampleFreq={props.resampleFreq}
         updateResampleFreq = {props.updateResampleFreq}

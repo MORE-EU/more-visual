@@ -151,7 +151,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                             updateCompare={props.updateCompare} chartRef={chartRef} updateChartRef={props.updateChartRef}
                             compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}
                             updateFrom={props.updateFrom} updateTo={props.updateTo} queryResults={queryResults}
-                            loading={loading}/>
+                            loading={loading} queryResultsLoading={queryResultsLoading}/>
           </Paper>
         </Box>
         <Toolkit
