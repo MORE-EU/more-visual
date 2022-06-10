@@ -52,7 +52,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     resampleFreq, patterns, graphZoom, customChangePoints,
     detectedChangePoints, activeTool, compare, filters, compareData,
     queryResultsLoading, from, to, cpDetectionEnabled, chartRef,
-  } = props; 
+  } = props;
   const [open, setOpen] = React.useState(false);
 
   if (props.match.params.id === undefined) {

@@ -15,7 +15,6 @@ import {
 } from "../visualizer.reducer";
 import {IPatterns} from "app/shared/model/patterns.model";
 import {Grid} from "@mui/material";
-import indicatorsAll from "highcharts/indicators/indicators-all";
 import annotationsAdvanced from "highcharts/modules/annotations-advanced";
 import priceIndicator from "highcharts/modules/price-indicator";
 import stockTools from "highcharts/modules/stock-tools";
@@ -54,8 +53,8 @@ export interface IChartProps {
   compareData: any[];
   updateQueryResults: typeof updateQueryResults;
   selectedMeasures: number[];
-  from: Date;
-  to: Date;
+  from: number;
+  to: number;
   resampleFreq: string;
   patterns: IPatterns;
   changeChart: boolean;
@@ -80,10 +79,7 @@ export interface IChartProps {
 // TODO: FIX FULLSCREEN
 
 stockTools(Highcharts);
-indicatorsAll(Highcharts);
 annotationsAdvanced(Highcharts);
-priceIndicator(Highcharts);
-// fullScreen(Highcharts);
 
 export const Chart = (props: IChartProps) => {
   const {
@@ -181,7 +177,8 @@ export const Chart = (props: IChartProps) => {
     latestFreq.current = resampleFreq;
   }, [compare, resampleFreq]);
 
-  const fetchData = (leftSide, rightSide) => {
+  const fetchData = (chart, leftSide, rightSide) => {
+    chart.showLoading();
     props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestFreq.current, latestMeasures.current);
     props.updateFrom(leftSide);
     props.updateTo(rightSide);
@@ -190,20 +187,40 @@ export const Chart = (props: IChartProps) => {
     }
     latestLeftSide.current = leftSide;
     latestRightSide.current = rightSide;
+    chart.hideLoading();
   }
+
 
   const chartFuncts = (e) => {
 
     const chart = e.target;
 
-
-    let maxFreqDate: number, minFreqDate: number;
     // CHART: INSTRUCTIONS
     chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
     Highcharts.addEvent(chart.container, "click", (event: MouseEvent) => {
       chart.hideLoading();
     });
 
+    const getSides = (max, min, p) => {
+      const pad = (max - min) + ((max - min) * p);
+      const leftSide = Math.max(Math.min(min - pad, (queryResults.timeRange[0] + min - pad)), queryResults.timeRange[0]);
+      const rightSide = Math.min(max + pad, queryResults.timeRange[1]);
+      return {leftSide, rightSide};
+    }
+
+    const checkForData = () => {
+      const currentExtremes = chart.xAxis[0].getExtremes();
+      const {dataMax, dataMin, max, min} = currentExtremes;
+      // Conditions for loading new data
+      if ((dataMax - max < 2 || min - dataMin < 2)) {
+        const {leftSide, rightSide} = getSides(max, min, 0.25);
+        latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
+        latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
+        if ((leftSide !== latestLeftSide.current || rightSide !== latestRightSide.current)) {
+          fetchData(chart, leftSide, rightSide);
+        }
+      }
+    }
 
     // CHART: ZOOM FUNCTION
     Highcharts.addEvent(chart.container, "wheel", (event: WheelEvent) => {
@@ -218,30 +235,16 @@ export const Chart = (props: IChartProps) => {
         xAxis.setExtremes(Math.max(newMin - step, queryResults.timeRange[0]),
           Math.min(Math.max(extremes.max + step, extremes.max), queryResults.timeRange[1]), true, false)
       }
+      checkForData();
     });
 
-    const getSides = (max, min, p) => {
-      const pad = (max - min) + ((max - min) * p);
-      const leftSide = Math.max(Math.min(min - pad, (queryResults.timeRange[0] + min - pad)), queryResults.timeRange[0]);
-      const rightSide = Math.min(max + pad, queryResults.timeRange[1]);
-      return {leftSide, rightSide};
-    }
-
-    setInterval(() => {
-        const currentExtremes = chart.xAxis[0].getExtremes();
-        const {dataMax, dataMin, max, min} = currentExtremes;
-        // Conditions for loading new data
-        if ((dataMax - max < 2  || min - dataMin < 2)) {
-          const {leftSide, rightSide} = getSides(max, min, 0.25);
-          latestLeftSide.current = latestLeftSide.current === null ? leftSide : latestLeftSide.current;
-          latestRightSide.current = latestRightSide.current === null ? rightSide : latestRightSide.current;
-          if ((leftSide !== latestLeftSide.current || rightSide != latestRightSide.current)) {
-            fetchData(leftSide, rightSide);
-          }
-        }
-      }, 300);
-      // Set initial extremes
-      chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
+    // CHART: PAN FUNCTION
+    Highcharts.wrap(Highcharts.Chart.prototype, "pan", function (proceed) {
+      proceed.apply(this, [].slice.call(arguments, 1));
+      checkForData();
+    });
+    // Set initial extremes
+    chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
     };
 
   return (
@@ -454,7 +457,6 @@ export const Chart = (props: IChartProps) => {
                 //   'separator', 'compareFiles', 'fullScreen',],
                 buttons: [
                   "changeType",
-                  "indicators",
                   "verticalLabels",
                   "highlightIntervals",
                   "compareFiles",

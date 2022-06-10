@@ -28,8 +28,8 @@ export interface IChartContainerProps {
   data: IDataPoint[];
   compareData: any[];
   selectedMeasures: number[];
-  from: Date;
-  to: Date;
+  from: number;
+  to: number;
   filters: any;
   resampleFreq: string;
   patterns: IPatterns;

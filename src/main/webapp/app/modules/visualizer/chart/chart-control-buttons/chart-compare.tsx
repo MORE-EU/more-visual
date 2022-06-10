@@ -7,8 +7,8 @@ import {IDataset} from 'app/shared/model/dataset.model';
 export interface IChartCompareProps {
   dataset: IDataset;
   showCompare: boolean;
-  from: Date;
-  to: Date;
+  from: number;
+  to: number;
   wdFiles: any[];
   compare: string;
   folder: string;

@@ -8,8 +8,8 @@ import {updateActiveTool, updateCustomChangePoints} from '../../visualizer.reduc
 import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface IChartDatePickerProps {
-  from: Date;
-  to: Date;
+  from: number;
+  to: number;
   showDatePick: boolean;
   setShowDatePick?: Dispatch<SetStateAction<any>>;
   customChangePoints: IChangePointDate[];

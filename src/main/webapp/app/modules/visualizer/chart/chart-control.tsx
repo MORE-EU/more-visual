@@ -22,8 +22,8 @@ import Highcharts from 'highcharts';
 
 interface IChartControlProps {
   dataset: IDataset,
-  from: Date,
-  to: Date,
+  from: number,
+  to: number,
   wdFiles: any[],
   updateChangeChart: typeof updateChangeChart,
   updateGraphZoom: typeof updateGraphZoom,
@@ -59,23 +59,16 @@ export const ChartControl = (props: IChartControlProps) => {
     showCompare, showChangePointFunction, folder, selectedMeasures, dataset, resampleFreq, queryResults
   } = props;
 
-  // const handleZoom = (zoomNum) => {
-  //   props.updateGraphZoom(zoomNum)
-  // }
-
-  // const [timeBut, setTimeBut] = useState(4);
-
   const handleOnAccept = (e, category) => {
     if(category === "from"){
-    props.updateQueryResults(folder, dataset.id, e.getTime(), to.getTime(), resampleFreq, selectedMeasures);
-    chartRef.xAxis[0].setExtremes(e.getTime()+200, to.getTime()-200);
+      chartRef.xAxis[0].setExtremes(e.getTime() + 200, to - 200);
+      props.updateQueryResults(folder, dataset.id, e.getTime(), to, resampleFreq, selectedMeasures);
     }else{
-    props.updateQueryResults(folder, dataset.id, from.getTime(), e.getTime(), resampleFreq, selectedMeasures);
-    chartRef.xAxis[0].setExtremes(from.getTime()+200, e.getTime()-200);
+      chartRef.xAxis[0].setExtremes(from + 200, e.getTime() - 200);
+      props.updateQueryResults(folder, dataset.id, from, e.getTime(), resampleFreq, selectedMeasures);
     }
-    
   }
- 
+
   return (
     <Grid container direction="row" sx={{mb: 1}}>
       <Grid item alignItems="center" sx={{display: "flex", flexGrow: 1, flexDirection: "row"}}>

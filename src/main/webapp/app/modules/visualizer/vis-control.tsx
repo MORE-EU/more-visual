@@ -23,8 +23,8 @@ import {Link} from "react-router-dom";
 export interface IVisControlProps {
   dataset: IDataset,
   selectedMeasures: number[],
-  from: Date,
-  to: Date,
+  from: number,
+  to: number,
   queryResults: IQueryResults,
   resampleFreq: string,
   wdFiles: any[],

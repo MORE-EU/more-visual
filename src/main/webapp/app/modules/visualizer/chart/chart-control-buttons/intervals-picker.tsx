@@ -8,8 +8,8 @@ import {IChangePointDate} from "app/shared/model/changepoint-date.model";
 import {updateActiveTool, updateCustomChangePoints} from "app/modules/visualizer/visualizer.reducer";
 
 interface IIntervalsPickerProps {
-  from: Date,
-  to: Date,
+  from: number,
+  to: number,
   customChangePoints: IChangePointDate[],
   updateCustomChangePoints: typeof updateCustomChangePoints,
   setOpen: Dispatch<SetStateAction<boolean>>,
