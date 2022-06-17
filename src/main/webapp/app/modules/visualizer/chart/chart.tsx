@@ -255,7 +255,7 @@ export const Chart = (props: IChartProps) => {
       else if(diff.includes("hour")){
         return "minute";
       }
-      else if(diff.includes("minute")){
+      else if(diff.includes("minute") || diff.includes("second")){
         return "second";
       }
       return "minute";
