@@ -24,7 +24,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
     props.enableCpDetection(action);
     if(action)
       props.applyCpDetection(dataset.id, from, to,
-        customChangePoints, detectIntervals);
+        customChangePoints);
   }
 
   return (

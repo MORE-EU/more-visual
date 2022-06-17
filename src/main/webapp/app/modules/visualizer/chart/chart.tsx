@@ -1,10 +1,11 @@
 import "../visualizer.scss";
-import React, {Dispatch, SetStateAction, useEffect, useRef, useState, useCallback} from "react";
+import React, {Dispatch, SetStateAction, useEffect, useRef, useState} from "react";
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
 import {IDataset} from "app/shared/model/dataset.model";
 import {
+  applyCpDetection,
   updateActiveTool,
   updateChartRef,
   updateCompareQueryResults,
@@ -23,11 +24,8 @@ import {IChangePointDate} from "app/shared/model/changepoint-date.model";
 import {IDataPoint} from "app/shared/model/data-point.model";
 import {IQueryResults} from "app/shared/model/query-results.model";
 import {ITimeRange} from "app/shared/model/time-range.model";
-import {Simulate} from "react-dom/test-utils";
 import _debounce from "lodash/debounce";
-
-import load = Simulate.load;
-
+import moment from "moment";
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
   time: {
@@ -71,6 +69,7 @@ export interface IChartProps {
   detectedChangePoints: IChangePointDate[];
   cpDetectionEnabled: boolean;
   updateCustomChangePoints: typeof updateCustomChangePoints;
+  applyCpDetection: typeof applyCpDetection;
   updateActiveTool: typeof updateActiveTool;
   setShowDatePick: Dispatch<SetStateAction<boolean>>;
   setShowChangePointFunction: Dispatch<SetStateAction<boolean>>;
@@ -117,21 +116,24 @@ export const Chart = (props: IChartProps) => {
   const [plotBands, setPlotBands] = useState([]);
   const [type, setType] = useState("line");
 
-
+  // Refs
+  const latestFrequency = useRef(resampleFreq);
   const latestLoading = useRef(queryResultsLoading);
   const latestLeftSide = useRef(null);
   const latestRightSide = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
+  const isCpDetectionEnabled = useRef(cpDetectionEnabled);
 
+
+  // Color Zones For Patterns
   useEffect(() => {
-    let newZones = [];
-    newZones =
+  const newZones =
       patterns !== null &&
       []
         .concat(
           ...patterns.patternGroups.map((patternGroup) => {
-            const zone = [].concat(
+            return [].concat(
               ...patternGroup.patterns.map((pattern) => {
                 return [
                   {value: pattern.start},
@@ -139,22 +141,17 @@ export const Chart = (props: IChartProps) => {
                 ];
               })
             );
-            return zone;
           })
         )
         .sort((a, b) => a.value.getTime() - b.value.getTime());
     setZones(newZones);
   }, [patterns]);
 
-  const annotationToDate = (annotation, len) => {
-    const startPoint = annotation.startXMin,
-      endPoint = annotation.startXMax;
-    return {range: {from: startPoint, to: endPoint} as ITimeRange, id: len};
-  };
 
+
+  // Color Bands for Change-points
   useEffect(() => {
-    let newPlotBands = [];
-    newPlotBands = (detectedChangePoints !== null && [].concat(...detectedChangePoints.map(date => {
+    const newPlotBands = (detectedChangePoints !== null && [].concat(...detectedChangePoints.map(date => {
       return {
         color: '#1e90ff',
         from: date.range.from,
@@ -164,13 +161,12 @@ export const Chart = (props: IChartProps) => {
     setPlotBands(newPlotBands);
   }, [detectedChangePoints]);
 
+
   useEffect(() => {
+    isCpDetectionEnabled.current = cpDetectionEnabled;
     if(!cpDetectionEnabled) setPlotBands([]);
   }, [cpDetectionEnabled]);
 
-  const getChartRef = (chart) => {
-    props.updateChartRef(chart);
-  }
 
   useEffect(() => {
     latestLoading.current = queryResultsLoading;
@@ -188,29 +184,41 @@ export const Chart = (props: IChartProps) => {
     latestCompare.current = compare;
   }, [compare]);
 
-  const fetchData = (chart, leftSide, rightSide) => {
-    chart.showLoading();
-    props.updateQueryResults(folder, dataset.id, leftSide, rightSide, resampleFreq, latestMeasures.current);
-    props.updateFrom(leftSide);
-    props.updateTo(rightSide);
-    if (latestCompare.current !== "") {
-      props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv', ""), leftSide, rightSide, latestMeasures.current);
-    }
-    latestLeftSide.current = leftSide;
-    latestRightSide.current = rightSide;
-    latestLoading.current && chart.hideLoading();
-  }
+  const getChartRef = (chart) => {
+    props.updateChartRef(chart);
+  };
 
-  const debounceFetchData = _debounce(fetchData, 500);
+  const annotationToDate = (annotation, len) => {
+    const startPoint = annotation.startXMin,
+      endPoint = annotation.startXMax;
+    return {range: {from: startPoint, to: endPoint} as ITimeRange, id: len};
+  };
 
-  const chartFuncts = (e) => {
+  const chartFunctions = (e) => {
 
     const chart = e.target;
+
     // CHART: INSTRUCTIONS
     chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
     Highcharts.addEvent(chart.container, "click", (event: MouseEvent) => {
       chart.hideLoading();
     });
+
+    const fetchData = (leftSide, rightSide) => {
+      chart.showLoading();
+      props.updateQueryResults(folder, dataset.id, leftSide, rightSide, resampleFreq, latestMeasures.current);
+      props.updateFrom(leftSide);
+      props.updateTo(rightSide);
+      if (latestCompare.current !== "") {
+        props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv', ""), leftSide, rightSide, latestMeasures.current);
+      }
+      latestLeftSide.current = leftSide;
+      latestRightSide.current = rightSide;
+      if(isCpDetectionEnabled.current) props.applyCpDetection(dataset.id, leftSide, rightSide, customChangePoints);
+      latestLoading.current && chart.hideLoading();
+    };
+
+    const debounceFetchData = _debounce(fetchData, 500);
 
     const getSides = (max, min, p) => {
       const pad = (max - min) + ((max - min) * p);
@@ -228,7 +236,42 @@ export const Chart = (props: IChartProps) => {
         latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
         latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
         if ((leftSide !== latestLeftSide.current || rightSide !== latestRightSide.current)) {
-          debounceFetchData(chart, leftSide, rightSide);
+          debounceFetchData(leftSide, rightSide);
+        }
+      }
+    }
+
+    const getDateDiff = (max, min) => {
+      return moment.duration(max.diff(min)).humanize();
+    }
+
+    const calculateFreqFromDiff = (diff : string) => {
+      if (diff.includes("month") || diff.includes("day")){
+        return "hour";
+      }
+      else if(diff.includes("hour")){
+        return "minute";
+      }
+      else if(diff.includes("minute")){
+        return "second";
+      }
+      return "minute";
+    }
+
+    const checkForDataOnZoom = () => {
+      const {dataMax, dataMin, max, min} = chart.xAxis[0].getExtremes();
+      const diff = getDateDiff(moment(max), moment(min));
+      const newFreq = calculateFreqFromDiff(diff);
+      console.log(newFreq, latestFrequency.current);
+      if((newFreq !== latestFrequency.current) ||
+        (dataMax - max < 2 || min - dataMin < 2)) {
+        latestFrequency.current = newFreq;
+        props.updateResampleFreq(newFreq);
+        const {leftSide, rightSide} = getSides(max, min, 0.25);
+        latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
+        latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
+        if ((leftSide !== latestLeftSide.current || rightSide !== latestRightSide.current)) {
+          debounceFetchData(leftSide, rightSide);
         }
       }
     }
@@ -238,14 +281,15 @@ export const Chart = (props: IChartProps) => {
       const xAxis = chart.xAxis[0],
         extremes = xAxis.getExtremes(),
         newMin = extremes.min;
-      const step = (extremes.max - extremes.min) / 100;
+      const {dataMax, dataMin, max, min} = extremes;
+      const step = (max - min) / 10;
       if (event.deltaY < 0) { // in
-        xAxis.setExtremes( newMin + step, extremes.max - step, true, false)
+        xAxis.setExtremes( newMin + step, max - step, true, false);
       } else if (event.deltaY > 0) { // out
         xAxis.setExtremes(Math.max(newMin - step, queryResults.timeRange[0]),
-          Math.min(Math.max(extremes.max + step, extremes.max), queryResults.timeRange[1]), true, false)
+          Math.min(Math.max(max + step, max), queryResults.timeRange[1]), true, false)
       }
-      checkForData();
+      checkForDataOnZoom();
     });
 
     // CHART: PAN FUNCTION
@@ -392,7 +436,7 @@ export const Chart = (props: IChartProps) => {
               },
               zoomType: false,
               events: {
-                load: chartFuncts
+                load: chartFunctions
               },
             },
             xAxis: {
@@ -457,7 +501,7 @@ export const Chart = (props: IChartProps) => {
             },
             colorAxis: null,
             legend: {
-              enabled: changeChart ? false : true,
+              enabled: !changeChart,
             },
             credits: {
               enabled: false,

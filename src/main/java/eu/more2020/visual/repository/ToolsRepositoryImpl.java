@@ -102,14 +102,16 @@ public class ToolsRepositoryImpl implements ToolsRepository {
             in.close();
             JsonNode responseObject = objectMapper.readTree(content.toString());
             JsonNode scores = responseObject.get("Score");
-            JsonNode starts = responseObject.get("Starting date");
-            JsonNode ends = responseObject.get("Ending date");
-            Integer noOfIntervals = scores.size();
+            JsonNode starts = responseObject.get("Starting_date");
+            JsonNode ends = responseObject.get("Ending_date");
+            Integer noOfIntervals = starts.size();
             List<Changepoint> detectedChangepoints = new ArrayList<>();
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
+//                detectedChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
+//                    LocalDateTime.parse(ends.get(ii).asText(), formatter)), scores.get(ii).asDouble()));
                 detectedChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
-                    LocalDateTime.parse(ends.get(ii).asText(), formatter)), scores.get(ii).asDouble()));
+                    LocalDateTime.parse(ends.get(ii).asText(), formatter)), 0.0));
             }
             return detectedChangepoints;
         } catch (Exception e) {

@@ -453,13 +453,13 @@ export const enableCpDetection = (bool: boolean) => ({
   payload: bool,
 });
 
-export const applyCpDetection = (id, from, to, customChangePoints, detectIntervals) => dispatch => {
+export const applyCpDetection = (id, from, to, customChangePoints) => dispatch => {
   const requestUrl = `api/tools/cp_detection/${id}`;
   dispatch({
     type: ACTION_TYPES.CHANGEPOINT_DETECTION,
     payload: axios.post(requestUrl, {
       range: { from, to } as ITimeRange,
-      changepoints: detectIntervals ? customChangePoints : null,
+      changepoints: customChangePoints,
     }),
   });
 };

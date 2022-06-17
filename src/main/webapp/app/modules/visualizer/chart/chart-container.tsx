@@ -15,6 +15,7 @@ import {
   updateQueryResults,
   updateTo,
   updateResampleFreq,
+  applyCpDetection,
 } from '../visualizer.reducer';
 import Chart from './chart';
 import {ChartControl} from './chart-control';
@@ -42,6 +43,7 @@ export interface IChartContainerProps {
   customChangePoints: IChangePointDate[];
   detectedChangePoints: IChangePointDate[];
   cpDetectionEnabled: boolean;
+  applyCpDetection: typeof applyCpDetection;
   compare: string;
   chartRef: any;
   updateCompare: typeof updateCompare;
@@ -107,6 +109,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
         customChangePoints={customChangePoints}
         detectedChangePoints={detectedChangePoints}
         cpDetectionEnabled={cpDetectionEnabled}
+        applyCpDetection={props.applyCpDetection}
         updateCustomChangePoints={props.updateCustomChangePoints}
         updateActiveTool={props.updateActiveTool}
         setCompare={setCompare}

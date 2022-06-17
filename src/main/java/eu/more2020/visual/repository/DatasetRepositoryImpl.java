@@ -109,8 +109,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 dataset.setFarmName(farm.getName());
                 dataset.setWashes(false);
                 if (farm.getType().contains("Solar"))
-                    // dataset.setWashes(hasWashes(dataset.getId()));
-                    dataset.setWashes(null);
+                    dataset.setWashes(hasWashes(dataset.getId()));
+                    //dataset.setWashes(null);
 
                 if (dataset.getTimeFormat() == null || dataset.getTimeFormat().isEmpty()) {
                     dataset.setTimeFormat(timeFormat);
