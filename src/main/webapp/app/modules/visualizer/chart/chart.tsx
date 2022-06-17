@@ -227,17 +227,20 @@ export const Chart = (props: IChartProps) => {
       return {leftSide, rightSide};
     }
 
+    const checkForData = (max, min) => {
+      const {leftSide, rightSide} = getSides(max, min, 0.25);
+      latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
+      latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
+      if ((leftSide !== latestLeftSide.current || rightSide !== latestRightSide.current)) {
+        debounceFetchData(leftSide, rightSide);
+      }
+    }
     const checkForDataOnPan = () => {
       const currentExtremes = chart.xAxis[0].getExtremes();
       const {dataMax, dataMin, max, min} = currentExtremes;
       // Conditions for loading new data
       if ((dataMax - max < 2 || min - dataMin < 2)) {
-        const {leftSide, rightSide} = getSides(max, min, 0.25);
-        latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
-        latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
-        if ((leftSide !== latestLeftSide.current || rightSide !== latestRightSide.current)) {
-          debounceFetchData(leftSide, rightSide);
-        }
+        checkForData(max, min);
       }
     }
 
@@ -267,12 +270,7 @@ export const Chart = (props: IChartProps) => {
         (dataMax - max < 2 || min - dataMin < 2)) {
         latestFrequency.current = newFreq;
         props.updateResampleFreq(newFreq);
-        const {leftSide, rightSide} = getSides(max, min, 0.25);
-        latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
-        latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
-        if ((leftSide !== latestLeftSide.current || rightSide !== latestRightSide.current)) {
-          debounceFetchData(leftSide, rightSide);
-        }
+        checkForData(max, min);
       }
     }
 
