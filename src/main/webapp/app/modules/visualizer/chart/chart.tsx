@@ -227,7 +227,7 @@ export const Chart = (props: IChartProps) => {
       return {leftSide, rightSide};
     }
 
-    const checkForData = () => {
+    const checkForDataOnPan = () => {
       const currentExtremes = chart.xAxis[0].getExtremes();
       const {dataMax, dataMin, max, min} = currentExtremes;
       // Conditions for loading new data
@@ -295,7 +295,7 @@ export const Chart = (props: IChartProps) => {
     // CHART: PAN FUNCTION
     Highcharts.wrap(Highcharts.Chart.prototype, "pan", function (proceed) {
       proceed.apply(this, [].slice.call(arguments, 1));
-      checkForData();
+      checkForDataOnPan();
     });
 
     // Set initial extremes
