@@ -106,6 +106,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
         folder={folder}
         graphZoom={graphZoom}
         compare={compare}
+        chartRef={chartRef}
         customChangePoints={customChangePoints}
         detectedChangePoints={detectedChangePoints}
         cpDetectionEnabled={cpDetectionEnabled}

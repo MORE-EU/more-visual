@@ -54,7 +54,7 @@ const initialState = {
   to: null as number,
   filters: {},
   patterns: null,
-  changeChart: false,
+  changeChart: true,
   datasetChoice: 0,
   wdFiles: [],
   patternNav: '0',
