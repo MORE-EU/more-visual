@@ -206,7 +206,7 @@ export const Chart = (props: IChartProps) => {
 
     const fetchData = (leftSide, rightSide) => {
       chart.showLoading();
-      props.updateQueryResults(folder, dataset.id, leftSide, rightSide, resampleFreq, latestMeasures.current);
+      props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestFrequency.current, latestMeasures.current);
       props.updateFrom(leftSide);
       props.updateTo(rightSide);
       if (latestCompare.current !== "") {
