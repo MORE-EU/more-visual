@@ -3,8 +3,10 @@ import {Box, Button, FormControl, MenuItem, Paper, Select, Tooltip} from '@mui/m
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import Heatmap from 'highcharts/modules/heatmap.js';
-import {BarChart, ShowChart, TableChart} from '@material-ui/icons';
 import GridViewIcon from '@mui/icons-material/GridView';
+import BarChart from '@mui/icons-material/BarChart';
+import TableChart from '@mui/icons-material/BarChart';
+import ShowChart from '@mui/icons-material/BarChart';
 
 Heatmap(Highcharts);
 
