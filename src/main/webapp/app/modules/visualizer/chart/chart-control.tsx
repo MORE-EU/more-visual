@@ -88,14 +88,13 @@ export const ChartControl = (props: IChartControlProps) => {
         <Button variant="text" size="small" onClick={() => {
           setTimeBut(4), handleZoom(null)
         }} sx={{textTransform: "none", color: !(timeBut === 4) ? "#424242" : "#0277bd"}}>ALL</Button> */}
-        {from &&
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DateTimePicker
               renderInput={(p) => <TextField size="small" {...p} />}
               label="From"
-              value={from}
-              minDateTime={queryResults.timeRange[0]}
-              maxDateTime={queryResults.timeRange[1]}
+              value={from ? from : null}
+              minDateTime={queryResults ? queryResults.timeRange[0] : null}
+              maxDateTime={queryResults ? queryResults.timeRange[1] : null}
               onAccept={(e) => {handleOnAccept(e, "from")}}
               onChange={(e) => {}}
               />
@@ -103,13 +102,13 @@ export const ChartControl = (props: IChartControlProps) => {
             <DateTimePicker
               renderInput={(p) => <TextField size="small" {...p} />}
               label="To"
-              value={to}
-              minDateTime={queryResults.timeRange[0]}
-              maxDateTime={queryResults.timeRange[1]}
+              value={to ? to : null}
+              minDateTime={queryResults ? queryResults.timeRange[0] : null}
+              maxDateTime={queryResults ? queryResults.timeRange[1] : null}
               onAccept={(e) => {handleOnAccept(e, "to")}}
               onChange={(e) => {}}
             />
-          </LocalizationProvider>}
+          </LocalizationProvider>
       </Grid>
       <Grid item>
         <Button variant="text" size="small" onClick={() => {

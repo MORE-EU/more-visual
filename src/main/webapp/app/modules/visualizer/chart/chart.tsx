@@ -16,7 +16,7 @@ import {
   updateTo,
 } from "../visualizer.reducer";
 import {IPatterns} from "app/shared/model/patterns.model";
-import {Grid} from "@mui/material";
+import {Grid, LinearProgress, Typography} from "@mui/material";
 import annotationsAdvanced from "highcharts/modules/annotations-advanced";
 import stockTools from "highcharts/modules/stock-tools";
 import {useScrollBlock} from "app/shared/util/useScrollBlock";
@@ -198,7 +198,6 @@ export const Chart = (props: IChartProps) => {
   };
 
   const chartFunctions = (e) => {
-
     const chart = e.target;
 
     // CHART: INSTRUCTIONS
@@ -265,7 +264,6 @@ export const Chart = (props: IChartProps) => {
       const {dataMax, dataMin, max, min} = chart.xAxis[0].getExtremes();
       const diff = getDateDiff(moment(max), moment(min));
       const newFreq = calculateFreqFromDiff(diff);
-      console.log(newFreq, latestFrequency.current);
       if((newFreq !== latestFrequency.current) ||
          (max > dataMax && max !== queryResults.timeRange[1]) || 
          (min < dataMin && min !== queryResults.timeRange[0])) {
@@ -304,11 +302,13 @@ export const Chart = (props: IChartProps) => {
 
   return (
     <Grid
-      sx={{border: "1px solid rgba(0, 0, 0, .1)"}}
+      sx={{border: "1px solid rgba(0, 0, 0, .1)", minHeight: "700px"}}
       onMouseOver={() => blockScroll()}
       onMouseLeave={() => allowScroll()}
-
     >
+      {!data ?
+      <LinearProgress />
+    : <LinearProgress variant="determinate" color="success" value={100} className={"linear-prog-hide"}/>}
       {data && (
         <HighchartsReact
           highcharts={Highcharts}
@@ -403,10 +403,7 @@ export const Chart = (props: IChartProps) => {
                     selectedMeasures.map((measure, index) => ({
                       data: compareData.map((d) => {
                         const val = d.values[index];
-                        return [
-                          d.timestamp,
-                          isNaN(val) ? null : val,
-                        ];
+                        return [d.timestamp,isNaN(val) ? null : val,];
                       }),
                       name: dataset.header[measure] + " " + compare,
                       yAxis: changeChart ? index : 0,
