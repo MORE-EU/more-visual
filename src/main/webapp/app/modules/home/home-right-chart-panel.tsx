@@ -5,8 +5,8 @@ import HighchartsReact from 'highcharts-react-official';
 import Heatmap from 'highcharts/modules/heatmap.js';
 import GridViewIcon from '@mui/icons-material/GridView';
 import BarChart from '@mui/icons-material/BarChart';
-import TableChart from '@mui/icons-material/BarChart';
-import ShowChart from '@mui/icons-material/BarChart';
+import TableChart from '@mui/icons-material/TableChart';
+import ShowChart from '@mui/icons-material/ShowChart';
 
 Heatmap(Highcharts);
 
