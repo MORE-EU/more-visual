@@ -7,6 +7,8 @@ import { IQueryResults } from 'app/shared/model/query-results.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import _ from 'lodash';
+import { compareAsc } from 'date-fns';
+import { ResetTvSharp } from '@mui/icons-material';
 
 export const ACTION_TYPES = {
   FETCH_DATASET: 'visualizer/FETCH_DATASET',
@@ -38,6 +40,7 @@ export const ACTION_TYPES = {
   UPDATE_COMPARE: 'visualizer/UPDATE_COMPARE',
   CHANGEPOINT_DETECTION: 'visualizer/CHANGEPOINT_DETECTION',
   ENABLE_CP_DETECTION: 'visualizer/ENABLE_CP_DETECTION',
+  RESET_CHART_VALUES: 'visualizer/RESET_CHART_VALUES',
 };
 
 const initialState = {
@@ -65,7 +68,7 @@ const initialState = {
   cpDetectionEnabled: false,
   graphZoom: null,
   activeTool: -1,
-  compare: '',
+  compare: [],
   directories: [],
   chartRef: null,
 };
@@ -170,7 +173,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
       return {
         ...state,
         queryResultsLoading: false,
-        compareData: action.payload.data.data,
+        compareData: action.payload,
       };
     case SUCCESS(ACTION_TYPES.CHANGEPOINT_DETECTION):
       return {
@@ -260,7 +263,22 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
     case ACTION_TYPES.UPDATE_COMPARE:
       return {
         ...state,
-        compare: action.payload,
+        compare: !state.compare.includes(action.payload)
+          ? [...state.compare, action.payload]
+          : state.compare.filter(comp => comp !== action.payload),
+      };
+    case ACTION_TYPES.RESET_CHART_VALUES:
+      return {
+        ...state,
+        queryResultsLoading: initialState.queryResultsLoading,
+        queryResults: initialState.queryResults,
+        data: initialState.data,
+        from: initialState.from,
+        to: initialState.to,
+        resampleFreq: initialState.resampleFreq,
+        compareData: initialState.compareData,
+        compare: initialState.compare,
+        chartRef: initialState.chartRef,
       };
     default:
       return state;
@@ -313,18 +331,22 @@ export const updateQueryResults = (folder, id, fromDate, toDate, freq, selMeasur
   });
 };
 
-export const updateCompareQueryResults = (folder, id, fromDate, toDate, selMeasures) => (dispatch, getState) => {
+export const updateCompareQueryResults = (folder, id: any[], fromDate, toDate, freq, selMeasures) => (dispatch, getState) => {
   let query;
   fromDate !== null && toDate !== null
     ? (query = {
         range: { from: fromDate, to: toDate } as ITimeRange,
-        frequency: 'SECOND',
+        frequency: freq.toUpperCase(),
         measures: selMeasures,
       } as IQuery)
     : (query = defaultQuery);
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS,
-    payload: axios.post(`api/datasets/${folder}/${id}/query`, query),
+    payload: Promise.all(
+      id.map(name => {
+        return axios.post(`api/datasets/${folder}/${name}/query`, query).then(res => res.data);
+      })
+    ).then(res => res.map(r => r.data)),
   });
 };
 
@@ -463,3 +485,7 @@ export const applyCpDetection = (id, from, to, customChangePoints) => dispatch =
     }),
   });
 };
+
+export const resetChartValues = () => ({
+  type: ACTION_TYPES.RESET_CHART_VALUES,
+});

@@ -44,7 +44,7 @@ export interface IChartContainerProps {
   detectedChangePoints: IChangePointDate[];
   cpDetectionEnabled: boolean;
   applyCpDetection: typeof applyCpDetection;
-  compare: string;
+  compare: any[];
   chartRef: any;
   updateCompare: typeof updateCompare;
   updateQueryResults: typeof updateQueryResults;

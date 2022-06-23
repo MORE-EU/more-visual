@@ -80,7 +80,7 @@ export interface IChartProps {
   updateTo: typeof updateTo;
   updateChartRef: typeof updateChartRef;
   updateResampleFreq: typeof updateResampleFreq;
-  compare: string;
+  compare: any[];
 }
 
 // TODO: FIX FULLSCREEN
@@ -176,10 +176,16 @@ export const Chart = (props: IChartProps) => {
   }, [queryResultsLoading])
 
   useEffect(() => {
+    if (compare.length !== 0) {
+      props.updateCompareQueryResults(folder, compare, from, to, resampleFreq, selectedMeasures);
+    }
+  }, [compare])
+
+  useEffect(() => {
     latestMeasures.current = selectedMeasures;
     props.updateQueryResults(folder, dataset.id, from ? from : null, to ? to : null, resampleFreq, selectedMeasures);
-    if (compare !== "") {
-      props.updateCompareQueryResults(folder, compare.replace('.csv', ""), from, to, selectedMeasures);
+    if (compare.length !== 0) {
+      props.updateCompareQueryResults(folder, compare, from, to, resampleFreq, selectedMeasures);
     }
   }, [dataset, selectedMeasures]);
 
@@ -187,17 +193,17 @@ export const Chart = (props: IChartProps) => {
     latestCompare.current = compare;
   }, [compare]);
 
-  const getChartRef = (chart) => {
+  const getChartRef = (chart: any) => {
     props.updateChartRef(chart);
   };
 
-  const annotationToDate = (annotation, len) => {
+  const annotationToDate = (annotation: { startXMin: any; startXMax: any; }, len: any) => {
     const startPoint = annotation.startXMin,
       endPoint = annotation.startXMax;
     return {range: {from: startPoint, to: endPoint} as ITimeRange, id: len};
   };
 
-  const chartFunctions = (e) => {
+  const chartFunctions = (e: { target: any; }) => {
     const chart = e.target;
 
     // CHART: INSTRUCTIONS
@@ -206,27 +212,27 @@ export const Chart = (props: IChartProps) => {
       chart.hideLoading();
     });
 
-    const fetchData = (leftSide, rightSide) => {
+    const fetchData = (leftSide: number, rightSide: number) => {
       chart.showLoading();
       props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestFrequency.current, latestMeasures.current);
       props.updateFrom(leftSide);
       props.updateTo(rightSide);
-      if (latestCompare.current !== "") {
-        props.updateCompareQueryResults(folder, latestCompare.current.replace('.csv', ""), leftSide, rightSide, latestMeasures.current);
+      if (latestCompare.current.length !== 0) {
+        props.updateCompareQueryResults(folder, latestCompare.current, leftSide, rightSide, latestFrequency.current, latestMeasures.current)
       }
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
       if(isCpDetectionEnabled.current) props.applyCpDetection(dataset.id, leftSide, rightSide, customChangePoints);
     };
 
-    const getSides = (max, min, p) => {
+    const getSides = (max: number, min: number, p: number) => {
       const pad = (max - min) + ((max - min) * p);
       const leftSide = Math.max(Math.min(min - pad, (queryResults.timeRange[0] + min - pad)), queryResults.timeRange[0]);
       const rightSide = Math.min(max + pad, queryResults.timeRange[1]);
       return {leftSide, rightSide};
     }
 
-    const checkForData = (max, min) => {
+    const checkForData = (max: any, min: any) => {
       const {leftSide, rightSide} = getSides(max, min, 0.25);
       latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
       latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
@@ -243,7 +249,7 @@ export const Chart = (props: IChartProps) => {
       }
     }
 
-    const getDateDiff = (max, min) => {
+    const getDateDiff = (max: moment.Moment, min: moment.Moment) => {
       return moment.duration(max.diff(min)).humanize();
     }
 
@@ -323,8 +329,8 @@ export const Chart = (props: IChartProps) => {
             plotOptions: {
               arearange: {
                 dataGrouping: {
-                  approximation(_, groupData) {
-                    const asc = (arr) => arr.sort((a, b) => a - b);
+                  approximation(_: any, groupData: string | any) {
+                    const asc = (arr: any[]) => arr.sort((a: number, b: number) => a - b);
                     return [
                       asc(groupData)[0],
                       asc(groupData)[groupData.length - 1],
@@ -334,17 +340,17 @@ export const Chart = (props: IChartProps) => {
               },
               boxplot: {
                 dataGrouping: {
-                  approximation(_, groupData) {
+                  approximation(_: any, groupData: string | any[]) {
                     // sort array ascending
-                    const asc = (arr) => arr.sort((a, b) => a - b);
-                    const sum = (arr) => arr.reduce((a, b) => a + b, 0);
-                    const mean = (arr) => sum(arr) / arr.length;
-                    const std = (arr) => {
+                    const asc = (arr: any) => arr.sort((a: number, b: number) => a - b);
+                    const sum = (arr: any[]) => arr.reduce((a: any, b: any) => a + b, 0);
+                    const mean = (arr: string | any) => sum(arr) / arr.length;
+                    const std = (arr: any[]) => {
                       const mu = mean(arr);
-                      const diffArr = arr.map((a) => (a - mu) ** 2);
+                      const diffArr = arr.map((a: number) => (a - mu) ** 2);
                       return Math.sqrt(sum(diffArr) / (arr.length - 1));
                     };
-                    const quantile = (arr, q) => {
+                    const quantile = (arr: any, q: number) => {
                       const sorted = asc(arr);
                       const pos = (sorted.length - 1) * q;
                       const base = Math.floor(pos);
@@ -359,10 +365,10 @@ export const Chart = (props: IChartProps) => {
                       }
                     };
 
-                    const q25 = (arr) => quantile(arr, 0.25);
-                    const q50 = (arr) => quantile(arr, 0.5);
-                    const q75 = (arr) => quantile(arr, 0.75);
-                    const median = (arr) => q50(arr);
+                    const q25 = (arr: any) => quantile(arr, 0.25);
+                    const q50 = (arr: any) => quantile(arr, 0.5);
+                    const q75 = (arr: any) => quantile(arr, 0.75);
+                    const median = (arr: any) => q50(arr);
 
                     return [
                       asc(groupData)[0],
@@ -400,17 +406,16 @@ export const Chart = (props: IChartProps) => {
                     zones,
                   }))
                   .concat(
-                    selectedMeasures.map((measure, index) => ({
-                      data: compareData.map((d) => {
+                    ...compareData.map((compData, idx) => selectedMeasures.map((measure, index) => ({
+                      data: compData.map(d => {
                         const val = d.values[index];
-                        return [d.timestamp,isNaN(val) ? null : val,];
+                        return [d.timestamp,isNaN(val) ? null : val];
                       }),
-                      name: dataset.header[measure] + " " + compare,
+                      name: dataset.header[measure] + " " + compare[idx],
                       yAxis: changeChart ? index : 0,
                       zoneAxis: "x",
                       zones,
-                    }))
-                  )
+                    }))))
                 : selectedMeasures.map((measure, index) => ({
                   data: data.map((d) => {
                     const val = d.values[index];
@@ -569,43 +574,43 @@ export const Chart = (props: IChartProps) => {
               bindings: {
                 line: {
                   className: "chart-line", // needs to be the same with above
-                  init(e) {
+                  init(e: any) {
                     setType("line");
                   },
                 },
                 spline: {
                   className: "chart-spline", // needs to be the same with above
-                  init(e) {
+                  init(e: any) {
                     setType("spline");
                   },
                 },
                 boxPlot: {
                   className: "chart-boxplot", // needs to be the same with above
-                  init(e) {
+                  init(e: any) {
                     setType("boxplot");
                   },
                 },
                 areaRange: {
                   className: "chart-arearange",
-                  init(e) {
+                  init(e: any) {
                     setType("arearange");
                   },
                 },
                 pickIntervals: {
                   className: "pick-intervals", // needs to be the same with above
-                  init(e) {
+                  init(e: any) {
                     props.setShowDatePick(true);
                   },
                 },
                 functionIntervals: {
                   className: "function-intervals", // needs to be the same with above
-                  init(e) {
+                  init(e: any) {
                     props.setShowChangePointFunction(true);
                   },
                 },
                 compareFiles: {
                   className: "compare-files", // needs to be the same with above
-                  init(e) {
+                  init(e: any) {
                     props.setCompare(true);
                   },
                 },
@@ -613,23 +618,23 @@ export const Chart = (props: IChartProps) => {
                   annotationsOptions: {
                     id: customChangePoints.length,
                     events: {
-                      remove(event) {
+                      remove(event: { target: { userOptions: { id: any; }; }; }) {
                         // get annotations
                         const annotations = this.chart.annotations.filter(
-                          (a) =>
+                          (a: { userOptions: { id: any; }; }) =>
                             a.userOptions.id !== event.target.userOptions.id
                         );
                         // convert annotations to dates
                         props.updateCustomChangePoints(
-                          annotations.map((a, id) => annotationToDate(a, id))
+                          annotations.map((a: any, id: any) => annotationToDate(a, id))
                         );
                       },
-                      afterUpdate(event) {
+                      afterUpdate(event: { target: { cancelClick: any; }; }) {
                         // convert annotations to dates
                         if (event.target.cancelClick !== undefined) {
                           const annotations = this.chart.annotations;
                           props.updateCustomChangePoints(
-                            annotations.map((a, id) => annotationToDate(a, id))
+                            annotations.map((a: any, id: any) => annotationToDate(a, id))
                           );
                         }
                       },
@@ -637,7 +642,7 @@ export const Chart = (props: IChartProps) => {
                   },
                   end() {
                     props.updateCustomChangePoints(
-                      this.chart.annotations.map((a, id) =>
+                      this.chart.annotations.map((a: any, id: any) =>
                         annotationToDate(a, id)
                       )
                     );

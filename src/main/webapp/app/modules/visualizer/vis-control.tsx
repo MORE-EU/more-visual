@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -8,6 +8,7 @@ import Checkbox from '@mui/material/Checkbox';
 import {FormControl, Grid, InputLabel, ListItemIcon, MenuItem, Select, Tooltip, Typography} from "@mui/material";
 import {
   getDataset,
+  resetChartValues,
   updateChangeChart,
   updateDatasetChoice,
   updateFrom,
@@ -18,7 +19,7 @@ import {
 } from "app/modules/visualizer/visualizer.reducer";
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import {IQueryResults} from "app/shared/model/query-results.model";
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 
 export interface IVisControlProps {
   dataset: IDataset,
@@ -30,7 +31,7 @@ export interface IVisControlProps {
   wdFiles: any[],
   folder: string,
   datasetChoice: number,
-  compare: string,
+  compare: any[],
   updateDatasetChoice: typeof updateDatasetChoice,
   updateFrom: typeof updateFrom,
   updateTo: typeof updateTo,
@@ -39,11 +40,17 @@ export interface IVisControlProps {
   updateChangeChart: typeof updateChangeChart,
   getDataset: typeof getDataset,
   updateQueryResults: typeof updateQueryResults,
+  resetChartValues: typeof resetChartValues,
 }
 
 
 export const VisControl = (props: IVisControlProps) => {
   const {dataset, selectedMeasures, from, to, wdFiles, folder, compare, queryResults} = props;
+  const location = useLocation();
+
+  useEffect(() => {
+    props.resetChartValues();
+  }, [location])
 
 
   const handleToggle = (col) => () => {
@@ -113,7 +120,7 @@ export const VisControl = (props: IVisControlProps) => {
       {wdFiles !== [] &&
         <>
           <Typography variant="h6" gutterBottom>
-            Available Files
+            {dataset.farmName}
           </Typography><List disablePadding dense={true}>
           {wdFiles.map((file, idx) => {
             return (
@@ -128,7 +135,7 @@ export const VisControl = (props: IVisControlProps) => {
                 divider
               >
                 <ListItemText primary={`${file}`} sx={{pl: 4}}/>
-                {compare === file &&
+                {compare.includes(file.replace(".csv", "")) &&
                   <Tooltip title="Currently comparing this file">
                     <ListItemIcon>
                       <CompareArrowsIcon/>

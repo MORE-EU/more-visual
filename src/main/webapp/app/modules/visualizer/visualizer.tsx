@@ -32,6 +32,7 @@ import {
   updateSelectedMeasures,
   updateTo,
   updateChartRef,
+  resetChartValues,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
@@ -122,12 +123,12 @@ export const Visualizer = (props: IVisualizerProps) => {
       >
         <Box
           sx={{flexBasis: "20%"}}>
-          <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
+          <Paper elevation={1} sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
             <VisControl dataset={dataset} selectedMeasures={props.selectedMeasures} queryResults={queryResults}
                         updateSelectedMeasures={props.updateSelectedMeasures} from={props.from} to={props.to}
                         resampleFreq={props.resampleFreq} updateFrom={props.updateFrom} updateTo={props.updateTo}
                         updateResampleFreq={props.updateResampleFreq} updateQueryResults={props.updateQueryResults}
-                        updateChangeChart={props.updateChangeChart} wdFiles={wdFiles}
+                        updateChangeChart={props.updateChangeChart} wdFiles={wdFiles} resetChartValues={props.resetChartValues}
                         updateDatasetChoice={props.updateDatasetChoice} datasetChoice={datasetChoice}
                         getDataset={props.getDataset} folder={props.match.params.folder} compare={compare}/>
           </Paper>
@@ -206,7 +207,7 @@ const mapDispatchToProps = {
   updatePatterns, getPatterns, updateChangeChart, updateDatasetChoice,
   getWdFiles, updatePatternNav, updateCustomChangePoints, getChangePointDates,
   updateGraphZoom, updateActiveTool, updateCompare, updateCompareQueryResults,
-  applyCpDetection, enableCpDetection, updateChartRef
+  applyCpDetection, enableCpDetection, updateChartRef, resetChartValues,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

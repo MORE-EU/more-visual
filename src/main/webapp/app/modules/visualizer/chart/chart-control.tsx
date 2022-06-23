@@ -32,7 +32,7 @@ interface IChartControlProps {
   resampleFreq: any,
   queryResults: any,
   customChangePoints: IChangePointDate[],
-  compare: string,
+  compare: any[],
   showDatePick: boolean,
   showCompare: boolean,
   showChangePointFunction: boolean,
@@ -124,7 +124,7 @@ export const ChartControl = (props: IChartControlProps) => {
                          updateCustomChangePoints={props.updateCustomChangePoints} setOpen={props.setOpen}
                          updateActiveTool={props.updateActiveTool}/>}
       {showCompare && <ChartCompare showCompare={showCompare} setCompare={props.setCompare} compare={compare}
-                                    updateCompare={props.updateCompare} wdFiles={wdFiles} data={data}
+                                    updateCompare={props.updateCompare} wdFiles={wdFiles} data={data} resampleFreq={resampleFreq}
                                     updateCompareQueryResults={props.updateCompareQueryResults} folder={folder}
                                     from={from} to={to} selectedMeasures={selectedMeasures} dataset={dataset}/>}
       {showChangePointFunction && <ChartChangePointFunctions showChangePointFunction={showChangePointFunction}
