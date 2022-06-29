@@ -43,6 +43,7 @@ public class TimeseriesTreeIndex {
     private String csv;
     private LocalDateTime firstDate, lastDate;
     private int objectsIndexed = 0;
+    private int flag = 0;
     private boolean isInitialized = false;
     private DateTimeFormatter formatter;
 
@@ -132,11 +133,9 @@ public class TimeseriesTreeIndex {
             for (Integer measureIndex : dataset.getMeasures()) {
                 statsMap.get(measureIndex).add(Double.parseDouble(row[measureIndex]));
             }
-
             this.addPoint(labels, rowOffset, row);
             objectsIndexed++;
             rowOffset = parser.getContext().currentChar() - 1;
-
         }
         parser.stopParsing();
         isInitialized = true;
