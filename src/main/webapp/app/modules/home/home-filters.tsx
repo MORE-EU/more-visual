@@ -45,17 +45,12 @@ export const HomeFilters = (props: IHomeFilters) => {
   const { allFilters, selected } = props;
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedAcc, setSelectedAcc] = useState(null);
+  const [selectedAcc, setSelectedAcc] = useState("");
   const [search, setSearch] = useState(null);
   const [searchResults, setSearchResults] = useState(null);
   const [inputValue, setInputValue] = useState("");
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popper' : undefined;
-
-  const handleInputChange = (val) => {
-    val !== "" ? setSearchResults(groupedOptions) : setSearchResults(search);
-    setInputValue(val);
-  }
 
   const handleClick = event => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -67,7 +62,7 @@ export const HomeFilters = (props: IHomeFilters) => {
   }, [open]);
 
   const handleAccordionClick = e => {
-    selectedAcc !== e.target.innerText ? setSelectedAcc(`${e.target.innerText}`) : setSelectedAcc(null);
+    selectedAcc !== e.target.innerText ? setSelectedAcc(e.target.innerText) : setSelectedAcc("");
     selectedAcc !== e.target.innerText && setInputValue("");
     setSearch(allFilters.filter(fi => fi.category === e.target.innerText)[0].values);
     setSearchResults(allFilters.filter(fi => fi.category === e.target.innerText)[0].values);
@@ -95,13 +90,17 @@ export const HomeFilters = (props: IHomeFilters) => {
     }
   };
 
+  const handleInputChange = (val, gopts) => {
+    val !== "" ? setSearchResults(gopts) : setSearchResults(search);
+    val !== null && setInputValue(val);
+  }
   
   const { getInputProps, groupedOptions } = useAutocomplete({
     id: 'autocomplete',
     options: search,
     freeSolo: true,
     inputValue,
-    onInputChange: (e, val) => handleInputChange(val)
+    onInputChange: (e, val) => handleInputChange(val, groupedOptions)
   });
 
   return (
@@ -127,6 +126,7 @@ export const HomeFilters = (props: IHomeFilters) => {
                 }}
                 expanded={selectedAcc === filter.category}
                 onChange={handleAccordionClick}
+                disableGutters
               >
                 <AccordionSummary aria-controls="panel1a-content">
                   <Typography variant="body1" sx={{ fontSize: 12, fontWeight: 900 }}>
@@ -134,7 +134,7 @@ export const HomeFilters = (props: IHomeFilters) => {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <input style={{width: "100%"}} type="text" className="form-control" placeholder="Type to search filter" {...getInputProps()} />
+                  {selectedAcc === filter.category && <input style={{width: "100%"}} type="text" className="form-control" placeholder="Type to search filter" {...getInputProps()} />}
                   <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                     {searchResults && searchResults.length !== 0 ? searchResults.map((filt, idx) => {
                           const labelId = `checkbox-list-label-${idx}`;
