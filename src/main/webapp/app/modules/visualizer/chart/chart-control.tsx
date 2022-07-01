@@ -97,7 +97,7 @@ export const ChartControl = (props: IChartControlProps) => {
               maxDateTime={queryResults ? queryResults.timeRange[1] : null}
               onAccept={(e) => {handleOnAccept(e, "from")}}
               onChange={(e) => {}}
-              inputFormat="dd/MM/yyyy"
+              inputFormat="dd/MM/yyyy hh:mm a"
               />
             <Typography variant="body1" sx={{pl: 1, pr: 1}}>{" - "}</Typography>
             <DateTimePicker
@@ -108,7 +108,7 @@ export const ChartControl = (props: IChartControlProps) => {
               maxDateTime={queryResults ? queryResults.timeRange[1] : null}
               onAccept={(e) => {handleOnAccept(e, "to")}}
               onChange={(e) => {}}
-              inputFormat="dd/MM/yyyy"
+              inputFormat="dd/MM/yyyy hh:mm a"
             />
           </LocalizationProvider>
       </Grid>
