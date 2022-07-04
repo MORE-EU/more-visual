@@ -6,6 +6,7 @@ import eu.more2020.visual.domain.*;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.ToolsRepository;
 import eu.more2020.visual.service.CsvDataService;
+import eu.more2020.visual.service.ModelarDataService;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -37,6 +38,8 @@ public class DatasetResource {
     private final DatasetRepository datasetRepository;
     private final ToolsRepository toolsRepository;
     private final CsvDataService csvDataService;
+    private final ModelarDataService modelarDataService;
+
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
@@ -45,10 +48,11 @@ public class DatasetResource {
 
     public DatasetResource(DatasetRepository datasetRepository,
                            ToolsRepository toolsRepository,
-                           CsvDataService csvDataService) {
+                           CsvDataService csvDataService, ModelarDataService modelarDataService) {
         this.datasetRepository = datasetRepository;
         this.toolsRepository = toolsRepository;
         this.csvDataService = csvDataService;
+        this.modelarDataService = modelarDataService;
     }
 
     /**
@@ -113,18 +117,7 @@ public class DatasetResource {
         log.debug("REST request to get Dataset : {}", id);
         log.debug("REST request to get Dataset : {}", folder);
         Optional<Dataset> dataset = datasetRepository.findById(id, folder);
-        dataset.ifPresent(d -> {
-            CsvParserSettings parserSettings = new CsvParserSettings();
-            parserSettings.getFormat().setDelimiter(',');
-            parserSettings.setIgnoreLeadingWhitespaces(false);
-            parserSettings.setIgnoreTrailingWhitespaces(false);
-            CsvParser parser = new CsvParser(parserSettings);
-            parser.beginParsing(new File(workspacePath + "/" + folder, d.getName()), Charset.forName("US-ASCII"));
-            parser.parseNext();
-            d.setHeader(parser.getContext().parsedHeaders());
-            log.debug("Headers: " + Arrays.toString(d.getHeader()));
-            parser.stopParsing();
-        });
+
 
         log.debug(dataset.toString());
         return ResponseUtil.wrapOrNotFound(dataset);
@@ -167,7 +160,17 @@ public class DatasetResource {
     @PostMapping("/datasets/{folder}/{id}/query")
     public ResponseEntity<QueryResults> executeQuery(@PathVariable String folder, @PathVariable String id, @Valid @RequestBody Query query) throws IOException {
         log.debug("REST request to execute Query: {}", query);
-        Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id, folder).map(dataset -> csvDataService.executeQuery(folder, dataset, query));
+        Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id, folder).map(dataset -> {
+            if (dataset.getType().equals("modelar")) {
+                try {
+                    return modelarDataService.executeQuery(dataset, query);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                return csvDataService.executeQuery(folder, dataset, query);
+            }
+        });
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 
