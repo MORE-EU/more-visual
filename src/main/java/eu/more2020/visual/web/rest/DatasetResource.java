@@ -171,6 +171,7 @@ public class DatasetResource {
                 return csvDataService.executeQuery(folder, dataset, query);
             }
         });
+        queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 

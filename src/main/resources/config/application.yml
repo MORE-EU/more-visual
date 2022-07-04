@@ -48,13 +48,13 @@ spring:
     allow-bean-definition-overriding: true
   task:
     execution:
-      thread-name-prefix: vf-tool-task-
+      thread-name-prefix: morevis-task-
       pool:
         core-size: 2
         max-size: 50
         queue-capacity: 10000
     scheduling:
-      thread-name-prefix: vf-tool-scheduling-
+      thread-name-prefix: morevis-scheduling-
       pool:
         size: 2
   thymeleaf:

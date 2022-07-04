@@ -89,10 +89,7 @@ public class ModelarDataService {
         queryResults.setMeasureStats(dataset.getMeasureStats());
         queryResults.setTimeRange(dataset.getTimeRange().toList());
 
-        log.debug(dataPoints.toString());
-
         return queryResults;
-
     }
 
     public void fillDatasetStats(Dataset dataset) throws Exception {
