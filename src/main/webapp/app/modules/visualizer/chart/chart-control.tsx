@@ -1,52 +1,79 @@
-import {Button, Grid, Tooltip, Typography} from '@mui/material';
-import React, {Dispatch, SetStateAction, useState} from 'react';
-import {updateActiveTool, updateChangeChart, updateChangePointDates, updateCompare, updateCompareQueryResults, updateGraphZoom,} from '../visualizer.reducer';
-import EventNoteIcon from '@mui/icons-material/EventNote';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import {Button, Grid, TextField, Typography} from '@mui/material';
+import React, {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
+import {
+  updateActiveTool,
+  updateChangeChart,
+  updateCompare,
+  updateCompareQueryResults,
+  updateCustomChangePoints,
+  updateFrom,
+  updateGraphZoom,
+  updateQueryResults,
+  updateTo,
+} from '../visualizer.reducer';
 import {ChartDatePicker} from './chart-control-buttons/chart-datepicker';
 import {ChartCompare} from './chart-control-buttons/chart-compare';
 import {IChangePointDate} from 'app/shared/model/changepoint-date.model';
-import { ChartChangePointFunctions } from './chart-control-buttons/chart-changepoint-functions';
+import {ChartChangePointFunctions} from './chart-control-buttons/chart-changepoint-functions';
+import {DateTimePicker, LocalizationProvider} from '@mui/lab';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import {IDataset} from 'app/shared/model/dataset.model';
+import Highcharts from 'highcharts';
 
 interface IChartControlProps {
-  from: Date,
-  to: Date,
+  dataset: IDataset,
+  from: number,
+  to: number,
   wdFiles: any[],
   updateChangeChart: typeof updateChangeChart,
   updateGraphZoom: typeof updateGraphZoom,
   changeChart: boolean,
   data: any,
-  changePointDates: IChangePointDate[],
-  compare: string,
+  resampleFreq: any,
+  queryResults: any,
+  customChangePoints: IChangePointDate[],
+  compare: any[],
   showDatePick: boolean,
   showCompare: boolean,
   showChangePointFunction: boolean,
   folder: string,
+  selectedMeasures: number[],
+  chartRef: any,
   updateCompare: typeof updateCompare,
-  updateChangePointDates: typeof updateChangePointDates,
+  updateCustomChangePoints: typeof updateCustomChangePoints,
   setOpen: Dispatch<SetStateAction<boolean>>,
   setShowDatePick: Dispatch<SetStateAction<boolean>>,
   setShowChangePointFunction: Dispatch<SetStateAction<boolean>>,
   updateCompareQueryResults: typeof updateCompareQueryResults,
   setCompare: Dispatch<SetStateAction<boolean>>,
+  updateFrom: typeof updateFrom,
+  updateTo: typeof updateTo,
+  updateQueryResults: typeof updateQueryResults,
   updateActiveTool: typeof updateActiveTool,
 
 }
 
 export const ChartControl = (props: IChartControlProps) => {
-  const {changeChart, from, to, wdFiles, data, changePointDates, compare, showDatePick, showCompare, showChangePointFunction, folder} = props;
+  const {
+    changeChart, from, to, wdFiles, data, customChangePoints, compare, showDatePick, chartRef,
+    showCompare, showChangePointFunction, folder, selectedMeasures, dataset, resampleFreq, queryResults
+  } = props;
 
-  const handleZoom = (zoomNum) => {
-    props.updateGraphZoom(zoomNum)
+  const handleOnAccept = (e, category) => {
+    if(category === "from"){
+      chartRef.xAxis[0].setExtremes(e.getTime() + 200, to - 200);
+      props.updateQueryResults(folder, dataset.id, e.getTime(), to, resampleFreq, selectedMeasures);
+    }else{
+      chartRef.xAxis[0].setExtremes(from + 200, e.getTime() - 200);
+      props.updateQueryResults(folder, dataset.id, from, e.getTime(), resampleFreq, selectedMeasures);
+    }
   }
 
-  const [timeBut, setTimeBut] = useState(4);
-
   return (
-    <Grid container direction="row">
+    <Grid container direction="row" sx={{mb: 1}}>
       <Grid item alignItems="center" sx={{display: "flex", flexGrow: 1, flexDirection: "row"}}>
-        <Typography variant="body1">Time</Typography>
-        <Button variant="text" size="small" onClick={() => {
+        <Typography variant="body1" sx={{pr: 1}}>Time</Typography>
+        {/* <Button variant="text" size="small" onClick={() => {
           setTimeBut(0), handleZoom(1 * 1000)
         }} sx={{textTransform: "none", color: !(timeBut === 0) ? "#424242" : "#0277bd"}}>1s</Button>
         <Button variant="text" size="small" onClick={() => {
@@ -60,21 +87,30 @@ export const ChartControl = (props: IChartControlProps) => {
         }} sx={{textTransform: "none", color: !(timeBut === 3) ? "#424242" : "#0277bd"}}>1h</Button>
         <Button variant="text" size="small" onClick={() => {
           setTimeBut(4), handleZoom(null)
-        }} sx={{textTransform: "none", color: !(timeBut === 4) ? "#424242" : "#0277bd"}}>ALL</Button>
-        {/* <Tooltip title="Indicators">
-        <Button variant="text" size="small"><TuneIcon color='action'/></Button>
-        </Tooltip> */}
-
-        {/* <Tooltip title="Pick Intervals">
-          <Button variant="text" size="small" onClick={() => {
-            props.setShowDatePick(true)
-          }}><EventNoteIcon color='action'/></Button>
-        </Tooltip>
-        <Tooltip title="Compare">
-          <Button variant="text" size="small" onClick={() => {
-            props.setCompare(true)
-          }}><AddCircleIcon color='action'/></Button>
-        </Tooltip> */}
+        }} sx={{textTransform: "none", color: !(timeBut === 4) ? "#424242" : "#0277bd"}}>ALL</Button> */}
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DateTimePicker
+              renderInput={(p) => <TextField size="small" {...p} />}
+              label="From"
+              value={from ? from : null}
+              minDateTime={queryResults ? queryResults.timeRange[0] : null}
+              maxDateTime={queryResults ? queryResults.timeRange[1] : null}
+              onAccept={(e) => {handleOnAccept(e, "from")}}
+              onChange={(e) => {}}
+              inputFormat="dd/MM/yyyy hh:mm a"
+              />
+            <Typography variant="body1" sx={{pl: 1, pr: 1}}>{" - "}</Typography>
+            <DateTimePicker
+              renderInput={(p) => <TextField size="small" {...p} />}
+              label="To"
+              value={to ? to : null}
+              minDateTime={queryResults ? queryResults.timeRange[0] : null}
+              maxDateTime={queryResults ? queryResults.timeRange[1] : null}
+              onAccept={(e) => {handleOnAccept(e, "to")}}
+              onChange={(e) => {}}
+              inputFormat="dd/MM/yyyy hh:mm a"
+            />
+          </LocalizationProvider>
       </Grid>
       <Grid item>
         <Button variant="text" size="small" onClick={() => {
@@ -86,12 +122,17 @@ export const ChartControl = (props: IChartControlProps) => {
       </Grid>
       {showDatePick &&
         <ChartDatePicker showDatePick={showDatePick} setShowDatePick={props.setShowDatePick} from={from} to={to}
-                         changePointDates={changePointDates}
-                         updateChangePointDates={props.updateChangePointDates} setOpen={props.setOpen}
+                         customChangePoints={customChangePoints}
+                         updateCustomChangePoints={props.updateCustomChangePoints} setOpen={props.setOpen}
                          updateActiveTool={props.updateActiveTool}/>}
-      {showCompare && <ChartCompare showCompare={showCompare} setCompare={props.setCompare} compare={compare} updateCompare={props.updateCompare} wdFiles={wdFiles} data={data} 
-                        updateCompareQueryResults={props.updateCompareQueryResults} folder={folder}/>}
-      {showChangePointFunction && <ChartChangePointFunctions showChangePointFunction={showChangePointFunction} setShowChangePointFunction={props.setShowChangePointFunction} setOpen={props.setOpen} updateActiveTool={props.updateActiveTool}/>}
+      {showCompare && <ChartCompare showCompare={showCompare} setCompare={props.setCompare} compare={compare}
+                                    updateCompare={props.updateCompare} wdFiles={wdFiles} data={data} resampleFreq={resampleFreq}
+                                    updateCompareQueryResults={props.updateCompareQueryResults} folder={folder}
+                                    from={from} to={to} selectedMeasures={selectedMeasures} dataset={dataset}/>}
+      {showChangePointFunction && <ChartChangePointFunctions showChangePointFunction={showChangePointFunction}
+                                                             setShowChangePointFunction={props.setShowChangePointFunction}
+                                                             setOpen={props.setOpen}
+                                                             updateActiveTool={props.updateActiveTool}/>}
     </Grid>
   );
 };

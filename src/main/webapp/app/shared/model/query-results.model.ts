@@ -1,6 +1,9 @@
+import { IDataPoint } from './data-point.model';
+
 export interface IQueryResults {
-  data?: string[];
+  data?: IDataPoint[];
   measureStats?: any;
+  timeRange?: number[];
 }
 
-export const defaultValue: Readonly<IQueryResults> = {data: []};
+export const defaultValue: Readonly<IQueryResults> = { data: [] };

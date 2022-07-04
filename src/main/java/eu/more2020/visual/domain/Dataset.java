@@ -2,7 +2,9 @@ package eu.more2020.visual.domain;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A Dataset.
@@ -10,24 +12,19 @@ import java.util.LinkedHashSet;
 public class Dataset implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-
+    public String samplingFreq;
+    public String delimiter;
     private String id;
-
     @NotNull
     private String name;
-
     private Boolean hasHeader;
-
     private String[] header;
-
     private Integer timeCol;
-
+    private String timeFormat;
     private String farmName;
-
     private String formalName;
-
-    private LinkedHashSet<Integer> measures = new LinkedHashSet<>();
+    private Boolean washes;
+    private List<Integer> measures = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -69,22 +66,60 @@ public class Dataset implements Serializable {
         this.timeCol = timeCol;
     }
 
-    public LinkedHashSet<Integer> getMeasures() {
+    public List<Integer> getMeasures() {
         return measures;
     }
 
-    public void setMeasures(LinkedHashSet<Integer> measures) {
+    public void setMeasures(List<Integer> measures) {
         this.measures = measures;
     }
 
-    public void setFarmName(String farmName) { this.farmName = farmName;}
+    public String getTimeFormat() {
+        return timeFormat;
+    }
+
+    public void setTimeFormat(String timeFormat) {
+        this.timeFormat = timeFormat;
+    }
 
     public String getFarmName() {
         return farmName;
     }
 
+    public void setFarmName(String farmName) {
+        this.farmName = farmName;
+    }
+
     public String getFormalName() {
         return formalName;
+    }
+
+    public void setFormalName(String formalName) {
+        this.formalName = formalName;
+    }
+
+    public String getSamplingFreq() {
+        return samplingFreq;
+    }
+
+    public void setSamplingFreq(String samplingFreq) {
+        this.samplingFreq = samplingFreq;
+    }
+
+    public String getDelimiter() {
+        return delimiter;
+    }
+
+    public void setDelimiter(String delimiter) {
+        this.delimiter = delimiter;
+    }
+
+    public Boolean getWashes() {
+        return washes;
+    }
+
+    public void setWashes(Boolean washes) {
+        this.washes = washes;
     }
 
     @Override
@@ -103,4 +138,21 @@ public class Dataset implements Serializable {
         return 31;
     }
 
+    @Override
+    public String toString() {
+        return "Dataset{" +
+            "id='" + id + '\'' +
+            ", name='" + name + '\'' +
+            ", hasHeader=" + hasHeader +
+            ", header=" + Arrays.toString(header) +
+            ", timeCol=" + timeCol +
+            ", timeFormat='" + timeFormat + '\'' +
+            ", farmName='" + farmName + '\'' +
+            ", formalName='" + formalName + '\'' +
+            ", measures=" + measures +
+            ", samplingFreq='" + samplingFreq + '\'' +
+            ", delimiter='" + delimiter + '\'' +
+            ", washes=" + washes +
+            '}';
+    }
 }

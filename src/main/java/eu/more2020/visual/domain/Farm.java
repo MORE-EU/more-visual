@@ -3,7 +3,6 @@ package eu.more2020.visual.domain;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 
 /**
  * A Dataset.

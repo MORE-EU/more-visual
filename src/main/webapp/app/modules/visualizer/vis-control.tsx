@@ -1,39 +1,37 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import {Box, FormControl, Grid, InputLabel, ListItemIcon, MenuItem, Select, Slider, Stack, Tooltip, Typography} from "@mui/material";
+import {FormControl, Grid, InputLabel, ListItemIcon, MenuItem, Select, Tooltip, Typography} from "@mui/material";
 import {
   getDataset,
+  resetChartValues,
   updateChangeChart,
   updateDatasetChoice,
   updateFrom,
+  updateQueryResults,
   updateResampleFreq,
   updateSelectedMeasures,
   updateTo,
 } from "app/modules/visualizer/visualizer.reducer";
-import TextField from '@mui/material/TextField';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import DateTimePicker from '@mui/lab/DateTimePicker';
 import {IQueryResults} from "app/shared/model/query-results.model";
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 
 export interface IVisControlProps {
   dataset: IDataset,
   selectedMeasures: number[],
-  from: Date,
-  to: Date,
+  from: number,
+  to: number,
   queryResults: IQueryResults,
   resampleFreq: string,
   wdFiles: any[],
   folder: string,
   datasetChoice: number,
-  compare: string,
+  compare: any[],
   updateDatasetChoice: typeof updateDatasetChoice,
   updateFrom: typeof updateFrom,
   updateTo: typeof updateTo,
@@ -41,17 +39,23 @@ export interface IVisControlProps {
   updateResampleFreq: typeof updateResampleFreq,
   updateChangeChart: typeof updateChangeChart,
   getDataset: typeof getDataset,
+  updateQueryResults: typeof updateQueryResults,
+  resetChartValues: typeof resetChartValues,
 }
 
 
 export const VisControl = (props: IVisControlProps) => {
-  const {dataset, selectedMeasures, from, to, wdFiles, folder, compare} = props;
+  const {dataset, selectedMeasures, from, to, wdFiles, folder, compare, queryResults} = props;
+  const location = useLocation();
+
+  useEffect(() => {
+    props.resetChartValues();
+  }, [location])
 
 
   const handleToggle = (col) => () => {
     const currentIndex = selectedMeasures.indexOf(col);
     const newChecked = [...selectedMeasures];
-
     if (currentIndex === -1) {
       newChecked.push(col);
     } else {
@@ -66,24 +70,25 @@ export const VisControl = (props: IVisControlProps) => {
     }
   }
 
-
   return <Grid container spacing={3}>
-    {props.from && <Grid item xs={12} mt={2}><LocalizationProvider dateAdapter={AdapterDateFns}>
+    {/* {from && <Grid item xs={12} mt={2}><LocalizationProvider dateAdapter={AdapterDateFns}>
       <Stack spacing={3}>
         <DateTimePicker
           renderInput={(p) => <TextField {...p} />}
           label="From"
           value={from}
           onChange={props.updateFrom}
+          onClose={() => {props.updateQueryResults(folder, dataset.id, from.getTime(), to.getTime(), selectedMeasures)}}
         />
         <DateTimePicker
           renderInput={(p) => <TextField {...p} />}
           label="To"
           value={to}
           onChange={props.updateTo}
+          onClose={() => {props.updateQueryResults(folder, dataset.id, from.getTime(), to.getTime(), selectedMeasures)}}
         /></Stack>
     </LocalizationProvider>
-    </Grid>}
+    </Grid>} */}
     <Grid item xs={12}>
       <FormControl variant="standard" sx={{m: 1, minWidth: 180}}>
         <InputLabel>Sample Frequency</InputLabel>
@@ -115,7 +120,7 @@ export const VisControl = (props: IVisControlProps) => {
       {wdFiles !== [] &&
         <>
           <Typography variant="h6" gutterBottom>
-            Available Files
+            {dataset.farmName}
           </Typography><List disablePadding dense={true}>
           {wdFiles.map((file, idx) => {
             return (
@@ -130,12 +135,12 @@ export const VisControl = (props: IVisControlProps) => {
                 divider
               >
                 <ListItemText primary={`${file}`} sx={{pl: 4}}/>
-                {compare === file && 
-                <Tooltip title="Currently comparing this file">
-                <ListItemIcon>
-                  <CompareArrowsIcon />
-                </ListItemIcon>
-                </Tooltip>}
+                {compare.includes(file.replace(".csv", "")) &&
+                  <Tooltip title="Currently comparing this file">
+                    <ListItemIcon>
+                      <CompareArrowsIcon/>
+                    </ListItemIcon>
+                  </Tooltip>}
               </ListItemButton>
             );
           })}

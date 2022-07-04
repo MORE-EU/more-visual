@@ -2,18 +2,19 @@ package eu.more2020.visual.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvToBeanBuilder;
-
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Farm;
 import eu.more2020.visual.domain.Sample;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,13 +24,19 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
-public class DataRepositoryImpl implements DatasetRepository {
+public class DatasetRepositoryImpl implements DatasetRepository {
 
     private final ApplicationProperties applicationProperties;
 
-    private final Logger log = LoggerFactory.getLogger(DataRepositoryImpl.class);
+    private final Logger log = LoggerFactory.getLogger(DatasetRepositoryImpl.class);
 
-    public DataRepositoryImpl(ApplicationProperties applicationProperties) {
+    @Value("${application.timeFormat}")
+    private String timeFormat;
+
+    @Value("${application.delimiter}")
+    private String delimiter;
+
+    public DatasetRepositoryImpl(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
     }
 
@@ -45,6 +52,30 @@ public class DataRepositoryImpl implements DatasetRepository {
         }
         return datasets;
     }
+
+    public Boolean hasWashes(String id) {
+        try {
+            URL dataURL = new URL(applicationProperties.getToolApi() + "washes/" + id);
+            HttpURLConnection con = (HttpURLConnection) dataURL.openConnection();
+            con.setRequestMethod("POST");
+            int status = con.getResponseCode();
+            BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer content = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            con.disconnect();
+            return Boolean.parseBoolean(String.valueOf(content));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
     public Farm getFarm(String folder) throws IOException {
         Farm farm = new Farm();
@@ -62,7 +93,7 @@ public class DataRepositoryImpl implements DatasetRepository {
     public Optional<Dataset> findById(String id, String folder) throws IOException {
         Assert.notNull(id, "Id must not be null!");
         ObjectMapper mapper = new ObjectMapper();
-        Dataset dataset = new Dataset();
+        Dataset dataset = null;
         List<Dataset> allDatasets = null;
         Farm farm = new Farm();
         File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + folder, folder + ".meta.json");
@@ -72,11 +103,21 @@ public class DataRepositoryImpl implements DatasetRepository {
             farm = mapper.readValue(reader, Farm.class);
         }
         allDatasets = farm.getData();
-
         for (Dataset d : allDatasets) {
             if (d.getId().equals(id)) {
                 dataset = d;
                 dataset.setFarmName(farm.getName());
+                dataset.setWashes(false);
+                if (farm.getType().contains("Solar"))
+                    // dataset.setWashes(hasWashes(dataset.getId()));
+                    dataset.setWashes(null);
+
+                if (dataset.getTimeFormat() == null || dataset.getTimeFormat().isEmpty()) {
+                    dataset.setTimeFormat(timeFormat);
+                }
+                if (dataset.getDelimiter() == null || dataset.getDelimiter().isEmpty()) {
+                    dataset.setDelimiter(delimiter);
+                }
                 break;
             }
         }
@@ -104,30 +145,30 @@ public class DataRepositoryImpl implements DatasetRepository {
         }
         return fileList;
     }
-    
+
     @Override
     public List<Sample> findSample(String folder) throws IOException {
         File f = new File(applicationProperties.getWorkspacePath() + "/" + folder);
         File[] matchingFiles = f.listFiles(new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-        return name.contains("sample") && name.endsWith("csv");
+            public boolean accept(File dir, String name) {
+                return name.contains("sample") && name.endsWith("csv");
             }
         });
         List<Sample> beans = new CsvToBeanBuilder(new FileReader(matchingFiles[0]))
-        .withType(Sample.class).build().parse();
+            .withType(Sample.class).build().parse();
         return beans;
     }
-    
+
     public List<String> findDirectories() throws IOException {
         File file = new File(applicationProperties.getWorkspacePath());
         String[] names = file.list();
         List<String> dirs = new ArrayList<>();
 
-        for(String name : names){
-        
-        if (new File(applicationProperties.getWorkspacePath() + "/" + name).isDirectory()){
-            log.debug(name);
-                dirs.add(name);        
+        for (String name : names) {
+
+            if (new File(applicationProperties.getWorkspacePath() + "/" + name).isDirectory()) {
+                log.debug(name);
+                dirs.add(name);
             }
         }
         return dirs;

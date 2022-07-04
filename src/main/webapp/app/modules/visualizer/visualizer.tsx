@@ -8,15 +8,37 @@ import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
 import {Redirect, RouteComponentProps} from 'react-router-dom';
 import {IRootState} from "app/shared/reducers";
-import {filterData,getChangePointDates,getDataset,getPatterns,getWdFiles,updateChangeChart,updateChangePointDates,
-updateDatasetChoice,updateFilters,updateFrom,updateGraphZoom,updatePatternNav,updatePatterns,
-updateQueryResults,updateResampleFreq,updateSelectedMeasures,updateTo,updateActiveTool,updateCompare, updateCompareQueryResults,
+import {
+  applyCpDetection,
+  enableCpDetection,
+  filterData,
+  getChangePointDates,
+  getDataset,
+  getPatterns,
+  getWdFiles,
+  updateActiveTool,
+  updateChangeChart,
+  updateCompare,
+  updateCompareQueryResults,
+  updateCustomChangePoints,
+  updateDatasetChoice,
+  updateFilters,
+  updateFrom,
+  updateGraphZoom,
+  updatePatternNav,
+  updatePatterns,
+  updateQueryResults,
+  updateResampleFreq,
+  updateSelectedMeasures,
+  updateTo,
+  updateChartRef,
+  resetChartValues,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
 import Toolkit from "app/modules/visualizer/tools/toolkit";
 import HomeIcon from '@mui/icons-material/Home';
-import {Breadcrumbs, Divider, Grid, Link, Typography} from "@mui/material";
+import {Breadcrumbs, Divider, Link, Typography} from "@mui/material";
 
 const mdTheme = createTheme();
 
@@ -28,8 +50,9 @@ export const Visualizer = (props: IVisualizerProps) => {
   const {
     dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
-    resampleFreq, patterns, graphZoom, changePointDates,
-    activeTool, compare, filters, compareData, queryResultsLoading,
+    resampleFreq, patterns, graphZoom, customChangePoints,
+    detectedChangePoints, activeTool, compare, filters, compareData,
+    queryResultsLoading, from, to, cpDetectionEnabled, chartRef,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -48,38 +71,43 @@ export const Visualizer = (props: IVisualizerProps) => {
     props.getDataset(props.match.params.folder, props.match.params.id);
   }, [props.match.params.id !== undefined]);
 
+  useEffect(() => {
+    wdFiles.length !== 0 && props.updateDatasetChoice(wdFiles.indexOf(props.match.params.id + ".csv"));
+  }, [wdFiles])
+
   return !loading && dataset !== null && <div>
-    {console.log(compare)}
     <ThemeProvider theme={mdTheme}>
       <Toolbar>
-        <Box  sx={{alignItems:'center', display: 'flex',
-        flexDirection: 'row'}}>
-        <Breadcrumbs aria-label="breadcrumb">
-        <Link
-          underline="hover"
-          sx={{ display: 'flex', alignItems: 'center' }}
-          color="inherit"
-          href="/"
-        >
-          <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-          Home
-        </Link>
-        <Link
-          underline="hover"
-          sx={{ display: 'flex', alignItems: 'center' }}
-          color="inherit"
-        >
-         
-         {dataset.farmName}
-        </Link>
-        <Typography
-          sx={{ display: 'flex', alignItems: 'center' }}
-          color="text.primary"
-        >
-         
-         {dataset.formalName}
-        </Typography>
-      </Breadcrumbs>
+        <Box sx={{
+          alignItems: 'center', display: 'flex',
+          flexDirection: 'row'
+        }}>
+          <Breadcrumbs aria-label="breadcrumb">
+            <Link
+              underline="hover"
+              sx={{display: 'flex', alignItems: 'center'}}
+              color="inherit"
+              href="/"
+            >
+              <HomeIcon sx={{mr: 0.5}} fontSize="inherit"/>
+              Home
+            </Link>
+            <Link
+              underline="hover"
+              sx={{display: 'flex', alignItems: 'center'}}
+              color="inherit"
+            >
+
+              {dataset.farmName}
+            </Link>
+            <Typography
+              sx={{display: 'flex', alignItems: 'center'}}
+              color="text.primary"
+            >
+
+              {dataset.formalName}
+            </Typography>
+          </Breadcrumbs>
         </Box>
       </Toolbar>
       <Divider/>
@@ -95,12 +123,12 @@ export const Visualizer = (props: IVisualizerProps) => {
       >
         <Box
           sx={{flexBasis: "20%"}}>
-          <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
+          <Paper elevation={1} sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
             <VisControl dataset={dataset} selectedMeasures={props.selectedMeasures} queryResults={queryResults}
                         updateSelectedMeasures={props.updateSelectedMeasures} from={props.from} to={props.to}
                         resampleFreq={props.resampleFreq} updateFrom={props.updateFrom} updateTo={props.updateTo}
-                        updateResampleFreq={props.updateResampleFreq}
-                        updateChangeChart={props.updateChangeChart} wdFiles={wdFiles}
+                        updateResampleFreq={props.updateResampleFreq} updateQueryResults={props.updateQueryResults}
+                        updateChangeChart={props.updateChangeChart} wdFiles={wdFiles} resetChartValues={props.resetChartValues}
                         updateDatasetChoice={props.updateDatasetChoice} datasetChoice={datasetChoice}
                         getDataset={props.getDataset} folder={props.match.params.folder} compare={compare}/>
           </Paper>
@@ -113,26 +141,32 @@ export const Visualizer = (props: IVisualizerProps) => {
             flexDirection: 'column',
 
           }}>
-            <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures}
-                            updateQueryResults={props.updateQueryResults} from={props.from} to={props.to}
-                            resampleFreq={props.resampleFreq} patterns={props.patterns} changeChart={changeChart}
+            <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures} filters={filters}
+                            updateQueryResults={props.updateQueryResults} from={from} to={to}
+                            resampleFreq={resampleFreq} updateResampleFreq ={props.updateResampleFreq} patterns={patterns} changeChart={changeChart}
                             folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}
                             graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}
-                            changePointDates={changePointDates} updateChangePointDates={props.updateChangePointDates}
-                            setOpen={setOpen} updateActiveTool={props.updateActiveTool} compare={compare} updateCompare={props.updateCompare}
-                            compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}/>
+                            customChangePoints={customChangePoints} cpDetectionEnabled={cpDetectionEnabled}
+                            detectedChangePoints = {detectedChangePoints} updateCustomChangePoints={props.updateCustomChangePoints}
+                            setOpen={setOpen} updateActiveTool={props.updateActiveTool} compare={compare}
+                            updateCompare={props.updateCompare} chartRef={chartRef} updateChartRef={props.updateChartRef}
+                            compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}
+                            updateFrom={props.updateFrom} updateTo={props.updateTo} queryResults={queryResults}
+                            loading={loading} queryResultsLoading={queryResultsLoading} applyCpDetection={props.applyCpDetection}/>
           </Paper>
         </Box>
         <Toolkit
-          open={open}
+          open={open} from={from} to={to}
           setOpen={setOpen} dataset={dataset}
           data={data} selectedMeasures={selectedMeasures}
           resampleFreq={resampleFreq} patterns={patterns}
-          filters = {filters} filterData={props.filterData}
+          filters={filters} filterData={props.filterData}
           updateFilters={props.updateFilters} queryResults={queryResults}
           updateSelectedMeasures={props.updateSelectedMeasures}
           updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}
-          changePointDates={changePointDates} activeTool={activeTool} updateActiveTool={props.updateActiveTool}
+          customChangePoints={customChangePoints} activeTool={activeTool} updateActiveTool={props.updateActiveTool}
+          applyCpDetection={props.applyCpDetection} enableCpDetection={props.enableCpDetection}
+          cpDetectionEnabled={cpDetectionEnabled}
         />
       </Box>
     </ThemeProvider>
@@ -155,12 +189,15 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   wdFiles: visualizer.wdFiles,
   patternNav: visualizer.patternNav,
   folder: visualizer.folder,
-  changePointDates: visualizer.changePointDates,
+  customChangePoints: visualizer.customChangePoints,
+  detectedChangePoints: visualizer.detectedChangePoints,
   graphZoom: visualizer.graphZoom,
   activeTool: visualizer.activeTool,
   compare: visualizer.compare,
   compareData: visualizer.compareData,
   queryResultsLoading: visualizer.queryResultsLoading,
+  cpDetectionEnabled: visualizer.cpDetectionEnabled,
+  chartRef: visualizer.chartRef,
 });
 
 const mapDispatchToProps = {
@@ -168,8 +205,9 @@ const mapDispatchToProps = {
   updateSelectedMeasures, updateFrom, updateTo,
   updateResampleFreq, updateFilters, filterData,
   updatePatterns, getPatterns, updateChangeChart, updateDatasetChoice,
-  getWdFiles, updatePatternNav, updateChangePointDates, getChangePointDates,
+  getWdFiles, updatePatternNav, updateCustomChangePoints, getChangePointDates,
   updateGraphZoom, updateActiveTool, updateCompare, updateCompareQueryResults,
+  applyCpDetection, enableCpDetection, updateChartRef, resetChartValues,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

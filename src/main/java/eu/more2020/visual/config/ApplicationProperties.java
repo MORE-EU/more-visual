@@ -11,6 +11,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
     String workspacePath;
+    String delimiter;
+    String timeFormat;
+    String toolApi;
 
     public String getWorkspacePath() {
         return workspacePath;
@@ -18,5 +21,29 @@ public class ApplicationProperties {
 
     public void setWorkspacePath(String workspacePath) {
         this.workspacePath = workspacePath;
+    }
+
+    public String getDelimiter() {
+        return delimiter;
+    }
+
+    public void setDelimiter(String delimiter) {
+        this.delimiter = delimiter;
+    }
+
+    public String getTimeFormat() {
+        return timeFormat;
+    }
+
+    public void setTimeFormat(String timeFormat) {
+        this.timeFormat = timeFormat;
+    }
+
+    public String getToolApi() {
+        return toolApi;
+    }
+
+    public void setToolApi(String toolApi) {
+        this.toolApi = toolApi;
     }
 }

@@ -1,11 +1,10 @@
-import {Box, Checkbox, Divider, Grid, Slider, Stack, Typography} from "@mui/material";
+import {Box, Checkbox, Divider, Slider, Stack, Typography} from "@mui/material";
 import List from "@mui/material/List";
 import TextField from "@mui/material/TextField";
 import React from "react";
 import {IDataset} from "app/shared/model/dataset.model";
 import {IQueryResults} from "app/shared/model/query-results.model";
-import { filterData,
-  updateFilters } from '../../visualizer.reducer';
+import {filterData, updateFilters} from '../../visualizer.reducer';
 
 export interface IFilterProps {
   dataset: IDataset,
@@ -26,16 +25,13 @@ export const Filter = (props: IFilterProps) => {
         Filters
       </Typography>
       <Box>
-        <Typography  gutterBottom>
+        <Typography gutterBottom>
           Remove filtered points
         </Typography>
-      <Checkbox
-        checked={removePoints}
-        onChange={() => setRemovePoints(!removePoints)}
-      />
+        <Checkbox/>
       </Box>
       <List dense sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
-        {queryResults && dataset.measures.map((col,idx) => {
+        {queryResults && dataset.measures.map((col, idx) => {
           const stats = queryResults.measureStats[col];
           return <Box key={col} sx={{width: '80%', mt: idx > 0 ? 1 : 0}}>
             <Typography gutterBottom variant="overline" sx={{textAlign: "center", fontWeight: 900, display: "block"}}>

@@ -1,18 +1,16 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 import {
   Avatar,
   Button,
   Divider,
   FormControl,
   Grid,
-  InputLabel,
   List,
   ListItem,
   ListItemAvatar,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  ListSubheader,
   MenuItem,
   Paper,
   Select,
@@ -22,11 +20,10 @@ import {
 import WindPowerIcon from '@mui/icons-material/WindPower';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MapIcon from '@mui/icons-material/Map';
-import { HomeFilters } from './home-filters';
-import { LatLng } from 'leaflet';
+import {HomeFilters} from './home-filters';
+import {LatLng} from 'leaflet';
 import CloseIcon from '@mui/icons-material/Close';
-import { grey } from '@mui/material/colors';
-import { bgcolor } from '@mui/system';
+import {grey} from '@mui/material/colors';
 
 export interface IHomeLeftMenu {
   setFly?: Dispatch<SetStateAction<LatLng>>;
@@ -40,67 +37,67 @@ export interface IHomeLeftMenu {
 }
 
 export const HomeLeftMenu = (props: IHomeLeftMenu) => {
-  const { items, allFilters, selected, directories, selectedDir } = props;
+  const {items, allFilters, selected, directories, selectedDir} = props;
 
   return (
     <>
-      <Paper elevation={3} sx={{ position: 'fixed', top: 10, left: 10, width: 'auto', height: 'auto', zIndex: 999 }}>
-        <Grid sx={{ paddingBottom: 1 }}>
-          <Typography variant="h6" sx={{ padding: 1 }}>
+      <Paper elevation={3} sx={{position: 'fixed', top: 10, left: 10, width: 'auto', height: 'auto', zIndex: 999}}>
+        <Grid sx={{paddingBottom: 1}}>
+          <Typography variant="h6" sx={{padding: 1}}>
             Dataset
           </Typography>
-          <FormControl sx={{pl: 3, pr: 3, width: "80%" }}>
+          <FormControl sx={{pl: 3, pr: 3, width: "80%"}}>
             <Select
               value={selectedDir}
               onChange={e => {
                 props.setSelectedDir(e.target.value);
               }}
-              sx={{ height: '2rem', bgcolor: "#e0e0e0" }}
+              sx={{height: '2rem', bgcolor: "#e0e0e0"}}
             >
               {directories.map(dir => (
-                <MenuItem value={dir}>{dir}</MenuItem>
+                <MenuItem key={`${dir}-key`} value={dir}>{dir}</MenuItem>
               ))}
             </Select>
           </FormControl>
         </Grid>
         <Grid>
-          <List sx={{ width: '100%', overflowY: 'scroll', maxHeight: '300px' }} dense={true}>
+          <List sx={{width: '100%', overflowY: 'scroll', maxHeight: '300px'}} dense={true}>
             {items.map((item, idx) => {
               return (
                 <>
                   <ListItem key={`${item}-${idx}`}>
                     <ListItemAvatar>
-                      <Avatar variant="rounded" sx={{ width: 30, height: 30, bgcolor: grey[800] }}>
-                        <WindPowerIcon />
+                      <Avatar variant="rounded" sx={{width: 30, height: 30, bgcolor: grey[800]}}>
+                        <WindPowerIcon/>
                       </Avatar>
                     </ListItemAvatar>
-                    <ListItemText primary={item.name} sx={{ mr: 2 }} />
+                    <ListItemText primary={item.name} sx={{mr: 2}}/>
                     <Tooltip title="Open Dashboard" placement="right">
-                      <Button sx={{ mr: 1, width: 'auto' }} size="small" color="secondary">
-                        <DashboardIcon />
+                      <Button sx={{mr: 1, width: 'auto'}} size="small" color="secondary">
+                        <DashboardIcon/>
                       </Button>
                     </Tooltip>
                     <Tooltip title="Show on Map" placement="right">
                       <Button
                         size="small"
                         color="info"
-                        sx={{ width: 'auto' }}
+                        sx={{width: 'auto'}}
                         onClick={() => {
                           props.setFly(new LatLng(item.fly[0], item.fly[1]));
                         }}
                       >
-                        <MapIcon />
+                        <MapIcon/>
                       </Button>
                     </Tooltip>
                   </ListItem>
-                  <Divider light />
+                  <Divider light/>
                 </>
               );
             })}
           </List>
         </Grid>
-        <Grid sx={{ paddingTop: 1 }}>
-          <Typography variant="h6" sx={{ padding: 1 }}>
+        <Grid sx={{paddingTop: 1}}>
+          <Typography variant="h6" sx={{padding: 1}}>
             Filtering
           </Typography>
           {selected.length !== 0 && (
@@ -113,15 +110,15 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
                     }}
                   >
                     <ListItemButton>
-                      <CloseIcon />
+                      <CloseIcon/>
                     </ListItemButton>
                   </ListItemIcon>
-                  <ListItemText primary={`${sel[0]} / ${sel[1]}`} />
+                  <ListItemText primary={`${sel[0]} / ${sel[1]}`}/>
                 </ListItem>
               ))}
             </List>
           )}
-          <HomeFilters allFilters={allFilters} setSelected={props.setSelected} selected={selected} />
+          <HomeFilters allFilters={allFilters} setSelected={props.setSelected} selected={selected}/>
         </Grid>
       </Paper>
     </>

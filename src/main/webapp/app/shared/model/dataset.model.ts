@@ -6,6 +6,7 @@ export interface IDataset {
   timeCol?: number;
   measures?: number[];
   header?: string[];
+  washes?: boolean;
 }
 
 export const defaultValue: Readonly<IDataset> = {};

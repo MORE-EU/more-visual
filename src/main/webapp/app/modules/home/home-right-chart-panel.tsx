@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { FormControl, Paper, Select, MenuItem, Box, Button, Tooltip } from '@mui/material';
+import React, {useEffect, useState} from 'react';
+import {Box, Button, FormControl, MenuItem, Paper, Select, Tooltip} from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import Heatmap from 'highcharts/modules/heatmap.js';
-import { BarChart, ShowChart, TableChart } from '@material-ui/icons';
 import GridViewIcon from '@mui/icons-material/GridView';
-import { ConstructionOutlined } from '@mui/icons-material';
+import BarChart from '@mui/icons-material/BarChart';
+import TableChart from '@mui/icons-material/TableChart';
+import ShowChart from '@mui/icons-material/ShowChart';
 
 Heatmap(Highcharts);
 
@@ -17,7 +18,7 @@ export interface IHomeRightChartPanel {
 // TODO: Fix tooltip when heatmap is used
 
 export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
-  const { filSamples, selected } = props;
+  const {filSamples, selected} = props;
 
   const [chartCategYaxis, setChartCategYaxis] = useState([]);
   const [chartCateg, setChartCateg] = useState([]);
@@ -99,11 +100,11 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
     }
 
     chartType === 'heatmap' &&
-      Object.keys(yCateg).map((category, idx) => {
-        Object.keys(xCateg).map((itm, index) => {
-          setChartData(old => [...old, [index, idx, yCateg[category].includes(itm) ? Number(xCateg[itm]) : 0]]);
-        });
+    Object.keys(yCateg).map((category, idx) => {
+      Object.keys(xCateg).map((itm, index) => {
+        setChartData(old => [...old, [index, idx, yCateg[category].includes(itm) ? Number(xCateg[itm]) : 0]]);
       });
+    });
   };
 
   useEffect(() => {
@@ -129,19 +130,19 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
       });
       filSamples.map(fil => {
         Object.keys(fil).map(f => {
-          if(selected.length !== 0){
+          if (selected.length !== 0) {
             if (JSON.stringify(selected).includes(JSON.stringify([f, fil[f]]))) {
-            xCateg[fil[option3]].push(fil[option2]);
+              xCateg[fil[option3]].push(fil[option2]);
             }
-          }else{
+          } else {
             if (f === option3) {
               xCateg[fil[f]].push(fil[option2]);
             }
           }
           if (chartType === 'heatmap' && f === option4) {
             Object.hasOwnProperty.call(yCateg, fil[option4]) &&
-              !yCateg[fil[f]].includes(fil[option3]) &&
-              yCateg[fil[f]].push(fil[option3]);
+            !yCateg[fil[f]].includes(fil[option3]) &&
+            yCateg[fil[f]].push(fil[option3]);
           }
         })
       });
@@ -155,8 +156,8 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
 
   return (
     <div>
-      <Paper elevation={3} sx={{ position: 'fixed', bottom: 10, right: 10, width: '400px', height: 'auto', zIndex: 999 }}>
-        <Box sx={{ textAlign: 'center', mt: 1, mb: 1 }}>
+      <Paper elevation={3} sx={{position: 'fixed', bottom: 10, right: 10, width: '400px', height: 'auto', zIndex: 999}}>
+        <Box sx={{textAlign: 'center', mt: 1, mb: 1}}>
           <Tooltip title="Bar Chart">
             <Button
               onClick={() => {
@@ -164,7 +165,7 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
                 setOption4('');
               }}
             >
-              <BarChart />
+              <BarChart/>
             </Button>
           </Tooltip>
           <Tooltip title="Line Chart">
@@ -174,7 +175,7 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
                 setOption4('');
               }}
             >
-              <ShowChart />
+              <ShowChart/>
             </Button>
           </Tooltip>
           <Tooltip title="Area Chart">
@@ -184,7 +185,7 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
                 setOption4('');
               }}
             >
-              <TableChart />
+              <TableChart/>
             </Button>
           </Tooltip>
           <Tooltip title="Heatmap">
@@ -194,14 +195,15 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
                 setOption4('continent');
               }}
             >
-              <GridViewIcon />
+              <GridViewIcon/>
             </Button>
           </Tooltip>
         </Box>
-        <HighchartsReact highcharts={Highcharts} constructorType={'chart'} options={options} />
-        <Box sx={{ textAlign: 'center', alignItems: 'center', display: 'flex', mt: 1, mb: 1, mr: 1, ml: 1, fontSize: 16 }}>
+        <HighchartsReact highcharts={Highcharts} constructorType={'chart'} options={options}/>
+        <Box
+          sx={{textAlign: 'center', alignItems: 'center', display: 'flex', mt: 1, mb: 1, mr: 1, ml: 1, fontSize: 16}}>
           {`Find `}
-          <FormControl variant="standard" sx={{ flex: 1 }}>
+          <FormControl variant="standard" sx={{flex: 1}}>
             <Select
               value={option1}
               onChange={e => {
@@ -226,7 +228,7 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
             </Select>
           </FormControl>
           {`of `}
-          <FormControl variant="standard" sx={{ flex: 1 }}>
+          <FormControl variant="standard" sx={{flex: 1}}>
             <Select
               value={option2}
               onChange={e => {
@@ -242,7 +244,7 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
             </Select>
           </FormControl>
           {`per `}
-          <FormControl variant="standard" sx={{ flex: 1 }}>
+          <FormControl variant="standard" sx={{flex: 1}}>
             <Select
               value={option3}
               onChange={e => {
@@ -257,7 +259,7 @@ export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
           {chartType === 'heatmap' && (
             <>
               {`and `}
-              <FormControl variant="standard" sx={{ flex: 1 }}>
+              <FormControl variant="standard" sx={{flex: 1}}>
                 <Select
                   value={option4}
                   onChange={e => {

@@ -2,9 +2,11 @@ import axios from 'axios';
 import { FAILURE, REQUEST, SUCCESS } from 'app/shared/reducers/action-type.util';
 import { IDataset } from 'app/shared/model/dataset.model';
 import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
-import { IQuery } from 'app/shared/model/query.model';
+import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
+import { IQueryResults } from 'app/shared/model/query-results.model';
+import { IDataPoint } from 'app/shared/model/data-point.model';
+import { ITimeRange } from 'app/shared/model/time-range.model';
 import _ from 'lodash';
-import { DateObject } from 'react-multi-date-picker';
 
 export const ACTION_TYPES = {
   FETCH_DATASET: 'visualizer/FETCH_DATASET',
@@ -27,42 +29,49 @@ export const ACTION_TYPES = {
   UPDATE_DATASETCHOICE: 'visualizer/UPDATE_DATASETCHOICE',
   UPDATE_PATTERNNAV: 'visualizer/UPDATE_PATTERNNAV',
   GET_CHANGEPOINT_DATES: 'visualizer/GET_CHANGEPOINT_DATES',
-  UPDATE_CHANGEPOINT_DATES: 'visualizer/UPDATE_CHANGEPOINTS_DATES',
+  UPDATE_CUSTOM_CHANGEPOINTS: 'visualizer/UPDATE_CUSTOM_CHANGEPOINTS',
   UPDATE_GRAPHZOOM: 'visualizer/UPDATE_GRAPHZOOM',
   UPDATE_ACTIVETOOL: 'visualizer/UPDATE_ACTIVETOOL',
+  UPDATE_CHARTREF: 'visualizer/UPDATE_CHARTREF',
   UPDATE_COMPARE: 'visualizer/UPDATE_COMPARE',
+  CHANGEPOINT_DETECTION: 'visualizer/CHANGEPOINT_DETECTION',
+  ENABLE_CP_DETECTION: 'visualizer/ENABLE_CP_DETECTION',
+  RESET_CHART_VALUES: 'visualizer/RESET_CHART_VALUES',
+  FETCH_QUERY_COMPARE_RESULTS: 'visualizer/FETCH_QUERY_COMPARE_RESULTS',
+  FETCH_DIRECTORIES: 'visualizer/FETCH_DIRECTORIES',
 };
 
 const initialState = {
   loading: true,
   errorMessage: null,
   dataset: null,
-  queryResults: null,
-  data: null,
+  queryResults: null as IQueryResults,
+  data: null as IDataPoint[],
+  compareData: null,
   queryResultsLoading: true,
   selectedMeasures: [],
   resampleFreq: 'minute',
-  from: null as Date,
-  to: null as Date,
+  from: null as number,
+  to: null as number,
   filters: {},
   patterns: null,
-  changeChart: false,
+  changeChart: true,
   datasetChoice: 0,
   wdFiles: [],
   patternNav: '0',
   folder: '',
   sampleFile: [],
-  changePointDates: [] as IChangePointDate[],
+  customChangePoints: [] as IChangePointDate[],
+  detectedChangePoints: [] as IChangePointDate[],
+  cpDetectionEnabled: false,
   graphZoom: null,
   activeTool: -1,
-  compare: '',
+  compare: [],
+  directories: [],
+  chartRef: null,
 };
 
 export type VisualizerState = Readonly<typeof initialState>;
-
-const initChangePointDates = (func, col) => {
-  return [new DateObject('2019-01-02'), new DateObject('2019-04-30'), new DateObject('2019-05-13'), new DateObject('2019-09-01')];
-};
 
 const initPatterns = (data, length, frequency) => {
   let pattern1 = { start: new Date(data[500][0]), end: new Date(data[500 + length][0]) };
@@ -96,6 +105,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
   switch (action.type) {
     case REQUEST(ACTION_TYPES.FETCH_WDFILES):
     case REQUEST(ACTION_TYPES.FETCH_DATASET):
+    case REQUEST(ACTION_TYPES.FETCH_DIRECTORIES):
     case REQUEST(ACTION_TYPES.FETCH_SAMPLEFILE):
       return {
         ...state,
@@ -104,11 +114,18 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
       };
     case FAILURE(ACTION_TYPES.FETCH_WDFILES):
     case FAILURE(ACTION_TYPES.FETCH_DATASET):
+    case FAILURE(ACTION_TYPES.FETCH_DIRECTORIES):
     case FAILURE(ACTION_TYPES.FETCH_SAMPLEFILE):
       return {
         ...state,
         loading: false,
         errorMessage: action.payload,
+      };
+    case SUCCESS(ACTION_TYPES.FETCH_DIRECTORIES):
+      return {
+        ...state,
+        loading: false,
+        directories: action.payload.data,
       };
     case SUCCESS(ACTION_TYPES.FETCH_WDFILES):
       return {
@@ -145,8 +162,19 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         queryResultsLoading: false,
         queryResults: action.payload.data,
         data: action.payload.data.data,
-        from: _.min(action.payload.data.data.map(row => new Date(row[state.dataset.timeCol]))),
-        to: _.max(action.payload.data.data.map(row => new Date(row[state.dataset.timeCol]))),
+        from: action.payload.data.data[0].timestamp,
+        to: action.payload.data.data[action.payload.data.data.length - 1].timestamp,
+      };
+    case SUCCESS(ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS):
+      return {
+        ...state,
+        queryResultsLoading: false,
+        compareData: action.payload,
+      };
+    case SUCCESS(ACTION_TYPES.CHANGEPOINT_DETECTION):
+      return {
+        ...state,
+        detectedChangePoints: action.payload.data,
       };
     case ACTION_TYPES.UPDATE_SELECTED_MEASURES:
       return {
@@ -162,6 +190,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
       return {
         ...state,
         to: action.payload,
+      };
+    case ACTION_TYPES.ENABLE_CP_DETECTION:
+      return {
+        ...state,
+        cpDetectionEnabled: action.payload,
       };
     case ACTION_TYPES.UPDATE_PATTERNS:
       return {
@@ -203,10 +236,10 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         patterns: initPatterns(action.payload.data, action.payload.length, action.payload.frequency),
       };
-    case ACTION_TYPES.UPDATE_CHANGEPOINT_DATES:
+    case ACTION_TYPES.UPDATE_CUSTOM_CHANGEPOINTS:
       return {
         ...state,
-        changePointDates: action.payload,
+        customChangePoints: action.payload,
       };
     case ACTION_TYPES.UPDATE_GRAPHZOOM:
       return {
@@ -218,16 +251,31 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         activeTool: action.payload,
       };
+    case ACTION_TYPES.UPDATE_CHARTREF:
+      return {
+        ...state,
+        chartRef: action.payload,
+      };
     case ACTION_TYPES.UPDATE_COMPARE:
       return {
         ...state,
-        compare: action.payload,
+        compare: !state.compare.includes(action.payload)
+          ? [...state.compare, action.payload]
+          : state.compare.filter(comp => comp !== action.payload),
       };
-    // case ACTION_TYPES.GET_CHANGEPOINT_DATES:
-    //   return {
-    //     ...state,
-    //     changePointDates: initChangePointDates(action.payload.func, action.payload.col),
-    //   };
+    case ACTION_TYPES.RESET_CHART_VALUES:
+      return {
+        ...state,
+        queryResultsLoading: initialState.queryResultsLoading,
+        queryResults: initialState.queryResults,
+        data: initialState.data,
+        from: initialState.from,
+        to: initialState.to,
+        resampleFreq: initialState.resampleFreq,
+        compareData: initialState.compareData,
+        compare: initialState.compare,
+        chartRef: initialState.chartRef,
+      };
     default:
       return state;
   }
@@ -257,11 +305,37 @@ export const getSampleFile = id => {
   };
 };
 
-export const updateQueryResults = (folder, id) => (dispatch, getState) => {
-  const query = {} as IQuery;
+export const updateQueryResults = (folder, id, fromDate, toDate, freq, selMeasures) => (dispatch, getState) => {
+  let query;
+  fromDate !== null && toDate !== null
+    ? (query = {
+        range: { from: fromDate, to: toDate } as ITimeRange,
+        frequency: freq.toUpperCase(),
+        measures: selMeasures,
+      } as IQuery)
+    : (query = defaultQuery);
   dispatch({
     type: ACTION_TYPES.FETCH_QUERY_RESULTS,
     payload: axios.post(`api/datasets/${folder}/${id}/query`, query),
+  });
+};
+
+export const updateCompareQueryResults = (folder, id: any[], fromDate, toDate, freq, selMeasures) => (dispatch, getState) => {
+  let query;
+  fromDate !== null && toDate !== null
+    ? (query = {
+        range: { from: fromDate, to: toDate } as ITimeRange,
+        frequency: freq.toUpperCase(),
+        measures: selMeasures,
+      } as IQuery)
+    : (query = defaultQuery);
+  dispatch({
+    type: ACTION_TYPES.FETCH_QUERY_COMPARE_RESULTS,
+    payload: Promise.all(
+      id.map(name => {
+        return axios.post(`api/datasets/${folder}/${name}/query`, query).then(res => res.data);
+      })
+    ).then(res => res.map(r => r.data)),
   });
 };
 
@@ -279,6 +353,13 @@ export const updateTo = to => ({
   type: ACTION_TYPES.UPDATE_TO,
   payload: to,
 });
+
+export const getDirectories = () => {
+  return {
+    type: ACTION_TYPES.FETCH_DIRECTORIES,
+    payload: axios.get(`api/datasets/directories`),
+  };
+};
 
 export const updateResampleFreq = freq => ({
   type: ACTION_TYPES.UPDATE_RESAMPLE_FREQ,
@@ -315,8 +396,13 @@ export const updateGraphZoom = data => ({
   payload: data,
 });
 
-export const updateChangePointDates = data => ({
-  type: ACTION_TYPES.UPDATE_CHANGEPOINT_DATES,
+export const updateChartRef = data => ({
+  type: ACTION_TYPES.UPDATE_CHARTREF,
+  payload: data,
+});
+
+export const updateCustomChangePoints = data => ({
+  type: ACTION_TYPES.UPDATE_CUSTOM_CHANGEPOINTS,
   payload: data,
 });
 
@@ -342,7 +428,7 @@ export const filterData = removePoints => (dispatch, getState) => {
           for (let i = 0; i < filteredCols.length; i++) {
             const col = filteredCols[i],
               filter = filters[col];
-            let value = parseFloat(row[col]);
+            const value = parseFloat(row[col]);
             if (value < filter[0] || value > filter[1]) {
               for (let j = 1; j < row.length; j++) {
                 row[j] = null;
@@ -380,3 +466,23 @@ export const getChangePointDates = (func, col) => dispatch => {
     payload: { func, col },
   });
 };
+
+export const enableCpDetection = (bool: boolean) => ({
+  type: ACTION_TYPES.ENABLE_CP_DETECTION,
+  payload: bool,
+});
+
+export const applyCpDetection = (id, from, to, customChangePoints) => dispatch => {
+  const requestUrl = `api/tools/cp_detection/${id}`;
+  dispatch({
+    type: ACTION_TYPES.CHANGEPOINT_DETECTION,
+    payload: axios.post(requestUrl, {
+      range: { from, to } as ITimeRange,
+      changepoints: customChangePoints,
+    }),
+  });
+};
+
+export const resetChartValues = () => ({
+  type: ACTION_TYPES.RESET_CHART_VALUES,
+});

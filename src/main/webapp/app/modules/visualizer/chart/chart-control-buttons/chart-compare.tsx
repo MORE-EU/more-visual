@@ -1,14 +1,18 @@
 import React, {Dispatch, SetStateAction, useState} from 'react';
-import {Box, Button, FormControl, Grid, InputLabel, MenuItem, Modal, Select, Tab} from '@mui/material';
-import {TabContext, TabList, TabPanel} from '@material-ui/lab';
-import Highcharts from 'highcharts/highstock'
-import { updateCompare, updateCompareQueryResults } from '../../visualizer.reducer';
+import {Box, Checkbox, FormControl, Grid, InputLabel, List, ListItem, ListItemButton, ListItemText, MenuItem, Modal, Select, Tab} from '@mui/material';
+import {updateCompare, updateCompareQueryResults} from '../../visualizer.reducer';
+import {IDataset} from 'app/shared/model/dataset.model';
 
 export interface IChartCompareProps {
+  dataset: IDataset;
   showCompare: boolean;
+  resampleFreq: string;
+  from: number;
+  to: number;
   wdFiles: any[];
-  compare: string;
+  compare: any[];
   folder: string;
+  selectedMeasures: number[];
   updateCompare: typeof updateCompare;
   updateCompareQueryResults: typeof updateCompareQueryResults,
   setCompare: Dispatch<SetStateAction<boolean>>;
@@ -29,14 +33,17 @@ const style = {
 } as const;
 
 export const ChartCompare = (props: IChartCompareProps) => {
-  const {showCompare, wdFiles, data, compare, folder} = props;
+  const {showCompare, wdFiles, data, compare, folder, from, to, selectedMeasures, dataset, resampleFreq} = props;
 
-  const [selectVal, setSelectVal] = useState('');
-  const [tabVal, setTabVal] = useState('1');
+  const handleOnClick = (e) => {
+    props.updateCompare(e.target.innerText.replace(".csv", ""))
+  }
 
-  const handleChange = (event, newValue) => {
-    setTabVal(newValue);
-  };
+  // const [tabVal, setTabVal] = useState('1');
+
+  // const handleChange = (event, newValue) => {
+  //   setTabVal(newValue);
+  // };
 
   const handleClose = () => {
     props.setCompare(false);
@@ -55,39 +62,65 @@ export const ChartCompare = (props: IChartCompareProps) => {
       <Modal open={showCompare} onClose={handleClose} aria-labelledby="modal-modal-title"
              aria-describedby="modal-modal-description">
         <Box sx={style}>
-        <TabContext value={tabVal}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleChange} aria-label="lab API tabs example">
-            <Tab label="Compare" value="1" />
-            <Tab label="Date compare" value="2" />
-          </TabList>
-        </Box>
-        <TabPanel value="1"> 
-        <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">File</InputLabel>
-            <Grid container flexDirection="row" >
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={selectVal}
-              label="file"
-              onChange={e => {
-                setSelectVal(e.target.value);
-              }}
-              sx={{flexGrow: 1}}
-            >
+          {/* <TabContext value={tabVal}>
+            <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+              <TabList onChange={handleChange} aria-label="lab API tabs example">
+                <Tab label="Compare" value="1"/>
+                <Tab label="Date compare" value="2"/>
+              </TabList>
+            </Box>
+            <TabPanel value="1"> */}
+              {/* <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">File</InputLabel>
+                <Grid container flexDirection="row">
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={compare}
+                    label="file"
+                    onChange={e => {
+                      props.updateCompare(e.target.value)
+                    }}
+                    sx={{flexGrow: 1}}
+                  >
+                    {wdFiles.map((file, idx) => (
+                      file.replace('.csv', "") !== dataset.id && <MenuItem value={`${file}`} key={idx}>{file}</MenuItem>
+                    ))}
+                  </Select>
+                  <Button variant="contained" sx={{textTransform: "none"}}
+                          onClick={() => {
+                            props.setCompare(false), props.updateCompareQueryResults(folder, compare.replace('.csv', ""), from, to, resampleFreq, selectedMeasures)
+                          }}>Add</Button>
+                  <Button variant="contained" sx={{textTransform: "none"}}
+                          onClick={() => {
+                            props.setCompare(false), props.updateCompare('')
+                          }}>Reset</Button>
+                </Grid>
+              </FormControl> */}
+              <List dense sx={{width: '100%'}}>
               {wdFiles.map((file, idx) => (
-                <MenuItem value={`${file}`} key={idx}>{file}</MenuItem>
+                file.replace('.csv', "") !== dataset.id && 
+                <ListItem
+                  key={`${file}-${idx}`}
+                  onClick={handleOnClick}
+                  secondaryAction={
+                  <Checkbox
+                  edge="end"
+                  checked={compare.includes(file.replace(".csv", ""))}
+                />
+              }
+              disablePadding
+            >
+              <ListItemButton>
+                <ListItemText id={`${file}-item-text`} primary={file}/>
+              </ListItemButton>
+            </ListItem>
               ))}
-            </Select>
-            <Button variant="contained" sx={{textTransform: "none"}} onClick={() => {props.setCompare(false), props.updateCompare(selectVal), props.updateCompareQueryResults(folder, selectVal.replace('.csv',""))}}>Add</Button>
-            <Button variant="contained" sx={{textTransform: "none"}} onClick={() => {props.setCompare(false), props.updateCompare('')}}>Reset</Button>
-            </Grid>
-          </FormControl>
-          </TabPanel>
-        <TabPanel value="2">Date compare</TabPanel>
-      </TabContext> 
-         
+            </List>
+            {/* </TabPanel>
+            <TabPanel value="2">Date compare</TabPanel>
+          </TabContext> */}
+
         </Box>
       </Modal>
     </>

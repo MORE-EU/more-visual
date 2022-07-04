@@ -1,25 +1,25 @@
-import React, { useState, useEffect, SetStateAction, Dispatch } from 'react';
-import { Button, Grid, Typography, Tooltip, Modal, Box, Divider, List, ListItem, ListItemText, IconButton } from '@mui/material';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import {Box, Button, Divider, Grid, List, ListItem, ListItemText, Modal, Typography} from '@mui/material';
 import TimePicker from 'react-multi-date-picker/plugins/time_picker';
 import {Calendar, DateObject} from 'react-multi-date-picker';
 import DatePanel from 'react-multi-date-picker/plugins/date_panel';
-import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
-import { updateActiveTool, updateChangePointDates } from '../../visualizer.reducer';
+import {IChangePointDate} from 'app/shared/model/changepoint-date.model';
+import {updateActiveTool, updateCustomChangePoints} from '../../visualizer.reducer';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface IChartDatePickerProps {
-  from: Date;
-  to: Date;
+  from: number;
+  to: number;
   showDatePick: boolean;
   setShowDatePick?: Dispatch<SetStateAction<any>>;
-  changePointDates: IChangePointDate[];
-  updateChangePointDates: typeof updateChangePointDates;
+  customChangePoints: IChangePointDate[];
+  updateCustomChangePoints: typeof updateCustomChangePoints;
   setOpen: Dispatch<SetStateAction<boolean>>;
   updateActiveTool: typeof updateActiveTool;
 }
 
 export const ChartDatePicker = (props: IChartDatePickerProps) => {
-  const {showDatePick, from, to, changePointDates} = props;
+  const {showDatePick, from, to, customChangePoints} = props;
 
   const [value, setValue] = useState({start: null, end: null});
   const [dateValues, setDateValues] = useState([]);
@@ -29,7 +29,7 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
   };
 
   useEffect(() => {
-      props.updateChangePointDates(dateValues);
+    props.updateCustomChangePoints(dateValues);
   }, [dateValues]);
 
   const handleCalendarChange = e => {
@@ -49,7 +49,7 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
   };
 
   const handleDeleteButton = (idx) => {
-    setDateValues(oldDateValues => oldDateValues.filter((date, i ) => i !== idx));
+    setDateValues(oldDateValues => oldDateValues.filter((date, i) => i !== idx));
   }
 
   const style = {
@@ -83,7 +83,8 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
                 onChange={e => {
                   handleCalendarChange(e as DateObject[]);
                 }}
-                plugins={[<DatePanel key={"DatePanel"} position="right" markFocused/>, <TimePicker key={"TimePicker"} position="bottom"/>]}
+                plugins={[<DatePanel key={"DatePanel"} position="right" markFocused/>,
+                  <TimePicker key={"TimePicker"} position="bottom"/>]}
               />
               <Button
                 sx={{mt: 1}}
@@ -93,31 +94,33 @@ export const ChartDatePicker = (props: IChartDatePickerProps) => {
                   handleAddButton();
                 }}
               >
-                <Typography variant="overline" component="h2" >
+                <Typography variant="overline" component="h2">
                   Add
                 </Typography>
               </Button>
               <List dense>
-                {dateValues.map((val,idx) => {
+                {dateValues.map((val, idx) => {
                   return (
                     <div key={idx}>
-                    <Divider variant="inset" component="li"  key={"d" + idx}/>
-                    <ListItem
-                    key={idx}
-                    disableGutters
-                    secondaryAction={
-                      <Button>
-                        <DeleteIcon color={"action"} onClick={() => {handleDeleteButton(idx)}}/>
-                      </Button>
-                    }
-                  >
-                      <ListItemText
-                        primary={`${val.start.toString().substring(0, val.start.toString().indexOf('G'))} - ${val.end
-                          .toString()
-                          .substring(0, val.end.toString().indexOf('G'))}`}
-                      />
-                    </ListItem>
-                      </div>
+                      <Divider variant="inset" component="li" key={"d" + idx}/>
+                      <ListItem
+                        key={idx}
+                        disableGutters
+                        secondaryAction={
+                          <Button>
+                            <DeleteIcon color={"action"} onClick={() => {
+                              handleDeleteButton(idx)
+                            }}/>
+                          </Button>
+                        }
+                      >
+                        <ListItemText
+                          primary={`${val.start.toString().substring(0, val.start.toString().indexOf('G'))} - ${val.end
+                            .toString()
+                            .substring(0, val.end.toString().indexOf('G'))}`}
+                        />
+                      </ListItem>
+                    </div>
                   );
                 })}
               </List>
