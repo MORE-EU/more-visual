@@ -124,6 +124,8 @@ export const Chart = (props: IChartProps) => {
   const chart = useRef(chartRef);
   const timeRange = useRef(null);
   const latestRightSide = useRef(null);
+  const latestFolder = useRef(null);
+  const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
   const isCpDetectionEnabled = useRef(cpDetectionEnabled);
@@ -208,7 +210,9 @@ export const Chart = (props: IChartProps) => {
   const chartFunctions = (e: { target: any; }) => {
     chart.current = e.target;
     timeRange.current = queryResults.timeRange;
-    
+    latestDatasetId.current = dataset.id;
+    latestFolder.current = folder;
+
     // CHART: INSTRUCTIONS
     chart.current.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
     Highcharts.addEvent(chart.current.container, "click", (event: MouseEvent) => {
@@ -217,15 +221,15 @@ export const Chart = (props: IChartProps) => {
 
     const fetchData = (leftSide: number, rightSide: number) => {
       chart.current.showLoading();
-      props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestFrequency.current, latestMeasures.current);
+      props.updateQueryResults(latestFolder.current, latestDatasetId.current, leftSide, rightSide, latestFrequency.current, latestMeasures.current);
       props.updateFrom(leftSide);
       props.updateTo(rightSide);
       if (latestCompare.current.length !== 0) {
-        props.updateCompareQueryResults(folder, latestCompare.current, leftSide, rightSide, latestFrequency.current, latestMeasures.current)
+        props.updateCompareQueryResults(latestFolder.current, latestCompare.current, leftSide, rightSide, latestFrequency.current, latestMeasures.current)
       }
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
-      if(isCpDetectionEnabled.current) props.applyCpDetection(dataset.id, leftSide, rightSide, customChangePoints);
+      if(isCpDetectionEnabled.current) props.applyCpDetection(latestDatasetId.current, leftSide, rightSide, customChangePoints);
     };
 
     const getSides = (max: number, min: number, p: number) => {
