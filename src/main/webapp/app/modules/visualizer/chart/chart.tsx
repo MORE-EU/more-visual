@@ -121,7 +121,11 @@ export const Chart = (props: IChartProps) => {
   // Refs
   const latestFrequency = useRef(resampleFreq);
   const latestLeftSide = useRef(null);
+  const chart = useRef(chartRef);
+  const timeRange = useRef(null);
   const latestRightSide = useRef(null);
+  const latestFolder = useRef(null);
+  const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
   const isCpDetectionEnabled = useRef(cpDetectionEnabled);
@@ -193,8 +197,8 @@ export const Chart = (props: IChartProps) => {
     latestCompare.current = compare;
   }, [compare]);
 
-  const getChartRef = (chart: any) => {
-    props.updateChartRef(chart);
+  const getChartRef = (chartR: any) => {
+    props.updateChartRef(chartR);
   };
 
   const annotationToDate = (annotation: { startXMin: any; startXMax: any; }, len: any) => {
@@ -204,31 +208,34 @@ export const Chart = (props: IChartProps) => {
   };
 
   const chartFunctions = (e: { target: any; }) => {
-    const chart = e.target;
+    chart.current = e.target;
+    timeRange.current = queryResults.timeRange;
+    latestDatasetId.current = dataset.id;
+    latestFolder.current = folder;
 
     // CHART: INSTRUCTIONS
-    chart.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
-    Highcharts.addEvent(chart.container, "click", (event: MouseEvent) => {
-      chart.hideLoading();
+    chart.current.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
+    Highcharts.addEvent(chart.current.container, "click", (event: MouseEvent) => {
+      chart.current.hideLoading();
     });
 
     const fetchData = (leftSide: number, rightSide: number) => {
-      chart.showLoading();
-      props.updateQueryResults(folder, dataset.id, leftSide, rightSide, latestFrequency.current, latestMeasures.current);
+      chart.current.showLoading();
+      props.updateQueryResults(latestFolder.current, latestDatasetId.current, leftSide, rightSide, latestFrequency.current, latestMeasures.current);
       props.updateFrom(leftSide);
       props.updateTo(rightSide);
       if (latestCompare.current.length !== 0) {
-        props.updateCompareQueryResults(folder, latestCompare.current, leftSide, rightSide, latestFrequency.current, latestMeasures.current)
+        props.updateCompareQueryResults(latestFolder.current, latestCompare.current, leftSide, rightSide, latestFrequency.current, latestMeasures.current)
       }
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
-      if(isCpDetectionEnabled.current) props.applyCpDetection(dataset.id, leftSide, rightSide, customChangePoints);
+      if(isCpDetectionEnabled.current) props.applyCpDetection(latestDatasetId.current, leftSide, rightSide, customChangePoints);
     };
 
     const getSides = (max: number, min: number, p: number) => {
       const pad = (max - min) + ((max - min) * p);
-      const leftSide = Math.max(Math.min(min - pad, (queryResults.timeRange[0] + min - pad)), queryResults.timeRange[0]);
-      const rightSide = Math.min(max + pad, queryResults.timeRange[1]);
+      const leftSide = Math.max(Math.min(min - pad, (timeRange.current[0] + min - pad)), timeRange.current[0]);
+      const rightSide = Math.min(max + pad, timeRange.current[1]);
       return {leftSide, rightSide};
     }
 
@@ -241,8 +248,7 @@ export const Chart = (props: IChartProps) => {
       }
     }
     const checkForDataOnPan = () => {
-      const currentExtremes = chart.xAxis[0].getExtremes();
-      const {dataMax, dataMin, max, min} = currentExtremes;
+      const {dataMax, dataMin, max, min} = chart.current.xAxis[0].getExtremes();
       // Conditions for loading new data
       if ((dataMax - max < 2 || min - dataMin < 2)) {
         checkForData(max, min);
@@ -267,12 +273,12 @@ export const Chart = (props: IChartProps) => {
     }
 
     const checkForDataOnZoom = () => {
-      const {dataMax, dataMin, max, min} = chart.xAxis[0].getExtremes();
+      const {dataMax, dataMin, max, min} = chart.current.xAxis[0].getExtremes();
       const diff = getDateDiff(moment(max), moment(min));
       const newFreq = calculateFreqFromDiff(diff);
       if((newFreq !== latestFrequency.current) ||
-         (max > dataMax && max !== queryResults.timeRange[1]) || 
-         (min < dataMin && min !== queryResults.timeRange[0])) {
+         (max > dataMax && max !== timeRange.current[1]) || 
+         (min < dataMin && min !== timeRange.current[0])) {
         latestFrequency.current = newFreq;
         props.updateResampleFreq(newFreq);
         checkForData(max, min);
@@ -280,15 +286,15 @@ export const Chart = (props: IChartProps) => {
     }
 
     // CHART: ZOOM FUNCTION
-    Highcharts.addEvent(chart.container, "wheel", (event: WheelEvent) => {
-      const {min, max} = chart.xAxis[0].getExtremes();
+    Highcharts.addEvent(chart.current.container, "wheel", (event: WheelEvent) => {
+      const {min, max} = chart.current.xAxis[0].getExtremes();
       const step = (max - min) / 10;
-      if(!chart.loadingShown){
+      if(!chart.current.loadingShown){
       if (event.deltaY < 0) { // in
-        chart.xAxis[0].setExtremes( min + step, max - step, true, false);
+        chart.current.xAxis[0].setExtremes( min + step, max - step, true, false);
       } else if (event.deltaY > 0) { // out
-        chart.xAxis[0].setExtremes(Math.max(min - step, queryResults.timeRange[0]),
-          Math.min(max + step, queryResults.timeRange[1]), true, false)
+        chart.current.xAxis[0].setExtremes(Math.max(min - step, timeRange.current[0]),
+          Math.min(max + step, timeRange.current[1]), true, false)
       }
       checkForDataOnZoom();
     }
@@ -296,14 +302,14 @@ export const Chart = (props: IChartProps) => {
 
     // CHART: PAN FUNCTION
     Highcharts.wrap(Highcharts.Chart.prototype, "pan", function (proceed) {
-      if(!chart.loadingShown){
+      if(!chart.current.loadingShown){
       proceed.apply(this, [].slice.call(arguments, 1));
       checkForDataOnPan();
       }
     });
 
     // Set initial extremes
-    chart.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
+    chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
     };
 
   return (

@@ -75,7 +75,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     wdFiles.length !== 0 && props.updateDatasetChoice(wdFiles.indexOf(props.match.params.id + ".csv"));
   }, [wdFiles])
 
-  return !loading && dataset !== null && <div>
+  return dataset !== null && <div>
     <ThemeProvider theme={mdTheme}>
       <Toolbar>
         <Box sx={{
