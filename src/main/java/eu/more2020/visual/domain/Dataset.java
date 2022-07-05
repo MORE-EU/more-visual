@@ -2,9 +2,11 @@ package eu.more2020.visual.domain;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A Dataset.
@@ -17,6 +19,7 @@ public class Dataset implements Serializable {
     private String id;
     @NotNull
     private String name;
+    private String type = "CSV";
     private Boolean hasHeader;
     private String[] header;
     private Integer timeCol;
@@ -25,6 +28,9 @@ public class Dataset implements Serializable {
     private String formalName;
     private Boolean washes;
     private List<Integer> measures = new ArrayList<>();
+    private Map<Integer, MeasureStats> measureStats;
+
+    private TimeRange timeRange;
 
     public String getId() {
         return id;
@@ -40,6 +46,14 @@ public class Dataset implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Boolean getHasHeader() {
@@ -120,6 +134,22 @@ public class Dataset implements Serializable {
 
     public void setWashes(Boolean washes) {
         this.washes = washes;
+    }
+
+    public Map<Integer, MeasureStats> getMeasureStats() {
+        return measureStats;
+    }
+
+    public void setMeasureStats(Map<Integer, MeasureStats> measureStats) {
+        this.measureStats = measureStats;
+    }
+
+    public TimeRange getTimeRange() {
+        return timeRange;
+    }
+
+    public void setTimeRange(TimeRange timeRange) {
+        this.timeRange = timeRange;
     }
 
     @Override

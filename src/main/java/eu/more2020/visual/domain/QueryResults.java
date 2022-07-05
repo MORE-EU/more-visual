@@ -51,4 +51,14 @@ public class QueryResults implements Serializable {
     public void setIoCount(int ioCount) {
         this.ioCount = ioCount;
     }
+
+    @Override
+    public String toString() {
+        return "QueryResults{" +
+            "data=" + data +
+            ", measureStats=" + measureStats +
+            ", timeRange=" + timeRange +
+            ", ioCount=" + ioCount +
+            '}';
+    }
 }
