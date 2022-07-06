@@ -303,7 +303,7 @@ export const Chart = (props: IChartProps) => {
     // CHART: PAN FUNCTION
     Highcharts.wrap(Highcharts.Chart.prototype, "pan", function (proceed) {
       if(!chart.current.loadingShown){
-        proceed.apply(this, [].slice.call(arguments, 1)); // eslint-disable-line no-use-before-define
+        proceed.apply(this, [].slice.call(arguments, 1)); // eslint-disable-line
         checkForDataOnPan();
       }
     });
