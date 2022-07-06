@@ -277,7 +277,7 @@ export const Chart = (props: IChartProps) => {
       const diff = getDateDiff(moment(max), moment(min));
       const newFreq = calculateFreqFromDiff(diff);
       if((newFreq !== latestFrequency.current) ||
-         (max > dataMax && max !== timeRange.current[1]) || 
+         (max > dataMax && max !== timeRange.current[1]) ||
          (min < dataMin && min !== timeRange.current[0])) {
         latestFrequency.current = newFreq;
         props.updateResampleFreq(newFreq);
@@ -303,8 +303,8 @@ export const Chart = (props: IChartProps) => {
     // CHART: PAN FUNCTION
     Highcharts.wrap(Highcharts.Chart.prototype, "pan", function (proceed) {
       if(!chart.current.loadingShown){
-      proceed.apply(this, [].slice.call(arguments, 1));
-      checkForDataOnPan();
+        proceed.apply(this, [].slice.call(arguments, 1)); // eslint-disable-line no-use-before-define
+        checkForDataOnPan();
       }
     });
 
