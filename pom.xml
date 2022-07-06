@@ -716,6 +716,13 @@
                 <!-- jhipster-needle-maven-add-plugin-management -->
             </plugins>
         </pluginManagement>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.5.0.Final</version>
+            </extension>
+        </extensions>
     </build>
     <profiles>
         <profile>
