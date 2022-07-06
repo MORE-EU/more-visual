@@ -1,7 +1,7 @@
 {
-  "name": "vf-tool",
+  "name": "MoreVis",
   "version": "0.0.1-SNAPSHOT",
-  "description": "Description for VfTool",
+  "description": "Description for MoreVis",
   "private": true,
   "license": "UNLICENSED",
   "cacheDirectories": [

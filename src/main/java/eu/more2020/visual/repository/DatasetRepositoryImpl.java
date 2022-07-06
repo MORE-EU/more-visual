@@ -2,10 +2,13 @@ package eu.more2020.visual.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvToBeanBuilder;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Farm;
 import eu.more2020.visual.domain.Sample;
+import eu.more2020.visual.service.ModelarDataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +18,12 @@ import org.springframework.util.Assert;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,14 +35,18 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
     private final Logger log = LoggerFactory.getLogger(DatasetRepositoryImpl.class);
 
+    private final ModelarDataService modelarDataService;
+
+
     @Value("${application.timeFormat}")
     private String timeFormat;
 
     @Value("${application.delimiter}")
     private String delimiter;
 
-    public DatasetRepositoryImpl(ApplicationProperties applicationProperties) {
+    public DatasetRepositoryImpl(ApplicationProperties applicationProperties, ModelarDataService modelarDataService) {
         this.applicationProperties = applicationProperties;
+        this.modelarDataService = modelarDataService;
     }
 
     @Override
@@ -119,6 +128,42 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                     dataset.setDelimiter(delimiter);
                 }
                 break;
+            }
+        }
+        if (dataset != null) {
+            switch (dataset.getType()) {
+                case "modelar":
+                    try {
+                        modelarDataService.fillDatasetStats(dataset);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                default:
+                    CsvParserSettings parserSettings = new CsvParserSettings();
+                    parserSettings.getFormat().setDelimiter(',');
+                    parserSettings.setIgnoreLeadingWhitespaces(false);
+                    parserSettings.setIgnoreTrailingWhitespaces(false);
+                    CsvParser parser = new CsvParser(parserSettings);
+                    parser.beginParsing(new File(applicationProperties.getWorkspacePath() + "/" + folder, dataset.getName()), Charset.forName("US-ASCII"));
+                    parser.parseNext();
+                    dataset.setHeader(parser.getContext().parsedHeaders());
+                    log.debug("Headers: " + Arrays.toString(dataset.getHeader()));
+                    parser.stopParsing();
+                    break;
+            }
+
+            if (dataset.getType().equals("csv")) {
+                CsvParserSettings parserSettings = new CsvParserSettings();
+                parserSettings.getFormat().setDelimiter(',');
+                parserSettings.setIgnoreLeadingWhitespaces(false);
+                parserSettings.setIgnoreTrailingWhitespaces(false);
+                CsvParser parser = new CsvParser(parserSettings);
+                parser.beginParsing(new File(applicationProperties.getWorkspacePath() + "/" + folder, dataset.getName()), Charset.forName("US-ASCII"));
+                parser.parseNext();
+                dataset.setHeader(parser.getContext().parsedHeaders());
+                log.debug("Headers: " + Arrays.toString(dataset.getHeader()));
+                parser.stopParsing();
             }
         }
         return Optional.ofNullable(dataset);

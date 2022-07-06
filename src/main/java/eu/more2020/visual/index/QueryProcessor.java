@@ -34,6 +34,7 @@ public class QueryProcessor {
     private TimeseriesTreeIndex timeseriesTreeIndex;
     private List<Integer> measures;
 
+
     public QueryProcessor(Query query, Dataset dataset, TimeseriesTreeIndex timeseriesTreeIndex) {
         this.query = query;
         this.measures = query.getMeasures() != null ? query.getMeasures() : dataset.getMeasures();
@@ -89,7 +90,9 @@ public class QueryProcessor {
                 previousDate = currentDate;
                 currentDate = timeseriesTreeIndex.parseStringToDate(row[dataset.getTimeCol()]).truncatedTo(timeseriesTreeIndex.TEMPORAL_HIERARCHY.get(freqLevel - 1).getBaseUnit());
                 if (!currentDate.equals(previousDate) && previousDate != null) {
-                    queryResults.getData().add(new DataPoint(previousDate, Arrays.stream(statsAccumulators).mapToDouble(StatsAccumulator::mean).toArray()));
+                    if (query.getRange() == null || query.getRange().contains(previousDate)) {
+                        queryResults.getData().add(new DataPoint(previousDate, Arrays.stream(statsAccumulators).mapToDouble(StatsAccumulator::mean).toArray()));
+                    }
                     statsAccumulators = new StatsAccumulator[measures.size()];
                     for (int j = 0; j < statsAccumulators.length; j++) {
                         statsAccumulators[j] = new StatsAccumulator();
@@ -98,7 +101,7 @@ public class QueryProcessor {
                 for (int j = 0; j < measures.size(); j++) {
                     statsAccumulators[j].add(Double.parseDouble(row[measures.get(j)]));
                 }
-                if (i == treeNode.getDataPointCount() - 1) {
+                if (i == treeNode.getDataPointCount() - 1 && (query.getRange() == null || query.getRange().contains(currentDate))) {
                     queryResults.getData().add(new DataPoint(currentDate, Arrays.stream(statsAccumulators).mapToDouble(StatsAccumulator::mean).toArray()));
                 }
             }
