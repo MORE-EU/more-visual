@@ -45,7 +45,7 @@
         <jjwt.version>0.11.1</jjwt.version>
         <problem-spring.version>0.25.2</problem-spring.version>
         <problem-spring-web.version>${problem-spring.version}</problem-spring-web.version>
-        <arrow.version>7.0.0</arrow.version>
+        <arrow.version>8.0.0</arrow.version>
         <javassist.version>3.24.0-GA</javassist.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <jaxb-runtime.version>2.3.3</jaxb-runtime.version>
