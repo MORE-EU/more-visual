@@ -316,13 +316,16 @@ export const Chart = (props: IChartProps) => {
       checkForDataOnPan();
       }
     });
+    
     setInterval(() => {
     if(latestLiveData.current){
-      const minVal = chart.current.yAxis[0].dataMin;
-      const maxVal = chart.current.yAxis[0].dataMax;
+      chart.current.series.map((serie, idx) => {
+      const minVal = chart.current.series[idx].dataMin;
+      const maxVal = chart.current.series[idx].dataMax;
       const y = Math.random() * (maxVal - minVal) + minVal;
       end = end + 60000;
-      chart.current.series[0].addPoint([end, y], true, false);
+        chart.current.series[idx].addPoint([end, y], true, false);
+      })
       const {min} = chart.current.xAxis[0].getExtremes();
       chart.current.xAxis[0].setExtremes(min + 60000, end);
     }
