@@ -50,6 +50,7 @@ Highcharts.setOptions({
 
 export interface IChartProps {
   dataset: IDataset;
+  liveData: boolean;
   loading: boolean;
   queryResultsLoading: boolean;
   queryResults: IQueryResults;
@@ -109,7 +110,8 @@ export const Chart = (props: IChartProps) => {
     queryResults,
     queryResultsLoading,
     loading,
-    chartRef
+    chartRef,
+    liveData,
   } = props;
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -129,6 +131,7 @@ export const Chart = (props: IChartProps) => {
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
   const isCpDetectionEnabled = useRef(cpDetectionEnabled);
+  const latestLiveData = useRef(false);
 
 
   // Color Zones For Patterns
@@ -151,6 +154,10 @@ export const Chart = (props: IChartProps) => {
         .sort((a, b) => a.value.getTime() - b.value.getTime());
     setZones(newZones);
   }, [patterns]);
+
+  useEffect(() => {
+    latestLiveData.current = liveData;
+  }, [liveData])
 
 
 
@@ -212,6 +219,7 @@ export const Chart = (props: IChartProps) => {
     timeRange.current = queryResults.timeRange;
     latestDatasetId.current = dataset.id;
     latestFolder.current = folder;
+    let end = to;
 
     // CHART: INSTRUCTIONS
     chart.current.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
@@ -302,12 +310,23 @@ export const Chart = (props: IChartProps) => {
     });
 
     // CHART: PAN FUNCTION
-    Highcharts.wrap(Highcharts.Chart.prototype, "pan", function (proceed) {
+    Highcharts.wrap(Highcharts.Chart.prototype, "pan", function (proceed, ...args) {
       if(!chart.current.loadingShown){
-      proceed.apply(this, [].slice.call(arguments, 1));
+      proceed.apply(this, args);
       checkForDataOnPan();
       }
     });
+    setInterval(() => {
+    if(latestLiveData.current){
+      const minVal = chart.current.yAxis[0].dataMin;
+      const maxVal = chart.current.yAxis[0].dataMax;
+      const y = Math.random() * (maxVal - minVal) + minVal;
+      end = end + 60000;
+      chart.current.series[0].addPoint([end, y], true, false);
+      const {min} = chart.current.xAxis[0].getExtremes();
+      chart.current.xAxis[0].setExtremes(min + 60000, end);
+    }
+    }, 1000)
 
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);

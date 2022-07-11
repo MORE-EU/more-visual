@@ -33,6 +33,7 @@ import {
   updateTo,
   updateChartRef,
   resetChartValues,
+  updateLiveData,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
@@ -52,7 +53,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     loading, queryResults, data, selectedMeasures,
     resampleFreq, patterns, graphZoom, customChangePoints,
     detectedChangePoints, activeTool, compare, filters, compareData,
-    queryResultsLoading, from, to, cpDetectionEnabled, chartRef,
+    queryResultsLoading, from, to, cpDetectionEnabled, chartRef, liveData,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -142,7 +143,7 @@ export const Visualizer = (props: IVisualizerProps) => {
 
           }}>
             <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures} filters={filters}
-                            updateQueryResults={props.updateQueryResults} from={from} to={to}
+                            updateQueryResults={props.updateQueryResults} from={from} to={to} liveData={liveData} updateLiveData={props.updateLiveData}
                             resampleFreq={resampleFreq} updateResampleFreq ={props.updateResampleFreq} patterns={patterns} changeChart={changeChart}
                             folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}
                             graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}
@@ -198,6 +199,7 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   queryResultsLoading: visualizer.queryResultsLoading,
   cpDetectionEnabled: visualizer.cpDetectionEnabled,
   chartRef: visualizer.chartRef,
+  liveData: visualizer.liveData,
 });
 
 const mapDispatchToProps = {
@@ -207,7 +209,7 @@ const mapDispatchToProps = {
   updatePatterns, getPatterns, updateChangeChart, updateDatasetChoice,
   getWdFiles, updatePatternNav, updateCustomChangePoints, getChangePointDates,
   updateGraphZoom, updateActiveTool, updateCompare, updateCompareQueryResults,
-  applyCpDetection, enableCpDetection, updateChartRef, resetChartValues,
+  applyCpDetection, enableCpDetection, updateChartRef, resetChartValues, updateLiveData
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

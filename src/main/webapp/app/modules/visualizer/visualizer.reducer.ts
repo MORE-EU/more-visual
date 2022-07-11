@@ -33,6 +33,7 @@ export const ACTION_TYPES = {
   UPDATE_GRAPHZOOM: 'visualizer/UPDATE_GRAPHZOOM',
   UPDATE_ACTIVETOOL: 'visualizer/UPDATE_ACTIVETOOL',
   UPDATE_CHARTREF: 'visualizer/UPDATE_CHARTREF',
+  UPDATE_LIVEDATA: 'visualizer/UPDATE_LIVEDATA',
   UPDATE_COMPARE: 'visualizer/UPDATE_COMPARE',
   CHANGEPOINT_DETECTION: 'visualizer/CHANGEPOINT_DETECTION',
   ENABLE_CP_DETECTION: 'visualizer/ENABLE_CP_DETECTION',
@@ -43,6 +44,7 @@ export const ACTION_TYPES = {
 
 const initialState = {
   loading: true,
+  liveData: false,
   errorMessage: null,
   dataset: null,
   queryResults: null as IQueryResults,
@@ -256,6 +258,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         chartRef: action.payload,
       };
+    case ACTION_TYPES.UPDATE_LIVEDATA:
+      return {
+        ...state,
+        liveData: !state.liveData,
+      };
     case ACTION_TYPES.UPDATE_COMPARE:
       return {
         ...state,
@@ -414,6 +421,10 @@ export const updateActiveTool = data => ({
 export const updateCompare = (data: string) => ({
   type: ACTION_TYPES.UPDATE_COMPARE,
   payload: data,
+});
+
+export const updateLiveData = () => ({
+  type: ACTION_TYPES.UPDATE_LIVEDATA,
 });
 
 export const filterData = removePoints => (dispatch, getState) => {

@@ -16,6 +16,7 @@ import {
   updateTo,
   updateResampleFreq,
   applyCpDetection,
+  updateLiveData,
 } from '../visualizer.reducer';
 import Chart from './chart';
 import {ChartControl} from './chart-control';
@@ -25,6 +26,7 @@ import {IQueryResults} from 'app/shared/model/query-results.model';
 
 export interface IChartContainerProps {
   dataset: IDataset;
+  liveData: boolean;
   loading: boolean;
   queryResultsLoading: boolean;
   queryResults: IQueryResults;
@@ -58,6 +60,7 @@ export interface IChartContainerProps {
   updateTo: typeof updateTo;
   updateChartRef: typeof updateChartRef;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  updateLiveData: typeof updateLiveData;
 }
 
 export const ChartContainer = (props: IChartContainerProps) => {
@@ -65,7 +68,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
     dataset, data, selectedMeasures, from, to, filters,
     wdFiles, changeChart, folder, graphZoom, customChangePoints,
     detectedChangePoints, cpDetectionEnabled,  resampleFreq, chartRef,
-    queryResults, compare, compareData, loading, queryResultsLoading,
+    queryResults, compare, compareData, loading, queryResultsLoading, liveData
   } = props;
 
   const [showDatePick, setShowDatePick] = useState(false);
@@ -75,7 +78,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
   return (
     <Box sx={{display: 'flex', flexDirection: "column"}}>
       <ChartControl updateChangeChart={props.updateChangeChart} changeChart={changeChart}
-                    selectedMeasures={selectedMeasures}
+                    selectedMeasures={selectedMeasures} updateLiveData={props.updateLiveData} liveData={liveData}
                     updateGraphZoom={props.updateGraphZoom} from={from} to={to} wdFiles={wdFiles} data={data}
                     customChangePoints={customChangePoints} updateCustomChangePoints={props.updateCustomChangePoints}
                     setOpen={props.setOpen} chartRef={chartRef}
@@ -96,6 +99,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
         updateQueryResults={props.updateQueryResults}
         from={from}
         to={to}
+        liveData={liveData}
         loading={loading}
         queryResultsLoading={queryResultsLoading}
         filters={filters}
