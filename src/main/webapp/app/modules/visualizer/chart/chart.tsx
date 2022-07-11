@@ -217,6 +217,7 @@ export const Chart = (props: IChartProps) => {
     chart.current.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
     Highcharts.addEvent(chart.current.container, "click", (event: MouseEvent) => {
       chart.current.hideLoading();
+      Highcharts.removeEvent(chart.current.container, "click");
     });
 
     const fetchData = (leftSide: number, rightSide: number) => {
