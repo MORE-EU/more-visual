@@ -1,7 +1,5 @@
 package eu.more2020.visual.web.rest;
 
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.domain.*;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.ToolsRepository;
@@ -18,12 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -183,6 +178,12 @@ public class DatasetResource {
         log.debug("Detected CP for {}", detectedChangepoints);
 
         return new ResponseEntity<>(detectedChangepoints, HttpStatus.OK);
+    }
+
+    @PostMapping("/tools/forecasting/{id}")
+    public List<DataPoint> forecast(@PathVariable String id) throws IOException {
+        log.debug("REST request to get Forecast");
+        return toolsRepository.forecasting(id);
     }
 
 }

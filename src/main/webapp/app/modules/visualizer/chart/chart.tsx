@@ -67,6 +67,7 @@ export interface IChartProps {
   filters: any;
   graphZoom: number;
   customChangePoints: IChangePointDate[];
+  groundTruthChangepointsEnabled: boolean;
   detectedChangePoints: IChangePointDate[];
   cpDetectionEnabled: boolean;
   updateCustomChangePoints: typeof updateCustomChangePoints;
@@ -81,6 +82,7 @@ export interface IChartProps {
   updateChartRef: typeof updateChartRef;
   updateResampleFreq: typeof updateResampleFreq;
   compare: any[];
+  forecastData: IDataPoint[];
 }
 
 // TODO: FIX FULLSCREEN
@@ -100,7 +102,6 @@ export const Chart = (props: IChartProps) => {
     patterns,
     changeChart,
     folder,
-    graphZoom,
     detectedChangePoints,
     customChangePoints,
     cpDetectionEnabled,
@@ -108,8 +109,9 @@ export const Chart = (props: IChartProps) => {
     compareData,
     queryResults,
     queryResultsLoading,
-    loading,
-    chartRef
+    groundTruthChangepointsEnabled,
+    chartRef,
+    forecastData,
   } = props;
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -130,6 +132,17 @@ export const Chart = (props: IChartProps) => {
   const latestCompare = useRef(compare);
   const isCpDetectionEnabled = useRef(cpDetectionEnabled);
 
+  const gtPlotBands = (dataset.gtChangepoints !== null && [].concat(...dataset.gtChangepoints.map(date => {
+    return {
+      color: '#425af5',
+      from: date.range.from,
+      to: date.range.to,
+      label: {
+        // text: 'I am a label 2', // Content of the label.
+        // align: 'left', // Positioning of the label.
+      }
+    };
+  })));
 
   // Color Zones For Patterns
   useEffect(() => {
@@ -156,21 +169,36 @@ export const Chart = (props: IChartProps) => {
 
   // Color Bands for Change-points
   useEffect(() => {
-    const newPlotBands = (detectedChangePoints !== null && [].concat(...detectedChangePoints.map(date => {
+    let newChangepointPlotBands = (detectedChangePoints !== null && [].concat(...detectedChangePoints.map(date => {
       return {
         color: '#1e90ff',
         from: date.range.from,
         to: date.range.to,
+        events: {
+          click: e => {
+          },
+          mouseover: function(e) {
+            this.svgElem.attr('fill', new Highcharts.Color(this.options.color).brighten(0.1).get());
+          },
+          mouseout: function(e) {
+            this.svgElem.attr('fill', this.options.color);
+          },
+
+        }
       };
     })));
-    setPlotBands(newPlotBands);
-  }, [detectedChangePoints]);
+    if(groundTruthChangepointsEnabled) newChangepointPlotBands = newChangepointPlotBands.concat(gtPlotBands);
+    setPlotBands(newChangepointPlotBands);
+  }, [detectedChangePoints, groundTruthChangepointsEnabled]);
 
 
   useEffect(() => {
     isCpDetectionEnabled.current = cpDetectionEnabled;
-    if(!cpDetectionEnabled) setPlotBands([]);
-  }, [cpDetectionEnabled]);
+    if(!cpDetectionEnabled){
+      if(groundTruthChangepointsEnabled) setPlotBands(gtPlotBands);
+      else setPlotBands([]);
+    }
+  }, [cpDetectionEnabled, groundTruthChangepointsEnabled]);
 
 
   useEffect(() => {
@@ -312,6 +340,41 @@ export const Chart = (props: IChartProps) => {
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
     };
 
+  let chartData = (data !== null) ? selectedMeasures
+    .map((measure, index) => ({
+      data: data.map((d) => {
+        const val = d.values[index];
+        return [d.timestamp, isNaN(val) ? null : val];
+      }),
+      name: dataset.header[measure],
+      yAxis: changeChart ? index : 0,
+      zoneAxis: "x",
+      zones,
+    })) : [];
+
+  const forecastChartData = (forecastData !== null) ? selectedMeasures
+    .map((measure, index) => ({
+      data: forecastData.map((d) => {
+        const val = d.values[index];
+        return [d.timestamp, isNaN(val) ? null : val];
+      }),
+      name: "Forecasted " + dataset.header[measure],
+      yAxis: changeChart ? index : 0,
+      zoneAxis: "x",
+      zones,
+    })) : [];
+
+  const compareChartData = (compareData !== null) ? compareData.map((compData, idx) => selectedMeasures.map((measure, index) => ({
+    data: compData.map(d => {
+      const val = d.values[index];
+      return [d.timestamp,isNaN(val) ? null : val];
+    }),
+    name: dataset.header[measure] + " " + compare[idx],
+    yAxis: changeChart ? index : 0,
+    zoneAxis: "x",
+    zones,
+  }))) : [];
+
   return (
     <Grid
       sx={{border: "1px solid rgba(0, 0, 0, .1)", minHeight: "700px"}}
@@ -399,39 +462,9 @@ export const Chart = (props: IChartProps) => {
               },
             },
             series:
-              compare.length !== 0 && compareData !== null
-                ? selectedMeasures
-                  .map((measure, index) => ({
-                    data: data.map((d) => {
-                      const val = d.values[index];
-                      return [d.timestamp, isNaN(val) ? null : val];
-                    }),
-                    name: dataset.header[measure],
-                    yAxis: changeChart ? index : 0,
-                    zoneAxis: "x",
-                    zones,
-                  }))
-                  .concat(
-                    ...compareData.map((compData, idx) => selectedMeasures.map((measure, index) => ({
-                      data: compData.map(d => {
-                        const val = d.values[index];
-                        return [d.timestamp,isNaN(val) ? null : val];
-                      }),
-                      name: dataset.header[measure] + " " + compare[idx],
-                      yAxis: changeChart ? index : 0,
-                      zoneAxis: "x",
-                      zones,
-                    }))))
-                : selectedMeasures.map((measure, index) => ({
-                  data: data.map((d) => {
-                    const val = d.values[index];
-                    return [d.timestamp, isNaN(val) ? null : val];
-                  }),
-                  name: dataset.header[measure],
-                  yAxis: changeChart ? index : 0,
-                  zoneAxis: "x",
-                  zones,
-                })),
+              [
+                ...chartData, ...forecastChartData, ...compareChartData
+              ],
             chart: {
               type,
               height: "700px",

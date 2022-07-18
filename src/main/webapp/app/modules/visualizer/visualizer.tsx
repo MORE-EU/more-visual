@@ -30,9 +30,12 @@ import {
   updateQueryResults,
   updateResampleFreq,
   updateSelectedMeasures,
+  updateShowGroundTruthChangepoints,
   updateTo,
   updateChartRef,
   resetChartValues,
+  enableForecasting,
+  applyForecasting,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
@@ -52,7 +55,8 @@ export const Visualizer = (props: IVisualizerProps) => {
     loading, queryResults, data, selectedMeasures,
     resampleFreq, patterns, graphZoom, customChangePoints,
     detectedChangePoints, activeTool, compare, filters, compareData,
-    queryResultsLoading, from, to, cpDetectionEnabled, chartRef,
+    queryResultsLoading, from, to, cpDetectionEnabled, chartRef, groundTruthChangepointsEnabled,
+    forecasting, forecastData,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -143,16 +147,18 @@ export const Visualizer = (props: IVisualizerProps) => {
           }}>
             <ChartContainer dataset={dataset} data={data} selectedMeasures={selectedMeasures} filters={filters}
                             updateQueryResults={props.updateQueryResults} from={from} to={to}
-                            resampleFreq={resampleFreq} updateResampleFreq ={props.updateResampleFreq} patterns={patterns} changeChart={changeChart}
-                            folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}
+                            resampleFreq={resampleFreq} updateResampleFreq ={props.updateResampleFreq} patterns={patterns}
+                            changeChart={changeChart} folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}
                             graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}
                             customChangePoints={customChangePoints} cpDetectionEnabled={cpDetectionEnabled}
                             detectedChangePoints = {detectedChangePoints} updateCustomChangePoints={props.updateCustomChangePoints}
+                            groundTruthChangepointsEnabled = {groundTruthChangepointsEnabled}
                             setOpen={setOpen} updateActiveTool={props.updateActiveTool} compare={compare}
                             updateCompare={props.updateCompare} chartRef={chartRef} updateChartRef={props.updateChartRef}
                             compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}
                             updateFrom={props.updateFrom} updateTo={props.updateTo} queryResults={queryResults}
-                            loading={loading} queryResultsLoading={queryResultsLoading} applyCpDetection={props.applyCpDetection}/>
+                            loading={loading} queryResultsLoading={queryResultsLoading} applyCpDetection={props.applyCpDetection}
+                            forecastData = {forecastData}/>
           </Paper>
         </Box>
         <Toolkit
@@ -166,7 +172,10 @@ export const Visualizer = (props: IVisualizerProps) => {
           updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}
           customChangePoints={customChangePoints} activeTool={activeTool} updateActiveTool={props.updateActiveTool}
           applyCpDetection={props.applyCpDetection} enableCpDetection={props.enableCpDetection}
-          cpDetectionEnabled={cpDetectionEnabled}
+          cpDetectionEnabled={cpDetectionEnabled} updateShowGroundTruthChangepoints = {props.updateShowGroundTruthChangepoints}
+          groundTruthChangepointsEnabled = {groundTruthChangepointsEnabled} forecasting={forecasting}
+          enableForecasting = {props.enableForecasting} applyForecasting = {props.applyForecasting}
+          forecastData={forecastData}
         />
       </Box>
     </ThemeProvider>
@@ -198,16 +207,20 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   queryResultsLoading: visualizer.queryResultsLoading,
   cpDetectionEnabled: visualizer.cpDetectionEnabled,
   chartRef: visualizer.chartRef,
+  groundTruthChangepointsEnabled: visualizer.groundTruthChangepointsEnabled,
+  forecasting: visualizer.forecasting,
+  forecastData: visualizer.forecastData,
 });
 
 const mapDispatchToProps = {
   getDataset, updateQueryResults,
   updateSelectedMeasures, updateFrom, updateTo,
-  updateResampleFreq, updateFilters, filterData,
+  updateResampleFreq, updateFilters, filterData, updateShowGroundTruthChangepoints,
   updatePatterns, getPatterns, updateChangeChart, updateDatasetChoice,
   getWdFiles, updatePatternNav, updateCustomChangePoints, getChangePointDates,
   updateGraphZoom, updateActiveTool, updateCompare, updateCompareQueryResults,
   applyCpDetection, enableCpDetection, updateChartRef, resetChartValues,
+  enableForecasting, applyForecasting,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

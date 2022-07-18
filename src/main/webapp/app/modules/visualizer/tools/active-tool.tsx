@@ -6,16 +6,17 @@ import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
 import {
   applyCpDetection,
-  enableCpDetection,
+  enableCpDetection, enableForecasting,
   filterData,
   getPatterns,
   updateActiveTool,
   updateFilters,
   updatePatterns,
-  updateSelectedMeasures
+  updateSelectedMeasures, updateShowGroundTruthChangepoints,
+  applyForecasting,
 } from '../visualizer.reducer';
 import ChangepointDetection from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
-import DeviationDetection from "app/modules/visualizer/tools/deviation-detection/deviation-detection";
+import Forecasting from "app/modules/visualizer/tools/forecasting/forecasting";
 import {IQueryResults} from "app/shared/model/query-results.model";
 import Filter from "app/modules/visualizer/tools/filter/filter";
 
@@ -40,13 +41,20 @@ export interface IActiveToolProps {
   applyCpDetection: typeof applyCpDetection,
   cpDetectionEnabled: boolean,
   enableCpDetection: typeof enableCpDetection,
+  updateShowGroundTruthChangepoints: typeof updateShowGroundTruthChangepoints,
+  groundTruthChangepointsEnabled:boolean,
+  enableForecasting:typeof enableForecasting,
+  applyForecasting: typeof applyForecasting,
+  forecasting:boolean,
+  forecastData: any,
 }
 
 const ActiveTool = (props: IActiveToolProps) => {
   const {
     activeTool, dataset, data, from, to, selectedMeasures, patterns,
-    resampleFreq, customChangePoints,
-    filters, queryResults, cpDetectionEnabled,
+    resampleFreq, customChangePoints, filters, queryResults,
+    cpDetectionEnabled, groundTruthChangepointsEnabled, forecasting,
+    forecastData,
   } = props;
 
   const goBack = () => {
@@ -67,9 +75,12 @@ const ActiveTool = (props: IActiveToolProps) => {
               getPatterns={props.getPatterns}
             />}
           {activeTool === 1 &&
-            <DeviationDetection
+            <Forecasting
               dataset={dataset}
-              customChangePoints={customChangePoints} data={data}
+              forecasting={forecasting}
+              enableForecasting={props.enableForecasting}
+              applyForecasting={props.applyForecasting}
+              forecastData={forecastData}
             />
           }
           {activeTool === 2 &&
@@ -82,6 +93,8 @@ const ActiveTool = (props: IActiveToolProps) => {
               data={data}
               enableCpDetection={props.enableCpDetection}
               cpDetectionEnabled={cpDetectionEnabled}
+              updateShowGroundTruthChangepoints={props.updateShowGroundTruthChangepoints}
+              groundTruthChangepointsEnabled={groundTruthChangepointsEnabled}
             />
           }
           {activeTool === 4 &&

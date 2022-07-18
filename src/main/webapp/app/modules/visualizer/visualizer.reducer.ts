@@ -24,6 +24,9 @@ export const ACTION_TYPES = {
   UPDATE_PATTERNS: 'visualizer/UPDATE_PATTERNS',
   UPDATE_COMPUTED_PATTERN_LENGTH: 'visualizer/UPDATE_COMPUTED_PATTERN_LENGTH',
   UPDATE_SELECTED_PATTERN: 'visualizer/UPDATE_SELECTED_PATTERN',
+  UPDATE_GROUND_TRUTH_CHANGEPOINTS: 'visualizer/UPDATE_GROUND_TRUTH_CHANGEPOINTS',
+  ENABLE_FORECASTING: 'visualizer/ENABLE_FORECASTING',
+  APPLY_FORECASTING: 'visualizer/APPLY_FORECASTING',
   GET_PATTERNS: 'visualizer/GET_PATTERNS',
   UPDATE_CHANGECHART: 'visualizer/UPDATE_CHANGECHART',
   UPDATE_DATASETCHOICE: 'visualizer/UPDATE_DATASETCHOICE',
@@ -64,6 +67,9 @@ const initialState = {
   customChangePoints: [] as IChangePointDate[],
   detectedChangePoints: [] as IChangePointDate[],
   cpDetectionEnabled: false,
+  groundTruthChangepointsEnabled: false,
+  forecasting: false,
+  forecastData: null as IDataPoint[],
   graphZoom: null,
   activeTool: -1,
   compare: [],
@@ -195,6 +201,21 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
       return {
         ...state,
         cpDetectionEnabled: action.payload,
+      };
+    case ACTION_TYPES.ENABLE_FORECASTING:
+      return {
+        ...state,
+        forecasting: action.payload,
+      };
+    case SUCCESS(ACTION_TYPES.APPLY_FORECASTING):
+      return {
+        ...state,
+        forecastData: action.payload.data,
+      };
+    case ACTION_TYPES.UPDATE_GROUND_TRUTH_CHANGEPOINTS:
+      return {
+        ...state,
+        groundTruthChangepointsEnabled: action.payload,
       };
     case ACTION_TYPES.UPDATE_PATTERNS:
       return {
@@ -416,6 +437,11 @@ export const updateCompare = (data: string) => ({
   payload: data,
 });
 
+export const updateShowGroundTruthChangepoints = (bool: boolean) => ({
+  type: ACTION_TYPES.UPDATE_GROUND_TRUTH_CHANGEPOINTS,
+  payload: bool,
+});
+
 export const filterData = removePoints => (dispatch, getState) => {
   const { queryResults, filters } = getState().visualizer;
   const clone = items => items.map(item => (Array.isArray(item) ? clone(item) : item));
@@ -480,6 +506,19 @@ export const applyCpDetection = (id, from, to, customChangePoints) => dispatch =
       range: { from, to } as ITimeRange,
       changepoints: customChangePoints,
     }),
+  });
+};
+
+export const enableForecasting = (bool: boolean) => ({
+  type: ACTION_TYPES.ENABLE_FORECASTING,
+  payload: bool,
+});
+
+export const applyForecasting = (id: string) => dispatch => {
+  const requestUrl = `api/tools/forecasting/${id}`;
+  dispatch({
+    type: ACTION_TYPES.APPLY_FORECASTING,
+    payload: axios.post(requestUrl),
   });
 };
 

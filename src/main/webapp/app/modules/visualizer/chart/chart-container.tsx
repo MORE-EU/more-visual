@@ -42,6 +42,7 @@ export interface IChartContainerProps {
   graphZoom: number;
   customChangePoints: IChangePointDate[];
   detectedChangePoints: IChangePointDate[];
+  groundTruthChangepointsEnabled: boolean;
   cpDetectionEnabled: boolean;
   applyCpDetection: typeof applyCpDetection;
   compare: any[];
@@ -58,6 +59,7 @@ export interface IChartContainerProps {
   updateTo: typeof updateTo;
   updateChartRef: typeof updateChartRef;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  forecastData: IDataPoint[];
 }
 
 export const ChartContainer = (props: IChartContainerProps) => {
@@ -66,6 +68,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
     wdFiles, changeChart, folder, graphZoom, customChangePoints,
     detectedChangePoints, cpDetectionEnabled,  resampleFreq, chartRef,
     queryResults, compare, compareData, loading, queryResultsLoading,
+    groundTruthChangepointsEnabled, forecastData,
   } = props;
 
   const [showDatePick, setShowDatePick] = useState(false);
@@ -107,6 +110,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
         graphZoom={graphZoom}
         compare={compare}
         chartRef={chartRef}
+        groundTruthChangepointsEnabled={groundTruthChangepointsEnabled}
         customChangePoints={customChangePoints}
         detectedChangePoints={detectedChangePoints}
         cpDetectionEnabled={cpDetectionEnabled}
@@ -120,6 +124,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
         updateFrom={props.updateFrom}
         updateTo={props.updateTo}
         updateChartRef={props.updateChartRef}
+        forecastData={forecastData}
       />
     </Box>
   );

@@ -1,7 +1,12 @@
 import React, {useState} from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
 import {Box, Button, Divider, Switch, Tooltip, Typography,} from "@mui/material";
-import {applyCpDetection, enableCpDetection} from "app/modules/visualizer/visualizer.reducer";
+import {
+  applyCpDetection,
+  enableCpDetection,
+  updateShowGroundTruthChangepoints
+} from "app/modules/visualizer/visualizer.reducer";
+import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 
 export interface IChangepointDetectionProps {
   dataset: IDataset,
@@ -11,12 +16,15 @@ export interface IChangepointDetectionProps {
   to: number,
   applyCpDetection: typeof applyCpDetection,
   cpDetectionEnabled: boolean,
+  updateShowGroundTruthChangepoints: typeof updateShowGroundTruthChangepoints,
   enableCpDetection: typeof enableCpDetection,
+  groundTruthChangepointsEnabled: boolean,
 }
 
 
 export const ChangepointDetection = (props: IChangepointDetectionProps) => {
-  const {dataset, customChangePoints, from, to, cpDetectionEnabled} = props;
+  const {dataset, customChangePoints, from, to,
+    cpDetectionEnabled, groundTruthChangepointsEnabled} = props;
   const [detectIntervals, setDetectIntervals] = useState(false);
 
   const handleCpDetection = () => {
@@ -26,30 +34,58 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
       props.applyCpDetection(dataset.id, from, to,
         customChangePoints);
   }
-
   return (
     <Box sx={{pl: 2, pr: 2}}>
       <Box>
         <Typography variant="h6" gutterBottom>
-          Changepoints
+          Soiling Detection
         </Typography>
         <Divider orientation="horizontal" flexItem>
         </Divider>
       </Box>
-      {dataset.washes
+      {dataset.gtChangepoints
         &&
         <Box>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'left',
+              p:0,
+            }}
+          >
+            <ManageSearchIcon/>
+            <Typography variant="body1" gutterBottom sx={{fontWeight:600}}>
+              Changepoint Selection
+            </Typography>
+
+          </Box>
           <Box sx={{
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}>
-            <Box sx={{pt: 1}}>Show</Box>
-            <Tooltip describeChild title={dataset.washes ? "Show Changepoints" : "No Data Found"}>
+            <Box sx={{pt: 1}}>Washes</Box>
+            <Tooltip describeChild title={dataset.gtChangepoints ? "Show Changepoints" : "No Data Found"}>
+              <Switch
+                checked={groundTruthChangepointsEnabled}
+                onChange={() => props.updateShowGroundTruthChangepoints(!groundTruthChangepointsEnabled)}
+                disabled={!dataset.gtChangepoints}
+                inputProps={{'aria-label': 'controlled'}}
+              />
+            </Tooltip>
+          </Box>
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}>
+            <Box sx={{pt: 1}}>Washing Events</Box>
+            <Tooltip describeChild title={dataset.gtChangepoints ? "Show Washing Event" : "No Data Found"}>
               <Switch
                 checked={cpDetectionEnabled}
                 onChange={() => handleCpDetection()}
-                disabled={!dataset.washes}
+                disabled={!dataset.gtChangepoints}
                 inputProps={{'aria-label': 'controlled'}}
               />
             </Tooltip>
@@ -69,6 +105,21 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
                 inputProps={{'aria-label': 'controlled'}}
               />
             </Tooltip>
+
+          </Box>
+          <Divider sx={{paddingBottom:2}}/>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'left',
+              p:0,
+            }}
+          >
+            <ManageSearchIcon/>
+            <Typography variant="body1" gutterBottom sx={{fontWeight:600}}>
+              Area Selection
+            </Typography>
           </Box>
         </Box>
 

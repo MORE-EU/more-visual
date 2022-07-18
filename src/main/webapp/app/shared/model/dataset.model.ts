@@ -1,3 +1,5 @@
+import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
+
 export interface IDataset {
   id?: string;
   name?: string;
@@ -6,7 +8,7 @@ export interface IDataset {
   timeCol?: number;
   measures?: number[];
   header?: string[];
-  washes?: boolean;
+  gtChangepoints?: IChangePointDate[];
 }
 
 export const defaultValue: Readonly<IDataset> = {};

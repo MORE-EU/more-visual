@@ -15,13 +15,14 @@ import ActiveTool from "app/modules/visualizer/tools/active-tool";
 import {IDataset} from "app/shared/model/dataset.model";
 import {
   applyCpDetection,
-  enableCpDetection,
+  enableCpDetection, enableForecasting,
   filterData,
   getPatterns,
   updateActiveTool,
   updateFilters,
   updatePatterns,
-  updateSelectedMeasures
+  updateSelectedMeasures, updateShowGroundTruthChangepoints,
+  applyForecasting,
 } from '../visualizer.reducer';
 import {IPatterns} from "app/shared/model/patterns.model";
 import {IQueryResults} from "app/shared/model/query-results.model";
@@ -100,13 +101,20 @@ export interface IToolkitProps {
   applyCpDetection: typeof applyCpDetection,
   cpDetectionEnabled: boolean,
   enableCpDetection: typeof enableCpDetection,
+  updateShowGroundTruthChangepoints: typeof updateShowGroundTruthChangepoints,
+  groundTruthChangepointsEnabled: boolean,
+  forecasting:boolean,
+  enableForecasting: typeof enableForecasting,
+  applyForecasting: typeof applyForecasting,
+  forecastData: any,
 }
 
 const Toolkit = (props: IToolkitProps) => {
   const {
     open, dataset, data, selectedMeasures, patterns,
     resampleFreq, customChangePoints, activeTool, filters,
-    queryResults, from, to, cpDetectionEnabled,
+    queryResults, from, to, cpDetectionEnabled, groundTruthChangepointsEnabled,
+    forecasting, forecastData,
   } = props;
 
   const handleDrawer = () => {
@@ -118,6 +126,7 @@ const Toolkit = (props: IToolkitProps) => {
     props.setOpen(true);
     props.updateActiveTool(key);
   }
+
   return (
     <Box>
       <CssBaseline/>
@@ -138,21 +147,15 @@ const Toolkit = (props: IToolkitProps) => {
             </ListItem>
             <ListItem button key={1} onClick={() => handleToolClick(1)}>
               <ListItemIcon>
-                <CompareArrowsIcon/>
+                <TimelineIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Deviation Detection"}/>
+              <ListItemText primary={"Forecasting"}/>
             </ListItem>
             <ListItem button key={2} onClick={() => handleToolClick(2)}>
               <ListItemIcon>
                 <ManageSearchIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Changepoint Detection"}/>
-            </ListItem>
-            <ListItem button key={3} onClick={() => handleToolClick(3)}>
-              <ListItemIcon>
-                <TimelineIcon/>
-              </ListItemIcon>
-              <ListItemText primary={"Semantic Segmentation"}/>
+              <ListItemText primary={"Soiling Detection"}/>
             </ListItem>
             <ListItem button key={4} onClick={() => handleToolClick(4)}>
               <ListItemIcon>
@@ -171,7 +174,9 @@ const Toolkit = (props: IToolkitProps) => {
           resampleFreq={resampleFreq} patterns={patterns} updateSelectedMeasures={props.updateSelectedMeasures}
           updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} customChangePoints={customChangePoints}
           applyCpDetection={props.applyCpDetection} cpDetectionEnabled={cpDetectionEnabled}
-          enableCpDetection={props.enableCpDetection}
+          enableCpDetection={props.enableCpDetection} updateShowGroundTruthChangepoints={props.updateShowGroundTruthChangepoints}
+          groundTruthChangepointsEnabled={groundTruthChangepointsEnabled} enableForecasting={props.enableForecasting}
+          applyForecasting = {props.applyForecasting} forecasting={forecasting} forecastData = {forecastData}
         />
       </Drawer>
     </Box>

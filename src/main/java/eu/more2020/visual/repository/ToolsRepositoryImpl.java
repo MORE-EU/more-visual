@@ -5,18 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.Changepoint;
 import eu.more2020.visual.domain.ChangepointDetection;
+import eu.more2020.visual.domain.DataPoint;
 import eu.more2020.visual.domain.TimeRange;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,6 +68,41 @@ public class ToolsRepositoryImpl implements ToolsRepository {
 
         in.close();
         return responseObject;
+    }
+
+    @Override
+    public List<DataPoint> forecasting(String id){
+        String jsonName = applicationProperties.getWorkspacePath() + "/" + id + "_predict.json";
+        File json = new File(jsonName);
+        List<DataPoint> forecastData = new ArrayList<>();
+        if(json.exists()){
+            // read json
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                BufferedReader in = new BufferedReader(
+                    new FileReader(json));
+                String inputLine;
+                StringBuffer content = new StringBuffer();
+                while ((inputLine = in.readLine()) != null) {
+                    content.append(inputLine);
+                }
+                JsonNode responseObject = objectMapper.readTree(content.toString());
+                Iterator<Map.Entry<String, JsonNode>> iter = responseObject.fields();
+                while(iter.hasNext()){
+                    Map.Entry<String, JsonNode> datum = iter.next();
+                    double[] vals = new double[1];
+                    vals[0] = datum.getValue().asDouble();
+                    DataPoint dataPoint = new DataPoint(LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(datum.getKey())), ZoneId.systemDefault()),
+                         vals);
+                    forecastData.add(dataPoint);
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+        return forecastData;
     }
 
     @Override
