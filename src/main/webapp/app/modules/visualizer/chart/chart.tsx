@@ -10,6 +10,7 @@ import {
   updateChartRef,
   updateCompareQueryResults,
   updateCustomChangePoints,
+  updateData,
   updateFrom,
   updateQueryResults,
   updateResampleFreq,
@@ -81,6 +82,7 @@ export interface IChartProps {
   updateTo: typeof updateTo;
   updateChartRef: typeof updateChartRef;
   updateResampleFreq: typeof updateResampleFreq;
+  updateData: typeof updateData;
   compare: any[];
 }
 
@@ -319,13 +321,16 @@ export const Chart = (props: IChartProps) => {
     
     setInterval(() => {
     if(latestLiveData.current){
+      const x = [];
       chart.current.series.map((serie, idx) => {
       const minVal = chart.current.series[idx].dataMin;
       const maxVal = chart.current.series[idx].dataMax;
       const y = Math.random() * (maxVal - minVal) + minVal;
       end = end + 60000;
-        chart.current.series[idx].addPoint([end, y], true, false);
+        // chart.current.series[idx].addPoint([end, y], true, false);
+        x.push(y);
       })
+      props.updateData({timestamp: end, values: x})
       const {min} = chart.current.xAxis[0].getExtremes();
       chart.current.xAxis[0].setExtremes(min + 60000, end);
     }

@@ -34,6 +34,7 @@ import {
   updateChartRef,
   resetChartValues,
   updateLiveData,
+  updateData,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
@@ -153,7 +154,8 @@ export const Visualizer = (props: IVisualizerProps) => {
                             updateCompare={props.updateCompare} chartRef={chartRef} updateChartRef={props.updateChartRef}
                             compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}
                             updateFrom={props.updateFrom} updateTo={props.updateTo} queryResults={queryResults}
-                            loading={loading} queryResultsLoading={queryResultsLoading} applyCpDetection={props.applyCpDetection}/>
+                            loading={loading} queryResultsLoading={queryResultsLoading} applyCpDetection={props.applyCpDetection}
+                            updateData={props.updateData}/>
           </Paper>
         </Box>
         <Toolkit
@@ -209,7 +211,7 @@ const mapDispatchToProps = {
   updatePatterns, getPatterns, updateChangeChart, updateDatasetChoice,
   getWdFiles, updatePatternNav, updateCustomChangePoints, getChangePointDates,
   updateGraphZoom, updateActiveTool, updateCompare, updateCompareQueryResults,
-  applyCpDetection, enableCpDetection, updateChartRef, resetChartValues, updateLiveData
+  applyCpDetection, enableCpDetection, updateChartRef, resetChartValues, updateLiveData, updateData
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

@@ -17,6 +17,7 @@ import {
   updateResampleFreq,
   applyCpDetection,
   updateLiveData,
+  updateData,
 } from '../visualizer.reducer';
 import Chart from './chart';
 import {ChartControl} from './chart-control';
@@ -61,6 +62,7 @@ export interface IChartContainerProps {
   updateChartRef: typeof updateChartRef;
   setOpen: Dispatch<SetStateAction<boolean>>;
   updateLiveData: typeof updateLiveData;
+  updateData: typeof updateData;
 }
 
 export const ChartContainer = (props: IChartContainerProps) => {
@@ -91,6 +93,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
                     updateFrom={props.updateFrom} updateTo={props.updateTo} resampleFreq={resampleFreq}
                     updateQueryResults={props.updateQueryResults} dataset={dataset}/>
       <Chart
+        updateData={props.updateData}
         dataset={dataset}
         queryResults={queryResults}
         data={data}

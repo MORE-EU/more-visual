@@ -40,6 +40,7 @@ export const ACTION_TYPES = {
   RESET_CHART_VALUES: 'visualizer/RESET_CHART_VALUES',
   FETCH_QUERY_COMPARE_RESULTS: 'visualizer/FETCH_QUERY_COMPARE_RESULTS',
   FETCH_DIRECTORIES: 'visualizer/FETCH_DIRECTORIES',
+  UPDATE_DATA: 'visualizer/UPDATE_DATA',
 };
 
 const initialState = {
@@ -263,6 +264,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         liveData: !state.liveData,
       };
+    case ACTION_TYPES.UPDATE_DATA:
+      return {
+        ...state,
+        data: [...state.data, action.payload],
+      };
     case ACTION_TYPES.UPDATE_COMPARE:
       return {
         ...state,
@@ -425,6 +431,11 @@ export const updateCompare = (data: string) => ({
 
 export const updateLiveData = () => ({
   type: ACTION_TYPES.UPDATE_LIVEDATA,
+});
+
+export const updateData = (data: {}) => ({
+  type: ACTION_TYPES.UPDATE_DATA,
+  payload: data,
 });
 
 export const filterData = removePoints => (dispatch, getState) => {
