@@ -120,6 +120,7 @@ export const Chart = (props: IChartProps) => {
 
   const [zones, setZones] = useState([]);
   const [plotBands, setPlotBands] = useState([]);
+  const [points, setPoints] = useState([]);
   const [type, setType] = useState("line");
 
   // Refs
@@ -222,6 +223,7 @@ export const Chart = (props: IChartProps) => {
     latestDatasetId.current = dataset.id;
     latestFolder.current = folder;
     let end = to;
+    let val = 10;
 
     // CHART: INSTRUCTIONS
     chart.current.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
@@ -333,6 +335,19 @@ export const Chart = (props: IChartProps) => {
       props.updateData({timestamp: end, values: x})
       const {min} = chart.current.xAxis[0].getExtremes();
       chart.current.xAxis[0].setExtremes(min + 60000, end);
+    }
+    if(val < 300){
+      const p = {      
+      point: {
+      x: data[val].timestamp,
+      y: data[val].values[0],
+      yAxis: 0,
+      xAxis: 0
+    },
+    text: `Label ${val / 10}`
+    }
+    data.length !== 0 && setPoints(prev => [...prev, p]);
+    val += 10;
     }
     }, 1000)
 
@@ -524,6 +539,10 @@ export const Chart = (props: IChartProps) => {
                     ]
                     : null,
               })),
+              annotations: [{
+                draggable: '',
+                labels: points
+            }],
             rangeSelector: {
               enabled: false,
             },
