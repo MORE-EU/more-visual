@@ -17,7 +17,7 @@ import {
   updateTo,
 } from "../visualizer.reducer";
 import {IPatterns} from "app/shared/model/patterns.model";
-import {Grid, LinearProgress, Typography} from "@mui/material";
+import {Grid, LinearProgress, Slider} from "@mui/material";
 import annotationsAdvanced from "highcharts/modules/annotations-advanced";
 import stockTools from "highcharts/modules/stock-tools";
 import {useScrollBlock} from "app/shared/util/useScrollBlock";
@@ -27,6 +27,7 @@ import {IQueryResults} from "app/shared/model/query-results.model";
 import {ITimeRange} from "app/shared/model/time-range.model";
 import _debounce from "lodash/debounce";
 import moment from "moment";
+import CloseIcon from '@mui/icons-material/Close';
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
   time: {
@@ -119,9 +120,44 @@ export const Chart = (props: IChartProps) => {
   const [blockScroll, allowScroll] = useScrollBlock();
 
   const [zones, setZones] = useState([]);
-  const [plotBands, setPlotBands] = useState([]);
-  const [points, setPoints] = useState([]);
+  // const [plotBands, setPlotBands] = useState([]);
   const [type, setType] = useState("line");
+  const [sliderVal, setSliderVal] = useState(null);
+  const [selectedPlot, setSelectedPlot] = useState(null);
+  const [ploti, setPloti] = useState([{
+    color: '#FCFFC5',
+    from: 1514932200000,
+    to: 1514936400000,
+    id: "plot1",
+    label: { 
+      text: 'plot 1', 
+      align: 'center' 
+    },
+    borderWidth: 0,
+    borderColor: 'black',
+    events: {
+        mouseup(e) {
+            handlePlotBandsSelection(this.id);
+        } 
+    }
+},
+{
+  color: '#FCFFC5',
+  from: 1514939400000,
+  to: 1514942400000,
+  id: "plot2",
+  label: { 
+    text: 'plot 2', 
+    align: 'center'
+  },
+  borderWidth: 0,
+  borderColor: 'black',
+  events: {
+      mouseup(e) {
+          handlePlotBandsSelection(this.id);
+      } 
+  }
+}])
 
   // Refs
   const latestFrequency = useRef(resampleFreq);
@@ -165,22 +201,22 @@ export const Chart = (props: IChartProps) => {
 
 
   // Color Bands for Change-points
-  useEffect(() => {
-    const newPlotBands = (detectedChangePoints !== null && [].concat(...detectedChangePoints.map(date => {
-      return {
-        color: '#1e90ff',
-        from: date.range.from,
-        to: date.range.to,
-      };
-    })));
-    setPlotBands(newPlotBands);
-  }, [detectedChangePoints]);
+  // useEffect(() => {
+  //   const newPlotBands = (detectedChangePoints !== null && [].concat(...detectedChangePoints.map(date => {
+  //     return {
+  //       color: '#1e90ff',
+  //       from: date.range.from,
+  //       to: date.range.to,
+  //     };
+  //   })));
+  //   setPlotBands(newPlotBands);
+  // }, [detectedChangePoints]);
 
 
-  useEffect(() => {
-    isCpDetectionEnabled.current = cpDetectionEnabled;
-    if(!cpDetectionEnabled) setPlotBands([]);
-  }, [cpDetectionEnabled]);
+  // useEffect(() => {
+  //   isCpDetectionEnabled.current = cpDetectionEnabled;
+  //   if(!cpDetectionEnabled) setPlotBands([]);
+  // }, [cpDetectionEnabled]);
 
 
   useEffect(() => {
@@ -217,13 +253,65 @@ export const Chart = (props: IChartProps) => {
     return {range: {from: startPoint, to: endPoint} as ITimeRange, id: len};
   };
 
+  const handlePlotBandsSelection = (id) => {
+    if(typeof id === "string")
+    {
+    const idx = ploti.findIndex(x => x.id === id);
+    if(idx !== selectedPlot){
+    setSelectedPlot(idx);
+    setSliderVal([ploti[idx].from, ploti[idx].to])
+    setPloti([...ploti].map(object => {
+      if(object.id === id) {
+        return {
+          ...object,
+          borderWidth: 1,
+        }
+      }else if(object.id !== id && object.borderWidth === 1){
+        return {
+          ...object,
+          borderWidth: 0,
+        }
+      }
+      else return object;
+    }))
+    }
+    }
+    else if(Array.isArray(id))
+    {
+    setSliderVal(id);
+    setPloti([...ploti].map((object, idx) => {
+      if(idx === selectedPlot) {
+        return {
+          ...object,
+          from: id[0],
+          to: id[1]
+        }
+      }
+      else return object;
+    }))
+    }
+    else
+    {
+    setSliderVal(null);
+    setSelectedPlot(null);
+    setPloti([...ploti].map((object, idx) => {
+      if(object.borderWidth === 1) {
+        return {
+          ...object,
+          borderWidth: 0
+        }
+      }
+      else return object;
+    }))
+    }
+  }
+
   const chartFunctions = (e: { target: any; }) => {
     chart.current = e.target;
     timeRange.current = queryResults.timeRange;
     latestDatasetId.current = dataset.id;
     latestFolder.current = folder;
     let end = to;
-    let val = 10;
 
     // CHART: INSTRUCTIONS
     chart.current.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
@@ -335,19 +423,6 @@ export const Chart = (props: IChartProps) => {
       props.updateData({timestamp: end, values: x})
       const {min} = chart.current.xAxis[0].getExtremes();
       chart.current.xAxis[0].setExtremes(min + 60000, end);
-    }
-    if(val < 300){
-      const p = {      
-      point: {
-      x: data[val].timestamp,
-      y: data[val].values[0],
-      yAxis: 0,
-      xAxis: 0
-    },
-    text: `Label ${val / 10}`
-    }
-    data.length !== 0 && setPoints(prev => [...prev, p]);
-    val += 10;
     }
     }, 1000)
 
@@ -494,7 +569,7 @@ export const Chart = (props: IChartProps) => {
               ordinal: false,
               type: "datetime",
               // range: graphZoom !== null ? graphZoom : Number.MAX_SAFE_INTEGER,
-              plotBands,
+              plotBands: ploti,
             },
             yAxis: changeChart
               ? selectedMeasures.map((measure, idx) => ({
@@ -539,10 +614,6 @@ export const Chart = (props: IChartProps) => {
                     ]
                     : null,
               })),
-              annotations: [{
-                draggable: '',
-                labels: points
-            }],
             rangeSelector: {
               enabled: false,
             },
@@ -563,7 +634,7 @@ export const Chart = (props: IChartProps) => {
             },
             stockTools: {
               gui: {
-                enabled: true,
+                enabled: false,
                 // buttons: ['changeType', 'indicators', 'verticalLabels', 'highlightIntervals',
                 //   'separator', 'compareFiles', 'fullScreen',],
                 buttons: [
@@ -706,6 +777,18 @@ export const Chart = (props: IChartProps) => {
           }}
         />
       )}
+      {sliderVal &&
+      <Grid sx={{ml: 3, mr: 3, display: "flex"}}>
+      <CloseIcon onClick={() => {handlePlotBandsSelection(null)}}/>
+      <Slider
+      value={sliderVal}
+      onChange={(e, newVal) => {handlePlotBandsSelection(newVal)}}
+      min={parseInt(data[0].timestamp, 10)}
+      max={parseInt(data[data.length-1].timestamp, 10)}
+      valueLabelDisplay="auto"
+      valueLabelFormat={x => `${new Date(x)}`}
+      />
+      </Grid>}
     </Grid>
   );
 };
