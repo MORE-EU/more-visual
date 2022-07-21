@@ -235,6 +235,59 @@ export const Chart = (props: IChartProps) => {
     return {range: {from: startPoint, to: endPoint} as ITimeRange, id: len};
   };
 
+  const handlePlotBandsSelection = (id) => {
+    if(typeof id === "string")
+    {
+      const idx = ploti.findIndex(x => x.id === id);
+      if(idx !== selectedPlot){
+        setSelectedPlot(idx);
+        setSliderVal([ploti[idx].from, ploti[idx].to])
+        setPloti([...ploti].map(object => {
+          if(object.id === id) {
+            return {
+              ...object,
+              borderWidth: 1,
+            }
+          }else if(object.id !== id && object.borderWidth === 1){
+            return {
+              ...object,
+              borderWidth: 0,
+            }
+          }
+          else return object;
+        }))
+      }
+    }
+    else if(Array.isArray(id))
+    {
+      setSliderVal(id);
+      setPloti([...ploti].map((object, idx) => {
+        if(idx === selectedPlot) {
+          return {
+            ...object,
+            from: id[0],
+            to: id[1]
+          }
+        }
+        else return object;
+      }))
+    }
+    else
+    {
+      setSliderVal(null);
+      setSelectedPlot(null);
+      setPloti([...ploti].map((object, idx) => {
+        if(object.borderWidth === 1) {
+          return {
+            ...object,
+            borderWidth: 0
+          }
+        }
+        else return object;
+      }))
+    }
+  }
+
   const chartFunctions = (e: { target: any; }) => {
     chart.current = e.target;
     timeRange.current = queryResults.timeRange;
