@@ -16,7 +16,7 @@ import {
   updateTo,
 } from "../visualizer.reducer";
 import {IPatterns} from "app/shared/model/patterns.model";
-import {Grid, LinearProgress, Typography} from "@mui/material";
+import {Grid, LinearProgress, Slider, Typography} from "@mui/material";
 import annotationsAdvanced from "highcharts/modules/annotations-advanced";
 import stockTools from "highcharts/modules/stock-tools";
 import {useScrollBlock} from "app/shared/util/useScrollBlock";
@@ -26,6 +26,7 @@ import {IQueryResults} from "app/shared/model/query-results.model";
 import {ITimeRange} from "app/shared/model/time-range.model";
 import _debounce from "lodash/debounce";
 import moment from "moment";
+import CloseIcon from "@mui/icons-material/Close";
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
   time: {
@@ -746,6 +747,18 @@ export const Chart = (props: IChartProps) => {
         />
       )}
     </Grid>
+    {sliderVal &&
+    <Grid sx={{ml: 3, mr: 3, display: "flex"}}>
+      <CloseIcon onClick={() => {handlePlotBandsSelection(null)}}/>
+      <Slider
+        value={sliderVal}
+        onChange={(e, newVal) => {handlePlotBandsSelection(newVal)}}
+        min={parseInt(data[0].timestamp, 10)}
+        max={parseInt(data[data.length-1].timestamp, 10)}
+        valueLabelDisplay="auto"
+        valueLabelFormat={x => `${new Date(x)}`}
+      />
+    </Grid>}
   );
 };
 
