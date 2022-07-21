@@ -122,40 +122,6 @@ export const Chart = (props: IChartProps) => {
   const [type, setType] = useState("line");
   const [sliderVal, setSliderVal] = useState(null);
   const [selectedPlot, setSelectedPlot] = useState(null);
-  const [ploti, setPloti] = useState([{
-    color: '#FCFFC5',
-    from: 1514932200000,
-    to: 1514936400000,
-    id: "plot1",
-    label: {
-      text: 'plot 1',
-      align: 'center'
-    },
-    borderWidth: 0,
-    borderColor: 'black',
-    events: {
-      mouseup(e) {
-        handlePlotBandsSelection(this.id);
-      }
-    }
-  },
-    {
-      color: '#FCFFC5',
-      from: 1514939400000,
-      to: 1514942400000,
-      id: "plot2",
-      label: {
-        text: 'plot 2',
-        align: 'center'
-      },
-      borderWidth: 0,
-      borderColor: 'black',
-      events: {
-        mouseup(e) {
-          handlePlotBandsSelection(this.id);
-        }
-      }
-    }])
   // Refs
   const latestFrequency = useRef(resampleFreq);
   const latestLeftSide = useRef(null);
@@ -205,21 +171,22 @@ export const Chart = (props: IChartProps) => {
 
   // Color Bands for Change-points
   useEffect(() => {
-    let newChangepointPlotBands = (detectedChangePoints !== null && [].concat(...detectedChangePoints.map(date => {
+    let newChangepointPlotBands = (detectedChangePoints !== null && [].concat(...detectedChangePoints.map((date, idx) => {
       return {
-        color: '#1e90ff',
+        color: '#FCFFC5',
         from: date.range.from,
         to: date.range.to,
+        id: "pb" + idx,
+        // label: {
+        //   text: 'plot 1',
+        //   align: 'center'
+        // },
+        borderWidth: 0,
+        borderColor: 'black',
         events: {
-          click: e => {
-          },
-          mouseover: function(e) {
-            this.svgElem.attr('fill', new Highcharts.Color(this.options.color).brighten(0.1).get());
-          },
-          mouseout: function(e) {
-            this.svgElem.attr('fill', this.options.color);
-          },
-
+          mouseup(e) {
+            handlePlotBandsSelection(this.id);
+          }
         }
       };
     })));
@@ -272,13 +239,13 @@ export const Chart = (props: IChartProps) => {
   };
 
   const handlePlotBandsSelection = (id) => {
-    if(typeof id === "string")
-    {
-      const idx = ploti.findIndex(x => x.id === id);
+    console.log(plotBands);
+    if(typeof id === "string") {
+      const idx = plotBands.findIndex(x => x.id === id);
       if(idx !== selectedPlot){
         setSelectedPlot(idx);
-        setSliderVal([ploti[idx].from, ploti[idx].to])
-        setPloti([...ploti].map(object => {
+        setSliderVal([plotBands[idx].from, plotBands[idx].to])
+        setPlotBands([...plotBands].map(object => {
           if(object.id === id) {
             return {
               ...object,
@@ -294,10 +261,9 @@ export const Chart = (props: IChartProps) => {
         }))
       }
     }
-    else if(Array.isArray(id))
-    {
+    else if(Array.isArray(id)) {
       setSliderVal(id);
-      setPloti([...ploti].map((object, idx) => {
+      setPlotBands([...plotBands].map((object, idx) => {
         if(idx === selectedPlot) {
           return {
             ...object,
@@ -308,11 +274,10 @@ export const Chart = (props: IChartProps) => {
         else return object;
       }))
     }
-    else
-    {
+    else {
       setSliderVal(null);
       setSelectedPlot(null);
-      setPloti([...ploti].map((object, idx) => {
+      setPlotBands([...plotBands].map((object, idx) => {
         if(object.borderWidth === 1) {
           return {
             ...object,
