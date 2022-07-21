@@ -120,7 +120,42 @@ export const Chart = (props: IChartProps) => {
   const [zones, setZones] = useState([]);
   const [plotBands, setPlotBands] = useState([]);
   const [type, setType] = useState("line");
-
+  const [sliderVal, setSliderVal] = useState(null);
+  const [selectedPlot, setSelectedPlot] = useState(null);
+  const [ploti, setPloti] = useState([{
+    color: '#FCFFC5',
+    from: 1514932200000,
+    to: 1514936400000,
+    id: "plot1",
+    label: {
+      text: 'plot 1',
+      align: 'center'
+    },
+    borderWidth: 0,
+    borderColor: 'black',
+    events: {
+      mouseup(e) {
+        handlePlotBandsSelection(this.id);
+      }
+    }
+  },
+    {
+      color: '#FCFFC5',
+      from: 1514939400000,
+      to: 1514942400000,
+      id: "plot2",
+      label: {
+        text: 'plot 2',
+        align: 'center'
+      },
+      borderWidth: 0,
+      borderColor: 'black',
+      events: {
+        mouseup(e) {
+          handlePlotBandsSelection(this.id);
+        }
+      }
+    }])
   // Refs
   const latestFrequency = useRef(resampleFreq);
   const latestLeftSide = useRef(null);
@@ -746,7 +781,6 @@ export const Chart = (props: IChartProps) => {
           }}
         />
       )}
-    </Grid>
     {sliderVal &&
     <Grid sx={{ml: 3, mr: 3, display: "flex"}}>
       <CloseIcon onClick={() => {handlePlotBandsSelection(null)}}/>
@@ -759,6 +793,7 @@ export const Chart = (props: IChartProps) => {
         valueLabelFormat={x => `${new Date(x)}`}
       />
     </Grid>}
+    </Grid>
   );
 };
 
