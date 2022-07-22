@@ -50,6 +50,7 @@ const initialState = {
   dataset: null,
   queryResults: null as IQueryResults,
   data: null as IDataPoint[],
+  secondaryData: null as IDataPoint[],
   compareData: null,
   queryResultsLoading: true,
   selectedMeasures: [],
@@ -181,6 +182,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
       return {
         ...state,
         detectedChangePoints: action.payload.data,
+        secondaryData: state.data,
       };
     case ACTION_TYPES.UPDATE_SELECTED_MEASURES:
       return {

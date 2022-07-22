@@ -3,17 +3,18 @@ import {IDataset} from "app/shared/model/dataset.model";
 import {Box, Button, Divider, Switch, Tooltip, Typography,} from "@mui/material";
 import {
   applyCpDetection,
-  enableCpDetection,
+  enableCpDetection, updateSelectedMeasures,
   updateShowGroundTruthChangepoints
 } from "app/modules/visualizer/visualizer.reducer";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 
-export interface IChangepointDetectionProps {
+export interface ISoilingDetectionProps {
   dataset: IDataset,
   data: any,
   customChangePoints: any,
   from: number,
   to: number,
+  updateSelectedMeasures: typeof updateSelectedMeasures,
   applyCpDetection: typeof applyCpDetection,
   cpDetectionEnabled: boolean,
   updateShowGroundTruthChangepoints: typeof updateShowGroundTruthChangepoints,
@@ -22,7 +23,7 @@ export interface IChangepointDetectionProps {
 }
 
 
-export const ChangepointDetection = (props: IChangepointDetectionProps) => {
+export const SoilingDetection = (props: ISoilingDetectionProps) => {
   const {dataset, customChangePoints, from, to,
     cpDetectionEnabled, groundTruthChangepointsEnabled} = props;
   const [detectIntervals, setDetectIntervals] = useState(false);
@@ -30,6 +31,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   const handleCpDetection = () => {
     const action = !cpDetectionEnabled;
     props.enableCpDetection(action);
+    props.updateSelectedMeasures([dataset.header.indexOf("power"), dataset.header.indexOf("precipitation")])
     if(action)
       props.applyCpDetection(dataset.id, from, to,
         customChangePoints);
@@ -118,7 +120,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
           >
             <ManageSearchIcon/>
             <Typography variant="body1" gutterBottom sx={{fontWeight:600}}>
-              Area Selection
+              Detect Soiling
             </Typography>
           </Box>
         </Box>
@@ -128,5 +130,5 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   );
 }
 
-export default ChangepointDetection;
+export default SoilingDetection;
 

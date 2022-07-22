@@ -55,6 +55,7 @@ export interface IChartProps {
   queryResultsLoading: boolean;
   queryResults: IQueryResults;
   data: IDataPoint[];
+  secondaryData: IDataPoint[];
   compareData: any[];
   updateQueryResults: typeof updateQueryResults;
   selectedMeasures: number[];
@@ -95,6 +96,7 @@ export const Chart = (props: IChartProps) => {
   const {
     dataset,
     data,
+    secondaryData,
     selectedMeasures,
     filters,
     from,
@@ -168,12 +170,11 @@ export const Chart = (props: IChartProps) => {
   }, [patterns]);
 
 
-
   // Color Bands for Change-points
   useEffect(() => {
     let newChangepointPlotBands = (detectedChangePoints !== null && [].concat(...detectedChangePoints.map((date, idx) => {
       return {
-        color: '#FCFFC5',
+        color: '#f56342',
         from: date.range.from,
         to: date.range.to,
         id: "pb" + idx,
@@ -184,16 +185,22 @@ export const Chart = (props: IChartProps) => {
         borderWidth: 0,
         borderColor: 'black',
         events: {
-          mouseup(e) {
-            handlePlotBandsSelection(this.id);
-          }
+          // mouseup(e) {
+          //   handlePlotBandsSelection(this.id);
+          // }
+          mouseover: function(e) {
+            this.svgElem.attr('fill', new Highcharts.Color(this.options.color).brighten(0.1).get());
+          },
+          mouseout: function(e) {
+            this.svgElem.attr('fill', this.options.color);
+          },
         }
       };
     })));
     if(groundTruthChangepointsEnabled) newChangepointPlotBands = newChangepointPlotBands.concat(gtPlotBands);
     setPlotBands(newChangepointPlotBands);
-  }, [detectedChangePoints, groundTruthChangepointsEnabled]);
 
+  }, [detectedChangePoints, groundTruthChangepointsEnabled]);
 
   useEffect(() => {
     isCpDetectionEnabled.current = cpDetectionEnabled;
@@ -202,7 +209,6 @@ export const Chart = (props: IChartProps) => {
       else setPlotBands([]);
     }
   }, [cpDetectionEnabled, groundTruthChangepointsEnabled]);
-
 
   useEffect(() => {
     if(chartRef !== null){
@@ -394,17 +400,94 @@ export const Chart = (props: IChartProps) => {
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
     };
 
-  let chartData = (data !== null) ? selectedMeasures
-    .map((measure, index) => ({
-      data: data.map((d) => {
-        const val = d.values[index];
-        return [d.timestamp, isNaN(val) ? null : val];
-      }),
-      name: dataset.header[measure],
-      yAxis: changeChart ? index : 0,
-      zoneAxis: "x",
-      zones,
-    })) : [];
+  const computeChartData = () => {
+    let chartData = (data !== null) ? selectedMeasures
+      .map((measure, index) => ({
+        data: data.map((d) => {
+          const val = d.values[index];
+          return [d.timestamp, isNaN(val) ? null : val];
+        }),
+        name: dataset.header[measure],
+        yAxis: changeChart ? index : 0,
+        zoneAxis: "x",
+        zones,
+      })) : [];
+    if(secondaryData){
+      const sz = chartData !== null ? chartData.length : 0;
+      chartData = [...chartData, {...chartData[0], yAxis: sz, name: "Soiling Ratio"}]
+    }
+    return chartData;
+  }
+
+  const computeYAxisData = () => {
+    let yAxisData = changeChart
+      ? selectedMeasures.map((measure, idx) => ({
+        title: {
+          enabled: true,
+          text: dataset.header[measure],
+        },
+        opposite: false,
+        top: `${(100 / selectedMeasures.length) * idx}%`,
+        height: `${
+          selectedMeasures.length > 1
+            ? 100 / selectedMeasures.length - 5
+            : 100
+        }%`,
+        offset: 0,
+        plotBands:
+          measure in filters
+            ? [
+              {
+                from: filters[measure][0],
+                to: filters[measure][1],
+              },
+            ]
+            : null,
+      }))
+      : selectedMeasures.map((measure, idx) => ({
+        title: {
+          enabled: false,
+          text: dataset.header[measure],
+        },
+        opposite: false,
+        top: "0%",
+        height: "100%",
+        offset: undefined,
+        plotBands:
+          measure in filters
+            ? [
+              {
+                from: filters[measure][0],
+                to: filters[measure][1],
+              },
+            ]
+            : null,
+      }));
+    if(secondaryData){
+      const sz = yAxisData.length;
+      const percent = Math.floor(90 / sz);
+      const newAxis = {
+        title: {
+          enabled: true,
+            text: "Soiling Ratio",
+          },
+        opposite: false,
+        top: `0%`,
+        height: `10%`,
+        offset: 0,
+        plotBands: [],
+      };
+      yAxisData = yAxisData.map((y, idx) =>
+        ({
+          ...y,
+          height: (percent - 5).toString() + "%",
+          top:  (12 + percent * idx).toString() + "%",
+        })
+      );
+      yAxisData.push(newAxis);
+    }
+    return yAxisData;
+  }
 
   const forecastChartData = (forecastData !== null) ? selectedMeasures
     .map((measure, index) => ({
@@ -517,7 +600,9 @@ export const Chart = (props: IChartProps) => {
             },
             series:
               [
-                ...chartData, ...forecastChartData, ...compareChartData
+                ...computeChartData(),
+                ...forecastChartData,
+                ...compareChartData
               ],
             chart: {
               type,
@@ -540,49 +625,7 @@ export const Chart = (props: IChartProps) => {
               // range: graphZoom !== null ? graphZoom : Number.MAX_SAFE_INTEGER,
               plotBands,
             },
-            yAxis: changeChart
-              ? selectedMeasures.map((measure, idx) => ({
-                title: {
-                  enabled: true,
-                  text: dataset.header[measure],
-                },
-                opposite: false,
-                top: `${(100 / selectedMeasures.length) * idx}%`,
-                height: `${
-                  selectedMeasures.length > 1
-                    ? 100 / selectedMeasures.length - 5
-                    : 100
-                }%`,
-                offset: 0,
-                plotBands:
-                  measure in filters
-                    ? [
-                      {
-                        from: filters[measure][0],
-                        to: filters[measure][1],
-                      },
-                    ]
-                    : null,
-              }))
-              : selectedMeasures.map((measure, idx) => ({
-                title: {
-                  enabled: false,
-                  text: dataset.header[measure],
-                },
-                opposite: false,
-                top: "0%",
-                height: "100%",
-                offset: undefined,
-                plotBands:
-                  measure in filters
-                    ? [
-                      {
-                        from: filters[measure][0],
-                        to: filters[measure][1],
-                      },
-                    ]
-                    : null,
-              })),
+            yAxis: computeYAxisData(),
             rangeSelector: {
               enabled: false,
             },

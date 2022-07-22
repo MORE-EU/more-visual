@@ -56,7 +56,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     resampleFreq, patterns, graphZoom, customChangePoints,
     detectedChangePoints, activeTool, compare, filters, compareData,
     queryResultsLoading, from, to, cpDetectionEnabled, chartRef, groundTruthChangepointsEnabled,
-    forecasting, forecastData,
+    forecasting, forecastData, secondaryData,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -158,7 +158,7 @@ export const Visualizer = (props: IVisualizerProps) => {
                             compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}
                             updateFrom={props.updateFrom} updateTo={props.updateTo} queryResults={queryResults}
                             loading={loading} queryResultsLoading={queryResultsLoading} applyCpDetection={props.applyCpDetection}
-                            forecastData = {forecastData}/>
+                            forecastData = {forecastData} secondaryData={secondaryData}/>
           </Paper>
         </Box>
         <Toolkit
@@ -187,6 +187,7 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   dataset: visualizer.dataset,
   queryResults: visualizer.queryResults,
   data: visualizer.data,
+  secondaryData: visualizer.secondaryData,
   selectedMeasures: visualizer.selectedMeasures,
   from: visualizer.from,
   to: visualizer.to,

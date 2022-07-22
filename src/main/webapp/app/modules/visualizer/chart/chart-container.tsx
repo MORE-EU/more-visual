@@ -30,6 +30,7 @@ export interface IChartContainerProps {
   queryResults: IQueryResults;
   wdFiles: any[];
   data: IDataPoint[];
+  secondaryData: IDataPoint[];
   compareData: any[];
   selectedMeasures: number[];
   from: number;
@@ -64,7 +65,7 @@ export interface IChartContainerProps {
 
 export const ChartContainer = (props: IChartContainerProps) => {
   const {
-    dataset, data, selectedMeasures, from, to, filters,
+    dataset, data, secondaryData, selectedMeasures, from, to, filters,
     wdFiles, changeChart, folder, graphZoom, customChangePoints,
     detectedChangePoints, cpDetectionEnabled,  resampleFreq, chartRef,
     queryResults, compare, compareData, loading, queryResultsLoading,
@@ -94,6 +95,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
         dataset={dataset}
         queryResults={queryResults}
         data={data}
+        secondaryData={secondaryData}
         compareData={compareData}
         selectedMeasures={selectedMeasures}
         updateQueryResults={props.updateQueryResults}

@@ -15,7 +15,7 @@ import {
   updateSelectedMeasures, updateShowGroundTruthChangepoints,
   applyForecasting,
 } from '../visualizer.reducer';
-import ChangepointDetection from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
+import ChangepointDetection, {SoilingDetection} from "app/modules/visualizer/tools/soiling-detection/soiling-detection";
 import Forecasting from "app/modules/visualizer/tools/forecasting/forecasting";
 import {IQueryResults} from "app/shared/model/query-results.model";
 import Filter from "app/modules/visualizer/tools/filter/filter";
@@ -84,7 +84,7 @@ const ActiveTool = (props: IActiveToolProps) => {
             />
           }
           {activeTool === 2 &&
-            <ChangepointDetection
+            <SoilingDetection
               dataset={dataset}
               from={from}
               to={to}
@@ -95,6 +95,7 @@ const ActiveTool = (props: IActiveToolProps) => {
               cpDetectionEnabled={cpDetectionEnabled}
               updateShowGroundTruthChangepoints={props.updateShowGroundTruthChangepoints}
               groundTruthChangepointsEnabled={groundTruthChangepointsEnabled}
+              updateSelectedMeasures={props.updateSelectedMeasures}
             />
           }
           {activeTool === 4 &&
