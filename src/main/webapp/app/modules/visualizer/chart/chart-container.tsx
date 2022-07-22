@@ -16,6 +16,7 @@ import {
   updateTo,
   updateResampleFreq,
   applyCpDetection,
+  applySoilingDetection,
 } from '../visualizer.reducer';
 import Chart from './chart';
 import {ChartControl} from './chart-control';
@@ -61,6 +62,8 @@ export interface IChartContainerProps {
   updateChartRef: typeof updateChartRef;
   setOpen: Dispatch<SetStateAction<boolean>>;
   forecastData: IDataPoint[];
+  soilingEnabled: boolean;
+  applySoilingDetection: typeof applySoilingDetection;
 }
 
 export const ChartContainer = (props: IChartContainerProps) => {
@@ -69,7 +72,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
     wdFiles, changeChart, folder, graphZoom, customChangePoints,
     detectedChangePoints, cpDetectionEnabled,  resampleFreq, chartRef,
     queryResults, compare, compareData, loading, queryResultsLoading,
-    groundTruthChangepointsEnabled, forecastData,
+    groundTruthChangepointsEnabled, forecastData, soilingEnabled,
   } = props;
 
   const [showDatePick, setShowDatePick] = useState(false);
@@ -127,6 +130,8 @@ export const ChartContainer = (props: IChartContainerProps) => {
         updateTo={props.updateTo}
         updateChartRef={props.updateChartRef}
         forecastData={forecastData}
+        soilingEnabled={soilingEnabled}
+        applySoilingDetection={props.applySoilingDetection}
       />
     </Box>
   );

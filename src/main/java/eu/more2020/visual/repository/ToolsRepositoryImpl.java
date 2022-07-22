@@ -156,5 +156,12 @@ public class ToolsRepositoryImpl implements ToolsRepository {
         return null;
     }
 
+    @Override
+    public List<DataPoint> soilingDetection(String id, TimeRange range) {
+        List<DataPoint> soilingIndex = new ArrayList<>();
+
+        return soilingIndex;
+    }
+
 
 }

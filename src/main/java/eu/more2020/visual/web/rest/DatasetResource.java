@@ -153,7 +153,8 @@ public class DatasetResource {
      * POST executeQuery
      */
     @PostMapping("/datasets/{folder}/{id}/query")
-    public ResponseEntity<QueryResults> executeQuery(@PathVariable String folder, @PathVariable String id, @Valid @RequestBody Query query) throws IOException {
+    public ResponseEntity<QueryResults> executeQuery(@PathVariable String folder,
+                                                     @PathVariable String id, @Valid @RequestBody Query query) throws IOException {
         log.debug("REST request to execute Query: {}", query);
         Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id, folder).map(dataset -> {
             if (dataset.getType().equals("modelar")) {
@@ -185,5 +186,13 @@ public class DatasetResource {
         log.debug("REST request to get Forecast");
         return toolsRepository.forecasting(id);
     }
+
+
+    @PostMapping("/tools/soiling/{id}")
+    public List<DataPoint> soilingDetection(@PathVariable String id, @Valid @RequestBody TimeRange range) throws IOException {
+        log.debug("REST request to apply Soiling Detection ");
+        return toolsRepository.soilingDetection(id, range);
+    }
+
 
 }

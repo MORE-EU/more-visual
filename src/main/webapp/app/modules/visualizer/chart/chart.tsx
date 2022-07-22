@@ -6,6 +6,7 @@ import HighchartsMore from "highcharts/highcharts-more";
 import {IDataset} from "app/shared/model/dataset.model";
 import {
   applyCpDetection,
+  applySoilingDetection,
   updateActiveTool,
   updateChartRef,
   updateCompareQueryResults,
@@ -85,6 +86,8 @@ export interface IChartProps {
   updateResampleFreq: typeof updateResampleFreq;
   compare: any[];
   forecastData: IDataPoint[];
+  soilingEnabled: boolean;
+  applySoilingDetection: typeof applySoilingDetection;
 }
 
 // TODO: FIX FULLSCREEN
@@ -115,6 +118,7 @@ export const Chart = (props: IChartProps) => {
     groundTruthChangepointsEnabled,
     chartRef,
     forecastData,
+    soilingEnabled,
   } = props;
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -135,6 +139,7 @@ export const Chart = (props: IChartProps) => {
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
   const isCpDetectionEnabled = useRef(cpDetectionEnabled);
+  const isSoilingEnabled = useRef(soilingEnabled);
 
   const gtPlotBands = (dataset.gtChangepoints !== null && [].concat(...dataset.gtChangepoints.map(date => {
     return {
@@ -209,6 +214,10 @@ export const Chart = (props: IChartProps) => {
       else setPlotBands([]);
     }
   }, [cpDetectionEnabled, groundTruthChangepointsEnabled]);
+
+  useEffect(() => {
+    isSoilingEnabled.current = soilingEnabled;
+  }, [soilingEnabled]);
 
   useEffect(() => {
     if(chartRef !== null){
@@ -318,6 +327,7 @@ export const Chart = (props: IChartProps) => {
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
       if(isCpDetectionEnabled.current) props.applyCpDetection(latestDatasetId.current, leftSide, rightSide, customChangePoints);
+      if(isSoilingEnabled.current) props.applySoilingDetection(latestDatasetId.current, leftSide, rightSide);
     };
 
     const getSides = (max: number, min: number, p: number) => {
@@ -511,7 +521,7 @@ export const Chart = (props: IChartProps) => {
     zoneAxis: "x",
     zones,
   }))) : [];
-
+  
   return (
     <Grid
       sx={{border: "1px solid rgba(0, 0, 0, .1)", minHeight: "700px"}}

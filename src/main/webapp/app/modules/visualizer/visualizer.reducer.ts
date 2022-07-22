@@ -27,6 +27,7 @@ export const ACTION_TYPES = {
   UPDATE_GROUND_TRUTH_CHANGEPOINTS: 'visualizer/UPDATE_GROUND_TRUTH_CHANGEPOINTS',
   ENABLE_FORECASTING: 'visualizer/ENABLE_FORECASTING',
   APPLY_FORECASTING: 'visualizer/APPLY_FORECASTING',
+  APPLY_SOILING_DETECTION: 'visualizer/APPLY_SOILING_DETECTION',
   GET_PATTERNS: 'visualizer/GET_PATTERNS',
   UPDATE_CHANGECHART: 'visualizer/UPDATE_CHANGECHART',
   UPDATE_DATASETCHOICE: 'visualizer/UPDATE_DATASETCHOICE',
@@ -39,6 +40,7 @@ export const ACTION_TYPES = {
   UPDATE_COMPARE: 'visualizer/UPDATE_COMPARE',
   CHANGEPOINT_DETECTION: 'visualizer/CHANGEPOINT_DETECTION',
   ENABLE_CP_DETECTION: 'visualizer/ENABLE_CP_DETECTION',
+  ENABLE_SOILING_DETECTION: 'visualizer/ENABLE_SOILING_DETECTION',
   RESET_CHART_VALUES: 'visualizer/RESET_CHART_VALUES',
   FETCH_QUERY_COMPARE_RESULTS: 'visualizer/FETCH_QUERY_COMPARE_RESULTS',
   FETCH_DIRECTORIES: 'visualizer/FETCH_DIRECTORIES',
@@ -70,6 +72,7 @@ const initialState = {
   cpDetectionEnabled: false,
   groundTruthChangepointsEnabled: false,
   forecasting: false,
+  soilingEnabled: false,
   forecastData: null as IDataPoint[],
   graphZoom: null,
   activeTool: -1,
@@ -182,7 +185,6 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
       return {
         ...state,
         detectedChangePoints: action.payload.data,
-        secondaryData: state.data,
       };
     case ACTION_TYPES.UPDATE_SELECTED_MEASURES:
       return {
@@ -204,6 +206,12 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         cpDetectionEnabled: action.payload,
       };
+    case ACTION_TYPES.ENABLE_SOILING_DETECTION:
+      return {
+        ...state,
+        soilingEnabled: action.payload,
+        secondaryData: null,
+      };
     case ACTION_TYPES.ENABLE_FORECASTING:
       return {
         ...state,
@@ -213,6 +221,11 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
       return {
         ...state,
         forecastData: action.payload.data,
+      };
+    case SUCCESS(ACTION_TYPES.APPLY_SOILING_DETECTION):
+      return {
+        ...state,
+        secondaryData: action.payload.data,
       };
     case ACTION_TYPES.UPDATE_GROUND_TRUTH_CHANGEPOINTS:
       return {
@@ -521,6 +534,20 @@ export const applyForecasting = (id: string) => dispatch => {
   dispatch({
     type: ACTION_TYPES.APPLY_FORECASTING,
     payload: axios.post(requestUrl),
+  });
+};
+
+export const enableSoilingDetection = (bool: boolean) => ({
+  type: ACTION_TYPES.ENABLE_SOILING_DETECTION,
+  payload: bool,
+});
+
+export const applySoilingDetection = (id: string, fromDate, toDate) => dispatch => {
+  const requestUrl = `api/tools/soiling/${id}`;
+  const range = { from: fromDate, to: toDate } as ITimeRange;
+  dispatch({
+    type: ACTION_TYPES.APPLY_SOILING_DETECTION,
+    payload: axios.post(requestUrl, range),
   });
 };
 

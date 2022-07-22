@@ -15,14 +15,18 @@ import ActiveTool from "app/modules/visualizer/tools/active-tool";
 import {IDataset} from "app/shared/model/dataset.model";
 import {
   applyCpDetection,
-  enableCpDetection, enableForecasting,
+  enableCpDetection,
+  enableForecasting,
   filterData,
   getPatterns,
   updateActiveTool,
   updateFilters,
   updatePatterns,
-  updateSelectedMeasures, updateShowGroundTruthChangepoints,
+  updateSelectedMeasures,
+  updateShowGroundTruthChangepoints,
   applyForecasting,
+  enableSoilingDetection,
+  applySoilingDetection,
 } from '../visualizer.reducer';
 import {IPatterns} from "app/shared/model/patterns.model";
 import {IQueryResults} from "app/shared/model/query-results.model";
@@ -107,6 +111,8 @@ export interface IToolkitProps {
   enableForecasting: typeof enableForecasting,
   applyForecasting: typeof applyForecasting,
   forecastData: any,
+  enableSoilingDetection: typeof enableSoilingDetection,
+  applySoilingDetection: typeof applySoilingDetection,
 }
 
 const Toolkit = (props: IToolkitProps) => {
@@ -177,6 +183,7 @@ const Toolkit = (props: IToolkitProps) => {
           enableCpDetection={props.enableCpDetection} updateShowGroundTruthChangepoints={props.updateShowGroundTruthChangepoints}
           groundTruthChangepointsEnabled={groundTruthChangepointsEnabled} enableForecasting={props.enableForecasting}
           applyForecasting = {props.applyForecasting} forecasting={forecasting} forecastData = {forecastData}
+          enableSoilingDetection = {props.enableSoilingDetection} applySoilingDetection = {props.applySoilingDetection}
         />
       </Drawer>
     </Box>

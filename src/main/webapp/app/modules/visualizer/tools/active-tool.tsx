@@ -6,14 +6,18 @@ import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
 import {
   applyCpDetection,
-  enableCpDetection, enableForecasting,
+  enableCpDetection,
+  enableForecasting,
   filterData,
   getPatterns,
   updateActiveTool,
   updateFilters,
   updatePatterns,
-  updateSelectedMeasures, updateShowGroundTruthChangepoints,
+  updateSelectedMeasures,
+  updateShowGroundTruthChangepoints,
+  enableSoilingDetection,
   applyForecasting,
+  applySoilingDetection,
 } from '../visualizer.reducer';
 import ChangepointDetection, {SoilingDetection} from "app/modules/visualizer/tools/soiling-detection/soiling-detection";
 import Forecasting from "app/modules/visualizer/tools/forecasting/forecasting";
@@ -47,6 +51,8 @@ export interface IActiveToolProps {
   applyForecasting: typeof applyForecasting,
   forecasting:boolean,
   forecastData: any,
+  enableSoilingDetection: typeof enableSoilingDetection,
+  applySoilingDetection: typeof applySoilingDetection,
 }
 
 const ActiveTool = (props: IActiveToolProps) => {
@@ -96,6 +102,8 @@ const ActiveTool = (props: IActiveToolProps) => {
               updateShowGroundTruthChangepoints={props.updateShowGroundTruthChangepoints}
               groundTruthChangepointsEnabled={groundTruthChangepointsEnabled}
               updateSelectedMeasures={props.updateSelectedMeasures}
+              enableSoilingDetection={props.enableSoilingDetection}
+              applySoilingDetection={props.applySoilingDetection}
             />
           }
           {activeTool === 4 &&

@@ -1,12 +1,24 @@
 import React, {useState} from 'react';
 import {IDataset} from "app/shared/model/dataset.model";
-import {Box, Button, Divider, Switch, Tooltip, Typography,} from "@mui/material";
 import {
-  applyCpDetection,
-  enableCpDetection, updateSelectedMeasures,
+  Box,
+  Button,
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Switch,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import {
+  applyCpDetection, applySoilingDetection,
+  enableCpDetection, enableSoilingDetection, updateSelectedMeasures,
   updateShowGroundTruthChangepoints
 } from "app/modules/visualizer/visualizer.reducer";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
+import HelpIcon from '@mui/icons-material/Help';
 
 export interface ISoilingDetectionProps {
   dataset: IDataset,
@@ -19,6 +31,8 @@ export interface ISoilingDetectionProps {
   cpDetectionEnabled: boolean,
   updateShowGroundTruthChangepoints: typeof updateShowGroundTruthChangepoints,
   enableCpDetection: typeof enableCpDetection,
+  enableSoilingDetection: typeof enableSoilingDetection,
+  applySoilingDetection: typeof applySoilingDetection,
   groundTruthChangepointsEnabled: boolean,
 }
 
@@ -27,6 +41,21 @@ export const SoilingDetection = (props: ISoilingDetectionProps) => {
   const {dataset, customChangePoints, from, to,
     cpDetectionEnabled, groundTruthChangepointsEnabled} = props;
   const [detectIntervals, setDetectIntervals] = useState(false);
+
+  const [weeks, setWeeks] = useState(1);
+  const [soilingIsEnabled, setSoilingIsEnabled] = useState(false);
+
+  const handleWeeksChange = (e) => {
+    setWeeks(e.target.value);
+  }
+
+  const handleEnableSoiling = () => {
+    const action = !soilingIsEnabled;
+    setSoilingIsEnabled(action);
+    props.enableSoilingDetection(action);
+    if(action)
+      props.applySoilingDetection(dataset.id, from, to);
+  }
 
   const handleCpDetection = () => {
     const action = !cpDetectionEnabled;
@@ -123,8 +152,47 @@ export const SoilingDetection = (props: ISoilingDetectionProps) => {
               Detect Soiling
             </Typography>
           </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'left',
+              alignItems: 'center',
+              p:0,
+            }}
+          >
+            <FormControl sx={{ m: 1, minWidth: "80%" }}>
+              <InputLabel id="select-week-input-label">Weeks</InputLabel>
+              <Select
+                labelId="select-weeks"
+                id="select-weeks-id"
+                value={weeks}
+                onChange={handleWeeksChange}
+                label="Weeks"
+              >
+                <MenuItem value={1}>One</MenuItem>
+                <MenuItem value={2}>Two</MenuItem>
+                <MenuItem value={3}>Three</MenuItem>
+                <MenuItem value={4}>Four</MenuItem>
+              </Select>
+            </FormControl>
+            <Tooltip title='Weeks after wash in which panel is considered clean' >
+              <HelpIcon/>
+            </Tooltip>
+          </Box>
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}>
+            <Box sx={{pt: 1}}>Enable</Box>
+            <Switch
+              checked={soilingIsEnabled}
+              onChange={() => handleEnableSoiling()}
+              inputProps={{'aria-label': 'controlled'}}
+            />
+          </Box>
         </Box>
-
       }
     </Box>
   );

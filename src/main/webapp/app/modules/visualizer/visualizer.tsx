@@ -36,6 +36,8 @@ import {
   resetChartValues,
   enableForecasting,
   applyForecasting,
+  enableSoilingDetection,
+  applySoilingDetection,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
@@ -56,7 +58,7 @@ export const Visualizer = (props: IVisualizerProps) => {
     resampleFreq, patterns, graphZoom, customChangePoints,
     detectedChangePoints, activeTool, compare, filters, compareData,
     queryResultsLoading, from, to, cpDetectionEnabled, chartRef, groundTruthChangepointsEnabled,
-    forecasting, forecastData, secondaryData,
+    forecasting, forecastData, secondaryData, soilingEnabled,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -158,7 +160,8 @@ export const Visualizer = (props: IVisualizerProps) => {
                             compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}
                             updateFrom={props.updateFrom} updateTo={props.updateTo} queryResults={queryResults}
                             loading={loading} queryResultsLoading={queryResultsLoading} applyCpDetection={props.applyCpDetection}
-                            forecastData = {forecastData} secondaryData={secondaryData}/>
+                            forecastData = {forecastData} secondaryData={secondaryData} soilingEnabled={soilingEnabled}
+                            applySoilingDetection = {props.applySoilingDetection}/>
           </Paper>
         </Box>
         <Toolkit
@@ -175,7 +178,8 @@ export const Visualizer = (props: IVisualizerProps) => {
           cpDetectionEnabled={cpDetectionEnabled} updateShowGroundTruthChangepoints = {props.updateShowGroundTruthChangepoints}
           groundTruthChangepointsEnabled = {groundTruthChangepointsEnabled} forecasting={forecasting}
           enableForecasting = {props.enableForecasting} applyForecasting = {props.applyForecasting}
-          forecastData={forecastData}
+          forecastData={forecastData} enableSoilingDetection={props.enableSoilingDetection}
+          applySoilingDetection = {props.applySoilingDetection}
         />
       </Box>
     </ThemeProvider>
@@ -211,6 +215,7 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   groundTruthChangepointsEnabled: visualizer.groundTruthChangepointsEnabled,
   forecasting: visualizer.forecasting,
   forecastData: visualizer.forecastData,
+  soilingEnabled: visualizer.soilingEnabled,
 });
 
 const mapDispatchToProps = {
@@ -221,7 +226,7 @@ const mapDispatchToProps = {
   getWdFiles, updatePatternNav, updateCustomChangePoints, getChangePointDates,
   updateGraphZoom, updateActiveTool, updateCompare, updateCompareQueryResults,
   applyCpDetection, enableCpDetection, updateChartRef, resetChartValues,
-  enableForecasting, applyForecasting,
+  enableForecasting, applyForecasting, enableSoilingDetection, applySoilingDetection,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;
