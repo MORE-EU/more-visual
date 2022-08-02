@@ -8,7 +8,7 @@ export interface IDataset {
   timeCol?: number;
   measures?: number[];
   header?: string[];
-  gtChangepoints?: IChangePointDate[];
+  resType?: number;
 }
 
 export const defaultValue: Readonly<IDataset> = {};

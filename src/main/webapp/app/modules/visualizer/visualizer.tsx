@@ -9,8 +9,8 @@ import Paper from '@mui/material/Paper';
 import {Redirect, RouteComponentProps} from 'react-router-dom';
 import {IRootState} from "app/shared/reducers";
 import {
-  applyCpDetection,
-  enableCpDetection,
+  applyChangepointDetection,
+  enableChangepointDetection,
   filterData,
   getChangePointDates,
   getDataset,
@@ -30,14 +30,15 @@ import {
   updateQueryResults,
   updateResampleFreq,
   updateSelectedMeasures,
-  updateShowGroundTruthChangepoints,
+  enableManualChangepoints,
   updateTo,
   updateChartRef,
   resetChartValues,
   enableForecasting,
   applyForecasting,
   enableSoilingDetection,
-  applySoilingDetection,
+  applyDeviationDetection,
+  getManualChangePoints,
 } from "app/modules/visualizer/visualizer.reducer";
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control";
@@ -55,10 +56,10 @@ export const Visualizer = (props: IVisualizerProps) => {
   const {
     dataset, changeChart, datasetChoice, wdFiles,
     loading, queryResults, data, selectedMeasures,
-    resampleFreq, patterns, graphZoom, customChangePoints,
+    resampleFreq, patterns, graphZoom, customChangePoints, manualChangePoints,
     detectedChangePoints, activeTool, compare, filters, compareData,
-    queryResultsLoading, from, to, cpDetectionEnabled, chartRef, groundTruthChangepointsEnabled,
-    forecasting, forecastData, secondaryData, soilingEnabled,
+    queryResultsLoading, from, to, changepointDetectionEnabled, chartRef,
+    manualChangepointsEnabled, forecasting, forecastData, secondaryData, soilingEnabled,
   } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -152,16 +153,16 @@ export const Visualizer = (props: IVisualizerProps) => {
                             resampleFreq={resampleFreq} updateResampleFreq ={props.updateResampleFreq} patterns={patterns}
                             changeChart={changeChart} folder={props.match.params.folder} updateChangeChart={props.updateChangeChart}
                             graphZoom={graphZoom} updateGraphZoom={props.updateGraphZoom} wdFiles={wdFiles}
-                            customChangePoints={customChangePoints} cpDetectionEnabled={cpDetectionEnabled}
+                            customChangePoints={customChangePoints} changepointDetectionEnabled={changepointDetectionEnabled}
                             detectedChangePoints = {detectedChangePoints} updateCustomChangePoints={props.updateCustomChangePoints}
-                            groundTruthChangepointsEnabled = {groundTruthChangepointsEnabled}
+                            manualChangepointsEnabled = {manualChangepointsEnabled} manualChangePoints={manualChangePoints}
                             setOpen={setOpen} updateActiveTool={props.updateActiveTool} compare={compare}
                             updateCompare={props.updateCompare} chartRef={chartRef} updateChartRef={props.updateChartRef}
                             compareData={compareData} updateCompareQueryResults={props.updateCompareQueryResults}
                             updateFrom={props.updateFrom} updateTo={props.updateTo} queryResults={queryResults}
-                            loading={loading} queryResultsLoading={queryResultsLoading} applyCpDetection={props.applyCpDetection}
+                            loading={loading} queryResultsLoading={queryResultsLoading} applyChangepointDetection={props.applyChangepointDetection}
                             forecastData = {forecastData} secondaryData={secondaryData} soilingEnabled={soilingEnabled}
-                            applySoilingDetection = {props.applySoilingDetection}/>
+                            applyDeviationDetection = {props.applyDeviationDetection}/>
           </Paper>
         </Box>
         <Toolkit
@@ -174,13 +175,13 @@ export const Visualizer = (props: IVisualizerProps) => {
           updateSelectedMeasures={props.updateSelectedMeasures}
           updatePatterns={props.updatePatterns} getPatterns={props.getPatterns}
           customChangePoints={customChangePoints} activeTool={activeTool} updateActiveTool={props.updateActiveTool}
-          applyCpDetection={props.applyCpDetection} enableCpDetection={props.enableCpDetection}
-          cpDetectionEnabled={cpDetectionEnabled} updateShowGroundTruthChangepoints = {props.updateShowGroundTruthChangepoints}
-          groundTruthChangepointsEnabled = {groundTruthChangepointsEnabled} forecasting={forecasting}
+          applyChangepointDetection={props.applyChangepointDetection} enableChangepointDetection={props.enableChangepointDetection}
+          changepointDetectionEnabled={changepointDetectionEnabled} enableManualChangepoints = {props.enableManualChangepoints}
+          manualChangepointsEnabled = {manualChangepointsEnabled} forecasting={forecasting}
           enableForecasting = {props.enableForecasting} applyForecasting = {props.applyForecasting}
           forecastData={forecastData} enableSoilingDetection={props.enableSoilingDetection}
-          applySoilingDetection = {props.applySoilingDetection}
-        />
+          applyDeviationDetection = {props.applyDeviationDetection} getManualChangePoints = {props.getManualChangePoints}
+         manualChangePoints={manualChangePoints} detectedChangePoints={detectedChangePoints}/>
       </Box>
     </ThemeProvider>
   </div>;
@@ -203,6 +204,7 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   wdFiles: visualizer.wdFiles,
   patternNav: visualizer.patternNav,
   folder: visualizer.folder,
+  manualChangePoints: visualizer.manualChangePoints,
   customChangePoints: visualizer.customChangePoints,
   detectedChangePoints: visualizer.detectedChangePoints,
   graphZoom: visualizer.graphZoom,
@@ -210,9 +212,9 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
   compare: visualizer.compare,
   compareData: visualizer.compareData,
   queryResultsLoading: visualizer.queryResultsLoading,
-  cpDetectionEnabled: visualizer.cpDetectionEnabled,
+  changepointDetectionEnabled: visualizer.changepointDetectionEnabled,
   chartRef: visualizer.chartRef,
-  groundTruthChangepointsEnabled: visualizer.groundTruthChangepointsEnabled,
+  manualChangepointsEnabled: visualizer.manualChangepointsEnabled,
   forecasting: visualizer.forecasting,
   forecastData: visualizer.forecastData,
   soilingEnabled: visualizer.soilingEnabled,
@@ -221,12 +223,13 @@ const mapStateToProps = ({visualizer}: IRootState) => ({
 const mapDispatchToProps = {
   getDataset, updateQueryResults,
   updateSelectedMeasures, updateFrom, updateTo,
-  updateResampleFreq, updateFilters, filterData, updateShowGroundTruthChangepoints,
+  updateResampleFreq, updateFilters, filterData, enableManualChangepoints,
   updatePatterns, getPatterns, updateChangeChart, updateDatasetChoice,
   getWdFiles, updatePatternNav, updateCustomChangePoints, getChangePointDates,
   updateGraphZoom, updateActiveTool, updateCompare, updateCompareQueryResults,
-  applyCpDetection, enableCpDetection, updateChartRef, resetChartValues,
-  enableForecasting, applyForecasting, enableSoilingDetection, applySoilingDetection,
+  applyChangepointDetection, enableChangepointDetection, updateChartRef, resetChartValues,
+  enableForecasting, applyForecasting, enableSoilingDetection, applyDeviationDetection,
+  getManualChangePoints,
 };
 
 type StateProps = ReturnType<typeof mapStateToProps>;

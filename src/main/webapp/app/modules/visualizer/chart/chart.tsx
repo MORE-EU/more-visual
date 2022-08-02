@@ -5,8 +5,8 @@ import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
 import {IDataset} from "app/shared/model/dataset.model";
 import {
-  applyCpDetection,
-  applySoilingDetection,
+  applyChangepointDetection,
+  applyDeviationDetection,
   updateActiveTool,
   updateChartRef,
   updateCompareQueryResults,
@@ -69,12 +69,13 @@ export interface IChartProps {
   folder: string;
   filters: any;
   graphZoom: number;
+  manualChangePoints: IChangePointDate[];
   customChangePoints: IChangePointDate[];
-  groundTruthChangepointsEnabled: boolean;
   detectedChangePoints: IChangePointDate[];
-  cpDetectionEnabled: boolean;
+  manualChangepointsEnabled: boolean;
+  changepointDetectionEnabled: boolean;
   updateCustomChangePoints: typeof updateCustomChangePoints;
-  applyCpDetection: typeof applyCpDetection;
+  applyChangepointDetection: typeof applyChangepointDetection;
   updateActiveTool: typeof updateActiveTool;
   setShowDatePick: Dispatch<SetStateAction<boolean>>;
   setShowChangePointFunction: Dispatch<SetStateAction<boolean>>;
@@ -87,7 +88,7 @@ export interface IChartProps {
   compare: any[];
   forecastData: IDataPoint[];
   soilingEnabled: boolean;
-  applySoilingDetection: typeof applySoilingDetection;
+  applyDeviationDetection: typeof applyDeviationDetection;
 }
 
 // TODO: FIX FULLSCREEN
@@ -108,14 +109,15 @@ export const Chart = (props: IChartProps) => {
     patterns,
     changeChart,
     folder,
+    manualChangePoints,
     detectedChangePoints,
     customChangePoints,
-    cpDetectionEnabled,
+    changepointDetectionEnabled,
     compare,
     compareData,
     queryResults,
     queryResultsLoading,
-    groundTruthChangepointsEnabled,
+    manualChangepointsEnabled,
     chartRef,
     forecastData,
     soilingEnabled,
@@ -138,10 +140,10 @@ export const Chart = (props: IChartProps) => {
   const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
-  const isCpDetectionEnabled = useRef(cpDetectionEnabled);
+  const ischangepointDetectionEnabled = useRef(changepointDetectionEnabled);
   const isSoilingEnabled = useRef(soilingEnabled);
 
-  const gtPlotBands = (dataset.gtChangepoints !== null && [].concat(...dataset.gtChangepoints.map(date => {
+  const manualPlotBands = (manualChangePoints !== null && [].concat(...manualChangePoints.map(date => {
     return {
       color: '#425af5',
       from: date.range.from,
@@ -202,18 +204,18 @@ export const Chart = (props: IChartProps) => {
         }
       };
     })));
-    if(groundTruthChangepointsEnabled) newChangepointPlotBands = newChangepointPlotBands.concat(gtPlotBands);
+    if(manualChangepointsEnabled) newChangepointPlotBands = newChangepointPlotBands.concat(manualPlotBands);
     setPlotBands(newChangepointPlotBands);
 
-  }, [detectedChangePoints, groundTruthChangepointsEnabled]);
+  }, [detectedChangePoints, manualChangepointsEnabled]);
 
   useEffect(() => {
-    isCpDetectionEnabled.current = cpDetectionEnabled;
-    if(!cpDetectionEnabled){
-      if(groundTruthChangepointsEnabled) setPlotBands(gtPlotBands);
+    ischangepointDetectionEnabled.current = changepointDetectionEnabled;
+    if(!changepointDetectionEnabled){
+      if(manualChangepointsEnabled) setPlotBands(manualPlotBands);
       else setPlotBands([]);
     }
-  }, [cpDetectionEnabled, groundTruthChangepointsEnabled]);
+  }, [changepointDetectionEnabled, manualChangepointsEnabled]);
 
   useEffect(() => {
     isSoilingEnabled.current = soilingEnabled;
@@ -254,7 +256,6 @@ export const Chart = (props: IChartProps) => {
   };
 
   const handlePlotBandsSelection = (id) => {
-    console.log(plotBands);
     if(typeof id === "string") {
       const idx = plotBands.findIndex(x => x.id === id);
       if(idx !== selectedPlot){
@@ -326,8 +327,8 @@ export const Chart = (props: IChartProps) => {
       }
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
-      if(isCpDetectionEnabled.current) props.applyCpDetection(latestDatasetId.current, leftSide, rightSide, customChangePoints);
-      if(isSoilingEnabled.current) props.applySoilingDetection(latestDatasetId.current, leftSide, rightSide);
+      if(ischangepointDetectionEnabled.current) props.applyChangepointDetection(latestDatasetId.current, leftSide, rightSide, customChangePoints);
+      if(isSoilingEnabled.current) props.applyDeviationDetection(latestDatasetId.current, leftSide, rightSide, detectedChangePoints);
     };
 
     const getSides = (max: number, min: number, p: number) => {
@@ -487,13 +488,21 @@ export const Chart = (props: IChartProps) => {
         offset: 0,
         plotBands: [],
       };
-      yAxisData = yAxisData.map((y, idx) =>
+      yAxisData = changeChart
+        ? yAxisData.map((y, idx) =>
         ({
           ...y,
           height: (percent - 5).toString() + "%",
           top:  (12 + percent * idx).toString() + "%",
         })
-      );
+      ) :
+        yAxisData.map((y, idx) =>
+          ({
+            ...y,
+            height: "90%",
+            top:  "12%",
+          })
+        );
       yAxisData.push(newAxis);
     }
     return yAxisData;
@@ -521,7 +530,7 @@ export const Chart = (props: IChartProps) => {
     zoneAxis: "x",
     zones,
   }))) : [];
-  
+
   return (
     <Grid
       sx={{border: "1px solid rgba(0, 0, 0, .1)", minHeight: "700px"}}

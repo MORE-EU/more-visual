@@ -14,8 +14,8 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ActiveTool from "app/modules/visualizer/tools/active-tool";
 import {IDataset} from "app/shared/model/dataset.model";
 import {
-  applyCpDetection,
-  enableCpDetection,
+  applyChangepointDetection,
+  enableChangepointDetection,
   enableForecasting,
   filterData,
   getPatterns,
@@ -23,13 +23,15 @@ import {
   updateFilters,
   updatePatterns,
   updateSelectedMeasures,
-  updateShowGroundTruthChangepoints,
+  enableManualChangepoints,
   applyForecasting,
   enableSoilingDetection,
-  applySoilingDetection,
+  applyDeviationDetection,
+  getManualChangePoints,
 } from '../visualizer.reducer';
 import {IPatterns} from "app/shared/model/patterns.model";
 import {IQueryResults} from "app/shared/model/query-results.model";
+import {IChangePointDate} from "app/shared/model/changepoint-date.model";
 
 const drawerWidth = 300;
 
@@ -102,25 +104,29 @@ export interface IToolkitProps {
   customChangePoints: any,
   updateActiveTool: typeof updateActiveTool,
   activeTool: number,
-  applyCpDetection: typeof applyCpDetection,
-  cpDetectionEnabled: boolean,
-  enableCpDetection: typeof enableCpDetection,
-  updateShowGroundTruthChangepoints: typeof updateShowGroundTruthChangepoints,
-  groundTruthChangepointsEnabled: boolean,
+  applyChangepointDetection: typeof applyChangepointDetection,
+  changepointDetectionEnabled: boolean,
+  enableChangepointDetection: typeof enableChangepointDetection,
+  enableManualChangepoints: typeof enableManualChangepoints,
+  manualChangepointsEnabled: boolean,
   forecasting:boolean,
   enableForecasting: typeof enableForecasting,
   applyForecasting: typeof applyForecasting,
   forecastData: any,
   enableSoilingDetection: typeof enableSoilingDetection,
-  applySoilingDetection: typeof applySoilingDetection,
+  applyDeviationDetection: typeof applyDeviationDetection,
+  getManualChangePoints: typeof getManualChangePoints,
+  manualChangePoints: IChangePointDate[],
+  detectedChangePoints: IChangePointDate[],
 }
 
 const Toolkit = (props: IToolkitProps) => {
   const {
     open, dataset, data, selectedMeasures, patterns,
     resampleFreq, customChangePoints, activeTool, filters,
-    queryResults, from, to, cpDetectionEnabled, groundTruthChangepointsEnabled,
-    forecasting, forecastData,
+    queryResults, from, to, changepointDetectionEnabled,
+    manualChangePoints, manualChangepointsEnabled,
+    forecasting, forecastData, detectedChangePoints,
   } = props;
 
   const handleDrawer = () => {
@@ -179,11 +185,13 @@ const Toolkit = (props: IToolkitProps) => {
           updateFilters={props.updateFilters} queryResults={queryResults}
           resampleFreq={resampleFreq} patterns={patterns} updateSelectedMeasures={props.updateSelectedMeasures}
           updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} customChangePoints={customChangePoints}
-          applyCpDetection={props.applyCpDetection} cpDetectionEnabled={cpDetectionEnabled}
-          enableCpDetection={props.enableCpDetection} updateShowGroundTruthChangepoints={props.updateShowGroundTruthChangepoints}
-          groundTruthChangepointsEnabled={groundTruthChangepointsEnabled} enableForecasting={props.enableForecasting}
+          applyChangepointDetection={props.applyChangepointDetection} changepointDetectionEnabled={changepointDetectionEnabled}
+          enableChangepointDetection={props.enableChangepointDetection} enableManualChangepoints={props.enableManualChangepoints}
+          manualChangepointsEnabled={manualChangepointsEnabled} enableForecasting={props.enableForecasting}
           applyForecasting = {props.applyForecasting} forecasting={forecasting} forecastData = {forecastData}
-          enableSoilingDetection = {props.enableSoilingDetection} applySoilingDetection = {props.applySoilingDetection}
+          enableSoilingDetection = {props.enableSoilingDetection} applyDeviationDetection = {props.applyDeviationDetection}
+          getManualChangePoints = {props.getManualChangePoints} manualChangePoints={manualChangePoints}
+          detectedChangePoints={detectedChangePoints}
         />
       </Drawer>
     </Box>

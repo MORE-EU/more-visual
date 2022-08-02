@@ -15,8 +15,8 @@ import {
   updateQueryResults,
   updateTo,
   updateResampleFreq,
-  applyCpDetection,
-  applySoilingDetection,
+  applyChangepointDetection,
+  applyDeviationDetection,
 } from '../visualizer.reducer';
 import Chart from './chart';
 import {ChartControl} from './chart-control';
@@ -42,11 +42,12 @@ export interface IChartContainerProps {
   changeChart: boolean;
   folder: string;
   graphZoom: number;
+  manualChangePoints: IChangePointDate[];
   customChangePoints: IChangePointDate[];
   detectedChangePoints: IChangePointDate[];
-  groundTruthChangepointsEnabled: boolean;
-  cpDetectionEnabled: boolean;
-  applyCpDetection: typeof applyCpDetection;
+  manualChangepointsEnabled: boolean;
+  changepointDetectionEnabled: boolean;
+  applyChangepointDetection: typeof applyChangepointDetection;
   compare: any[];
   chartRef: any;
   updateCompare: typeof updateCompare;
@@ -63,16 +64,16 @@ export interface IChartContainerProps {
   setOpen: Dispatch<SetStateAction<boolean>>;
   forecastData: IDataPoint[];
   soilingEnabled: boolean;
-  applySoilingDetection: typeof applySoilingDetection;
+  applyDeviationDetection: typeof applyDeviationDetection;
 }
 
 export const ChartContainer = (props: IChartContainerProps) => {
   const {
     dataset, data, secondaryData, selectedMeasures, from, to, filters,
-    wdFiles, changeChart, folder, graphZoom, customChangePoints,
-    detectedChangePoints, cpDetectionEnabled,  resampleFreq, chartRef,
+    wdFiles, changeChart, folder, graphZoom, manualChangePoints, customChangePoints,
+    detectedChangePoints, changepointDetectionEnabled,  resampleFreq, chartRef,
     queryResults, compare, compareData, loading, queryResultsLoading,
-    groundTruthChangepointsEnabled, forecastData, soilingEnabled,
+    manualChangepointsEnabled, forecastData, soilingEnabled,
   } = props;
 
   const [showDatePick, setShowDatePick] = useState(false);
@@ -115,11 +116,12 @@ export const ChartContainer = (props: IChartContainerProps) => {
         graphZoom={graphZoom}
         compare={compare}
         chartRef={chartRef}
-        groundTruthChangepointsEnabled={groundTruthChangepointsEnabled}
+        manualChangepointsEnabled={manualChangepointsEnabled}
+        manualChangePoints={manualChangePoints}
         customChangePoints={customChangePoints}
         detectedChangePoints={detectedChangePoints}
-        cpDetectionEnabled={cpDetectionEnabled}
-        applyCpDetection={props.applyCpDetection}
+        changepointDetectionEnabled={changepointDetectionEnabled}
+        applyChangepointDetection={props.applyChangepointDetection}
         updateCustomChangePoints={props.updateCustomChangePoints}
         updateActiveTool={props.updateActiveTool}
         setCompare={setCompare}
@@ -131,7 +133,7 @@ export const ChartContainer = (props: IChartContainerProps) => {
         updateChartRef={props.updateChartRef}
         forecastData={forecastData}
         soilingEnabled={soilingEnabled}
-        applySoilingDetection={props.applySoilingDetection}
+        applyDeviationDetection={props.applyDeviationDetection}
       />
     </Box>
   );

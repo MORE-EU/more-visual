@@ -5,8 +5,8 @@ import PatternExtraction from "app/modules/visualizer/tools/pattern-extraction/p
 import {IDataset} from "app/shared/model/dataset.model";
 import {IPatterns} from "app/shared/model/patterns.model";
 import {
-  applyCpDetection,
-  enableCpDetection,
+  applyChangepointDetection,
+  enableChangepointDetection,
   enableForecasting,
   filterData,
   getPatterns,
@@ -14,15 +14,16 @@ import {
   updateFilters,
   updatePatterns,
   updateSelectedMeasures,
-  updateShowGroundTruthChangepoints,
+  enableManualChangepoints,
   enableSoilingDetection,
   applyForecasting,
-  applySoilingDetection,
+  applyDeviationDetection, getManualChangePoints,
 } from '../visualizer.reducer';
 import ChangepointDetection, {SoilingDetection} from "app/modules/visualizer/tools/soiling-detection/soiling-detection";
 import Forecasting from "app/modules/visualizer/tools/forecasting/forecasting";
 import {IQueryResults} from "app/shared/model/query-results.model";
 import Filter from "app/modules/visualizer/tools/filter/filter";
+import {IChangePointDate} from "app/shared/model/changepoint-date.model";
 
 export interface IActiveToolProps {
   activeTool: number,
@@ -42,25 +43,28 @@ export interface IActiveToolProps {
   queryResults: IQueryResults,
   updateFilters: typeof updateFilters,
   filterData: typeof filterData,
-  applyCpDetection: typeof applyCpDetection,
-  cpDetectionEnabled: boolean,
-  enableCpDetection: typeof enableCpDetection,
-  updateShowGroundTruthChangepoints: typeof updateShowGroundTruthChangepoints,
-  groundTruthChangepointsEnabled:boolean,
+  applyChangepointDetection: typeof applyChangepointDetection,
+  changepointDetectionEnabled: boolean,
+  enableChangepointDetection: typeof enableChangepointDetection,
+  enableManualChangepoints: typeof enableManualChangepoints,
+  manualChangepointsEnabled:boolean,
   enableForecasting:typeof enableForecasting,
   applyForecasting: typeof applyForecasting,
   forecasting:boolean,
   forecastData: any,
   enableSoilingDetection: typeof enableSoilingDetection,
-  applySoilingDetection: typeof applySoilingDetection,
+  applyDeviationDetection: typeof applyDeviationDetection,
+  getManualChangePoints: typeof getManualChangePoints,
+  manualChangePoints: IChangePointDate[],
+  detectedChangePoints: IChangePointDate[],
 }
 
 const ActiveTool = (props: IActiveToolProps) => {
   const {
     activeTool, dataset, data, from, to, selectedMeasures, patterns,
     resampleFreq, customChangePoints, filters, queryResults,
-    cpDetectionEnabled, groundTruthChangepointsEnabled, forecasting,
-    forecastData,
+    changepointDetectionEnabled, manualChangepointsEnabled, forecasting,
+    forecastData, manualChangePoints, detectedChangePoints,
   } = props;
 
   const goBack = () => {
@@ -94,17 +98,20 @@ const ActiveTool = (props: IActiveToolProps) => {
               dataset={dataset}
               from={from}
               to={to}
-              applyCpDetection={props.applyCpDetection}
+              applyChangepointDetection={props.applyChangepointDetection}
               customChangePoints={customChangePoints}
               data={data}
-              enableCpDetection={props.enableCpDetection}
-              cpDetectionEnabled={cpDetectionEnabled}
-              updateShowGroundTruthChangepoints={props.updateShowGroundTruthChangepoints}
-              groundTruthChangepointsEnabled={groundTruthChangepointsEnabled}
+              enableChangepointDetection={props.enableChangepointDetection}
+              changepointDetectionEnabled={changepointDetectionEnabled}
+              enableManualChangepoints={props.enableManualChangepoints}
+              manualChangepointsEnabled={manualChangepointsEnabled}
               updateSelectedMeasures={props.updateSelectedMeasures}
               enableSoilingDetection={props.enableSoilingDetection}
-              applySoilingDetection={props.applySoilingDetection}
-            />
+              applyDeviationDetection={props.applyDeviationDetection}
+              getManualChangePoints={props.getManualChangePoints}
+              manualChangePoints = {manualChangePoints}
+              detectedChangePoints={detectedChangePoints}
+             />
           }
           {activeTool === 4 &&
             <Filter

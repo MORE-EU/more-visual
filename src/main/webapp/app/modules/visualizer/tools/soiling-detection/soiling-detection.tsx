@@ -13,12 +13,14 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  applyCpDetection, applySoilingDetection,
-  enableCpDetection, enableSoilingDetection, updateSelectedMeasures,
-  updateShowGroundTruthChangepoints
+  applyChangepointDetection, applyDeviationDetection,
+  enableChangepointDetection, enableSoilingDetection, updateSelectedMeasures,
+  enableManualChangepoints, getManualChangePoints
 } from "app/modules/visualizer/visualizer.reducer";
+import ChangepointDetection from "../changepoint-detection/changepoint-detection";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
-import HelpIcon from '@mui/icons-material/Help';
+import HelpIcon from "@mui/icons-material/Help";
+import {IChangePointDate} from "app/shared/model/changepoint-date.model";
 
 export interface ISoilingDetectionProps {
   dataset: IDataset,
@@ -27,20 +29,24 @@ export interface ISoilingDetectionProps {
   from: number,
   to: number,
   updateSelectedMeasures: typeof updateSelectedMeasures,
-  applyCpDetection: typeof applyCpDetection,
-  cpDetectionEnabled: boolean,
-  updateShowGroundTruthChangepoints: typeof updateShowGroundTruthChangepoints,
-  enableCpDetection: typeof enableCpDetection,
+  applyChangepointDetection: typeof applyChangepointDetection,
+  changepointDetectionEnabled: boolean,
+  enableManualChangepoints: typeof enableManualChangepoints,
+  enableChangepointDetection: typeof enableChangepointDetection,
   enableSoilingDetection: typeof enableSoilingDetection,
-  applySoilingDetection: typeof applySoilingDetection,
-  groundTruthChangepointsEnabled: boolean,
+  applyDeviationDetection: typeof applyDeviationDetection,
+  manualChangepointsEnabled: boolean,
+  getManualChangePoints: typeof getManualChangePoints,
+  manualChangePoints: IChangePointDate[],
+  detectedChangePoints: IChangePointDate[],
 }
+
 
 
 export const SoilingDetection = (props: ISoilingDetectionProps) => {
   const {dataset, customChangePoints, from, to,
-    cpDetectionEnabled, groundTruthChangepointsEnabled} = props;
-  const [detectIntervals, setDetectIntervals] = useState(false);
+    changepointDetectionEnabled, manualChangepointsEnabled,
+    manualChangePoints, detectedChangePoints} = props;
 
   const [weeks, setWeeks] = useState(1);
   const [soilingIsEnabled, setSoilingIsEnabled] = useState(false);
@@ -54,17 +60,11 @@ export const SoilingDetection = (props: ISoilingDetectionProps) => {
     setSoilingIsEnabled(action);
     props.enableSoilingDetection(action);
     if(action)
-      props.applySoilingDetection(dataset.id, from, to);
+      props.applyDeviationDetection(dataset.id, from, to, detectedChangePoints);
   }
 
-  const handleCpDetection = () => {
-    const action = !cpDetectionEnabled;
-    props.enableCpDetection(action);
-    props.updateSelectedMeasures([dataset.header.indexOf("power"), dataset.header.indexOf("precipitation")])
-    if(action)
-      props.applyCpDetection(dataset.id, from, to,
-        customChangePoints);
-  }
+
+
   return (
     <Box sx={{pl: 2, pr: 2}}>
       <Box>
@@ -74,70 +74,16 @@ export const SoilingDetection = (props: ISoilingDetectionProps) => {
         <Divider orientation="horizontal" flexItem>
         </Divider>
       </Box>
-      {dataset.gtChangepoints
-        &&
+      <ChangepointDetection
+          dataset={dataset} customChangePoints={customChangePoints}
+          from={from} to={to} updateSelectedMeasures={props.updateSelectedMeasures}
+          enableManualChangepoints={props.enableManualChangepoints}
+          applyChangepointDetection={props.applyChangepointDetection} changepointDetectionEnabled={changepointDetectionEnabled}
+          manualChangepointsEnabled = {manualChangepointsEnabled} enableChangepointDetection={props.enableChangepointDetection}
+          changepointsName={"Washing Events"} manualChangepointsName={"Manual Washes"} potentialChangepointsName={"Rains"}
+          shownMeasures={[dataset.header.indexOf("power"), dataset.header.indexOf("precipitation")]}
+          getManualChangePoints={props.getManualChangePoints} manualChangePoints={manualChangePoints}/>
         <Box>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'left',
-              p:0,
-            }}
-          >
-            <ManageSearchIcon/>
-            <Typography variant="body1" gutterBottom sx={{fontWeight:600}}>
-              Changepoint Selection
-            </Typography>
-
-          </Box>
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-            <Box sx={{pt: 1}}>Washes</Box>
-            <Tooltip describeChild title={dataset.gtChangepoints ? "Show Changepoints" : "No Data Found"}>
-              <Switch
-                checked={groundTruthChangepointsEnabled}
-                onChange={() => props.updateShowGroundTruthChangepoints(!groundTruthChangepointsEnabled)}
-                disabled={!dataset.gtChangepoints}
-                inputProps={{'aria-label': 'controlled'}}
-              />
-            </Tooltip>
-          </Box>
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-            <Box sx={{pt: 1}}>Washing Events</Box>
-            <Tooltip describeChild title={dataset.gtChangepoints ? "Show Washing Event" : "No Data Found"}>
-              <Switch
-                checked={cpDetectionEnabled}
-                onChange={() => handleCpDetection()}
-                disabled={!dataset.gtChangepoints}
-                inputProps={{'aria-label': 'controlled'}}
-              />
-            </Tooltip>
-          </Box>
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-            <Box sx={{pt: 1}}>Use Annotations</Box>
-            <Tooltip describeChild
-                     title={customChangePoints.length === 0 ? "Use Intervals on Chart" : "Select Intervals on the Chart"}>
-              <Switch
-                checked={detectIntervals && customChangePoints.length > 0}
-                onChange={() => setDetectIntervals(!detectIntervals)}
-                disabled={customChangePoints.length === 0 || cpDetectionEnabled}
-                inputProps={{'aria-label': 'controlled'}}
-              />
-            </Tooltip>
-
-          </Box>
           <Divider sx={{paddingBottom:2}}/>
           <Box
             sx={{
@@ -193,7 +139,6 @@ export const SoilingDetection = (props: ISoilingDetectionProps) => {
             />
           </Box>
         </Box>
-      }
     </Box>
   );
 }

@@ -173,12 +173,18 @@ public class DatasetResource {
 
 
     @PostMapping("/tools/cp_detection/{id}")
-    public ResponseEntity<List<Changepoint>> cpDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {
+    public ResponseEntity<List<Changepoint>> changePointDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {
         log.debug("CP for {}", changepoints);
         List<Changepoint> detectedChangepoints = toolsRepository.cpDetection(id, changepoints);
         log.debug("Detected CP for {}", detectedChangepoints);
 
         return new ResponseEntity<>(detectedChangepoints, HttpStatus.OK);
+    }
+
+    @GetMapping("/tools/cp_detection/washes/{id}")
+    public List<Changepoint> getManualChangepoints(@PathVariable String id) throws IOException {
+        log.debug("REST request to get manual changepoints ");
+        return toolsRepository.getManualChangepoints(id);
     }
 
     @PostMapping("/tools/forecasting/{id}")
@@ -189,10 +195,10 @@ public class DatasetResource {
 
 
     @PostMapping("/tools/soiling/{id}")
-    public List<DataPoint> soilingDetection(@PathVariable String id, @Valid @RequestBody TimeRange range) throws IOException {
+    public List<DataPoint> soilingDetection(@PathVariable String id,
+                                            @Valid @RequestBody DeviationDetection deviationDetection) throws IOException {
         log.debug("REST request to apply Soiling Detection ");
-        return toolsRepository.soilingDetection(id, range);
+        return toolsRepository.soilingDetection(id, deviationDetection);
     }
-
 
 }

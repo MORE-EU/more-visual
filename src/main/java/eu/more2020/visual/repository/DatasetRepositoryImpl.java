@@ -63,40 +63,6 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         return datasets;
     }
 
-    public List<Changepoint> hasGroundTruth(String id) {
-        try {
-            URL dataURL = new URL(applicationProperties.getToolApi() + "washes/" + id);
-            HttpURLConnection con = (HttpURLConnection) dataURL.openConnection();
-            con.setRequestMethod("POST");
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(applicationProperties.getTimeFormat());
-            ObjectMapper objectMapper = new ObjectMapper();
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer content = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
-            con.disconnect();
-            JsonNode responseObject = objectMapper.readTree(content.toString());
-            JsonNode starts = responseObject.get("Starting_date");
-            JsonNode ends = responseObject.get("Ending_date");
-            Integer noOfIntervals = starts.size();
-            List<Changepoint> gtChangepoints = new ArrayList<>();
-            for (Integer i = 0; i < noOfIntervals; i++) {
-                String ii = i.toString();
-                gtChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
-                    LocalDateTime.parse(ends.get(ii).asText(), formatter)), 0.0));
-            }
-            return gtChangepoints;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-    }
-
-
     public Farm getFarm(String folder) throws IOException {
         Farm farm = new Farm();
         ObjectMapper mapper = new ObjectMapper();
@@ -127,10 +93,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
             if (d.getId().equals(id)) {
                 dataset = d;
                 dataset.setFarmName(farm.getName());
-                if (farm.getType().contains("Solar"))
-                    dataset.setGtChangepoints(hasGroundTruth(dataset.getId()));
-                    //dataset.setWashes(null);
-
+                dataset.setResType(farm.getType());
                 if (dataset.getTimeFormat() == null || dataset.getTimeFormat().isEmpty()) {
                     dataset.setTimeFormat(timeFormat);
                 }

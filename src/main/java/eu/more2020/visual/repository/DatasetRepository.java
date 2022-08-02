@@ -1,5 +1,6 @@
 package eu.more2020.visual.repository;
 
+import eu.more2020.visual.domain.Changepoint;
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Sample;
 

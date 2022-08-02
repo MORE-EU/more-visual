@@ -28,6 +28,7 @@ export const ACTION_TYPES = {
   ENABLE_FORECASTING: 'visualizer/ENABLE_FORECASTING',
   APPLY_FORECASTING: 'visualizer/APPLY_FORECASTING',
   APPLY_SOILING_DETECTION: 'visualizer/APPLY_SOILING_DETECTION',
+  GET_MANUAL_CHANGEPOINTS: 'visualizer/GET_MANUAL_CHANGEPOINTS',
   GET_PATTERNS: 'visualizer/GET_PATTERNS',
   UPDATE_CHANGECHART: 'visualizer/UPDATE_CHANGECHART',
   UPDATE_DATASETCHOICE: 'visualizer/UPDATE_DATASETCHOICE',
@@ -67,10 +68,11 @@ const initialState = {
   patternNav: '0',
   folder: '',
   sampleFile: [],
+  manualChangePoints: [] as IChangePointDate[],
   customChangePoints: [] as IChangePointDate[],
   detectedChangePoints: [] as IChangePointDate[],
-  cpDetectionEnabled: false,
-  groundTruthChangepointsEnabled: false,
+  changepointDetectionEnabled: false,
+  manualChangepointsEnabled: false,
   forecasting: false,
   soilingEnabled: false,
   forecastData: null as IDataPoint[],
@@ -204,7 +206,7 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
     case ACTION_TYPES.ENABLE_CP_DETECTION:
       return {
         ...state,
-        cpDetectionEnabled: action.payload,
+        changepointDetectionEnabled: action.payload,
       };
     case ACTION_TYPES.ENABLE_SOILING_DETECTION:
       return {
@@ -227,10 +229,15 @@ export default (state: VisualizerState = initialState, action): VisualizerState 
         ...state,
         secondaryData: action.payload.data,
       };
+    case SUCCESS(ACTION_TYPES.GET_MANUAL_CHANGEPOINTS):
+      return {
+        ...state,
+        manualChangePoints: action.payload.data,
+      };
     case ACTION_TYPES.UPDATE_GROUND_TRUTH_CHANGEPOINTS:
       return {
         ...state,
-        groundTruthChangepointsEnabled: action.payload,
+        manualChangepointsEnabled: action.payload,
       };
     case ACTION_TYPES.UPDATE_PATTERNS:
       return {
@@ -452,7 +459,7 @@ export const updateCompare = (data: string) => ({
   payload: data,
 });
 
-export const updateShowGroundTruthChangepoints = (bool: boolean) => ({
+export const enableManualChangepoints = (bool: boolean) => ({
   type: ACTION_TYPES.UPDATE_GROUND_TRUTH_CHANGEPOINTS,
   payload: bool,
 });
@@ -508,12 +515,12 @@ export const getChangePointDates = (func, col) => dispatch => {
   });
 };
 
-export const enableCpDetection = (bool: boolean) => ({
+export const enableChangepointDetection = (bool: boolean) => ({
   type: ACTION_TYPES.ENABLE_CP_DETECTION,
   payload: bool,
 });
 
-export const applyCpDetection = (id, from, to, customChangePoints) => dispatch => {
+export const applyChangepointDetection = (id, from, to, customChangePoints) => dispatch => {
   const requestUrl = `api/tools/cp_detection/${id}`;
   dispatch({
     type: ACTION_TYPES.CHANGEPOINT_DETECTION,
@@ -542,15 +549,26 @@ export const enableSoilingDetection = (bool: boolean) => ({
   payload: bool,
 });
 
-export const applySoilingDetection = (id: string, fromDate, toDate) => dispatch => {
+export const applyDeviationDetection = (id: string, fromDate, toDate, changepoints) => dispatch => {
   const requestUrl = `api/tools/soiling/${id}`;
   const range = { from: fromDate, to: toDate } as ITimeRange;
   dispatch({
     type: ACTION_TYPES.APPLY_SOILING_DETECTION,
-    payload: axios.post(requestUrl, range),
+    payload: axios.post(requestUrl, {
+      range,
+      changepoints,
+    }),
   });
 };
 
 export const resetChartValues = () => ({
   type: ACTION_TYPES.RESET_CHART_VALUES,
 });
+
+export const getManualChangePoints = (id: string) => dispatch => {
+  const requestUrl = `api/tools/cp_detection/washes/${id}`;
+  dispatch({
+    type: ACTION_TYPES.GET_MANUAL_CHANGEPOINTS,
+    payload: axios.get(requestUrl),
+  });
+};

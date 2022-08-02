@@ -3,10 +3,7 @@ package eu.more2020.visual.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.more2020.visual.config.ApplicationProperties;
-import eu.more2020.visual.domain.Changepoint;
-import eu.more2020.visual.domain.ChangepointDetection;
-import eu.more2020.visual.domain.DataPoint;
-import eu.more2020.visual.domain.TimeRange;
+import eu.more2020.visual.domain.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +39,40 @@ public class ToolsRepositoryImpl implements ToolsRepository {
             dates.add(dateNode.asText());
         }
         return dates;
+    }
+
+    @Override
+    public List<Changepoint> getManualChangepoints(String id) {
+        try {
+            URL dataURL = new URL(applicationProperties.getToolApi() + "washes/" + id);
+            HttpURLConnection con = (HttpURLConnection) dataURL.openConnection();
+            con.setRequestMethod("POST");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(applicationProperties.getTimeFormat());
+            ObjectMapper objectMapper = new ObjectMapper();
+            BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer content = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            con.disconnect();
+            JsonNode responseObject = objectMapper.readTree(content.toString());
+            JsonNode starts = responseObject.get("Starting_date");
+            JsonNode ends = responseObject.get("Ending_date");
+            Integer noOfIntervals = starts.size();
+            List<Changepoint> gtChangepoints = new ArrayList<>();
+            for (Integer i = 0; i < noOfIntervals; i++) {
+                String ii = i.toString();
+                gtChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
+                    LocalDateTime.parse(ends.get(ii).asText(), formatter)), 0.0));
+            }
+            return gtChangepoints;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     public JsonNode getRains(String id, Map<String, Object> params) throws IOException {
@@ -157,9 +188,41 @@ public class ToolsRepositoryImpl implements ToolsRepository {
     }
 
     @Override
-    public List<DataPoint> soilingDetection(String id, TimeRange range) {
+    public List<DataPoint> soilingDetection(String id, DeviationDetection deviationDetection) {
         List<DataPoint> soilingIndex = new ArrayList<>();
-
+        try {
+            URL dataURL = new URL(applicationProperties.getToolApi() + "power_index/" + id);
+            Map<String, Object> params = new LinkedHashMap<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(applicationProperties.getTimeFormat());
+            params.put("start_date", deviationDetection.getRange().getFrom().format(formatter));
+            params.put("end_date", deviationDetection.getRange().getTo().format(formatter));
+            if (deviationDetection.getChangepoints() != null) {
+                params.put("cp_starts", deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getFrom().format(formatter)).collect(Collectors.toList()));
+                params.put("cp_ends", deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getTo().format(formatter)).collect(Collectors.toList()));
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(params);
+            HttpURLConnection conn = (HttpURLConnection) dataURL.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setDoOutput(true);
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = json.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+            BufferedReader in = new BufferedReader(
+                new InputStreamReader(conn.getInputStream()));
+            String inputLine;
+            StringBuffer content = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
         return soilingIndex;
     }
 
