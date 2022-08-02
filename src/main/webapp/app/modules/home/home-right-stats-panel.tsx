@@ -1,20 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {Box, FormControl, MenuItem, Paper, Select, Typography} from '@mui/material';
 import Highcharts from 'highcharts';
 import Heatmap from 'highcharts/modules/heatmap.js';
-
+import { useAppDispatch, useAppSelector } from '../store/storeConfig';
+import { setStatCateg, setStatSelect } from '../store/homeSlice';
 Heatmap(Highcharts);
 
-export interface IHomeRightPanel {
-  filSamples: any[];
-  selected: any[];
-}
+export const HomeRightStatsPanel = () => {
 
-export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
-  const {filSamples, selected} = props;
-
-  const [statSelect, setStatSelect] = useState('noOfTurbines');
-  const [statCateg, setStatCateg] = useState([]);
+  const { filSamples, selected, statSelect, statCateg } = useAppSelector(state => state.home);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     let stCat = [];
@@ -24,11 +19,11 @@ export const HomeRightStatsPanel = (props: IHomeRightPanel) => {
       }
     }
     stCat = stCat.filter(st => st === 'noOfTurbines' || st === 'power');
-    setStatCateg(stCat);
+    dispatch(setStatCateg(stCat));
   }, [filSamples]);
 
   const handleChange = event => {
-    setStatSelect(event.target.value);
+    dispatch(setStatSelect(event.target.value));
   };
 
   const handleStatsPanel = val => {

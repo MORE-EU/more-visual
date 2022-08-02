@@ -1,17 +1,13 @@
 import React from 'react';
-import {IDataset} from "app/shared/model/dataset.model";
 import {Box, Typography,} from "@mui/material";
 import DeviationModel from "app/modules/visualizer/tools/deviation-detection/deviation-model";
-
-export interface IDeviationDetectionProps {
-  dataset: IDataset,
-  data: any,
-  customChangePoints: any,
-}
+import { useAppSelector } from 'app/modules/store/storeConfig';
 
 
-export const DeviationDetection = (props: IDeviationDetectionProps) => {
-  const {dataset, customChangePoints} = props;
+export const DeviationDetection = () => {
+
+  const {dataset, customChangePoints} = useAppSelector(state => state.visualizer);
+
   return (
     <Box sx={{pl: 2, pr: 2}}>
       <Box>

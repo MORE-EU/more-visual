@@ -1,31 +1,18 @@
+import React, { useEffect, useRef, useState } from "react";
 import "../visualizer.scss";
-import React, {Dispatch, SetStateAction, useEffect, useRef, useState} from "react";
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
-import {IDataset} from "app/shared/model/dataset.model";
-import {
-  applyCpDetection,
-  updateActiveTool,
-  updateChartRef,
-  updateCompareQueryResults,
-  updateCustomChangePoints,
-  updateFrom,
-  updateQueryResults,
-  updateResampleFreq,
-  updateTo,
-} from "../visualizer.reducer";
-import {IPatterns} from "app/shared/model/patterns.model";
-import {Grid, LinearProgress, Typography} from "@mui/material";
+import {Grid, LinearProgress} from "@mui/material";
 import annotationsAdvanced from "highcharts/modules/annotations-advanced";
 import stockTools from "highcharts/modules/stock-tools";
 import {useScrollBlock} from "app/shared/util/useScrollBlock";
-import {IChangePointDate} from "app/shared/model/changepoint-date.model";
-import {IDataPoint} from "app/shared/model/data-point.model";
-import {IQueryResults} from "app/shared/model/query-results.model";
 import {ITimeRange} from "app/shared/model/time-range.model";
 import _debounce from "lodash/debounce";
 import moment from "moment";
+import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
+import { setCompare, setShowChangePointFunction, setShowDatePick, updateChartRef, updateCompareQueryResults,
+updateCustomChangePoints, updateFrom, updateQueryResults, updateResampleFreq, updateTo, applyCpDetection } from "app/modules/store/visualizerSlice";
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
   time: {
@@ -48,69 +35,16 @@ Highcharts.setOptions({
   },
 });
 
-export interface IChartProps {
-  dataset: IDataset;
-  loading: boolean;
-  queryResultsLoading: boolean;
-  queryResults: IQueryResults;
-  data: IDataPoint[];
-  compareData: any[];
-  updateQueryResults: typeof updateQueryResults;
-  selectedMeasures: number[];
-  from: number;
-  to: number;
-  chartRef: any;
-  resampleFreq: string;
-  patterns: IPatterns;
-  changeChart: boolean;
-  folder: string;
-  filters: any;
-  graphZoom: number;
-  customChangePoints: IChangePointDate[];
-  detectedChangePoints: IChangePointDate[];
-  cpDetectionEnabled: boolean;
-  updateCustomChangePoints: typeof updateCustomChangePoints;
-  applyCpDetection: typeof applyCpDetection;
-  updateActiveTool: typeof updateActiveTool;
-  setShowDatePick: Dispatch<SetStateAction<boolean>>;
-  setShowChangePointFunction: Dispatch<SetStateAction<boolean>>;
-  setCompare: Dispatch<SetStateAction<boolean>>;
-  updateCompareQueryResults: typeof updateCompareQueryResults;
-  updateFrom: typeof updateFrom;
-  updateTo: typeof updateTo;
-  updateChartRef: typeof updateChartRef;
-  updateResampleFreq: typeof updateResampleFreq;
-  compare: any[];
-}
-
 // TODO: FIX FULLSCREEN
 
 stockTools(Highcharts);
 annotationsAdvanced(Highcharts);
 
-export const Chart = (props: IChartProps) => {
-  const {
-    dataset,
-    data,
-    selectedMeasures,
-    filters,
-    from,
-    to,
-    resampleFreq,
-    patterns,
-    changeChart,
-    folder,
-    graphZoom,
-    detectedChangePoints,
-    customChangePoints,
-    cpDetectionEnabled,
-    compare,
-    compareData,
-    queryResults,
-    queryResultsLoading,
-    loading,
-    chartRef
-  } = props;
+export const Chart = () => {
+
+  const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, queryResultsLoading, filters, customChangePoints,
+    queryResults, changeChart, compare, cpDetectionEnabled, patterns, detectedChangePoints, data, compareData} = useAppSelector(state => state.visualizer);
+  const dispatch = useAppDispatch();
 
   const [blockScroll, allowScroll] = useScrollBlock();
 
@@ -181,15 +115,15 @@ export const Chart = (props: IChartProps) => {
 
   useEffect(() => {
     if (compare.length !== 0) {
-      props.updateCompareQueryResults(folder, compare, from, to, resampleFreq, selectedMeasures);
+      dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures}));
     }
   }, [compare])
 
   useEffect(() => {
     latestMeasures.current = selectedMeasures;
-    props.updateQueryResults(folder, dataset.id, from ? from : null, to ? to : null, resampleFreq, selectedMeasures);
+    dispatch(updateQueryResults({folder, id: dataset.id, from: from ? from : null, to: to ? to : null, resampleFreq, selectedMeasures}));
     if (compare.length !== 0) {
-      props.updateCompareQueryResults(folder, compare, from, to, resampleFreq, selectedMeasures);
+      dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures}));
     }
   }, [dataset, selectedMeasures]);
 
@@ -198,7 +132,7 @@ export const Chart = (props: IChartProps) => {
   }, [compare]);
 
   const getChartRef = (chartR: any) => {
-    props.updateChartRef(chartR);
+    dispatch(updateChartRef(chartR));
   };
 
   const annotationToDate = (annotation: { startXMin: any; startXMax: any; }, len: any) => {
@@ -222,15 +156,17 @@ export const Chart = (props: IChartProps) => {
 
     const fetchData = (leftSide: number, rightSide: number) => {
       chart.current.showLoading();
-      props.updateQueryResults(latestFolder.current, latestDatasetId.current, leftSide, rightSide, latestFrequency.current, latestMeasures.current);
-      props.updateFrom(leftSide);
-      props.updateTo(rightSide);
+      dispatch(updateQueryResults({folder: latestFolder.current, id: latestDatasetId.current, 
+      from: leftSide, to: rightSide, resampleFreq: latestFrequency.current, selectedMeasures: latestMeasures.current}));
+      dispatch(updateFrom(leftSide));
+      dispatch(updateTo(rightSide));
       if (latestCompare.current.length !== 0) {
-        props.updateCompareQueryResults(latestFolder.current, latestCompare.current, leftSide, rightSide, latestFrequency.current, latestMeasures.current)
+        dispatch(updateCompareQueryResults({folder: latestFolder.current, id: latestCompare.current,
+        from: leftSide, to: rightSide, resampleFreq: latestFrequency.current, selectedMeasures: latestMeasures.current}))
       }
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
-      if(isCpDetectionEnabled.current) props.applyCpDetection(latestDatasetId.current, leftSide, rightSide, customChangePoints);
+      if(isCpDetectionEnabled.current) dispatch(applyCpDetection({id: latestDatasetId.current, from: leftSide, to: rightSide, customChangePoints}));
     };
 
     const getSides = (max: number, min: number, p: number) => {
@@ -281,7 +217,7 @@ export const Chart = (props: IChartProps) => {
          (max > dataMax && max !== timeRange.current[1]) || 
          (min < dataMin && min !== timeRange.current[0])) {
         latestFrequency.current = newFreq;
-        props.updateResampleFreq(newFreq);
+        dispatch(updateResampleFreq(newFreq));
         checkForData(max, min);
       }
     }
@@ -302,9 +238,9 @@ export const Chart = (props: IChartProps) => {
     });
 
     // CHART: PAN FUNCTION
-    Highcharts.wrap(Highcharts.Chart.prototype, "pan", function (proceed) {
+    Highcharts.wrap(Highcharts.Chart.prototype, "pan", function (proceed, ...args) {
       if(!chart.current.loadingShown){
-      proceed.apply(this, [].slice.call(arguments, 1));
+      proceed.apply(this, args);
       checkForDataOnPan();
       }
     });
@@ -606,19 +542,19 @@ export const Chart = (props: IChartProps) => {
                 pickIntervals: {
                   className: "pick-intervals", // needs to be the same with above
                   init(e: any) {
-                    props.setShowDatePick(true);
+                    dispatch(setShowDatePick(true));
                   },
                 },
                 functionIntervals: {
                   className: "function-intervals", // needs to be the same with above
                   init(e: any) {
-                    props.setShowChangePointFunction(true);
+                    dispatch(setShowChangePointFunction(true));
                   },
                 },
                 compareFiles: {
                   className: "compare-files", // needs to be the same with above
                   init(e: any) {
-                    props.setCompare(true);
+                    dispatch(setCompare(true));
                   },
                 },
                 measureX: {
@@ -632,27 +568,27 @@ export const Chart = (props: IChartProps) => {
                             a.userOptions.id !== event.target.userOptions.id
                         );
                         // convert annotations to dates
-                        props.updateCustomChangePoints(
+                        dispatch(updateCustomChangePoints(
                           annotations.map((a: any, id: any) => annotationToDate(a, id))
-                        );
+                        ));
                       },
                       afterUpdate(event: { target: { cancelClick: any; }; }) {
                         // convert annotations to dates
                         if (event.target.cancelClick !== undefined) {
                           const annotations = this.chart.annotations;
-                          props.updateCustomChangePoints(
+                          dispatch(updateCustomChangePoints(
                             annotations.map((a: any, id: any) => annotationToDate(a, id))
-                          );
+                          ));
                         }
                       },
                     },
                   },
                   end() {
-                    props.updateCustomChangePoints(
+                    dispatch(updateCustomChangePoints(
                       this.chart.annotations.map((a: any, id: any) =>
                         annotationToDate(a, id)
                       )
-                    );
+                    ));
                   },
                 },
               },

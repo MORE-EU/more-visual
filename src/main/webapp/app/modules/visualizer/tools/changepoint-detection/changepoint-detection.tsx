@@ -1,30 +1,21 @@
 import React, {useState} from 'react';
-import {IDataset} from "app/shared/model/dataset.model";
-import {Box, Button, Divider, Switch, Tooltip, Typography,} from "@mui/material";
-import {applyCpDetection, enableCpDetection} from "app/modules/visualizer/visualizer.reducer";
+import {Box, Divider, Switch, Tooltip, Typography,} from "@mui/material";
+import { useAppSelector, useAppDispatch } from 'app/modules/store/storeConfig';
+import { applyCpDetection, enableCpDetection } from 'app/modules/store/visualizerSlice';
 
-export interface IChangepointDetectionProps {
-  dataset: IDataset,
-  data: any,
-  customChangePoints: any,
-  from: number,
-  to: number,
-  applyCpDetection: typeof applyCpDetection,
-  cpDetectionEnabled: boolean,
-  enableCpDetection: typeof enableCpDetection,
-}
+export const ChangepointDetection = () => {
 
+  const {cpDetectionEnabled, dataset, from, to, customChangePoints} = useAppSelector(state => state.visualizer);
+  const dispatch = useAppDispatch();
 
-export const ChangepointDetection = (props: IChangepointDetectionProps) => {
-  const {dataset, customChangePoints, from, to, cpDetectionEnabled} = props;
   const [detectIntervals, setDetectIntervals] = useState(false);
 
   const handleCpDetection = () => {
     const action = !cpDetectionEnabled;
-    props.enableCpDetection(action);
+    dispatch(enableCpDetection(action));
     if(action)
-      props.applyCpDetection(dataset.id, from, to,
-        customChangePoints);
+      dispatch(applyCpDetection({id: dataset.id, from, to,
+        customChangePoints}));
   }
 
   return (

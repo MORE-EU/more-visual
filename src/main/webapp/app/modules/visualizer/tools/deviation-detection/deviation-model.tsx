@@ -90,9 +90,7 @@ export const DeviationModel = (props: IChangepointModelProps) => {
         </Box>
       </Box>
       {isTrained &&
-        <Scores
-          scores={scores}
-          changePointDates={changePointDates}/>
+        <Scores />
       }
     </Box>
   );
