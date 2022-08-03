@@ -79,7 +79,6 @@ const initialState = {
   from: null as number,
   to: null as number,
   wdFiles: [],
-  detectedChangePoints: [] as IChangePointDate[],
   sampleFile: [],
   directories: [],
   liveData: false,
@@ -90,8 +89,6 @@ const initialState = {
   datasetChoice: 0,
   patternNav: '0',
   folder: '',
-  customChangePoints: [] as IChangePointDate[],
-  cpDetectionEnabled: false,
   graphZoom: null,
   activeTool: -1,
   compare: [],
@@ -104,6 +101,15 @@ const initialState = {
   fixedWidth: 0,
   expand: false,
   open: false,
+  secondaryData: null as IDataPoint[],
+  forecastData: null as IDataPoint[],
+  manualChangePoints: null as IChangePointDate[],
+  customChangePoints: null as IChangePointDate[],
+  detectedChangePoints: null as IChangePointDate[],
+  changepointDetectionEnabled: false,
+  manualChangepointsEnabled: false,
+  forecasting: false,
+  soilingEnabled: false,
 };
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
@@ -165,19 +171,48 @@ export const updateCompareQueryResults = createAsyncThunk(
   }
 );
 
-export const applyCpDetection = createAsyncThunk(
-  'applyCpDetection',
-  async (data: { id: string; from: number; to: number; customChangePoints: IChangePointDate[] }) => {
-    const { id, from, to, customChangePoints } = data;
+export const applyChangepointDetection = createAsyncThunk(
+  'applyChangepointDetection',
+  async (data: { id: string; from: number; to: number; changepoints: IChangePointDate[] }) => {
+    const { id, from, to, changepoints} = data;
     const response = await axios
       .post(`api/tools/cp_detection/${id}`, {
         range: { from, to } as ITimeRange,
-        changepoints: customChangePoints,
+        changepoints,
       })
       .then(res => res);
     return response.data;
   }
 );
+
+export const applyForecasting = createAsyncThunk(
+  'applyForecasting',
+  async(id: string) => {
+    const requestUrl = `api/tools/forecasting/${id}`;
+    const response = await axios.post(requestUrl);
+    return response.data;
+  });
+
+export const applyDeviationDetection = createAsyncThunk(
+  'applyDeviationDetection',
+  async (data: {id: string, from : number, to : number, changepoints : IChangePointDate[]}) => {
+    const requestUrl = `api/tools/soiling/${data.id}`;
+    const range = {from: data.from, to: data.to} as unknown as ITimeRange;
+    const changepoints = data.changepoints;
+    const response = await axios.post(requestUrl, {
+      range,
+      changepoints,
+    });
+    return response.data;
+  });
+
+export const getManualChangePoints = createAsyncThunk(
+  'getManualChangePoints',
+  async (id: string) => {
+    const requestUrl = `api/tools/cp_detection/washes/${id}`;
+    const response = await axios.get(requestUrl);
+    return response.data;
+  });
 
 // Then, handle actions in your reducers:
 const visualizer = createSlice({
@@ -237,9 +272,6 @@ const visualizer = createSlice({
     getPatterns(state, action: {payload: {data: IDataPoint[], val: number, resampleFreq: string}, type: string}) {
       state.patterns = initPatterns(action.payload.data, action.payload.val, action.payload.resampleFreq);
     },
-    enableCpDetection(state, action) {
-      state.cpDetectionEnabled = action.payload;
-    },
     setShowDatePick(state, action) {
       state.showDatePick = action.payload;
     },
@@ -269,6 +301,19 @@ const visualizer = createSlice({
     },
     setFolder(state, action) {
       state.folder = action.payload;
+    },
+    enableChangepointDetection(state, action) {
+      state.changepointDetectionEnabled = action.payload;
+    },
+    enableSoilingDetection(state, action){
+      state.soilingEnabled = action.payload;
+      state.secondaryData = null;
+    },
+    enableForecasting(state, action){
+      state.forecasting = action.payload;
+    },
+    enableManualChangepoints(state, action){
+      state.manualChangepointsEnabled = action.payload;
     },
     resetChartValues(state) {
       state.queryResultsLoading = initialState.queryResultsLoading;
@@ -328,13 +373,23 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected), (state, action) => {
       state.queryResultsLoading = false;
     });
+    builder.addMatcher(isAnyOf(applyChangepointDetection.fulfilled), (state, action) => {
+      state.detectedChangePoints = action.payload;
+    });
+    builder.addMatcher(isAnyOf(getManualChangePoints.fulfilled), (state, action) => {
+      state.manualChangePoints = action.payload;
+    });
+    builder.addMatcher(isAnyOf(applyDeviationDetection.fulfilled), (state, action) => {
+      state.secondaryData = action.payload;
+    });
   },
 });
 
 export const {
   resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilters,
   updatePatterns,updateChangeChart,updateDatasetChoice,updatePatternNav,updateChartRef,updateCustomChangePoints,
-  updateActiveTool,updateCompare,updateLiveData,updateData,getPatterns,enableCpDetection,resetChartValues,
+  updateActiveTool,updateCompare,updateLiveData,updateData,getPatterns, enableForecasting, enableSoilingDetection,
+  enableManualChangepoints, enableChangepointDetection, resetChartValues,
   setShowDatePick,setShowChangePointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
   setExpand,setOpen,filterData, setFolder,
 } = visualizer.actions;

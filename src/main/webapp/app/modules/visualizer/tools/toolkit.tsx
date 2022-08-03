@@ -98,23 +98,17 @@ const Toolkit = () => {
             </ListItem>
             <ListItem button key={1} onClick={() => handleToolClick(1)}>
               <ListItemIcon>
-                <CompareArrowsIcon/>
+                <ManageSearchIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Deviation Detection"}/>
+              <ListItemText primary={"Soiling Detection"}/>
             </ListItem>
             <ListItem button key={2} onClick={() => handleToolClick(2)}>
               <ListItemIcon>
-                <ManageSearchIcon/>
-              </ListItemIcon>
-              <ListItemText primary={"Changepoint Detection"}/>
-            </ListItem>
-            <ListItem button key={3} onClick={() => handleToolClick(3)}>
-              <ListItemIcon>
                 <TimelineIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Semantic Segmentation"}/>
+              <ListItemText primary={"Forecasting"}/>
             </ListItem>
-            <ListItem button key={4} onClick={() => handleToolClick(4)}>
+            <ListItem button key={3} onClick={() => handleToolClick(3)}>
               <ListItemIcon>
                 <FilterAltIcon/>
               </ListItemIcon>

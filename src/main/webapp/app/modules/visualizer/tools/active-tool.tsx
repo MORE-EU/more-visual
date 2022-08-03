@@ -2,11 +2,11 @@ import * as React from 'react';
 import {Box, IconButton} from "@mui/material";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import PatternExtraction from "app/modules/visualizer/tools/pattern-extraction/pattern-extraction";
-import ChangepointDetection from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
-import DeviationDetection from "app/modules/visualizer/tools/deviation-detection/deviation-detection";
 import Filter from "app/modules/visualizer/tools/filter/filter";
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { updateActiveTool } from 'app/modules/store/visualizerSlice';
+import SoilingDetection from "app/modules/visualizer/tools/soiling-detection/soiling-detection";
+import Forecasting from "app/modules/visualizer/tools/forecasting/forecasting";
 
 const ActiveTool = () => {
 
@@ -24,9 +24,9 @@ const ActiveTool = () => {
             <ArrowBackIosIcon/>
           </IconButton>
           {activeTool === 0 && <PatternExtraction />}
-          {activeTool === 1 && <DeviationDetection />}
-          {activeTool === 2 && <ChangepointDetection />}
-          {activeTool === 4 && <Filter />}
+          {activeTool === 1 && <SoilingDetection />}
+          {activeTool === 2 && <Forecasting />}
+          {activeTool === 3 && <Filter />}
         </Box>
       }
     </Box>

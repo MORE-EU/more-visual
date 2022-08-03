@@ -3,16 +3,28 @@ import "../visualizer.scss";
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
-import {Grid, LinearProgress} from "@mui/material";
+import {Grid, Slider, LinearProgress} from "@mui/material";
 import annotationsAdvanced from "highcharts/modules/annotations-advanced";
 import stockTools from "highcharts/modules/stock-tools";
 import {useScrollBlock} from "app/shared/util/useScrollBlock";
 import {ITimeRange} from "app/shared/model/time-range.model";
-import _debounce from "lodash/debounce";
 import moment from "moment";
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import { setCompare, setShowChangePointFunction, setShowDatePick, updateChartRef, updateCompareQueryResults,
-updateCustomChangePoints, updateFrom, updateQueryResults, updateResampleFreq, updateTo, applyCpDetection } from "app/modules/store/visualizerSlice";
+import {
+  setCompare,
+  setShowChangePointFunction,
+  setShowDatePick,
+  updateChartRef,
+  updateCompareQueryResults,
+  updateCustomChangePoints,
+  updateFrom,
+  updateQueryResults,
+  updateResampleFreq,
+  updateTo,
+  applyChangepointDetection,
+  applyDeviationDetection
+} from "app/modules/store/visualizerSlice";
+import CloseIcon from "@mui/icons-material/Close";
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
   time: {
@@ -43,7 +55,8 @@ annotationsAdvanced(Highcharts);
 export const Chart = () => {
 
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, queryResultsLoading, filters, customChangePoints,
-    queryResults, changeChart, compare, cpDetectionEnabled, patterns, detectedChangePoints, data, compareData} = useAppSelector(state => state.visualizer);
+    queryResults, changeChart, compare, changepointDetectionEnabled, patterns, detectedChangePoints, data, compareData, secondaryData,
+    forecastData, soilingEnabled, manualChangepointsEnabled, manualChangePoints,} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -51,7 +64,8 @@ export const Chart = () => {
   const [zones, setZones] = useState([]);
   const [plotBands, setPlotBands] = useState([]);
   const [type, setType] = useState("line");
-
+  const [sliderVal, setSliderVal] = useState(null);
+  const [selectedPlot, setSelectedPlot] = useState(null);
   // Refs
   const latestFrequency = useRef(resampleFreq);
   const latestLeftSide = useRef(null);
@@ -62,8 +76,20 @@ export const Chart = () => {
   const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
-  const isCpDetectionEnabled = useRef(cpDetectionEnabled);
+  const isChangePointDetectionEnabled = useRef(changepointDetectionEnabled);
+  const isSoilingEnabled = useRef(soilingEnabled);
 
+  const manualPlotBands = (manualChangePoints !== null && [].concat(...manualChangePoints.map(date => {
+    return {
+      color: '#425af5',
+      from: date.range.from,
+      to: date.range.to,
+      label: {
+        // text: 'I am a label 2', // Content of the label.
+        // align: 'left', // Positioning of the label.
+      }
+    };
+  })));
 
   // Color Zones For Patterns
   useEffect(() => {
@@ -86,26 +112,50 @@ export const Chart = () => {
     setZones(newZones);
   }, [patterns]);
 
-
-
   // Color Bands for Change-points
   useEffect(() => {
-    const newPlotBands = (detectedChangePoints !== null && [].concat(...detectedChangePoints.map(date => {
+    let newChangepointPlotBands = (detectedChangePoints !== null ? [].concat(...detectedChangePoints.map((date, idx) => {
       return {
-        color: '#1e90ff',
+        color: '#f56342',
         from: date.range.from,
         to: date.range.to,
+        id: "pb" + idx,
+        // label: {
+        //   text: 'plot 1',
+        //   align: 'center'
+        // },
+        borderWidth: 0,
+        borderColor: 'black',
+        events: {
+          // mouseup(e) {
+          //   handlePlotBandsSelection(this.id);
+          // }
+          mouseover: function(e) {
+            this.svgElem.attr('fill', new Highcharts.Color(this.options.color).brighten(0.1).get());
+          },
+          mouseout: function(e) {
+            this.svgElem.attr('fill', this.options.color);
+          },
+        }
       };
-    })));
-    setPlotBands(newPlotBands);
-  }, [detectedChangePoints]);
+    })) : []);
+    if(manualChangepointsEnabled) newChangepointPlotBands = newChangepointPlotBands.concat(manualPlotBands);
+    setPlotBands(newChangepointPlotBands);
+
+  }, [detectedChangePoints, manualChangepointsEnabled]);
 
 
   useEffect(() => {
-    isCpDetectionEnabled.current = cpDetectionEnabled;
-    if(!cpDetectionEnabled) setPlotBands([]);
-  }, [cpDetectionEnabled]);
+    isChangePointDetectionEnabled.current = changepointDetectionEnabled;
+    if(!changepointDetectionEnabled){
+      if(manualChangepointsEnabled) setPlotBands(manualPlotBands);
+      else setPlotBands([]);
+    }
+  }, [changepointDetectionEnabled, manualChangepointsEnabled]);
 
+  useEffect(() => {
+    isSoilingEnabled.current = soilingEnabled;
+  }, [soilingEnabled]);
 
   useEffect(() => {
     if(chartRef !== null){
@@ -141,6 +191,57 @@ export const Chart = () => {
     return {range: {from: startPoint, to: endPoint} as ITimeRange, id: len};
   };
 
+
+  const handlePlotBandsSelection = (id) => {
+    if(typeof id === "string") {
+      const idx = plotBands.findIndex(x => x.id === id);
+      if(idx !== selectedPlot){
+        setSelectedPlot(idx);
+        setSliderVal([plotBands[idx].from, plotBands[idx].to])
+        setPlotBands([...plotBands].map(object => {
+          if(object.id === id) {
+            return {
+              ...object,
+              borderWidth: 1,
+            }
+          }else if(object.id !== id && object.borderWidth === 1){
+            return {
+              ...object,
+              borderWidth: 0,
+            }
+          }
+          else return object;
+        }))
+      }
+    }
+    else if(Array.isArray(id)) {
+      setSliderVal(id);
+      setPlotBands([...plotBands].map((object, idx) => {
+        if(idx === selectedPlot) {
+          return {
+            ...object,
+            from: id[0],
+            to: id[1]
+          }
+        }
+        else return object;
+      }))
+    }
+    else {
+      setSliderVal(null);
+      setSelectedPlot(null);
+      setPlotBands([...plotBands].map((object, idx) => {
+        if(object.borderWidth === 1) {
+          return {
+            ...object,
+            borderWidth: 0
+          }
+        }
+        else return object;
+      }))
+    }
+  }
+
   const chartFunctions = (e: { target: any; }) => {
     chart.current = e.target;
     timeRange.current = queryResults.timeRange;
@@ -156,7 +257,7 @@ export const Chart = () => {
 
     const fetchData = (leftSide: number, rightSide: number) => {
       chart.current.showLoading();
-      dispatch(updateQueryResults({folder: latestFolder.current, id: latestDatasetId.current, 
+      dispatch(updateQueryResults({folder: latestFolder.current, id: latestDatasetId.current,
       from: leftSide, to: rightSide, resampleFreq: latestFrequency.current, selectedMeasures: latestMeasures.current}));
       dispatch(updateFrom(leftSide));
       dispatch(updateTo(rightSide));
@@ -166,7 +267,8 @@ export const Chart = () => {
       }
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
-      if(isCpDetectionEnabled.current) dispatch(applyCpDetection({id: latestDatasetId.current, from: leftSide, to: rightSide, customChangePoints}));
+      if(isChangePointDetectionEnabled.current) dispatch(applyChangepointDetection({id: latestDatasetId.current, from: leftSide, to: rightSide, changepoints: customChangePoints}));
+      if(isSoilingEnabled.current) dispatch(applyDeviationDetection({id: latestDatasetId.current, from: leftSide, to: rightSide, changepoints : detectedChangePoints}));
     };
 
     const getSides = (max: number, min: number, p: number) => {
@@ -214,7 +316,7 @@ export const Chart = () => {
       const diff = getDateDiff(moment(max), moment(min));
       const newFreq = calculateFreqFromDiff(diff);
       if((newFreq !== latestFrequency.current) ||
-         (max > dataMax && max !== timeRange.current[1]) || 
+         (max > dataMax && max !== timeRange.current[1]) ||
          (min < dataMin && min !== timeRange.current[0])) {
         latestFrequency.current = newFreq;
         dispatch(updateResampleFreq(newFreq));
@@ -249,6 +351,126 @@ export const Chart = () => {
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
     };
 
+  const computeChartData = () => {
+    let chartData = (data !== null) ? selectedMeasures
+      .map((measure, index) => ({
+        data: data.map((d) => {
+          const val = d.values[index];
+          return [d.timestamp, isNaN(val) ? null : val];
+        }),
+        name: dataset.header[measure],
+        yAxis: changeChart ? index : 0,
+        zoneAxis: "x",
+        zones,
+      })) : [];
+    if(secondaryData){
+      const sz = chartData !== null ? chartData.length : 0;
+      chartData = [...chartData, {...chartData[0], yAxis: sz, name: "Soiling Ratio"}]
+    }
+    return chartData;
+  }
+
+  const computeYAxisData = () => {
+    let yAxisData = changeChart
+      ? selectedMeasures.map((measure, idx) => ({
+        title: {
+          enabled: true,
+          text: dataset.header[measure],
+        },
+        opposite: false,
+        top: `${(100 / selectedMeasures.length) * idx}%`,
+        height: `${
+          selectedMeasures.length > 1
+            ? 100 / selectedMeasures.length - 5
+            : 100
+        }%`,
+        offset: 0,
+        plotBands:
+          measure in filters
+            ? [
+              {
+                from: filters[measure][0],
+                to: filters[measure][1],
+              },
+            ]
+            : null,
+      }))
+      : selectedMeasures.map((measure, idx) => ({
+        title: {
+          enabled: false,
+          text: dataset.header[measure],
+        },
+        opposite: false,
+        top: "0%",
+        height: "100%",
+        offset: undefined,
+        plotBands:
+          measure in filters
+            ? [
+              {
+                from: filters[measure][0],
+                to: filters[measure][1],
+              },
+            ]
+            : null,
+      }));
+    if(secondaryData){
+      const sz = yAxisData.length;
+      const percent = Math.floor(90 / sz);
+      const newAxis = {
+        title: {
+          enabled: true,
+          text: "Soiling Ratio",
+        },
+        opposite: false,
+        top: `0%`,
+        height: `10%`,
+        offset: 0,
+        plotBands: [],
+      };
+      yAxisData = changeChart
+        ? yAxisData.map((y, idx) =>
+          ({
+            ...y,
+            height: (percent - 5).toString() + "%",
+            top:  (12 + percent * idx).toString() + "%",
+          })
+        ) :
+        yAxisData.map((y, idx) =>
+          ({
+            ...y,
+            height: "90%",
+            top:  "12%",
+          })
+        );
+      yAxisData.push(newAxis);
+    }
+    return yAxisData;
+  }
+
+  const forecastChartData = (forecastData !== null) ? selectedMeasures
+    .map((measure, index) => ({
+      data: forecastData.map((d) => {
+        const val = d.values[index];
+        return [d.timestamp, isNaN(val) ? null : val];
+      }),
+      name: "Forecasted " + dataset.header[measure],
+      yAxis: changeChart ? index : 0,
+      zoneAxis: "x",
+      zones,
+    })) : [];
+
+  const compareChartData = (compareData !== null) ? compareData.map((compData, idx) => selectedMeasures.map((measure, index) => ({
+    data: compData.map(d => {
+      const val = d.values[index];
+      return [d.timestamp,isNaN(val) ? null : val];
+    }),
+    name: dataset.header[measure] + " " + compare[idx],
+    yAxis: changeChart ? index : 0,
+    zoneAxis: "x",
+    zones,
+  }))) : [];
+
   return (
     <Grid
       sx={{border: "1px solid rgba(0, 0, 0, .1)", minHeight: "700px"}}
@@ -256,8 +478,8 @@ export const Chart = () => {
       onMouseLeave={() => allowScroll()}
     >
       {!data ?
-      <LinearProgress />
-    : <LinearProgress variant="determinate" color="success" value={100} className={"linear-prog-hide"}/>}
+        <LinearProgress />
+        : <LinearProgress variant="determinate" color="success" value={100} className={"linear-prog-hide"}/>}
       {data && (
         <HighchartsReact
           highcharts={Highcharts}
@@ -336,39 +558,11 @@ export const Chart = () => {
               },
             },
             series:
-              compare.length !== 0 && compareData !== null
-                ? selectedMeasures
-                  .map((measure, index) => ({
-                    data: data.map((d) => {
-                      const val = d.values[index];
-                      return [d.timestamp, isNaN(val) ? null : val];
-                    }),
-                    name: dataset.header[measure],
-                    yAxis: changeChart ? index : 0,
-                    zoneAxis: "x",
-                    zones,
-                  }))
-                  .concat(
-                    ...compareData.map((compData, idx) => selectedMeasures.map((measure, index) => ({
-                      data: compData.map(d => {
-                        const val = d.values[index];
-                        return [d.timestamp,isNaN(val) ? null : val];
-                      }),
-                      name: dataset.header[measure] + " " + compare[idx],
-                      yAxis: changeChart ? index : 0,
-                      zoneAxis: "x",
-                      zones,
-                    }))))
-                : selectedMeasures.map((measure, index) => ({
-                  data: data.map((d) => {
-                    const val = d.values[index];
-                    return [d.timestamp, isNaN(val) ? null : val];
-                  }),
-                  name: dataset.header[measure],
-                  yAxis: changeChart ? index : 0,
-                  zoneAxis: "x",
-                  zones,
-                })),
+              [
+                ...computeChartData(),
+                ...forecastChartData,
+                ...compareChartData
+              ],
             chart: {
               type,
               height: "700px",
@@ -390,49 +584,7 @@ export const Chart = () => {
               // range: graphZoom !== null ? graphZoom : Number.MAX_SAFE_INTEGER,
               plotBands,
             },
-            yAxis: changeChart
-              ? selectedMeasures.map((measure, idx) => ({
-                title: {
-                  enabled: true,
-                  text: dataset.header[measure],
-                },
-                opposite: false,
-                top: `${(100 / selectedMeasures.length) * idx}%`,
-                height: `${
-                  selectedMeasures.length > 1
-                    ? 100 / selectedMeasures.length - 5
-                    : 100
-                }%`,
-                offset: 0,
-                plotBands:
-                  measure in filters
-                    ? [
-                      {
-                        from: filters[measure][0],
-                        to: filters[measure][1],
-                      },
-                    ]
-                    : null,
-              }))
-              : selectedMeasures.map((measure, idx) => ({
-                title: {
-                  enabled: false,
-                  text: dataset.header[measure],
-                },
-                opposite: false,
-                top: "0%",
-                height: "100%",
-                offset: undefined,
-                plotBands:
-                  measure in filters
-                    ? [
-                      {
-                        from: filters[measure][0],
-                        to: filters[measure][1],
-                      },
-                    ]
-                    : null,
-              })),
+            yAxis: computeYAxisData(),
             rangeSelector: {
               enabled: false,
             },
@@ -559,7 +711,7 @@ export const Chart = () => {
                 },
                 measureX: {
                   annotationsOptions: {
-                    id: customChangePoints.length,
+                    id: customChangePoints !== null  ? customChangePoints.length : 0,
                     events: {
                       remove(event: { target: { userOptions: { id: any; }; }; }) {
                         // get annotations
@@ -596,6 +748,18 @@ export const Chart = () => {
           }}
         />
       )}
+      {sliderVal &&
+        <Grid sx={{ml: 3, mr: 3, display: "flex"}}>
+          <CloseIcon onClick={() => {handlePlotBandsSelection(null)}}/>
+          <Slider
+            value={sliderVal}
+            onChange={(e, newVal) => {handlePlotBandsSelection(newVal)}}
+            min={parseInt(data[0].timestamp, 10)}
+            max={parseInt(data[data.length-1].timestamp, 10)}
+            valueLabelDisplay="auto"
+            valueLabelFormat={x => `${new Date(x)}`}
+          />
+        </Grid>}
     </Grid>
   );
 };
