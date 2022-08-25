@@ -1,6 +1,5 @@
 package eu.more2020.visual.index.modelar;
 
-import com.google.common.math.StatsAccumulator;
 import eu.more2020.visual.domain.*;
 import eu.more2020.visual.index.TimeSeriesIndexUtil;
 import eu.more2020.visual.index.TreeNode;
@@ -49,12 +48,7 @@ public class ModelarTTI {
     }
 
     public QueryResults initialize(Query q0) throws Exception {
-        Map<Integer, StatsAccumulator> statsMap = new HashMap<>();
-        for (Integer measureIndex : dataset.getMeasures()) {
-            statsMap.put(measureIndex, new StatsAccumulator());
-        }
         List<Integer> measures = dataset.getMeasures();
-
 
         int queryFrequencyLevel = TimeSeriesIndexUtil.getTemporalLevelIndex(q0.getFrequency()) + 1;
 

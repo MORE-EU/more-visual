@@ -32,18 +32,18 @@ public class CsvQueryProcessor {
     private Stack<TreeNode> stack = new Stack<>();
     private FileInputStream fileInputStream;
     private CsvParser parser;
-    private TimeseriesTreeIndex timeseriesTreeIndex;
+    private CsvTTI tti;
     private List<Integer> measures;
 
 
-    public CsvQueryProcessor(Query query, Dataset dataset, TimeseriesTreeIndex timeseriesTreeIndex) {
+    public CsvQueryProcessor(Query query, Dataset dataset, CsvTTI tti) {
         this.query = query;
         this.measures = query.getMeasures() != null ? query.getMeasures() : dataset.getMeasures();
         this.queryResults = new QueryResults();
         this.dataset = dataset;
-        this.timeseriesTreeIndex = timeseriesTreeIndex;
+        this.tti = tti;
         this.freqLevel = TimeSeriesIndexUtil.getTemporalLevelIndex(query.getFrequency()) + 1;
-        CsvParserSettings parserSettings = timeseriesTreeIndex.createCsvParserSettings();
+        CsvParserSettings parserSettings = tti.createCsvParserSettings();
         parser = new CsvParser(parserSettings);
     }
 
@@ -51,9 +51,9 @@ public class CsvQueryProcessor {
         LocalDateTime start;
         LocalDateTime end;
         if (query.getRange() == null) {
-            start = timeseriesTreeIndex.getTimeRange().getTo()
+            start = tti.getTimeRange().getTo()
                 .minus(7, ChronoUnit.DAYS);
-            end = timeseriesTreeIndex.getTimeRange().getTo();
+            end = tti.getTimeRange().getTo();
         } else {
             start = query.getRange().getFrom();
             end = query.getRange().getTo();
@@ -61,12 +61,12 @@ public class CsvQueryProcessor {
         List<Integer> startLabels = getLabels(start);
         List<Integer> endLabels = getLabels(end);
 
-        fileInputStream = new FileInputStream(timeseriesTreeIndex.getCsv());
+        fileInputStream = new FileInputStream(tti.getCsv());
         this.processQueryNodes(root, startLabels, endLabels, true, true, 0);
         fileInputStream.close();
 
-        queryResults.setMeasureStats(timeseriesTreeIndex.getMeasureStats());
-        queryResults.setTimeRange(timeseriesTreeIndex.getFirstLastDate());
+        queryResults.setMeasureStats(tti.getMeasureStats());
+        queryResults.setTimeRange(tti.getFirstLastDate());
         return queryResults;
     }
 
@@ -89,7 +89,7 @@ public class CsvQueryProcessor {
                 row = this.parser.parseLine(s);
                 queryResults.setIoCount(queryResults.getIoCount() + 1);
                 previousDate = currentDate;
-                currentDate = timeseriesTreeIndex.parseStringToDate(row[dataset.getTimeCol()]).truncatedTo(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(freqLevel - 1).getBaseUnit());
+                currentDate = tti.parseStringToDate(row[dataset.getTimeCol()]).truncatedTo(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(freqLevel - 1).getBaseUnit());
                 if (!currentDate.equals(previousDate) && previousDate != null) {
                     if (query.getRange() == null || query.getRange().contains(previousDate)) {
                         queryResults.getData().add(new DataPoint(previousDate, Arrays.stream(statsAccumulators).mapToDouble(DoubleSummaryStatistics::getAverage).toArray()));

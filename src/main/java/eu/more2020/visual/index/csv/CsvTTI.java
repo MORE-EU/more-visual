@@ -1,6 +1,5 @@
 package eu.more2020.visual.index.csv;
 
-import com.google.common.math.StatsAccumulator;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.domain.*;
@@ -17,9 +16,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TimeseriesTreeIndex {
+public class CsvTTI {
 
-    private static final Logger LOG = LogManager.getLogger(TimeseriesTreeIndex.class);
+    private static final Logger LOG = LogManager.getLogger(CsvTTI.class);
 
 
     protected CsvTreeNode root;
@@ -32,7 +31,7 @@ public class TimeseriesTreeIndex {
     private boolean isInitialized = false;
     private DateTimeFormatter formatter;
 
-    public TimeseriesTreeIndex(String csv, Dataset dataset) {
+    public CsvTTI(String csv, Dataset dataset) {
         this.dataset = dataset;
         this.csv = csv;
         this.formatter = DateTimeFormatter.ofPattern(dataset.getTimeFormat(), Locale.ENGLISH);
@@ -63,9 +62,9 @@ public class TimeseriesTreeIndex {
     }
 
     public QueryResults initialize(Query q0) throws IOException {
-        Map<Integer, StatsAccumulator> statsMap = new HashMap<>();
+        Map<Integer, DoubleSummaryStatistics> statsMap = new HashMap<>();
         for (Integer measureIndex : dataset.getMeasures()) {
-            statsMap.put(measureIndex, new StatsAccumulator());
+            statsMap.put(measureIndex, new DoubleSummaryStatistics());
         }
         LocalDateTime from = LocalDateTime.MIN;
         LocalDateTime to = LocalDateTime.MAX;
@@ -104,7 +103,7 @@ public class TimeseriesTreeIndex {
                 labels.add(dateTime.get(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(i)));
             }
             for (Integer measureIndex : dataset.getMeasures()) {
-                statsMap.get(measureIndex).add(Double.parseDouble(row[measureIndex]));
+                statsMap.get(measureIndex).accept(Double.parseDouble(row[measureIndex]));
             }
 
             this.addPoint(labels, rowOffset, row);
@@ -117,7 +116,7 @@ public class TimeseriesTreeIndex {
         timeRange = new TimeRange(this.firstDate, this.lastDate);
 
         measureStats = statsMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-            e -> new MeasureStats(e.getValue().mean(), e.getValue().min(), e.getValue().max())));
+            e -> new MeasureStats(e.getValue().getAverage(), e.getValue().getMin(), e.getValue().getMax())));
 
         LOG.debug("Indexing Complete. Total Indexed Objects: " + objectsIndexed);
 
@@ -143,19 +142,6 @@ public class TimeseriesTreeIndex {
         CsvQueryProcessor queryProcessor = new CsvQueryProcessor(query, dataset, this);
         return queryProcessor.prepareQueryResults(root);
     }
-
-/*    public Map<Integer, StatsAccumulator> getStats(List<TreeNode> queryNodes) {
-        Map<Integer, StatsAccumulator> stats = new HashMap<>();
-        for (TreeNode node : queryNodes) {
-            node.getStats().forEach(
-                (key, value) ->
-                    stats.merge(key, value, (v1, v2) -> {
-                        v1.addAll(v2);
-                        return v1;
-                    }));
-        }
-        return stats;
-    }*/
 
     public void traverse(TreeNode node) {
         LOG.debug(node);
