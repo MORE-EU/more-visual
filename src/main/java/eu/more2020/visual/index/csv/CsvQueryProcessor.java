@@ -1,12 +1,13 @@
-package eu.more2020.visual.index;
+package eu.more2020.visual.index.csv;
 
-import com.google.common.math.StatsAccumulator;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.domain.DataPoint;
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Query;
 import eu.more2020.visual.domain.QueryResults;
+import eu.more2020.visual.index.TimeSeriesIndexUtil;
+import eu.more2020.visual.index.TreeNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,9 +22,9 @@ import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class QueryProcessor {
+public class CsvQueryProcessor {
 
-    private static final Logger LOG = LogManager.getLogger(QueryProcessor.class);
+    private static final Logger LOG = LogManager.getLogger(CsvQueryProcessor.class);
     private Query query;
     private QueryResults queryResults;
     private Dataset dataset;
@@ -35,18 +36,18 @@ public class QueryProcessor {
     private List<Integer> measures;
 
 
-    public QueryProcessor(Query query, Dataset dataset, TimeseriesTreeIndex timeseriesTreeIndex) {
+    public CsvQueryProcessor(Query query, Dataset dataset, TimeseriesTreeIndex timeseriesTreeIndex) {
         this.query = query;
         this.measures = query.getMeasures() != null ? query.getMeasures() : dataset.getMeasures();
         this.queryResults = new QueryResults();
         this.dataset = dataset;
         this.timeseriesTreeIndex = timeseriesTreeIndex;
-        this.freqLevel = timeseriesTreeIndex.getTemporalLevelIndex(query.getFrequency()) + 1;
+        this.freqLevel = TimeSeriesIndexUtil.getTemporalLevelIndex(query.getFrequency()) + 1;
         CsvParserSettings parserSettings = timeseriesTreeIndex.createCsvParserSettings();
         parser = new CsvParser(parserSettings);
     }
 
-    public QueryResults prepareQueryResults(TreeNode root) throws IOException {
+    public QueryResults prepareQueryResults(CsvTreeNode root) throws IOException {
         LocalDateTime start;
         LocalDateTime end;
         if (query.getRange() == null) {
@@ -69,16 +70,16 @@ public class QueryProcessor {
         return queryResults;
     }
 
-    public void processNode(TreeNode treeNode) throws IOException {
+    public void processNode(CsvTreeNode treeNode) throws IOException {
         if (treeNode.getLevel() == freqLevel) {
-            queryResults.getData().add(new DataPoint(getCurrentNodeDateTime(), measures.stream().mapToDouble(measure -> treeNode.getStats().get(measure).mean()).toArray()));
+            queryResults.getData().add(new DataPoint(getCurrentNodeDateTime(), measures.stream().mapToDouble(measure -> treeNode.getStats().get(measure).getAverage()).toArray()));
         } else {
             fileInputStream.getChannel().position(treeNode.getFileOffsetStart());
             String[] row;
             LocalDateTime previousDate, currentDate = null;
-            StatsAccumulator[] statsAccumulators = new StatsAccumulator[measures.size()];
+            DoubleSummaryStatistics[] statsAccumulators = new DoubleSummaryStatistics[measures.size()];
             for (int i = 0; i < statsAccumulators.length; i++) {
-                statsAccumulators[i] = new StatsAccumulator();
+                statsAccumulators[i] = new DoubleSummaryStatistics();
             }
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8));
@@ -88,27 +89,27 @@ public class QueryProcessor {
                 row = this.parser.parseLine(s);
                 queryResults.setIoCount(queryResults.getIoCount() + 1);
                 previousDate = currentDate;
-                currentDate = timeseriesTreeIndex.parseStringToDate(row[dataset.getTimeCol()]).truncatedTo(timeseriesTreeIndex.TEMPORAL_HIERARCHY.get(freqLevel - 1).getBaseUnit());
+                currentDate = timeseriesTreeIndex.parseStringToDate(row[dataset.getTimeCol()]).truncatedTo(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(freqLevel - 1).getBaseUnit());
                 if (!currentDate.equals(previousDate) && previousDate != null) {
                     if (query.getRange() == null || query.getRange().contains(previousDate)) {
-                        queryResults.getData().add(new DataPoint(previousDate, Arrays.stream(statsAccumulators).mapToDouble(StatsAccumulator::mean).toArray()));
+                        queryResults.getData().add(new DataPoint(previousDate, Arrays.stream(statsAccumulators).mapToDouble(DoubleSummaryStatistics::getAverage).toArray()));
                     }
-                    statsAccumulators = new StatsAccumulator[measures.size()];
+                    statsAccumulators = new DoubleSummaryStatistics[measures.size()];
                     for (int j = 0; j < statsAccumulators.length; j++) {
-                        statsAccumulators[j] = new StatsAccumulator();
+                        statsAccumulators[j] = new DoubleSummaryStatistics();
                     }
                 }
                 for (int j = 0; j < measures.size(); j++) {
-                    statsAccumulators[j].add(Double.parseDouble(row[measures.get(j)]));
+                    statsAccumulators[j].accept(Double.parseDouble(row[measures.get(j)]));
                 }
                 if (i == treeNode.getDataPointCount() - 1 && (query.getRange() == null || query.getRange().contains(currentDate))) {
-                    queryResults.getData().add(new DataPoint(currentDate, Arrays.stream(statsAccumulators).mapToDouble(StatsAccumulator::mean).toArray()));
+                    queryResults.getData().add(new DataPoint(currentDate, Arrays.stream(statsAccumulators).mapToDouble(DoubleSummaryStatistics::getAverage).toArray()));
                 }
             }
         }
     }
 
-    private void processQueryNodes(TreeNode node, List<Integer> startLabels,
+    private void processQueryNodes(CsvTreeNode node, List<Integer> startLabels,
                                    List<Integer> endLabels, boolean isFirst, boolean isLast, int level) throws IOException {
         stack.push(node);
         // we are at a leaf node
@@ -134,7 +135,7 @@ public class QueryProcessor {
             // The child's first node will be the first node of the current first node and the same for the end
             boolean childIsFirst = child.getLabel() == start && isFirst;
             boolean childIsLast = child.getLabel() == end && isLast;
-            processQueryNodes(child, startLabels, endLabels, childIsFirst, childIsLast, level + 1);
+            processQueryNodes((CsvTreeNode) child, startLabels, endLabels, childIsFirst, childIsLast, level + 1);
         }
 
         stack.pop();
@@ -144,14 +145,14 @@ public class QueryProcessor {
     private LocalDateTime getCurrentNodeDateTime() {
         LocalDateTime dateTime = LocalDateTime.of(0, 1, 1, 0, 0, 0, 0);
         for (int i = 1; i <= freqLevel; i++) {
-            dateTime = dateTime.with(timeseriesTreeIndex.TEMPORAL_HIERARCHY.get(i - 1), stack.get(i).getLabel());
+            dateTime = dateTime.with(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(i - 1), stack.get(i).getLabel());
         }
         return dateTime;
     }
 
     private List<Integer> getLabels(LocalDateTime date) {
         List<Integer> labels = new ArrayList<>();
-        for (TemporalField temporalField : timeseriesTreeIndex.TEMPORAL_HIERARCHY) {
+        for (TemporalField temporalField : TimeSeriesIndexUtil.TEMPORAL_HIERARCHY) {
             labels.add(date.get(temporalField));
         }
         return labels;

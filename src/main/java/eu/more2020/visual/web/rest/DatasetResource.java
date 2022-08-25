@@ -1,11 +1,10 @@
 package eu.more2020.visual.web.rest;
 
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.domain.*;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.ToolsRepository;
 import eu.more2020.visual.service.CsvDataService;
+import eu.more2020.visual.service.IndexedModelarDataService;
 import eu.more2020.visual.service.ModelarDataService;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
@@ -18,12 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +35,7 @@ public class DatasetResource {
     private final ToolsRepository toolsRepository;
     private final CsvDataService csvDataService;
     private final ModelarDataService modelarDataService;
+    private final IndexedModelarDataService indexedModelarDataService;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -48,11 +45,12 @@ public class DatasetResource {
 
     public DatasetResource(DatasetRepository datasetRepository,
                            ToolsRepository toolsRepository,
-                           CsvDataService csvDataService, ModelarDataService modelarDataService) {
+                           CsvDataService csvDataService, ModelarDataService modelarDataService, IndexedModelarDataService indexedModelarDataService) {
         this.datasetRepository = datasetRepository;
         this.toolsRepository = toolsRepository;
         this.csvDataService = csvDataService;
         this.modelarDataService = modelarDataService;
+        this.indexedModelarDataService = indexedModelarDataService;
     }
 
     /**
@@ -163,7 +161,7 @@ public class DatasetResource {
         Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id, folder).map(dataset -> {
             if (dataset.getType().equals("modelar")) {
                 try {
-                    return modelarDataService.executeQuery(dataset, query);
+                    return indexedModelarDataService.executeQuery(dataset, query);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -171,7 +169,7 @@ public class DatasetResource {
                 return csvDataService.executeQuery(folder, dataset, query);
             }
         });
-        queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
+        // queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 

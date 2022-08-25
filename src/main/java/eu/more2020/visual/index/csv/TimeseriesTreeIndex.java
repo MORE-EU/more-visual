@@ -1,11 +1,11 @@
-package eu.more2020.visual.index;
+package eu.more2020.visual.index.csv;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.math.StatsAccumulator;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.domain.*;
+import eu.more2020.visual.index.TimeSeriesIndexUtil;
+import eu.more2020.visual.index.TreeNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,29 +14,15 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.time.temporal.ChronoField.*;
-
 public class TimeseriesTreeIndex {
 
-    public static final List<TemporalField> TEMPORAL_HIERARCHY = Arrays.asList(YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, MILLI_OF_SECOND);
     private static final Logger LOG = LogManager.getLogger(TimeseriesTreeIndex.class);
-    private static BiMap<String, TemporalField> temporalFielMap = HashBiMap.create();
 
-    static {
-        temporalFielMap.put("YEAR", YEAR);
-        temporalFielMap.put("MONTH", MONTH_OF_YEAR);
-        temporalFielMap.put("DAY", DAY_OF_MONTH);
-        temporalFielMap.put("HOUR", HOUR_OF_DAY);
-        temporalFielMap.put("MINUTE", MINUTE_OF_HOUR);
-        temporalFielMap.put("SECOND", SECOND_OF_MINUTE);
-        temporalFielMap.put("MILLI", MILLI_OF_SECOND);
-    }
 
-    protected TreeNode root;
+    protected CsvTreeNode root;
     private TimeRange timeRange;
     private Map<Integer, MeasureStats> measureStats;
     private Dataset dataset;
@@ -52,24 +38,12 @@ public class TimeseriesTreeIndex {
         this.formatter = DateTimeFormatter.ofPattern(dataset.getTimeFormat(), Locale.ENGLISH);
     }
 
-    public static TemporalField getTemporalFieldByName(String name) {
-        return temporalFielMap.get(name);
-    }
-
-    public static String getTemporalFieldName(TemporalField temporalField) {
-        return temporalFielMap.inverse().get(temporalField);
-    }
-
-    public static int getTemporalLevelIndex(String temporalLevel) {
-        return TEMPORAL_HIERARCHY.indexOf(getTemporalFieldByName(temporalLevel));
-    }
-
     private TreeNode addPoint(Stack<Integer> labels, long fileOffset, String[] row) {
         if (root == null) {
-            root = new TreeNode(0, 0);
+            root = new CsvTreeNode(0, 0);
         }
 
-        TreeNode node = root;
+        CsvTreeNode node = root;
         if (node.getDataPointCount() == 0) {
             node.setFileOffsetStart(fileOffset);
         }
@@ -77,7 +51,7 @@ public class TimeseriesTreeIndex {
         node.adjustStats(row, dataset);
 
         for (Integer label : labels) {
-            TreeNode child = node.getOrAddChild(label);
+            CsvTreeNode child = (CsvTreeNode) node.getOrAddChild(label);
             node = child;
             if (node.getDataPointCount() == 0) {
                 node.setFileOffsetStart(fileOffset);
@@ -111,7 +85,7 @@ public class TimeseriesTreeIndex {
 
         String[] row;
 
-        int queryFrequencyLevel = getTemporalLevelIndex(q0.getFrequency()) + 1;
+        int queryFrequencyLevel = TimeSeriesIndexUtil.getTemporalLevelIndex(q0.getFrequency()) + 1;
         while ((row = parser.parseNext()) != null) {
             LocalDateTime dateTime = parseStringToDate(row[dataset.getTimeCol()]);
             if (objectsIndexed == 0) {
@@ -127,7 +101,7 @@ public class TimeseriesTreeIndex {
             Stack<Integer> labels = new Stack<>();
             int lastIndex = q0.getRange() != null && q0.getRange().contains(dateTime) ? queryFrequencyLevel : queryFrequencyLevel - 1;
             for (int i = 0; i < lastIndex; i++) {
-                labels.add(dateTime.get(TEMPORAL_HIERARCHY.get(i)));
+                labels.add(dateTime.get(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(i)));
             }
             for (Integer measureIndex : dataset.getMeasures()) {
                 statsMap.get(measureIndex).add(Double.parseDouble(row[measureIndex]));
@@ -137,7 +111,7 @@ public class TimeseriesTreeIndex {
             objectsIndexed++;
             rowOffset = parser.getContext().currentChar() - 1;
         }
-        
+
         parser.stopParsing();
         isInitialized = true;
         timeRange = new TimeRange(this.firstDate, this.lastDate);
@@ -166,11 +140,11 @@ public class TimeseriesTreeIndex {
         if (!isInitialized) {
             return initialize(query);
         }
-        QueryProcessor queryProcessor = new QueryProcessor(query, dataset, this);
+        CsvQueryProcessor queryProcessor = new CsvQueryProcessor(query, dataset, this);
         return queryProcessor.prepareQueryResults(root);
     }
 
-    public Map<Integer, StatsAccumulator> getStats(List<TreeNode> queryNodes) {
+/*    public Map<Integer, StatsAccumulator> getStats(List<TreeNode> queryNodes) {
         Map<Integer, StatsAccumulator> stats = new HashMap<>();
         for (TreeNode node : queryNodes) {
             node.getStats().forEach(
@@ -181,7 +155,7 @@ public class TimeseriesTreeIndex {
                     }));
         }
         return stats;
-    }
+    }*/
 
     public void traverse(TreeNode node) {
         LOG.debug(node);

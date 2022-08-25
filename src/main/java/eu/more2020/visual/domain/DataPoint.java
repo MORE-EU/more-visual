@@ -8,6 +8,10 @@ public class DataPoint {
 
     private double[] values;
 
+    public DataPoint(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public DataPoint(LocalDateTime timestamp, double[] values) {
         this.timestamp = timestamp;
         this.values = values;
