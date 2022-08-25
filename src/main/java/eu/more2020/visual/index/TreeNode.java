@@ -52,7 +52,7 @@ public class TreeNode {
         }
         TreeNode child = getChild(label);
         if (child == null) {
-            child = new TreeNode(label, level + 1);
+            child = this.createChild(label, level + 1);
             children.put(label, child);
         }
         return child;
@@ -72,6 +72,10 @@ public class TreeNode {
 
     public Map<Integer, DoubleSummaryStatistics> getStatisticsMap() {
         return statisticsMap;
+    }
+
+    public TreeNode createChild(int label, int level){
+        return new TreeNode(label, level);
     }
 
 

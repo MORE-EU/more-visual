@@ -39,4 +39,9 @@ public class CsvTreeNode extends TreeNode {
             statistics.accept(Double.parseDouble(row[colIndex]));
         }
     }
+
+    @Override
+    public TreeNode createChild(int label, int level){
+        return new CsvTreeNode(label, level);
+    }
 }
