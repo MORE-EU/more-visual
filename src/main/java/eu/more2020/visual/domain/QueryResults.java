@@ -3,6 +3,7 @@ package eu.more2020.visual.domain;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +13,7 @@ public class QueryResults implements Serializable {
 
     private List<DataPoint> data = new ArrayList<>();
 
-    private Map<Integer, MeasureStats> measureStats;
+    private Map<Integer, DoubleSummaryStatistics> measureStats;
 
     private List<LocalDateTime> timeRange = new ArrayList<>();
 
@@ -36,11 +37,11 @@ public class QueryResults implements Serializable {
         this.data = data;
     }
 
-    public Map<Integer, MeasureStats> getMeasureStats() {
+    public Map<Integer, DoubleSummaryStatistics> getMeasureStats() {
         return measureStats;
     }
 
-    public void setMeasureStats(Map<Integer, MeasureStats> measureStats) {
+    public void setMeasureStats(Map<Integer, DoubleSummaryStatistics> measureStats) {
         this.measureStats = measureStats;
     }
 

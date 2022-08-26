@@ -1,12 +1,12 @@
 package eu.more2020.visual.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A Dataset.
@@ -28,7 +28,11 @@ public class Dataset implements Serializable {
     private String formalName;
     private Boolean washes;
     private List<Integer> measures = new ArrayList<>();
-    private Map<Integer, MeasureStats> measureStats;
+    private Map<Integer, DoubleSummaryStatistics> measureStats;
+
+    // only used for csv dataset case
+    List<DataFileInfo> fileInfoList = new ArrayList<>();
+
 
     private TimeRange timeRange;
 
@@ -136,11 +140,11 @@ public class Dataset implements Serializable {
         this.washes = washes;
     }
 
-    public Map<Integer, MeasureStats> getMeasureStats() {
+    public Map<Integer, DoubleSummaryStatistics> getMeasureStats() {
         return measureStats;
     }
 
-    public void setMeasureStats(Map<Integer, MeasureStats> measureStats) {
+    public void setMeasureStats(Map<Integer, DoubleSummaryStatistics> measureStats) {
         this.measureStats = measureStats;
     }
 
@@ -150,6 +154,14 @@ public class Dataset implements Serializable {
 
     public void setTimeRange(TimeRange timeRange) {
         this.timeRange = timeRange;
+    }
+
+    public List<DataFileInfo> getFileInfoList() {
+        return fileInfoList;
+    }
+
+    public void setFileInfoList(List<DataFileInfo> fileInfoList) {
+        this.fileInfoList = fileInfoList;
     }
 
     @Override

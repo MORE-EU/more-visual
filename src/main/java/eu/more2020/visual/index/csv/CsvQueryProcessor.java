@@ -48,25 +48,14 @@ public class CsvQueryProcessor {
     }
 
     public QueryResults prepareQueryResults(CsvTreeNode root) throws IOException {
-        LocalDateTime start;
-        LocalDateTime end;
-        if (query.getRange() == null) {
-            start = tti.getTimeRange().getTo()
-                .minus(7, ChronoUnit.DAYS);
-            end = tti.getTimeRange().getTo();
-        } else {
-            start = query.getRange().getFrom();
-            end = query.getRange().getTo();
-        }
-        List<Integer> startLabels = getLabels(start);
-        List<Integer> endLabels = getLabels(end);
+        List<Integer> startLabels = getLabels(query.getRange().getFrom());
+        List<Integer> endLabels = getLabels(query.getRange().getTo());
 
         fileInputStream = new FileInputStream(tti.getCsv());
         this.processQueryNodes(root, startLabels, endLabels, true, true, 0);
         fileInputStream.close();
 
         queryResults.setMeasureStats(tti.getMeasureStats());
-        queryResults.setTimeRange(tti.getFirstLastDate());
         return queryResults;
     }
 

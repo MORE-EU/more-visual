@@ -5,10 +5,9 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.config.ApplicationProperties;
-import eu.more2020.visual.domain.Dataset;
-import eu.more2020.visual.domain.Farm;
-import eu.more2020.visual.domain.Sample;
+import eu.more2020.visual.domain.*;
 import eu.more2020.visual.service.ModelarDataService;
+import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,10 +21,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -140,33 +138,57 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                     }
                     break;
                 default:
-                    CsvParserSettings parserSettings = new CsvParserSettings();
-                    parserSettings.getFormat().setDelimiter(',');
-                    parserSettings.setIgnoreLeadingWhitespaces(false);
-                    parserSettings.setIgnoreTrailingWhitespaces(false);
-                    CsvParser parser = new CsvParser(parserSettings);
-                    parser.beginParsing(new File(applicationProperties.getWorkspacePath() + "/" + folder, dataset.getName()), Charset.forName("US-ASCII"));
-                    parser.parseNext();
-                    dataset.setHeader(parser.getContext().parsedHeaders());
-                    log.debug("Headers: " + Arrays.toString(dataset.getHeader()));
-                    parser.stopParsing();
+                    File file = new File(applicationProperties.getWorkspacePath() + "/" + folder, dataset.getName());
+                    if (!file.isDirectory()) {
+                        DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
+                        fillDataFileInfo(dataset, dataFileInfo);
+                        dataset.getFileInfoList().add(dataFileInfo);
+                    } else {
+                        Dataset finalDataset = dataset;
+                        List<DataFileInfo> fileInfoList = Arrays.stream(file.listFiles(f -> !f.isDirectory() && f.getName().endsWith(".csv"))).map(f -> {
+                            DataFileInfo dataFileInfo = new DataFileInfo(f.getAbsolutePath());
+                            try {
+                                fillDataFileInfo(finalDataset, dataFileInfo);
+                            } catch (IOException e) {
+                                new RuntimeException(e);
+                            }
+                            return dataFileInfo;
+                        }).collect(Collectors.toList());
+                        // sort csv files by their time ranges ascending
+                        fileInfoList.sort(Comparator.comparing(i -> i.getTimeRange().getFrom()));
+                        dataset.setFileInfoList(fileInfoList);
+                    }
+                    if (dataset.getTimeRange() == null) {
+                        dataset.setTimeRange(dataset.getFileInfoList().get(0).getTimeRange());
+                    }
+                    dataset.setTimeRange(dataset.getFileInfoList().stream().map(DataFileInfo::getTimeRange)
+                        .reduce(dataset.getTimeRange(), (range1, range2) -> range1.span(range2)));
                     break;
-            }
-
-            if (dataset.getType().equals("csv")) {
-                CsvParserSettings parserSettings = new CsvParserSettings();
-                parserSettings.getFormat().setDelimiter(',');
-                parserSettings.setIgnoreLeadingWhitespaces(false);
-                parserSettings.setIgnoreTrailingWhitespaces(false);
-                CsvParser parser = new CsvParser(parserSettings);
-                parser.beginParsing(new File(applicationProperties.getWorkspacePath() + "/" + folder, dataset.getName()), Charset.forName("US-ASCII"));
-                parser.parseNext();
-                dataset.setHeader(parser.getContext().parsedHeaders());
-                log.debug("Headers: " + Arrays.toString(dataset.getHeader()));
-                parser.stopParsing();
             }
         }
         return Optional.ofNullable(dataset);
+    }
+
+    private void fillDataFileInfo(Dataset dataset, DataFileInfo dataFileInfo) throws IOException {
+        CsvParserSettings parserSettings = new CsvParserSettings();
+        parserSettings.getFormat().setDelimiter(',');
+        parserSettings.setIgnoreLeadingWhitespaces(false);
+        parserSettings.setIgnoreTrailingWhitespaces(false);
+        CsvParser parser = new CsvParser(parserSettings);
+        parser.beginParsing(new File(dataFileInfo.getFilePath()), Charset.forName("US-ASCII"));
+        if (dataset.getHasHeader()) {
+            parser.parseNext();  //skip header row
+            dataset.setHeader(parser.getContext().parsedHeaders());
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dataset.getTimeFormat(), Locale.ENGLISH);
+        LocalDateTime from = LocalDateTime.parse(parser.parseNext()[dataset.getTimeCol()], formatter);
+        parser.stopParsing();
+
+        ReversedLinesFileReader reversedLinesFileReader = new ReversedLinesFileReader(new File(dataFileInfo.getFilePath()), Charset.forName("US-ASCII"));
+        String lastRow = reversedLinesFileReader.readLine();
+        reversedLinesFileReader.close();
+        LocalDateTime to = LocalDateTime.parse(parser.parseLine(lastRow)[dataset.getTimeCol()], formatter);
+        dataFileInfo.setTimeRange(new TimeRange(from, to));
     }
 
     @Override

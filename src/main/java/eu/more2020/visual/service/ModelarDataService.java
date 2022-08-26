@@ -52,7 +52,7 @@ public class ModelarDataService {
         List<Integer> measures = query.getMeasures() != null ? query.getMeasures() : dataset.getMeasures();
 
         List<TimeRange> intervals = new ArrayList<>();
-        if (query.getRange() != null){
+        if (query.getRange() != null) {
             intervals.add(query.getRange());
         }
         String sql = getSqlQuery(measures, query.getFrequency(), intervals);
@@ -114,13 +114,13 @@ public class ModelarDataService {
     public void fillDatasetStats(Dataset dataset) throws Exception {
         List<Integer> measures = dataset.getMeasures();
 
-        String sql = "SELECT tid, MIN(value) as min_value, MAX(value) as max_value, AVG(value) as mean_value, MIN(timestamp) as min_timestamp, MAX(timestamp) as max_timestamp FROM DataPoint "
+        String sql = "SELECT tid, MIN(value) as min_value, MAX(value) as max_value, SUM(value) as sum_value, COUNT(1) as count, MIN(timestamp) as min_timestamp, MAX(timestamp) as max_timestamp FROM DataPoint "
             + " WHERE tid IN ("
             + measures.stream().map(i -> i.toString()).collect(Collectors.joining(",")) + ")  GROUP BY tid";
 
         FlightStream flightStream = this.executeSqlQuery(sql);
 
-        Map<Integer, MeasureStats> measureStatsMap = new HashMap<>();
+        Map<Integer, DoubleSummaryStatistics> measureStatsMap = new HashMap<>();
 
         TimeRange timeRange = null;
 
@@ -134,15 +134,16 @@ public class ModelarDataService {
                     timeRange.setTo(Instant.ofEpochMilli(((TimeStampVector) vsr.getVector("max_timestamp")).get(row)).atZone(ZoneOffset.UTC).toLocalDateTime());
                 }
                 int tid = ((IntVector) vsr.getVector("tid")).get(row);
-                MeasureStats measureStats = new MeasureStats(((Float8Vector) vsr.getVector("mean_value")).get(row),
+                DoubleSummaryStatistics measureStats = new DoubleSummaryStatistics(((BigIntVector) vsr.getVector("count")).get(row),
                     ((Float4Vector) vsr.getVector("min_value")).get(row),
-                    ((Float4Vector) vsr.getVector("max_value")).get(row));
+                    ((Float4Vector) vsr.getVector("max_value")).get(row),
+                    ((Float8Vector) vsr.getVector("sum")).get(row));
                 measureStatsMap.put(tid, measureStats);
             }
             flightStream.close();
         }
 
-        dataset.setMeasureStats(measureStatsMap);
+        // dataset.setMeasureStats(measureStatsMap);
         dataset.setTimeRange(timeRange);
     }
 

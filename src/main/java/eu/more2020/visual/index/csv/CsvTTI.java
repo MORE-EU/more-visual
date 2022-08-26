@@ -22,11 +22,9 @@ public class CsvTTI {
 
 
     protected CsvTreeNode root;
-    private TimeRange timeRange;
-    private Map<Integer, MeasureStats> measureStats;
+    private Map<Integer, DoubleSummaryStatistics> measureStats;
     private Dataset dataset;
     private String csv;
-    private LocalDateTime firstDate, lastDate;
     private int objectsIndexed = 0;
     private boolean isInitialized = false;
     private DateTimeFormatter formatter;
@@ -61,10 +59,10 @@ public class CsvTTI {
         return node;
     }
 
-    public QueryResults initialize(Query q0) throws IOException {
-        Map<Integer, DoubleSummaryStatistics> statsMap = new HashMap<>();
+    public void initialize(Query q0) throws IOException {
+        measureStats = new HashMap<>();
         for (Integer measureIndex : dataset.getMeasures()) {
-            statsMap.put(measureIndex, new DoubleSummaryStatistics());
+            measureStats.put(measureIndex, new DoubleSummaryStatistics());
         }
         LocalDateTime from = LocalDateTime.MIN;
         LocalDateTime to = LocalDateTime.MAX;
@@ -87,11 +85,6 @@ public class CsvTTI {
         int queryFrequencyLevel = TimeSeriesIndexUtil.getTemporalLevelIndex(q0.getFrequency()) + 1;
         while ((row = parser.parseNext()) != null) {
             LocalDateTime dateTime = parseStringToDate(row[dataset.getTimeCol()]);
-            if (objectsIndexed == 0) {
-                this.firstDate = dateTime;
-            } else {
-                this.lastDate = dateTime;
-            }
             if (dateTime.isBefore(from)) {
                 from = dateTime;
             } else if (dateTime.isAfter(to)) {
@@ -103,7 +96,7 @@ public class CsvTTI {
                 labels.add(dateTime.get(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(i)));
             }
             for (Integer measureIndex : dataset.getMeasures()) {
-                statsMap.get(measureIndex).accept(Double.parseDouble(row[measureIndex]));
+                measureStats.get(measureIndex).accept(Double.parseDouble(row[measureIndex]));
             }
 
             this.addPoint(labels, rowOffset, row);
@@ -113,16 +106,14 @@ public class CsvTTI {
 
         parser.stopParsing();
         isInitialized = true;
-        timeRange = new TimeRange(this.firstDate, this.lastDate);
 
-        measureStats = statsMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-            e -> new MeasureStats(e.getValue().getAverage(), e.getValue().getMin(), e.getValue().getMax())));
+       /* measureStats = statsMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
+            e -> new MeasureStats(e.getValue().getAverage(), e.getValue().getMin(), e.getValue().getMax())));*/
+
 
         LOG.debug("Indexing Complete. Total Indexed Objects: " + objectsIndexed);
 
 //        traverse(root);
-
-        return this.executeQuery(q0);
     }
 
 //    public int getLevel(TreeNode node) {
@@ -137,7 +128,7 @@ public class CsvTTI {
 
     public synchronized QueryResults executeQuery(Query query) throws IOException {
         if (!isInitialized) {
-            return initialize(query);
+            initialize(query);
         }
         CsvQueryProcessor queryProcessor = new CsvQueryProcessor(query, dataset, this);
         return queryProcessor.prepareQueryResults(root);
@@ -171,18 +162,8 @@ public class CsvTTI {
         return csv;
     }
 
-    public TimeRange getTimeRange() {
-        return timeRange;
-    }
-
-    public Map<Integer, MeasureStats> getMeasureStats() {
+    public Map<Integer, DoubleSummaryStatistics> getMeasureStats() {
         return measureStats;
     }
 
-    public List<LocalDateTime> getFirstLastDate() {
-        List<LocalDateTime> timerange = new ArrayList<>();
-        timerange.add(firstDate);
-        timerange.add(lastDate);
-        return timerange;
-    }
 }

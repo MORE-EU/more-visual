@@ -166,7 +166,7 @@ public class DatasetResource {
                     throw new RuntimeException(e);
                 }
             } else {
-                return csvDataService.executeQuery(folder, dataset, query);
+                return csvDataService.executeQuery(dataset, query);
             }
         });
         // queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
