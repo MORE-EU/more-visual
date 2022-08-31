@@ -78,6 +78,7 @@ export const Chart = () => {
   const latestCompare = useRef(compare);
   const isChangePointDetectionEnabled = useRef(changepointDetectionEnabled);
   const isSoilingEnabled = useRef(soilingEnabled);
+  const extraMeasures = [isSoilingEnabled.current];
 
   const manualPlotBands = (manualChangePoints !== null && [].concat(...manualChangePoints.map(date => {
     return {
@@ -171,7 +172,8 @@ export const Chart = () => {
 
   useEffect(() => {
     latestMeasures.current = selectedMeasures;
-    dispatch(updateQueryResults({folder, id: dataset.id, from: from ? from : null, to: to ? to : null, resampleFreq, selectedMeasures}));
+    dispatch(updateQueryResults({folder, id: dataset.id, from: from ? from : null, to: to ? to : null,
+      resampleFreq, selectedMeasures, extraMeasures}));
     if (compare.length !== 0) {
       dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures}));
     }
@@ -258,7 +260,8 @@ export const Chart = () => {
     const fetchData = (leftSide: number, rightSide: number) => {
       chart.current.showLoading();
       dispatch(updateQueryResults({folder: latestFolder.current, id: latestDatasetId.current,
-      from: leftSide, to: rightSide, resampleFreq: latestFrequency.current, selectedMeasures: latestMeasures.current}));
+      from: leftSide, to: rightSide, resampleFreq: latestFrequency.current,
+        selectedMeasures: latestMeasures.current, extraMeasures}));
       dispatch(updateFrom(leftSide));
       dispatch(updateTo(rightSide));
       if (latestCompare.current.length !== 0) {

@@ -135,14 +135,16 @@ export const getSampleFile = createAsyncThunk('getSampleFile', async (id: string
 
 export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
-  async (data: { folder: string; id: string[]; from: number; to: number; resampleFreq: string; selectedMeasures: any[] }) => {
-    const { folder, id, from, to, resampleFreq, selectedMeasures } = data;
+  async (data: { folder: string; id: string[];
+    from: number; to: number; resampleFreq: string; selectedMeasures: any[]; extraMeasures: any[]}) => {
+    const { folder, id, from, to, resampleFreq, selectedMeasures, extraMeasures } = data;
     let query;
     from !== null && to !== null
       ? (query = {
           range: { from, to } as ITimeRange,
           frequency: resampleFreq.toUpperCase(),
           measures: selectedMeasures,
+          extraMeasures: extraMeasures,
         } as IQuery)
       : (query = defaultQuery);
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);

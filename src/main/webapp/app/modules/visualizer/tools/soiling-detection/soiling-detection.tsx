@@ -19,7 +19,6 @@ import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {
   enableSoilingDetection,
   applyDeviationDetection,
-  applyChangepointDetection
 } from "app/modules/store/visualizerSlice";
 
 
@@ -42,8 +41,6 @@ export const SoilingDetection = () => {
     if(action)
       dispatch(applyDeviationDetection({id: dataset.id, from, to, changepoints : detectedChangePoints}));
   }
-
-
 
   return (
     <Box sx={{pl: 2, pr: 2}}>
