@@ -8,8 +8,6 @@ public class Query {
 
     private List<Integer> measures;
 
-    private List<Integer> extraMeasures;
-
     private String frequency;
 
     public Query() {
@@ -45,21 +43,11 @@ public class Query {
         this.measures = measures;
     }
 
-
-    public List<Integer> getExtraMeasures() {
-        return extraMeasures;
-    }
-
-    public void setExtraMeasures(List<Integer> extraMeasures) {
-        this.extraMeasures = extraMeasures;
-    }
-
     @Override
     public String toString() {
         return "Query{" +
             "range=" + range +
             ", measures=" + measures +
-            ", extraMeasures=" + extraMeasures +
             ", frequency='" + frequency + '\'' +
             '}';
     }
