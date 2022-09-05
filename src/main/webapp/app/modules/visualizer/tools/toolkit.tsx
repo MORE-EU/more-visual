@@ -1,5 +1,4 @@
-import * as React from 'react';
-import {Dispatch, SetStateAction} from 'react';
+import React from 'react';
 import {Box, CssBaseline, CSSObject, Divider, List, ListItem, ListItemIcon, ListItemText, Theme} from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import {styled} from '@mui/material/styles';
@@ -12,19 +11,8 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch'; // changepoint
 import TimelineIcon from '@mui/icons-material/Timeline'; // segmentation
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ActiveTool from "app/modules/visualizer/tools/active-tool";
-import {IDataset} from "app/shared/model/dataset.model";
-import {
-  applyCpDetection,
-  enableCpDetection,
-  filterData,
-  getPatterns,
-  updateActiveTool,
-  updateFilters,
-  updatePatterns,
-  updateSelectedMeasures
-} from '../visualizer.reducer';
-import {IPatterns} from "app/shared/model/patterns.model";
-import {IQueryResults} from "app/shared/model/query-results.model";
+import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
+import { setOpen, updateActiveTool } from 'app/modules/store/visualizerSlice';
 
 const drawerWidth = 300;
 
@@ -76,47 +64,19 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
   }),
 );
 
+const Toolkit = () => {
 
-export interface IToolkitProps {
-  open?: boolean,
-  setOpen: Dispatch<SetStateAction<boolean>>,
-  dataset: IDataset,
-  from: number,
-  to: number,
-  data: any,
-  filters: any,
-  queryResults: IQueryResults,
-  updateFilters: typeof updateFilters,
-  filterData: typeof filterData,
-  selectedMeasures: number[],
-  resampleFreq: string,
-  patterns: IPatterns,
-  updateSelectedMeasures: typeof updateSelectedMeasures,
-  updatePatterns: typeof updatePatterns,
-  getPatterns: typeof getPatterns,
-  customChangePoints: any,
-  updateActiveTool: typeof updateActiveTool,
-  activeTool: number,
-  applyCpDetection: typeof applyCpDetection,
-  cpDetectionEnabled: boolean,
-  enableCpDetection: typeof enableCpDetection,
-}
-
-const Toolkit = (props: IToolkitProps) => {
-  const {
-    open, dataset, data, selectedMeasures, patterns,
-    resampleFreq, customChangePoints, activeTool, filters,
-    queryResults, from, to, cpDetectionEnabled,
-  } = props;
+  const {open, activeTool} = useAppSelector(state => state.visualizer);
+  const dispatch = useAppDispatch();
 
   const handleDrawer = () => {
-    props.setOpen(!open);
-    props.updateActiveTool(-1);
+    dispatch(setOpen(!open));
+    dispatch(updateActiveTool(-1));
   };
 
   const handleToolClick = (key) => {
-    props.setOpen(true);
-    props.updateActiveTool(key);
+    dispatch(setOpen(true));
+    dispatch(updateActiveTool(key));
   }
   return (
     <Box>
@@ -138,23 +98,17 @@ const Toolkit = (props: IToolkitProps) => {
             </ListItem>
             <ListItem button key={1} onClick={() => handleToolClick(1)}>
               <ListItemIcon>
-                <CompareArrowsIcon/>
+                <ManageSearchIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Deviation Detection"}/>
+              <ListItemText primary={"Soiling Detection"}/>
             </ListItem>
             <ListItem button key={2} onClick={() => handleToolClick(2)}>
               <ListItemIcon>
-                <ManageSearchIcon/>
-              </ListItemIcon>
-              <ListItemText primary={"Changepoint Detection"}/>
-            </ListItem>
-            <ListItem button key={3} onClick={() => handleToolClick(3)}>
-              <ListItemIcon>
                 <TimelineIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Semantic Segmentation"}/>
+              <ListItemText primary={"Forecasting"}/>
             </ListItem>
-            <ListItem button key={4} onClick={() => handleToolClick(4)}>
+            <ListItem button key={3} onClick={() => handleToolClick(3)}>
               <ListItemIcon>
                 <FilterAltIcon/>
               </ListItemIcon>
@@ -162,17 +116,7 @@ const Toolkit = (props: IToolkitProps) => {
             </ListItem>
           </List>
         }
-        <ActiveTool
-          activeTool={activeTool} from={from} to={to}
-          updateActiveTool={props.updateActiveTool}
-          dataset={dataset} data={data} selectedMeasures={selectedMeasures}
-          filters={filters} filterData={props.filterData}
-          updateFilters={props.updateFilters} queryResults={queryResults}
-          resampleFreq={resampleFreq} patterns={patterns} updateSelectedMeasures={props.updateSelectedMeasures}
-          updatePatterns={props.updatePatterns} getPatterns={props.getPatterns} customChangePoints={customChangePoints}
-          applyCpDetection={props.applyCpDetection} cpDetectionEnabled={cpDetectionEnabled}
-          enableCpDetection={props.enableCpDetection}
-        />
+        <ActiveTool />
       </Drawer>
     </Box>
   );

@@ -1,21 +1,7 @@
-import React, {Dispatch, SetStateAction} from 'react';
-import {
-  Avatar,
-  Button,
-  Divider,
-  FormControl,
-  Grid,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Paper,
-  Select,
-  Tooltip,
-  Typography,
+import React from 'react';
+import {Avatar,Button,Divider,FormControl,Grid,List,ListItem,
+  ListItemAvatar,ListItemButton,ListItemIcon,ListItemText,MenuItem,
+  Paper,Select,Tooltip,Typography,
 } from '@mui/material';
 import WindPowerIcon from '@mui/icons-material/WindPower';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -24,20 +10,14 @@ import {HomeFilters} from './home-filters';
 import {LatLng} from 'leaflet';
 import CloseIcon from '@mui/icons-material/Close';
 import {grey} from '@mui/material/colors';
+import { useAppSelector, useAppDispatch } from '../store/storeConfig';
+import { setFly, setSelected, setSelectedDir } from '../store/homeSlice';
 
-export interface IHomeLeftMenu {
-  setFly?: Dispatch<SetStateAction<LatLng>>;
-  items: any[];
-  allFilters: any[];
-  selected: any[];
-  selectedDir: string;
-  directories: any[];
-  setSelected?: Dispatch<SetStateAction<any[]>>;
-  setSelectedDir?: Dispatch<SetStateAction<string>>;
-}
+export const HomeLeftMenu = () => {
 
-export const HomeLeftMenu = (props: IHomeLeftMenu) => {
-  const {items, allFilters, selected, directories, selectedDir} = props;
+  const { directories } = useAppSelector(state => state.visualizer);
+  const { selectedDir, selected, items } = useAppSelector(state => state.home);
+  const dispatch = useAppDispatch();
 
   return (
     <>
@@ -50,7 +30,7 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
             <Select
               value={selectedDir}
               onChange={e => {
-                props.setSelectedDir(e.target.value);
+                dispatch(setSelectedDir(e.target.value));
               }}
               sx={{height: '2rem', bgcolor: "#e0e0e0"}}
             >
@@ -83,7 +63,7 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
                         color="info"
                         sx={{width: 'auto'}}
                         onClick={() => {
-                          props.setFly(new LatLng(item.fly[0], item.fly[1]));
+                          dispatch(setFly(new LatLng(item.fly[0], item.fly[1])));
                         }}
                       >
                         <MapIcon/>
@@ -102,11 +82,11 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
           </Typography>
           {selected.length !== 0 && (
             <List disablePadding dense>
-              {selected.map(sel => (
+              {selected.map( sel => (
                 <ListItem dense disablePadding key={sel}>
                   <ListItemIcon
                     onClick={() => {
-                      props.setSelected(selected.filter(fil => fil !== sel));
+                     dispatch(setSelected(selected.filter(fil => fil !== sel)));
                     }}
                   >
                     <ListItemButton>
@@ -118,7 +98,7 @@ export const HomeLeftMenu = (props: IHomeLeftMenu) => {
               ))}
             </List>
           )}
-          <HomeFilters allFilters={allFilters} setSelected={props.setSelected} selected={selected}/>
+          <HomeFilters />
         </Grid>
       </Paper>
     </>
