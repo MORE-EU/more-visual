@@ -131,7 +131,7 @@ public class CsvTTI {
             initialize(query);
         }
         CsvQueryProcessor queryProcessor = new CsvQueryProcessor(query, dataset, this);
-        return queryProcessor.prepareQueryResults(root);
+        return queryProcessor.prepareQueryResults(root, query.getFilter());
     }
 
     public void traverse(TreeNode node) {

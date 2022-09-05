@@ -42,7 +42,6 @@ public class CsvDataService {
                 }
                 return tti;
             }).collect(Collectors.toList());
-
         return ttis;
     }
 
@@ -69,7 +68,7 @@ public class CsvDataService {
                     }
                 });
             }
-            queryResults.getMeasureStats().forEach((integer, doubleSummaryStatistics) -> log.debug(doubleSummaryStatistics.toString()));
+            // queryResults.getMeasureStats().forEach((integer, doubleSummaryStatistics) -> log.debug(doubleSummaryStatistics.toString()));
             return queryResults;
         } catch (IOException e) {
             e.printStackTrace();

@@ -4,6 +4,7 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.domain.DataPoint;
 import eu.more2020.visual.domain.Dataset;
+import eu.more2020.visual.domain.Filter;
 import eu.more2020.visual.domain.Query;
 import eu.more2020.visual.domain.QueryResults;
 import eu.more2020.visual.index.TimeSeriesIndexUtil;
@@ -47,12 +48,12 @@ public class CsvQueryProcessor {
         parser = new CsvParser(parserSettings);
     }
 
-    public QueryResults prepareQueryResults(CsvTreeNode root) throws IOException {
+    public QueryResults prepareQueryResults(CsvTreeNode root, Filter filter) throws IOException {
         List<Integer> startLabels = getLabels(query.getRange().getFrom());
         List<Integer> endLabels = getLabels(query.getRange().getTo());
 
         fileInputStream = new FileInputStream(tti.getCsv());
-        this.processQueryNodes(root, startLabels, endLabels, true, true, 0);
+        this.processQueryNodes(root, startLabels, endLabels, true, true, 0, filter);
         fileInputStream.close();
 
         queryResults.setMeasureStats(tti.getMeasureStats());
@@ -99,7 +100,8 @@ public class CsvQueryProcessor {
     }
 
     private void processQueryNodes(CsvTreeNode node, List<Integer> startLabels,
-                                   List<Integer> endLabels, boolean isFirst, boolean isLast, int level) throws IOException {
+                                   List<Integer> endLabels, boolean isFirst, boolean isLast, int level,
+                                   Filter filter) throws IOException {
         stack.push(node);
         // we are at a leaf node
         Collection<TreeNode> children = node.getChildren();
@@ -115,16 +117,37 @@ public class CsvQueryProcessor {
         /* We filter in each level only in the first node and the last. If we are on the first node, we get everything that is from the start filter
          * and after. Else if we are in the last node we get everything before the end filter. Finally, if we re in intermediary nodes we get all children
          * that are below the filtered values of the current node.*/
+        if(filter != null){
+        if (isFirst)
+        for(int i=0; i < filter.getFilterMes().size(); i++){
+            int y = i;
+            System.out.print(y);
+            children = children.stream().filter(child -> {
+            return child.getStats().get(filter.getFilterMes().get(y)).getAverage() > filter.getFilValues().get(y) && 
+            child.getStats().get(filter.getFilterMes().get(y)).getAverage() < filter.getFilValues().get(y+1) && 
+            child.getLabel() >= start;
+        }).collect(Collectors.toList());
+        }
+        if (isLast)
+        for(int i=0; i < filter.getFilterMes().size(); i++){
+            int y = i;
+            children = children.stream().filter(child -> {
+            return child.getStats().get(filter.getFilterMes().get(y)).getAverage() > filter.getFilValues().get(y) && 
+            child.getStats().get(filter.getFilterMes().get(y)).getAverage() < filter.getFilValues().get(y+1) && 
+            child.getLabel() <= end;
+        }).collect(Collectors.toList());
+        }
+        }else{
         if (isFirst)
             children = children.stream().filter(child -> child.getLabel() >= start).collect(Collectors.toList());
         if (isLast)
             children = children.stream().filter(child -> child.getLabel() <= end).collect(Collectors.toList());
-
+        }
         for (TreeNode child : children) {
             // The child's first node will be the first node of the current first node and the same for the end
             boolean childIsFirst = child.getLabel() == start && isFirst;
             boolean childIsLast = child.getLabel() == end && isLast;
-            processQueryNodes((CsvTreeNode) child, startLabels, endLabels, childIsFirst, childIsLast, level + 1);
+            processQueryNodes((CsvTreeNode) child, startLabels, endLabels, childIsFirst, childIsLast, level + 1, filter);
         }
 
         stack.pop();

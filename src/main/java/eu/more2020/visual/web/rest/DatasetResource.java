@@ -158,8 +158,9 @@ public class DatasetResource {
     @PostMapping("/datasets/{folder}/{id}/query")
     public ResponseEntity<QueryResults> executeQuery(@PathVariable String folder, @PathVariable String id, @Valid @RequestBody Query query) throws IOException {
         log.debug("REST request to execute Query: {}", query);
-        Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id, folder).map(dataset -> {
-            if (dataset.getType().equals("modelar")) {
+        Optional<QueryResults> queryResultsOptional;
+            queryResultsOptional = datasetRepository.findById(id, folder).map(dataset -> {
+                if (dataset.getType().equals("modelar")) {
                 try {
                     return indexedModelarDataService.executeQuery(dataset, query);
                 } catch (Exception e) {
@@ -168,11 +169,10 @@ public class DatasetResource {
             } else {
                 return csvDataService.executeQuery(dataset, query);
             }
-        });
+            });
         // queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
-
 
     @PostMapping("/tools/cp_detection/{id}")
     public ResponseEntity<List<Changepoint>> cpDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {

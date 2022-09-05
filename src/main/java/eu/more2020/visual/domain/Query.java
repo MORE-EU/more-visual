@@ -6,6 +6,8 @@ public class Query {
 
     private TimeRange range;
 
+    private Filter filter;
+
     private List<Integer> measures;
 
     private String frequency;
@@ -13,10 +15,11 @@ public class Query {
     public Query() {
     }
 
-    public Query(TimeRange range, List<Integer> measures, String frequency) {
+    public Query(TimeRange range, List<Integer> measures, String frequency, Filter filter) {
         this.range = range;
         this.measures = measures;
         this.frequency = frequency;
+        this.filter = filter;
     }
 
     public TimeRange getRange() {
@@ -29,6 +32,14 @@ public class Query {
 
     public String getFrequency() {
         return frequency;
+    }
+
+    public Filter getFilter() {
+        return this.filter;
+    }
+
+    public void setFilter(Filter filter) {
+        this.filter = filter;
     }
 
     public void setFrequency(String frequency) {
@@ -48,7 +59,8 @@ public class Query {
         return "Query{" +
             "range=" + range +
             ", measures=" + measures +
-            ", frequency='" + frequency + '\'' +
+            ", frequency=" + frequency + 
+            ", filter=" + (filter != null ? filter.toString() : "null") +
             '}';
     }
 }
