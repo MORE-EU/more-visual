@@ -55,7 +55,7 @@ The fields that concern a user and must be edited before deployment are in the a
 	delimiter:	Delimiter of the data files.
 	toolAPI: Server in which the REST API for the event detection tools is running.
 
-In the case where the RES data are stored in CSV datafiles. The user must place these files in the workspace directory they defined in the configuration file. This folder must contain CSV files, one for each RES and a JSON file that contains metadata on the different RES and how to access their data. The schema of the JSON file is described below: 
+In the case where the RES data are stored in CSV datafiles. The user must place these files in the workspace directory they defined in the configuration file. This folder must contain the data files of each RES and a JSON file that contains metadata on the different RES and how to access their data. The RES data files can either be a single CSV or multiple CSV files inside a directory. The schema of the JSON file is described below: 
 
 	name:	Name of the farm
 	type:	Type of the farm. If it is a wind turbine farm then the type is 1, while for a solar panel farm the type is 0.
