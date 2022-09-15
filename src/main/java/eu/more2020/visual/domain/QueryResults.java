@@ -18,7 +18,6 @@ public class QueryResults implements Serializable {
 
     private int ioCount = 0;
 
-
     public List<LocalDateTime> getTimeRange() {
         return this.timeRange;
     }
@@ -26,7 +25,6 @@ public class QueryResults implements Serializable {
     public void setTimeRange(List<LocalDateTime> timeRange) {
         this.timeRange = timeRange;
     }
-
 
     public List<DataPoint> getData() {
         return data;

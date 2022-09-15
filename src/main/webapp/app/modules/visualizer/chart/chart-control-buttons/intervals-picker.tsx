@@ -1,31 +1,20 @@
-import React, {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState} from 'react';
 import {Box, Button, Tooltip} from '@mui/material';
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import HighlightAltIcon from '@mui/icons-material/HighlightAlt';
 import FunctionsIcon from '@mui/icons-material/Functions';
 import {ChartDatePicker} from "app/modules/visualizer/chart/chart-control-buttons/chart-datepicker";
-import {IChangePointDate} from "app/shared/model/changepoint-date.model";
-import {updateActiveTool, updateCustomChangePoints} from "app/modules/visualizer/visualizer.reducer";
+import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
+import { setExpand, setFixedWidth, setShowDatePick } from 'app/modules/store/visualizerSlice';
 
-interface IIntervalsPickerProps {
-  from: number,
-  to: number,
-  customChangePoints: IChangePointDate[],
-  updateCustomChangePoints: typeof updateCustomChangePoints,
-  setOpen: Dispatch<SetStateAction<boolean>>,
-  updateActiveTool: typeof updateActiveTool,
-}
+export const IntervalsPicker = () => {
 
-
-export const IntervalsPicker = (props: IIntervalsPickerProps) => {
-  const {from, to, customChangePoints} = props;
+  const {expand, showDatePick, fixedWidth} = useAppSelector(state => state.visualizer);
+  const dispatch = useAppDispatch();
   const ref = useRef(null);
-  const [fixedWidth, setFixedWidth] = React.useState(0);
-  const [expand, setExpand] = React.useState(false);
-  const [showDatePick, setShowDatePick] = useState(false);
 
   useEffect(() => {
-    setFixedWidth(ref.current.offsetWidth);
+    dispatch(setFixedWidth(ref.current.offsetWidth));
   }, []);
 
   const expanded = {
@@ -39,7 +28,7 @@ export const IntervalsPicker = (props: IIntervalsPickerProps) => {
                 color={expand ? 'success' : 'primary'}
                 style={expand ? expanded : null}
                 onClick={() => {
-                  setExpand(!expand);
+                  dispatch(setExpand(!expand));
                 }}><EventNoteIcon color='action'/></Button>
       </Tooltip>
       {expand &&
@@ -54,7 +43,7 @@ export const IntervalsPicker = (props: IIntervalsPickerProps) => {
               <HighlightAltIcon color='action'/></Button>
           </Tooltip>
           <Tooltip title="Pick Intervals">
-            <Button variant="text" size="small" onClick={() => setShowDatePick(true)}>
+            <Button variant="text" size="small" onClick={() => dispatch(setShowDatePick(true))}>
               <EventNoteIcon color='action'/></Button>
           </Tooltip>
           <Tooltip title="Use a Function">
@@ -62,11 +51,7 @@ export const IntervalsPicker = (props: IIntervalsPickerProps) => {
               <FunctionsIcon color='action'/></Button>
           </Tooltip>
         </Box>}
-      {showDatePick &&
-        <ChartDatePicker showDatePick={showDatePick} setShowDatePick={setShowDatePick} from={from} to={to}
-                         customChangePoints={customChangePoints}
-                         updateCustomChangePoints={props.updateCustomChangePoints} setOpen={props.setOpen}
-                         updateActiveTool={props.updateActiveTool}/>}
+      {showDatePick && <ChartDatePicker />}
     </Box>
   )
 }
