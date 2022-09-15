@@ -38,6 +38,7 @@ export const VisControl = () => {
     }
   }
 
+  // @ts-ignore
   return <Grid container spacing={3}>
     <Grid item xs={12}>
       <FormControl variant="standard" sx={{m: 1, minWidth: 180}}>
@@ -55,11 +56,10 @@ export const VisControl = () => {
       </FormControl>
     </Grid>
     <Grid item xs={11}>
-      {wdFiles !== [] &&
         <>
           <Typography variant="h6" gutterBottom>
             {dataset.farmName}
-          </Typography><List disablePadding dense={true}>
+          </Typography><Lnpist disablePadding dense={true}>
           {wdFiles.map((file, idx) => {
             return (
               <ListItemButton
@@ -82,9 +82,8 @@ export const VisControl = () => {
               </ListItemButton>
             );
           })}
-        </List>
+        </Lnpist>
         </>
-      }
     </Grid>
     <Grid item xs={12}>
       <Typography variant="h6" gutterBottom>
