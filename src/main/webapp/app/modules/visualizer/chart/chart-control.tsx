@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {Button, Grid, TextField, Typography} from '@mui/material';
 import {ChartDatePicker} from './chart-control-buttons/chart-datepicker';
 import {ChartCompare} from './chart-control-buttons/chart-compare';
@@ -10,17 +10,19 @@ import { updateChangeChart, updateQueryResults } from 'app/modules/store/visuali
 
 export const ChartControl = () => {
 
-  const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, 
-  queryResults, changeChart, showChangePointFunction, showCompare, showDatePick } = useAppSelector(state => state.visualizer);
+  const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, extraMeasures,
+  queryResults, changeChart, showChangePointFunction, showCompare, showDatePick, soilingEnabled } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
+  const isSoilingEnabled = useRef(soilingEnabled);
+  const activeTools = [isSoilingEnabled.current];
 
   const handleOnAccept = (e, category) => {
     if(category === "from"){
       chartRef.xAxis[0].setExtremes(e.getTime() + 200, to - 200);
-      dispatch(updateQueryResults({folder, id: dataset.id, from: e.getTime(), to, resampleFreq, selectedMeasures}));
+      dispatch(updateQueryResults({folder, id: dataset.id, from: e.getTime(), to, resampleFreq, selectedMeasures, extraMeasures}));
     }else{
       chartRef.xAxis[0].setExtremes(from + 200, e.getTime() - 200);
-      dispatch(updateQueryResults({folder, id: dataset.id, from, to: e.getTime(), resampleFreq, selectedMeasures}));
+      dispatch(updateQueryResults({folder, id: dataset.id, from, to: e.getTime(), resampleFreq, selectedMeasures, extraMeasures}));
     }
   }
 

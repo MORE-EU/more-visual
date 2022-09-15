@@ -101,8 +101,8 @@ const initialState = {
   fixedWidth: 0,
   expand: false,
   open: false,
-  secondaryData: null as IDataPoint[],
   forecastData: null as IDataPoint[],
+  secondaryData: null as IDataPoint[],
   manualChangePoints: null as IChangePointDate[],
   customChangePoints: null as IChangePointDate[],
   detectedChangePoints: null as IChangePointDate[],
@@ -110,6 +110,7 @@ const initialState = {
   manualChangepointsEnabled: false,
   forecasting: false,
   soilingEnabled: false,
+  extraMeasures: null,
 };
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
@@ -137,7 +138,7 @@ export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
   async (data: { folder: string; id: string[];
     from: number; to: number; resampleFreq: string; selectedMeasures: any[]; extraMeasures: any[]}) => {
-    const { folder, id, from, to, resampleFreq, selectedMeasures, extraMeasures } = data;
+    const { folder, id, from, to, resampleFreq, selectedMeasures, extraMeasures} = data;
     let query;
     from !== null && to !== null
       ? (query = {
@@ -197,12 +198,14 @@ export const applyForecasting = createAsyncThunk(
 
 export const applyDeviationDetection = createAsyncThunk(
   'applyDeviationDetection',
-  async (data: {id: string, from : number, to : number, changepoints : IChangePointDate[]}) => {
-    const requestUrl = `api/tools/soiling/${data.id}`;
+  async (data: {folder: string, resampleFreq: string; id: string, from : number, to : number, changepoints : IChangePointDate[]}) => {
+    const requestUrl = `api/tools/soiling/${data.folder}/${data.id}`;
     const range = {from: data.from, to: data.to} as unknown as ITimeRange;
     const changepoints = data.changepoints;
+    const frequency = data.resampleFreq;
     const response = await axios.post(requestUrl, {
       range,
+      frequency,
       changepoints,
     });
     return response.data;
@@ -309,7 +312,7 @@ const visualizer = createSlice({
     },
     enableSoilingDetection(state, action){
       state.soilingEnabled = action.payload;
-      state.secondaryData = null;
+      state.extraMeasures = null;
     },
     enableForecasting(state, action){
       state.forecasting = action.payload;
@@ -382,6 +385,7 @@ const visualizer = createSlice({
       state.manualChangePoints = action.payload;
     });
     builder.addMatcher(isAnyOf(applyDeviationDetection.fulfilled), (state, action) => {
+      //state.extraMeasures = action.payload;
       state.secondaryData = action.payload;
     });
   },

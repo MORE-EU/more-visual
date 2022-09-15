@@ -55,8 +55,8 @@ annotationsAdvanced(Highcharts);
 export const Chart = () => {
 
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, queryResultsLoading, filters, customChangePoints,
-    queryResults, changeChart, compare, changepointDetectionEnabled, patterns, detectedChangePoints, data, compareData, secondaryData,
-    forecastData, soilingEnabled, manualChangepointsEnabled, manualChangePoints,} = useAppSelector(state => state.visualizer);
+    queryResults, changeChart, compare, changepointDetectionEnabled, patterns, detectedChangePoints, data, compareData, extraMeasures,
+    forecastData, soilingEnabled, manualChangepointsEnabled, manualChangePoints, secondaryData} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -75,10 +75,10 @@ export const Chart = () => {
   const latestFolder = useRef(null);
   const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
+  const latestExtraMeasures = useRef(extraMeasures);
   const latestCompare = useRef(compare);
   const isChangePointDetectionEnabled = useRef(changepointDetectionEnabled);
   const isSoilingEnabled = useRef(soilingEnabled);
-  const extraMeasures = [isSoilingEnabled.current];
 
   const manualPlotBands = (manualChangePoints !== null && [].concat(...manualChangePoints.map(date => {
     return {
@@ -261,17 +261,19 @@ export const Chart = () => {
       chart.current.showLoading();
       dispatch(updateQueryResults({folder: latestFolder.current, id: latestDatasetId.current,
       from: leftSide, to: rightSide, resampleFreq: latestFrequency.current,
-        selectedMeasures: latestMeasures.current, extraMeasures}));
+        selectedMeasures: latestMeasures.current, extraMeasures: latestExtraMeasures.current}));
       dispatch(updateFrom(leftSide));
       dispatch(updateTo(rightSide));
       if (latestCompare.current.length !== 0) {
         dispatch(updateCompareQueryResults({folder: latestFolder.current, id: latestCompare.current,
-        from: leftSide, to: rightSide, resampleFreq: latestFrequency.current, selectedMeasures: latestMeasures.current}))
+        from: leftSide, to: rightSide, resampleFreq: latestFrequency.current,
+          selectedMeasures: latestMeasures.current}))
       }
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
       if(isChangePointDetectionEnabled.current) dispatch(applyChangepointDetection({id: latestDatasetId.current, from: leftSide, to: rightSide, changepoints: customChangePoints}));
-      if(isSoilingEnabled.current) dispatch(applyDeviationDetection({id: latestDatasetId.current, from: leftSide, to: rightSide, changepoints : detectedChangePoints}));
+      if(isSoilingEnabled.current) dispatch(applyDeviationDetection({id: latestDatasetId.current,
+        folder: latestFolder.current, resampleFreq: latestFrequency.current, from: leftSide, to: rightSide, changepoints : detectedChangePoints}));
     };
 
     const getSides = (max: number, min: number, p: number) => {
@@ -368,7 +370,12 @@ export const Chart = () => {
       })) : [];
     if(secondaryData){
       const sz = chartData !== null ? chartData.length : 0;
-      chartData = [...chartData, {...chartData[0], yAxis: sz, name: "Soiling Ratio"}]
+      const sData = secondaryData.map((d) => {
+        const val = d.values[0];
+        return {x : d.timestamp, y : isNaN(val) ? null : val, name : "Expected Power Loss: " + d.values[1]}
+      });
+      // @ts-ignore
+      chartData = [...chartData, {data: sData, yAxis: sz, name: 'Soiling Ratio'}]
     }
     return chartData;
   }
@@ -388,15 +395,6 @@ export const Chart = () => {
             : 100
         }%`,
         offset: 0,
-        plotBands:
-          measure in filters
-            ? [
-              {
-                from: filters[measure][0],
-                to: filters[measure][1],
-              },
-            ]
-            : null,
       }))
       : selectedMeasures.map((measure, idx) => ({
         title: {
@@ -407,15 +405,6 @@ export const Chart = () => {
         top: "0%",
         height: "100%",
         offset: undefined,
-        plotBands:
-          measure in filters
-            ? [
-              {
-                from: filters[measure][0],
-                to: filters[measure][1],
-              },
-            ]
-            : null,
       }));
     if(secondaryData){
       const sz = yAxisData.length;
@@ -559,6 +548,12 @@ export const Chart = () => {
                 //   groupAll: true,
                 // },
               },
+            },
+            tooltip: {
+              // formatter: function() {
+              //   if (this.point !== undefined && this.point.tt !== undefined) return this.point.tt;
+              //   return this.y.toString();
+              // }
             },
             series:
               [

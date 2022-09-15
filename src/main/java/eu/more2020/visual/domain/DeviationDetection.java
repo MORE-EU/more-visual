@@ -3,17 +3,20 @@ package eu.more2020.visual.domain;
 import java.util.List;
 
 public class DeviationDetection {
-    TimeRange range;
+    private TimeRange range;
 
-    List<Changepoint> changepoints;
+    private String frequency;
+
+    private List<Changepoint> changepoints;
 
 
     public DeviationDetection() {
     }
 
-    public DeviationDetection(TimeRange range, List<Changepoint> changepoints) {
+    public DeviationDetection(TimeRange range, String frequency, List<Changepoint> changepoints) {
         this.range = range;
         this.changepoints = changepoints;
+        this.frequency = frequency;
     }
 
     public TimeRange getRange() {
@@ -32,11 +35,19 @@ public class DeviationDetection {
         this.changepoints = changepoints;
     }
 
+    public String getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
 
     @Override
     public String toString() {
         return "DeviationDetection{" +
             "range=" + range +
+            ", frequency=" + frequency +
             ", changepoints=" + changepoints +
             '}';
     }

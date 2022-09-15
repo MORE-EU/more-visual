@@ -23,7 +23,7 @@ import {
 
 
 export const SoilingDetection = () => {
-  const { dataset, from, to,
+  const {folder, dataset, from, to, resampleFreq,
     detectedChangePoints} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
@@ -39,7 +39,7 @@ export const SoilingDetection = () => {
     setSoilingIsEnabled(action);
     dispatch(enableSoilingDetection(action));
     if(action)
-      dispatch(applyDeviationDetection({id: dataset.id, from, to, changepoints : detectedChangePoints}));
+      dispatch(applyDeviationDetection({folder, id: dataset.id, from, to, resampleFreq, changepoints : detectedChangePoints}));
   }
 
   return (
