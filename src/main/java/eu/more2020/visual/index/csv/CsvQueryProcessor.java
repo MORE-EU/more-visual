@@ -66,8 +66,8 @@ public class CsvQueryProcessor {
         List<Double> filteredVals = new ArrayList<Double>();
         Boolean notApplicable = false;
         if(filter != null){
-            for(Integer measure : dataset.getMeasures()){
-                if(filter.getFilterMes().contains(measure)){
+            for(Integer measure : filter.getFilterMes()){
+                if(dataset.getMeasures().contains(measure)){
                 Double compareVal = treeNode.getStats().get(measure).getAverage();
                 Double[] compareFil = filter.getFilValues().get(filter.getFilterMes().indexOf(measure));
                 if(!(compareVal > compareFil[0] && compareVal < compareFil[1])){
