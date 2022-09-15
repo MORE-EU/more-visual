@@ -59,7 +59,7 @@ export const VisControl = () => {
         <>
           <Typography variant="h6" gutterBottom>
             {dataset.farmName}
-          </Typography><Lnpist disablePadding dense={true}>
+          </Typography><List disablePadding dense={true}>
           {wdFiles.map((file, idx) => {
             return (
               <ListItemButton
@@ -82,7 +82,7 @@ export const VisControl = () => {
               </ListItemButton>
             );
           })}
-        </Lnpist>
+        </List>
         </>
     </Grid>
     <Grid item xs={12}>

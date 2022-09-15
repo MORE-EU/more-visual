@@ -117,7 +117,7 @@ export const Chart = () => {
   useEffect(() => {
     let newChangepointPlotBands = (detectedChangePoints !== null ? [].concat(...detectedChangePoints.map((date, idx) => {
       return {
-        color: '#f56342',
+        color: '#f5dd42',
         from: date.range.from,
         to: date.range.to,
         id: "pb" + idx,
@@ -271,10 +271,14 @@ export const Chart = () => {
       }
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
-      if(isChangePointDetectionEnabled.current) dispatch(applyChangepointDetection({id: latestDatasetId.current, from: leftSide, to: rightSide, changepoints: customChangePoints}));
-      if(isSoilingEnabled.current) dispatch(applyDeviationDetection({id: latestDatasetId.current,
-        folder: latestFolder.current, resampleFreq: latestFrequency.current, from: leftSide, to: rightSide, changepoints : detectedChangePoints}));
-    };
+      if(isChangePointDetectionEnabled.current)
+        dispatch(
+          applyChangepointDetection({id: latestDatasetId.current,
+            from: leftSide, to: rightSide, changepoints: customChangePoints})).then((res) => {
+          if(isSoilingEnabled.current) dispatch(applyDeviationDetection({id: latestDatasetId.current,
+            folder: latestFolder.current, resampleFreq: latestFrequency.current, from: leftSide, to: rightSide, changepoints: res.payload}));
+        });
+      };
 
     const getSides = (max: number, min: number, p: number) => {
       const pad = (max - min) + ((max - min) * p);
