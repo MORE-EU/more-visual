@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import Highcharts from 'highcharts/highstock';
+import React from 'react';
+import Highcharts from 'highcharts/highstock'
+import {IDataset} from "app/shared/model/dataset.model";
+import {getPatterns, updatePatterns, updateSelectedMeasures,} from '../../visualizer.reducer';
 import {Box, Button, TextField} from '@mui/material';
+import {IPatterns} from "app/shared/model/patterns.model";
 import DimensionSelector from "app/shared/layout/DimensionSelector";
 import PatternResults from "app/modules/visualizer/tools/pattern-extraction/pattern-results";
-import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getPatterns, updatePatterns, updateSelectedMeasures } from 'app/modules/store/visualizerSlice';
 
 Highcharts.setOptions({
   time: {
@@ -12,32 +13,45 @@ Highcharts.setOptions({
   }
 });
 
-export const VisPatterns = () => {
+export interface IVisPatternsProps {
+  dataset: IDataset,
+  data: any,
+  selectedMeasures: number[],
+  resampleFreq: string,
+  updateSelectedMeasures: typeof updateSelectedMeasures,
+  updatePatterns: typeof updatePatterns,
+  getPatterns: typeof getPatterns,
+  patterns: IPatterns,
+}
 
-  const {selectedMeasures, resampleFreq, data, patterns, dataset} = useAppSelector(state => state.visualizer);
-  const dispatch = useAppDispatch();
 
-  const [dimensions, setDimensions] = useState(selectedMeasures);
-  const [patternLength, setPatternLength] = useState(10);
-  const [minNeighbors, setMinNeighbors] = useState(1);
-  const [maxNeighbors, setMaxNeighbors] = useState(4);
+export const VisPatterns = (props: IVisPatternsProps) => {
+  const {
+    dataset, data, selectedMeasures,
+    patterns, resampleFreq
+  } = props;
+
+  const [dimensions, setDimensions] = React.useState(selectedMeasures);
+  const [patternLength, setPatternLength] = React.useState(10);
+  const [minNeighbors, setMinNeighbors] = React.useState(1);
+  const [maxNeighbors, setMaxNeighbors] = React.useState(4);
 
   const changeComputedPatternLength = (e) => {
     const val = parseInt(e.target.value, 10);
     // TODO: Change to real data
-    dispatch(getPatterns({data, val, resampleFreq}));
+    props.getPatterns(data, val, resampleFreq);
   }
 
   const clearPatterns = (e) => {
     // TODO: Change to real data
-    dispatch(updatePatterns(null));
+    props.updatePatterns(null);
   }
 
 
   function handleFindPatterns(e: React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>) {
     // TODO: Change to real data
-    dispatch(getPatterns({data, val: patternLength, resampleFreq}));
-    dispatch(updateSelectedMeasures(dimensions));
+    props.getPatterns(data, patternLength, resampleFreq);
+    props.updateSelectedMeasures(dimensions);
   }
 
   return (
@@ -97,7 +111,12 @@ export const VisPatterns = () => {
           variant="contained">Clear</Button>
       </Box>
       {patterns &&
-        <PatternResults dimensions={dimensions} />
+        <PatternResults
+          dataset={dataset}
+          patterns={patterns}
+          dimensions={dimensions}
+          updateSelectedMeasures={props.updateSelectedMeasures}
+        />
       }
 
     </Box>

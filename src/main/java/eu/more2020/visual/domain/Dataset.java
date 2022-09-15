@@ -19,7 +19,6 @@ public class Dataset implements Serializable {
     private String id;
     @NotNull
     private String name;
-    private Integer resType; // 0: panel, 1: turbine
     private String type = "CSV";
     private Boolean hasHeader;
     private String[] header;
@@ -27,7 +26,7 @@ public class Dataset implements Serializable {
     private String timeFormat;
     private String farmName;
     private String formalName;
-    private List<Changepoint>  gtChangepoints;
+    private Boolean washes;
     private List<Integer> measures = new ArrayList<>();
     private Map<Integer, MeasureStats> measureStats;
 
@@ -129,12 +128,12 @@ public class Dataset implements Serializable {
         this.delimiter = delimiter;
     }
 
-    public List<Changepoint> getgtChangepoints() {
-        return gtChangepoints;
+    public Boolean getWashes() {
+        return washes;
     }
 
-    public void setGtChangepoints(List<Changepoint>  gtChangepoints) {
-        this.gtChangepoints = gtChangepoints;
+    public void setWashes(Boolean washes) {
+        this.washes = washes;
     }
 
     public Map<Integer, MeasureStats> getMeasureStats() {
@@ -147,14 +146,6 @@ public class Dataset implements Serializable {
 
     public TimeRange getTimeRange() {
         return timeRange;
-    }
-
-    public Integer getResType() {
-        return resType;
-    }
-
-    public void setResType(Integer resType) {
-        this.resType = resType;
     }
 
     public void setTimeRange(TimeRange timeRange) {
@@ -191,7 +182,7 @@ public class Dataset implements Serializable {
             ", measures=" + measures +
             ", samplingFreq='" + samplingFreq + '\'' +
             ", delimiter='" + delimiter + '\'' +
-            ", gtChangepoints=" + gtChangepoints +
+            ", washes=" + washes +
             '}';
     }
 }

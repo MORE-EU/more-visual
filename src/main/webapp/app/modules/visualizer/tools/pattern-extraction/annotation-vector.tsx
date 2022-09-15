@@ -1,21 +1,26 @@
-import React, {useState} from "react";
+import React from "react";
+import {IDataset} from "app/shared/model/dataset.model";
+import {IPatterns} from "app/shared/model/patterns.model";
 import {Button, FormControl, Grid, InputLabel, MenuItem, Select} from "@mui/material";
 import ModalStyles from "app/shared/layout/ModalStyle";
-import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import { setOpen } from "app/modules/store/visualizerSlice";
 
-export const AnnotationVector = () => {
-  
-  const {patterns} = useAppSelector(state => state.visualizer);
-  const dispatch = useAppDispatch();
 
-  const [corrected, setCorrected] = useState(patterns.corrected.knee !== null);
-  const [avFunction, setAVFunction] = useState(0);
+export interface IAnnotationVectorProps {
+  dataset: IDataset,
+  patterns: IPatterns,
+  setOpen: (boolean) => {},
+}
+
+
+export const AnnotationVector = (props: IAnnotationVectorProps) => {
+  const {dataset, patterns} = props;
+  const [corrected, setCorrected] = React.useState(patterns.corrected.knee !== null);
+  const [avFunction, setAVFunction] = React.useState(0);
 
   const applyAV = (e, p) => {
     // TODO: API CALL
     p.corrected.annotationVector = {func: e.target.value};
-    dispatch(setOpen(false));
+    props.setOpen(false);
   }
 
   const classes = ModalStyles();

@@ -27,7 +27,7 @@ public class CsvDataService {
         indexes.remove(id, folder);
     }
 
-    public synchronized TimeseriesTreeIndex getIndex(String folder, Dataset dataset) throws IOException {
+    private synchronized TimeseriesTreeIndex getIndex(String folder, Dataset dataset) throws IOException {
         TimeseriesTreeIndex index = (TimeseriesTreeIndex) indexes.get(dataset.getId(), folder);
         if (index != null) {
             return index;

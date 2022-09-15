@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,12 +49,8 @@ public class TimeseriesTreeIndex {
     public TimeseriesTreeIndex(String csv, Dataset dataset) {
         this.dataset = dataset;
         this.csv = csv;
-        this.formatter =
-            new DateTimeFormatterBuilder().appendPattern(dataset.getTimeFormat())
-                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-                .toFormatter();    }
+        this.formatter = DateTimeFormatter.ofPattern(dataset.getTimeFormat(), Locale.ENGLISH);
+    }
 
     public static TemporalField getTemporalFieldByName(String name) {
         return temporalFielMap.get(name);
@@ -69,7 +63,6 @@ public class TimeseriesTreeIndex {
     public static int getTemporalLevelIndex(String temporalLevel) {
         return TEMPORAL_HIERARCHY.indexOf(getTemporalFieldByName(temporalLevel));
     }
-
 
     private TreeNode addPoint(Stack<Integer> labels, long fileOffset, String[] row) {
         if (root == null) {
@@ -93,57 +86,6 @@ public class TimeseriesTreeIndex {
             node.adjustStats(row, dataset);
         }
         return node;
-    }
-
-    public void enhance(String csvDataPath, String frequency, TimeRange range) {
-        CsvParserSettings parserSettings = createCsvParserSettings();
-        // to be able to get file offset of first measurement
-        parserSettings.setHeaderExtractionEnabled(false);
-        CsvParser parser = new CsvParser(parserSettings);
-        objectsIndexed = 0;
-
-        parser.beginParsing(new File(csvDataPath), Charset.forName("US-ASCII"));
-        long rowOffset = 0l;
-        if (dataset.getHasHeader()) {
-            parser.parseNext();  //skip header row
-            rowOffset = parser.getContext().currentChar() - 1;
-        }
-        int noOfColumns = measureStats.size();
-
-        String[] row;
-        while ((row = parser.parseNext()) != null) {
-            LocalDateTime dateTime = parseStringToDate(row[dataset.getTimeCol()]);
-
-        }
-        parser.stopParsing();
-        LocalDateTime from = LocalDateTime.MIN;
-        LocalDateTime to = LocalDateTime.MAX;
-        int queryFrequencyLevel = getTemporalLevelIndex(frequency) + 1;
-        while ((row = parser.parseNext()) != null) {
-            LocalDateTime dateTime = parseStringToDate(row[dataset.getTimeCol()]);
-            if (objectsIndexed == 0) {
-                this.firstDate = dateTime;
-            } else {
-                this.lastDate = dateTime;
-            }
-            if (dateTime.isBefore(from)) {
-                from = dateTime;
-            } else if (dateTime.isAfter(to)) {
-                to = dateTime;
-            }
-            Stack<Integer> labels = new Stack<>();
-            int lastIndex = range != null && range.contains(dateTime) ? queryFrequencyLevel : queryFrequencyLevel - 1;
-            for (int i = 0; i < lastIndex; i++) {
-                labels.add(dateTime.get(TEMPORAL_HIERARCHY.get(i)));
-            }
-//            for (Integer measureIndex : dataset.getMeasures()) {
-//                statsMap.get(measureIndex).add(Double.parseDouble(row[measureIndex]));
-//            }
-
-            this.addPoint(labels, rowOffset, row);
-            objectsIndexed++;
-            rowOffset = parser.getContext().currentChar() - 1;
-        }
     }
 
     public QueryResults initialize(Query q0) throws IOException {
@@ -195,7 +137,7 @@ public class TimeseriesTreeIndex {
             objectsIndexed++;
             rowOffset = parser.getContext().currentChar() - 1;
         }
-
+        
         parser.stopParsing();
         isInitialized = true;
         timeRange = new TimeRange(this.firstDate, this.lastDate);

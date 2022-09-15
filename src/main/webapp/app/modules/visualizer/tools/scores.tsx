@@ -7,14 +7,19 @@ import Fade from "@material-ui/core/Fade";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts/highstock";
 
+export interface IScoresProps {
+  scores: {},
+  changePointDates: any,
+}
+
 
 const functions = ["R-SQUARED", "MAE", "ME", "MAPE", "MPE"];
 
-export const Scores = () => {
+export const Scores = (props: IScoresProps) => {
+  const {changePointDates, scores} = props;
   const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const [scores, setScores] = React.useState({});
-  const [changePointDates, setChangePointDates] = React.useState([]);
+
 
   const getLabels = () => {
     const labels = [];

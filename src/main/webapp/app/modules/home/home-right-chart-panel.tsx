@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, Button, FormControl, MenuItem, Paper, Select, Tooltip} from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -7,19 +7,27 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import BarChart from '@mui/icons-material/BarChart';
 import TableChart from '@mui/icons-material/TableChart';
 import ShowChart from '@mui/icons-material/ShowChart';
-import { useAppSelector, useAppDispatch } from '../store/storeConfig';
-import { setChartCateg, setChartCategYaxis, setChartData, setChartType, setOption1, setOption2, setOption3, setOption4 } from '../store/homeSlice';
 
 Heatmap(Highcharts);
 
+export interface IHomeRightChartPanel {
+  filSamples: any[];
+  selected: any[];
+}
+
 // TODO: Fix tooltip when heatmap is used
-// TODO: Fix heatmap chartData when moving maps
 
-export const HomeRightChartPanel = () => {
+export const HomeRightChartPanel = (props: IHomeRightChartPanel) => {
+  const {filSamples, selected} = props;
 
-  const { chartData, chartCateg, option1, option2, option3, option4, chartType, 
-  chartCategYaxis, filSamples, selected } = useAppSelector(state => state.home);
-  const dispatch = useAppDispatch(); 
+  const [chartCategYaxis, setChartCategYaxis] = useState([]);
+  const [chartCateg, setChartCateg] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [chartType, setChartType] = useState('column');
+  const [option1, setOption1] = useState('AVG');
+  const [option2, setOption2] = useState('power');
+  const [option3, setOption3] = useState('country');
+  const [option4, setOption4] = useState('');
 
   const options = {
     title: {
@@ -27,7 +35,7 @@ export const HomeRightChartPanel = () => {
     },
     series: [
       {
-        data: chartData? chartData: null,
+        data: chartData,
       },
     ],
     xAxis: {
@@ -84,29 +92,23 @@ export const HomeRightChartPanel = () => {
         xCateg[`${item}`] = xCateg[item].length;
       });
     }
-    // dispatch(setChartCateg([]));
-    // dispatch(setChartData([]));
-    const chartCategValues = [];
-    const chartDataValues = [];
+    setChartCateg([]);
+    setChartData([]);
     for (const [key, value] of Object.entries(xCateg)) {
-      chartCategValues.push(key);
-      chartType !== 'heatmap' && chartDataValues.push(Number(value));
+      setChartCateg(old => [...old, key]);
+      chartType !== 'heatmap' && setChartData(old => [...old, Number(value)]);
     }
-    dispatch(setChartCateg(chartCategValues));
-    chartType !== 'heatmap' && dispatch(setChartData(chartDataValues));
 
-    const chartDataValuesHeat = [];
-    chartType === 'heatmap' && (
+    chartType === 'heatmap' &&
     Object.keys(yCateg).map((category, idx) => {
       Object.keys(xCateg).map((itm, index) => {
-        chartDataValuesHeat.push([index, idx, yCateg[category].includes(itm) ? Math.trunc(Number(xCateg[itm])) : 0]);
+        setChartData(old => [...old, [index, idx, yCateg[category].includes(itm) ? Number(xCateg[itm]) : 0]]);
       });
-    }))
-    chartType === 'heatmap' && dispatch(setChartData(chartDataValuesHeat));
+    });
   };
 
   useEffect(() => {
-    dispatch(setChartCategYaxis([]));
+    setChartCategYaxis([]);
     const xCateg = {};
     const yCateg = {};
     if (filSamples.length !== 0) {
@@ -146,12 +148,9 @@ export const HomeRightChartPanel = () => {
       });
     }
 
-    const chartCategYaxisValues = [];
     Object.keys(yCateg).map(key => {
-      chartCategYaxisValues.push(key);
+      setChartCategYaxis(old => [...old, key]);
     });
-    dispatch(setChartCategYaxis(chartCategYaxisValues));
-
     handleBoundStats(option1, xCateg, yCateg);
   }, [option1, option2, option3, option4, filSamples, selected]);
 
@@ -162,8 +161,8 @@ export const HomeRightChartPanel = () => {
           <Tooltip title="Bar Chart">
             <Button
               onClick={() => {
-                dispatch(setChartType('column'));
-                dispatch(setOption4(''));
+                setChartType('column');
+                setOption4('');
               }}
             >
               <BarChart/>
@@ -172,8 +171,8 @@ export const HomeRightChartPanel = () => {
           <Tooltip title="Line Chart">
             <Button
               onClick={() => {
-                dispatch(setChartType('line'));
-                dispatch(setOption4(''));
+                setChartType('line');
+                setOption4('');
               }}
             >
               <ShowChart/>
@@ -182,8 +181,8 @@ export const HomeRightChartPanel = () => {
           <Tooltip title="Area Chart">
             <Button
               onClick={() => {
-                dispatch(setChartType('area'));
-                dispatch(setOption4(''));
+                setChartType('area');
+                setOption4('');
               }}
             >
               <TableChart/>
@@ -192,8 +191,8 @@ export const HomeRightChartPanel = () => {
           <Tooltip title="Heatmap">
             <Button
               onClick={() => {
-                dispatch(setChartType('heatmap'));
-                dispatch(setOption4('continent'));
+                setChartType('heatmap');
+                setOption4('continent');
               }}
             >
               <GridViewIcon/>
@@ -208,7 +207,7 @@ export const HomeRightChartPanel = () => {
             <Select
               value={option1}
               onChange={e => {
-                dispatch(setOption1(e.target.value));
+                setOption1(e.target.value);
               }}
             >
               <MenuItem key={1} value={`AVG`}>
@@ -233,7 +232,7 @@ export const HomeRightChartPanel = () => {
             <Select
               value={option2}
               onChange={e => {
-                dispatch(setOption2(e.target.value.toString()));
+                setOption2(e.target.value.toString());
               }}
             >
               <MenuItem key={1} value={`noOfTurbines`}>
@@ -249,7 +248,7 @@ export const HomeRightChartPanel = () => {
             <Select
               value={option3}
               onChange={e => {
-                dispatch(setOption3(e.target.value));
+                setOption3(e.target.value);
               }}
             >
               <MenuItem key={1} value={`country`}>
@@ -264,7 +263,7 @@ export const HomeRightChartPanel = () => {
                 <Select
                   value={option4}
                   onChange={e => {
-                    dispatch(setOption3(e.target.value));
+                    setOption3(e.target.value);
                   }}
                 >
                   <MenuItem key={1} value={`continent`}>

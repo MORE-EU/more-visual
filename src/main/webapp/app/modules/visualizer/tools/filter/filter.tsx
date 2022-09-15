@@ -1,14 +1,23 @@
-import React from "react";
 import {Box, Checkbox, Divider, Slider, Stack, Typography} from "@mui/material";
 import List from "@mui/material/List";
 import TextField from "@mui/material/TextField";
-import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { filterData, updateFilters } from "app/modules/store/visualizerSlice";
+import React from "react";
+import {IDataset} from "app/shared/model/dataset.model";
+import {IQueryResults} from "app/shared/model/query-results.model";
+import {filterData, updateFilters} from '../../visualizer.reducer';
 
-export const Filter = () => {
+export interface IFilterProps {
+  dataset: IDataset,
+  filters: any,
+  queryResults: IQueryResults,
+  updateFilters: typeof updateFilters,
+  filterData: typeof filterData,
+}
 
-  const { queryResults, dataset, filters } = useAppSelector(state => state.visualizer);
-  const dispatch = useAppDispatch();
+export const Filter = (props: IFilterProps) => {
+
+  const {dataset, queryResults, filters} = props;
+  const [removePoints, setRemovePoints] =  React.useState(false);
 
   return (
     <Box sx={{pl: 2, pr: 2}}>
@@ -32,21 +41,21 @@ export const Filter = () => {
               value={filters[col] || [stats.min, stats.max]}
               min={stats.min} max={stats.max}
               onChange={(e, newRange) => {
-                dispatch(updateFilters({measureCol: col, range: newRange}));
+                props.updateFilters(col, newRange);
               }}
-              onChangeCommitted={() => dispatch(filterData(false))}
+              onChangeCommitted={() => props.filterData(removePoints)}
               valueLabelDisplay="auto"
             />
             <Stack direction="row" spacing={2}>
               <TextField id="outlined-basic" label="Min-Value" variant="outlined" size="small"
                          value={filters[col] ? parseFloat(filters[col][0]).toFixed(2) : parseFloat(stats.min).toFixed(2)} onChange={(e) => {
-                dispatch(updateFilters({measureCol: col, range: [e.target.value, filters[col] ? filters[col][1] : stats.max]}));
-                dispatch(filterData(false));
+                props.updateFilters(col, [e.target.value, filters[col] ? filters[col][1] : stats.max]);
+                props.filterData(removePoints);
               }}/>
               <TextField id="outlined-basic" label="Max-Value" variant="outlined" size="small"
                          value={filters[col] ? parseFloat(filters[col][1]).toFixed(2) : parseFloat(stats.max).toFixed(2)} onChange={(e) => {
-                dispatch(updateFilters({measureCol: col, range: [filters[col] ? filters[col][0] : stats.min, e.target.value]}));
-                dispatch(filterData(false));
+                props.updateFilters(col, [filters[col] ? filters[col][0] : stats.min, e.target.value]);
+                props.filterData(removePoints);
               }}/>
             </Stack>
             <Divider sx={{mt: 2}}/>

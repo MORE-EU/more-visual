@@ -1,23 +1,29 @@
 import {Button, FormControl, Grid, InputLabel, MenuItem, Select} from "@mui/material";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts/highstock";
-import React, {useState} from "react";
+import React from "react";
+import {IDataset} from "app/shared/model/dataset.model";
+import {IPatterns} from "app/shared/model/patterns.model";
 import ModalStyles from "app/shared/layout/ModalStyle";
+import {updateSelectedMeasures} from "app/modules/visualizer/visualizer.reducer";
 import DimensionSelector from "app/shared/layout/DimensionSelector";
-import { useAppSelector, useAppDispatch } from 'app/modules/store/storeConfig';
-import { setOpen, updateSelectedMeasures } from "app/modules/store/visualizerSlice";
 
-export const KneePlot = () => {
-  
-  const {patterns, dataset} = useAppSelector(state => state.visualizer);
-  const dispatch = useAppDispatch();
+export interface IKneePlotProps {
+  dataset: IDataset,
+  patterns: IPatterns,
+  setOpen: (boolean) => {},
+  updateSelectedMeasures: typeof updateSelectedMeasures,
+}
 
-  const [corrected, setCorrected] = useState(patterns.corrected.knee !== null);
+
+export const KneePlot = (props: IKneePlotProps) => {
+  const {dataset, patterns} = props;
+  const [corrected, setCorrected] = React.useState(patterns.corrected.knee !== null);
   const correctedK = corrected ? patterns.corrected.knee.k : 0;
   const correctedDimensions = corrected ? patterns.corrected.knee.dimensions : [];
 
-  const [k, setK] = useState(correctedK);
-  const [selectedDimensions, setSelectedDimensions] = useState(correctedDimensions);
+  const [k, setK] = React.useState(correctedK);
+  const [selectedDimensions, setSelectedDimensions] = React.useState(correctedDimensions);
   const header = dataset.header;
   const measures = dataset.measures;
   const classes = ModalStyles();
@@ -34,9 +40,9 @@ export const KneePlot = () => {
     // TODO: set correction through api
     const knee = {k: 4, dimensions}
     patterns.corrected.knee = knee; // api call
-    dispatch(updateSelectedMeasures(dimensions));
+    props.updateSelectedMeasures(dimensions);
     setCorrected(true);
-    dispatch(setOpen(false));
+    props.setOpen(false);
   }
 
   const createData = () => {

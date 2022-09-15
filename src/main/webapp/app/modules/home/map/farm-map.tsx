@@ -1,22 +1,27 @@
-import React, { useEffect} from 'react';
+import React, {Dispatch, SetStateAction, useEffect} from 'react';
 import {MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents, ZoomControl} from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import {Link} from 'react-router-dom';
-import L from 'leaflet';
+import L, {LatLng} from 'leaflet';
 import './map.scss';
 import 'leaflet/dist/leaflet.css';
 import {Paper, Typography} from '@mui/material';
-import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { setBounds } from 'app/modules/store/homeSlice';
+
 require('react-leaflet-markercluster/dist/styles.min.css');
 
+export interface IFarmMap {
+  fly: LatLng;
+  setBounds?: Dispatch<SetStateAction<{}>>;
+  items: any[];
+  selected: any[];
+}
+
 const FlyComponent = props => {
-  const dispatch = useAppDispatch();
   const map = useMap();
   map.attributionControl.remove();
   useMapEvents({
     moveend() {
-      dispatch(setBounds(map.getBounds()));
+      props.setBounds(map.getBounds());
     },
   });
   useEffect(() => {
@@ -28,9 +33,8 @@ const FlyComponent = props => {
   return null;
 };
 
-export const FarmMap = () => {
-
-  const { fly, items, selected } = useAppSelector(state => state.home);
+export const FarmMap = (props: IFarmMap) => {
+  const {fly, items, selected} = props;
 
   const icon = new L.Icon({
     iconUrl: '../../../content/images/leaflet-icons/marker-icon.png',
@@ -49,7 +53,7 @@ export const FarmMap = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <ZoomControl position="topright"/>
-        <FlyComponent fly={fly} />
+        <FlyComponent fly={fly} setBounds={props.setBounds}/>
         {items.map((item, itemIdx) =>
           (
             <MarkerClusterGroup showCoverageOnHover={true} key={itemIdx}>

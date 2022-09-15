@@ -1,22 +1,26 @@
-import React, {useEffect} from 'react';
-import {hot} from 'react-hot-loader';
-import {BrowserRouter as Router} from 'react-router-dom';
-import {toast, ToastContainer} from 'react-toastify';
-import ErrorBoundary from 'app/shared/error/error-boundary';
-import AppRoutes from 'app/routes';
 import 'react-toastify/dist/ReactToastify.css';
 import './app.scss';
-import { useAppDispatch } from './modules/store/storeConfig';
-import { getProfile } from './shared/reducers/application-profile';
+
+
+import React, {useEffect} from 'react';
+import {connect} from 'react-redux';
+import {BrowserRouter as Router} from 'react-router-dom';
+import {toast, ToastContainer} from 'react-toastify';
+import {hot} from 'react-hot-loader';
+
+import {IRootState} from 'app/shared/reducers';
+import {getProfile} from 'app/shared/reducers/application-profile';
+import ErrorBoundary from 'app/shared/error/error-boundary';
+import AppRoutes from 'app/routes';
 
 const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
 
-export const App = () => {
+export interface IAppProps extends StateProps, DispatchProps {
+}
 
-  const dispatch = useAppDispatch();
-  
+export const App = (props: IAppProps) => {
   useEffect(() => {
-    dispatch(getProfile());
+    props.getProfile();
   }, []);
 
   return (
@@ -34,4 +38,14 @@ export const App = () => {
   );
 };
 
-export default hot(module)(App);
+const mapStateToProps = ({applicationProfile}: IRootState) => ({
+  ribbonEnv: applicationProfile.ribbonEnv,
+  isInProduction: applicationProfile.inProduction,
+});
+
+const mapDispatchToProps = {getProfile};
+
+type StateProps = ReturnType<typeof mapStateToProps>;
+type DispatchProps = typeof mapDispatchToProps;
+
+export default connect(mapStateToProps, mapDispatchToProps)(hot(module)(App));

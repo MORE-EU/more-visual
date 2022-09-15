@@ -1,15 +1,19 @@
-import React from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 import {Box, Button, Grid, Modal, Typography} from '@mui/material';
-import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { setOpen, setShowChangePointFunction, updateActiveTool } from 'app/modules/store/visualizerSlice';
+import {updateActiveTool} from '../../visualizer.reducer';
 
-export const ChartChangePointFunctions = () => {
+export interface IChartDatePickerProps {
+  showChangePointFunction: boolean;
+  setShowChangePointFunction?: Dispatch<SetStateAction<boolean>>;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  updateActiveTool: typeof updateActiveTool;
+}
 
-  const { showChangePointFunction } = useAppSelector(state => state.visualizer);
-  const dispatch = useAppDispatch();
+export const ChartChangePointFunctions = (props: IChartDatePickerProps) => {
+  const {showChangePointFunction} = props;
 
   const handleClose = () => {
-    dispatch(setShowChangePointFunction(false));
+    props.setShowChangePointFunction(false);
   };
 
   const style = {
@@ -26,8 +30,8 @@ export const ChartChangePointFunctions = () => {
 
   return (
     <>
-      <Modal open={showChangePointFunction} onClose={handleClose} aria-labelledby="modal-title"
-             aria-describedby="modal-description">
+      <Modal open={showChangePointFunction} onClose={handleClose} aria-labelledby="modal-modal-title"
+             aria-describedby="modal-modal-description">
         <Box sx={style}>
           <Grid item sx={{textAlign: 'center'}}>
             <Typography variant="h6" component="h2">
@@ -37,7 +41,7 @@ export const ChartChangePointFunctions = () => {
               size="small"
               variant="contained"
               onClick={() => {
-                dispatch(setShowChangePointFunction(false)), dispatch(setOpen(true)), dispatch(updateActiveTool(2));
+                props.setShowChangePointFunction(false), props.setOpen(true), props.updateActiveTool(2);
               }}
             >
               <Typography variant="overline" component="h2">

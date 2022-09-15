@@ -1,23 +1,35 @@
-import React, { useEffect } from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {Box, Button, Divider, Grid, List, ListItem, ListItemText, Modal, Typography} from '@mui/material';
 import TimePicker from 'react-multi-date-picker/plugins/time_picker';
 import {Calendar, DateObject} from 'react-multi-date-picker';
 import DatePanel from 'react-multi-date-picker/plugins/date_panel';
+import {IChangePointDate} from 'app/shared/model/changepoint-date.model';
+import {updateActiveTool, updateCustomChangePoints} from '../../visualizer.reducer';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { setDateValues, setShowDatePick, setSingleDateValue, updateCustomChangePoints } from 'app/modules/store/visualizerSlice';
 
-export const ChartDatePicker = () => {
+export interface IChartDatePickerProps {
+  from: number;
+  to: number;
+  showDatePick: boolean;
+  setShowDatePick?: Dispatch<SetStateAction<any>>;
+  customChangePoints: IChangePointDate[];
+  updateCustomChangePoints: typeof updateCustomChangePoints;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  updateActiveTool: typeof updateActiveTool;
+}
 
-  const {dateValues, singleDateValue, showDatePick, from} = useAppSelector(state => state.visualizer);
-  const dispatch = useAppDispatch();
+export const ChartDatePicker = (props: IChartDatePickerProps) => {
+  const {showDatePick, from, to, customChangePoints} = props;
+
+  const [value, setValue] = useState({start: null, end: null});
+  const [dateValues, setDateValues] = useState([]);
 
   const handleClose = () => {
-    dispatch(setShowDatePick(false));
+    props.setShowDatePick(false);
   };
 
   useEffect(() => {
-    dispatch(updateCustomChangePoints(dateValues));
+    props.updateCustomChangePoints(dateValues);
   }, [dateValues]);
 
   const handleCalendarChange = e => {
@@ -28,16 +40,16 @@ export const ChartDatePicker = () => {
       date1.setHours(e[0].hour, e[0].minute, e[0].second, 0);
       date2.setFullYear(e[1].year, e[1].month.number - 1, e[1].day);
       date2.setHours(e[1].hour, e[1].minute, e[1].second, 0);
-      dispatch(setSingleDateValue({start: date1, end: date2}));
+      setValue({start: date1, end: date2});
     }
   };
 
   const handleAddButton = () => {
-    dispatch(setDateValues([...dateValues, singleDateValue]));
+    setDateValues([...dateValues, value]);
   };
 
   const handleDeleteButton = (idx) => {
-    dispatch(setDateValues(dateValues.filter((date, i) => i !== idx)));
+    setDateValues(oldDateValues => oldDateValues.filter((date, i) => i !== idx));
   }
 
   const style = {

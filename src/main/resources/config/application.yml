@@ -103,7 +103,7 @@ jhipster:
 
 application:
   workspacePath: /opt/more-workspace
-  timeFormat: 'yyyy-MM-dd[ HH:mm:ss]'
+  timeFormat: 'yyyy-MM-dd HH:mm:ss'
   delimiter: ','
   toolApi: http://localhost:8889/
   modelardb:

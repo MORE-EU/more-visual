@@ -1,22 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
+import {IDataset} from "app/shared/model/dataset.model";
 import {Box, Button, Typography} from '@mui/material';
+import {IPatterns} from 'app/shared/model/patterns.model';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
+import {updateSelectedMeasures} from '../../visualizer.reducer';
 import {KneePlot} from "app/modules/visualizer/tools/pattern-extraction/knee-plot";
 import {AnnotationVector} from "app/modules/visualizer/tools/pattern-extraction/annotation-vector";
 import ModalStyles from "app/shared/layout/ModalStyle";
-import { useAppSelector } from 'app/modules/store/storeConfig';
 
-export const VisCorrection = () => {
 
-  const {patterns} = useAppSelector(state => state.visualizer);
+export interface IVisCorrectionProps {
+  dataset: IDataset,
+  patterns: IPatterns,
+  updateSelectedMeasures: typeof updateSelectedMeasures,
+}
 
+export const VisCorrection = (props: IVisCorrectionProps) => {
+  const {dataset, patterns} = props;
   const classes = ModalStyles();
-  const [open, setOpen] = useState(false);
-  const [openC, setOpenC] = useState(-1);
+  const [open, setOpen] = React.useState(false);
+  const [openC, setOpenC] = React.useState(-1);
   // let setOpenFunc = setOpen.bind(this); //so it can be passed as a prop of knee-plot
   const correctedKnee = patterns.corrected.knee !== null;
   const correctedAv = patterns.corrected.annotationVector !== null;
@@ -118,8 +125,10 @@ export const VisCorrection = () => {
           <Fade in={open}>
             <div>
 
-              {openC === 0 && <KneePlot />}
-              {openC === 1 && <AnnotationVector />}
+              {openC === 0 && <KneePlot dataset={dataset} patterns={patterns}
+                                        updateSelectedMeasures={props.updateSelectedMeasures}
+                                        setOpen={setOpen.bind(this)}/>}
+              {openC === 1 && <AnnotationVector dataset={dataset} patterns={patterns} setOpen={setOpen.bind(this)}/>}
             </div>
           </Fade>
         </Modal>

@@ -1,32 +1,42 @@
 import './home.scss';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {FarmMap} from './map/farm-map';
+import {IRootState} from 'app/shared/reducers';
+import {connect} from 'react-redux';
+import {getDirectories, getSampleFile, getWdFiles} from 'app/modules/visualizer/visualizer.reducer';
+import {RouteComponentProps} from 'react-router-dom';
+import {LatLng} from 'leaflet';
 import {HomeLeftMenu} from './home-left-menu';
 import {HomeRightStatsPanel} from './home-right-stats-panel';
 import {HomeRightChartPanel} from './home-right-chart-panel';
-import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { getDirectories, getSampleFile, getWdFiles } from '../store/visualizerSlice';
-import { setAllFilters, setFilSamples, setItems, setSelectedDir } from '../store/homeSlice';
 
-export const Home = () => {
+export interface IHomeProps extends StateProps, DispatchProps, RouteComponentProps<{ folder: string; id: string }> {
+}
 
-  const { directories, sampleFile } = useAppSelector(state => state.visualizer);
-  const { selectedDir, bounds, items } = useAppSelector(state => state.home);
-  const dispatch = useAppDispatch();
+export const Home = (props: IHomeProps) => {
+  const {sampleFile, directories} = props;
+
+  const [fly, setFly] = useState(new LatLng(51.505, -0.09));
+  const [bounds, setBounds] = useState({_southWest: {lat: 0, lng: 0}, _northEast: {lat: 0, lng: 0}});
+  const [filSamples, setFilSamples] = useState([]);
+  const [allFilters, setAllFilters] = useState([]);
+  const [items, setItems] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [selectedDir, setSelectedDir] = useState("");
 
   useEffect(() => {
-    dispatch(getWdFiles('bbz'));
-    dispatch(getDirectories());
+    props.getWdFiles('bbz');
+    props.getDirectories();
   }, []);
 
   useEffect(() => {
     if (directories.length !== 0) {
-      dispatch(setSelectedDir(directories[0]));
+      setSelectedDir(directories[0]);
     }
   }, [directories])
 
   useEffect(() => {
-    selectedDir.length !== 0 && dispatch(getSampleFile(selectedDir))
+    selectedDir.length !== 0 && props.getSampleFile(selectedDir)
   }, [selectedDir])
 
   useEffect(() => {
@@ -45,7 +55,7 @@ export const Home = () => {
         farmInfo: info
       }), (latlngs = []), (info = []));
     }
-    dispatch(setItems(farms));
+    setItems(farms);
 
     // Filter Array Creation
     if (sampleFile.length !== 0) {
@@ -62,7 +72,7 @@ export const Home = () => {
         });
         filter.values.sort();
       });
-      dispatch(setAllFilters(filters));
+      setAllFilters(filters);
     }
   }, [sampleFile]);
 
@@ -92,19 +102,36 @@ export const Home = () => {
         filteredSamples.push(sample);
       }
     });
-    dispatch(setFilSamples(filteredSamples));
+    setFilSamples(filteredSamples);
   }, [bounds]);
 
   return (
     sampleFile.length !== 0 && (
       <div>
-        <HomeLeftMenu />
-        <HomeRightStatsPanel />
-        <HomeRightChartPanel />
-        <FarmMap />
+        <HomeLeftMenu setFly={setFly} items={items} selected={selected}
+                      allFilters={allFilters} setSelected={setSelected} directories={directories}
+                      selectedDir={selectedDir} setSelectedDir={setSelectedDir}/>
+        <HomeRightStatsPanel filSamples={filSamples} selected={selected}/>
+        <HomeRightChartPanel filSamples={filSamples} selected={selected}/>
+        <FarmMap fly={fly} setBounds={setBounds} items={items} selected={selected}/>
       </div>
     )
   );
 };
 
-export default Home;
+const mapStateToProps = ({visualizer}: IRootState) => ({
+  wdFiles: visualizer.wdFiles,
+  sampleFile: visualizer.sampleFile,
+  directories: visualizer.directories,
+});
+
+const mapDispatchToProps = {
+  getWdFiles,
+  getSampleFile,
+  getDirectories,
+};
+
+type StateProps = ReturnType<typeof mapStateToProps>;
+type DispatchProps = typeof mapDispatchToProps;
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
