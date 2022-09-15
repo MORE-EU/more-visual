@@ -32,41 +32,6 @@ const initPatterns = (data, length, frequency) => {
   return { frequency, length, patternGroups, knee, corrected };
 };
 
-export const filData = (removePoints, queryResults, filters) => {
-  const clone = items => items.map(item => (Array.isArray(item) ? clone(item) : item));
-  const d = clone(queryResults.data);
-  if (removePoints) {
-    d.map(row => {
-      const filteredCols = Object.keys(filters);
-      for (let i = 0; i < filteredCols.length; i++) {
-        const col = filteredCols[i],
-          filter = filters[col];
-        const value = parseFloat(row[col]);
-        if (value < filter[0] || value > filter[1]) {
-          for (let j = 1; j < row.length; j++) {
-            row[j] = null;
-          }
-          break;
-        }
-      }
-      return row;
-    });
-  } else {
-    queryResults.data.filter(row => {
-      const filteredCols = Object.keys(filters);
-      for (let i = 0; i < filteredCols.length; i++) {
-        const col = filteredCols[i],
-          filter = filters[col];
-        const value = parseFloat(row[col]);
-        if (value < filter[0] || value > filter[1]) {
-          return false;
-        }
-      }
-      return true;
-    });
-  }
-};
-
 const initialState = {
   loading: true,
   errorMessage: null,
@@ -83,7 +48,7 @@ const initialState = {
   directories: [],
   liveData: false,
   resampleFreq: 'minute',
-  filters: {},
+  filter: {filterMes: [], filValues: []},
   patterns: null,
   changeChart: true,
   datasetChoice: 0,
@@ -136,15 +101,16 @@ export const getSampleFile = createAsyncThunk('getSampleFile', async (id: string
 export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
   async (data: { folder: string; id: string[];
-    from: number; to: number; resampleFreq: string; selectedMeasures: any[]; extraMeasures: any[]}) => {
-    const { folder, id, from, to, resampleFreq, selectedMeasures, extraMeasures } = data;
+    from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter: object}) => {
+    const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
+    console.log(filter);
     let query;
     from !== null && to !== null
       ? (query = {
           range: { from, to } as ITimeRange,
           frequency: resampleFreq.toUpperCase(),
           measures: selectedMeasures,
-          extraMeasures: extraMeasures,
+          filter,
         } as IQuery)
       : (query = defaultQuery);
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
@@ -154,14 +120,15 @@ export const updateQueryResults = createAsyncThunk(
 
 export const updateCompareQueryResults = createAsyncThunk(
   'updateCompareQueryResults',
-  async (data: { folder: string; id: string[]; from: number; to: number; resampleFreq: string; selectedMeasures: any[] }) => {
-    const { folder, id, from, to, resampleFreq, selectedMeasures } = data;
+  async (data: { folder: string; id: string[]; from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter: {}; }) => {
+    const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
     let query;
     from !== null && to !== null
       ? (query = {
           range: { from, to } as ITimeRange,
           frequency: resampleFreq.toUpperCase(),
           measures: selectedMeasures,
+          filter
         } as IQuery)
       : (query = defaultQuery);
     const response = Promise.all(
@@ -237,7 +204,12 @@ const visualizer = createSlice({
       state.resampleFreq = action.payload;
     },
     updateFilters(state, action: {payload: {measureCol: any, range: any}, type: string}) {
-      state.filters = { ...state.filters, [action.payload.measureCol]: action.payload.range };
+      state.filter = { filterMes: !state.filter.filterMes.includes(action.payload.measureCol) ? 
+      [...state.filter.filterMes, action.payload.measureCol] : [...state.filter.filterMes] , 
+      filValues: state.filter.filterMes.includes(action.payload.measureCol) ?
+      [...state.filter.filValues.slice(0, state.filter.filterMes.indexOf(action.payload.measureCol)), 
+      action.payload.range, ...state.filter.filValues.slice(state.filter.filterMes.indexOf(action.payload.measureCol)+1)] : 
+      [...state.filter.filValues, action.payload.range]};
     },
     updatePatterns(state, action) {
       state.patterns = action.payload;
@@ -297,9 +269,6 @@ const visualizer = createSlice({
     },
     setOpen(state, action) {
       state.open = action.payload;
-    },
-    filterData(state, action) {
-      state.data = filData(action.payload, state.queryResults, state.filters);
     },
     setFolder(state, action) {
       state.folder = action.payload;
@@ -393,6 +362,6 @@ export const {
   updateActiveTool,updateCompare,updateLiveData,updateData,getPatterns, enableForecasting, enableSoilingDetection,
   enableManualChangepoints, enableChangepointDetection, resetChartValues,
   setShowDatePick,setShowChangePointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
-  setExpand,setOpen,filterData, setFolder,
+  setExpand,setOpen, setFolder,
 } = visualizer.actions;
 export default visualizer.reducer;

@@ -19,7 +19,7 @@ public class Dataset implements Serializable {
     private String id;
     @NotNull
     private String name;
-    private Integer resType; // 0: panel, 1: turbine
+    private String resType; // 0: panel, 1: turbine
     private String type = "CSV";
     private Boolean hasHeader;
     private String[] header;
@@ -153,11 +153,11 @@ public class Dataset implements Serializable {
         return timeRange;
     }
 
-    public Integer getResType() {
+    public String getResType() {
         return resType;
     }
 
-    public void setResType(Integer resType) {
+    public void setResType(String resType) {
         this.resType = resType;
     }
 

@@ -18,7 +18,7 @@ public class Farm implements Serializable {
     private String name;
 
     @NotNull
-    private Integer type;
+    private String type;
 
     private ArrayList<Dataset> data;
 
@@ -30,7 +30,7 @@ public class Farm implements Serializable {
         return name;
     }
 
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 

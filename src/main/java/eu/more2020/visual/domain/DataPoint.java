@@ -1,6 +1,7 @@
 package eu.more2020.visual.domain;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 public class DataPoint {
 
@@ -37,7 +38,7 @@ public class DataPoint {
     public String toString() {
         return "DataPoint{" +
             "timestamp=" + timestamp +
-            ", values=" + values +
+            ", values=" + Arrays.toString(values) +
             '}';
     }
 }

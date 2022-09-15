@@ -35,10 +35,12 @@ public class CsvQueryProcessor {
     private CsvParser parser;
     private CsvTTI tti;
     private List<Integer> measures;
+    private Filter filter;
 
 
     public CsvQueryProcessor(Query query, Dataset dataset, CsvTTI tti) {
         this.query = query;
+        this.filter = query.getFilter();
         this.measures = query.getMeasures() != null ? query.getMeasures() : dataset.getMeasures();
         this.queryResults = new QueryResults();
         this.dataset = dataset;
@@ -53,16 +55,62 @@ public class CsvQueryProcessor {
         List<Integer> endLabels = getLabels(query.getRange().getTo());
 
         fileInputStream = new FileInputStream(tti.getCsv());
-        this.processQueryNodes(root, startLabels, endLabels, true, true, 0, filter);
+        this.processQueryNodes(root, startLabels, endLabels, true, true, 0);
         fileInputStream.close();
 
         queryResults.setMeasureStats(tti.getMeasureStats());
         return queryResults;
     }
 
+    public double[] nodeSelection(CsvTreeNode treeNode) throws IOException {
+        List<Double> filteredVals = new ArrayList<Double>();
+        Boolean notApplicable = false;
+        if(filter != null){
+            for(Integer measure : dataset.getMeasures()){
+                if(filter.getFilterMes().contains(measure)){
+                Double compareVal = treeNode.getStats().get(measure).getAverage();
+                Double[] compareFil = filter.getFilValues().get(filter.getFilterMes().indexOf(measure));
+                if(!(compareVal > compareFil[0] && compareVal < compareFil[1])){
+                    notApplicable = true;
+                    break;  
+                } 
+            }
+        }
+        if(!notApplicable){
+            measures.forEach(mez -> {
+                filteredVals.add(treeNode.getStats().get(mez).getAverage());
+            });
+        }
+        return filteredVals.stream().mapToDouble(val -> val).toArray();
+        }else{
+        return measures.stream()
+        .mapToDouble(mes-> treeNode.getStats().get(mes).getAverage())
+        .toArray();
+        }
+    }
+
+    public double[] nodeSelectionFile(DoubleSummaryStatistics[] statsAccumulators) throws IOException {
+        Boolean notApplicable = false;
+        for(Integer measure : filter.getFilterMes()){
+            if(dataset.getMeasures().contains(measure)){
+                Double[] compareFil = filter.getFilValues().get(filter.getFilterMes().indexOf(measure));
+                Double compareVal = statsAccumulators[measures.indexOf(measure)].getAverage();
+                        if(!(compareVal > compareFil[0] && compareVal < compareFil[1])){
+                            notApplicable = true;
+                            break;
+                        }
+            }
+        }
+        if(!notApplicable){
+            return Arrays.stream(statsAccumulators).mapToDouble(DoubleSummaryStatistics::getAverage).toArray();
+        }else{
+            return new ArrayList<Double>().stream().mapToDouble(m -> m).toArray();
+        }
+    }
+
     public void processNode(CsvTreeNode treeNode) throws IOException {
         if (treeNode.getLevel() == freqLevel) {
-            queryResults.getData().add(new DataPoint(getCurrentNodeDateTime(), measures.stream().mapToDouble(measure -> treeNode.getStats().get(measure).getAverage()).toArray()));
+            queryResults.getData().add(new DataPoint(getCurrentNodeDateTime(), nodeSelection(treeNode))); 
         } else {
             fileInputStream.getChannel().position(treeNode.getFileOffsetStart());
             String[] row;
@@ -82,7 +130,7 @@ public class CsvQueryProcessor {
                 currentDate = tti.parseStringToDate(row[dataset.getTimeCol()]).truncatedTo(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(freqLevel - 1).getBaseUnit());
                 if (!currentDate.equals(previousDate) && previousDate != null) {
                     if (query.getRange() == null || query.getRange().contains(previousDate)) {
-                        queryResults.getData().add(new DataPoint(previousDate, Arrays.stream(statsAccumulators).mapToDouble(DoubleSummaryStatistics::getAverage).toArray()));
+                        queryResults.getData().add(new DataPoint(previousDate, nodeSelectionFile(statsAccumulators)));
                     }
                     statsAccumulators = new DoubleSummaryStatistics[measures.size()];
                     for (int j = 0; j < statsAccumulators.length; j++) {
@@ -92,16 +140,16 @@ public class CsvQueryProcessor {
                 for (int j = 0; j < measures.size(); j++) {
                     statsAccumulators[j].accept(Double.parseDouble(row[measures.get(j)]));
                 }
+                // nodeSelectionFile(statsAccumulators);
                 if (i == treeNode.getDataPointCount() - 1 && (query.getRange() == null || query.getRange().contains(currentDate))) {
-                    queryResults.getData().add(new DataPoint(currentDate, Arrays.stream(statsAccumulators).mapToDouble(DoubleSummaryStatistics::getAverage).toArray()));
+                    queryResults.getData().add(new DataPoint(currentDate, nodeSelectionFile(statsAccumulators)));
                 }
             }
         }
     }
 
     private void processQueryNodes(CsvTreeNode node, List<Integer> startLabels,
-                                   List<Integer> endLabels, boolean isFirst, boolean isLast, int level,
-                                   Filter filter) throws IOException {
+                                   List<Integer> endLabels, boolean isFirst, boolean isLast, int level) throws IOException {
         stack.push(node);
         // we are at a leaf node
         Collection<TreeNode> children = node.getChildren();
@@ -117,37 +165,16 @@ public class CsvQueryProcessor {
         /* We filter in each level only in the first node and the last. If we are on the first node, we get everything that is from the start filter
          * and after. Else if we are in the last node we get everything before the end filter. Finally, if we re in intermediary nodes we get all children
          * that are below the filtered values of the current node.*/
-        if(filter != null){
-        if (isFirst)
-        for(int i=0; i < filter.getFilterMes().size(); i++){
-            int y = i;
-            System.out.print(y);
-            children = children.stream().filter(child -> {
-            return child.getStats().get(filter.getFilterMes().get(y)).getAverage() > filter.getFilValues().get(y) && 
-            child.getStats().get(filter.getFilterMes().get(y)).getAverage() < filter.getFilValues().get(y+1) && 
-            child.getLabel() >= start;
-        }).collect(Collectors.toList());
-        }
-        if (isLast)
-        for(int i=0; i < filter.getFilterMes().size(); i++){
-            int y = i;
-            children = children.stream().filter(child -> {
-            return child.getStats().get(filter.getFilterMes().get(y)).getAverage() > filter.getFilValues().get(y) && 
-            child.getStats().get(filter.getFilterMes().get(y)).getAverage() < filter.getFilValues().get(y+1) && 
-            child.getLabel() <= end;
-        }).collect(Collectors.toList());
-        }
-        }else{
+        
         if (isFirst)
             children = children.stream().filter(child -> child.getLabel() >= start).collect(Collectors.toList());
         if (isLast)
             children = children.stream().filter(child -> child.getLabel() <= end).collect(Collectors.toList());
-        }
         for (TreeNode child : children) {
             // The child's first node will be the first node of the current first node and the same for the end
             boolean childIsFirst = child.getLabel() == start && isFirst;
             boolean childIsLast = child.getLabel() == end && isLast;
-            processQueryNodes((CsvTreeNode) child, startLabels, endLabels, childIsFirst, childIsLast, level + 1, filter);
+            processQueryNodes((CsvTreeNode) child, startLabels, endLabels, childIsFirst, childIsLast, level + 1);
         }
 
         stack.pop();

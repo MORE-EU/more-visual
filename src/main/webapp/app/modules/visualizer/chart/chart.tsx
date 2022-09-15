@@ -54,7 +54,7 @@ annotationsAdvanced(Highcharts);
 
 export const Chart = () => {
 
-  const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, queryResultsLoading, filters, customChangePoints,
+  const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, queryResultsLoading, filter, customChangePoints,
     queryResults, changeChart, compare, changepointDetectionEnabled, patterns, detectedChangePoints, data, compareData, secondaryData,
     forecastData, soilingEnabled, manualChangepointsEnabled, manualChangePoints,} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
@@ -76,6 +76,7 @@ export const Chart = () => {
   const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
+  const latestFilter = useRef(filter);
   const isChangePointDetectionEnabled = useRef(changepointDetectionEnabled);
   const isSoilingEnabled = useRef(soilingEnabled);
   const extraMeasures = [isSoilingEnabled.current];
@@ -131,10 +132,10 @@ export const Chart = () => {
           // mouseup(e) {
           //   handlePlotBandsSelection(this.id);
           // }
-          mouseover: function(e) {
+          mouseover(e) {
             this.svgElem.attr('fill', new Highcharts.Color(this.options.color).brighten(0.1).get());
           },
-          mouseout: function(e) {
+          mouseout(e) {
             this.svgElem.attr('fill', this.options.color);
           },
         }
@@ -159,6 +160,10 @@ export const Chart = () => {
   }, [soilingEnabled]);
 
   useEffect(() => {
+    latestFilter.current = filter;
+  }, [filter])
+
+  useEffect(() => {
     if(chartRef !== null){
     !queryResultsLoading && chartRef.hideLoading();
     }
@@ -166,16 +171,16 @@ export const Chart = () => {
 
   useEffect(() => {
     if (compare.length !== 0) {
-      dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures}));
+      dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures, filter}));
     }
   }, [compare])
 
   useEffect(() => {
     latestMeasures.current = selectedMeasures;
     dispatch(updateQueryResults({folder, id: dataset.id, from: from ? from : null, to: to ? to : null,
-      resampleFreq, selectedMeasures, extraMeasures}));
+      resampleFreq, selectedMeasures, filter}));
     if (compare.length !== 0) {
-      dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures}));
+      dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures, filter}));
     }
   }, [dataset, selectedMeasures]);
 
@@ -261,12 +266,12 @@ export const Chart = () => {
       chart.current.showLoading();
       dispatch(updateQueryResults({folder: latestFolder.current, id: latestDatasetId.current,
       from: leftSide, to: rightSide, resampleFreq: latestFrequency.current,
-        selectedMeasures: latestMeasures.current, extraMeasures}));
+        selectedMeasures: latestMeasures.current, filter: latestFilter.current}));
       dispatch(updateFrom(leftSide));
       dispatch(updateTo(rightSide));
       if (latestCompare.current.length !== 0) {
         dispatch(updateCompareQueryResults({folder: latestFolder.current, id: latestCompare.current,
-        from: leftSide, to: rightSide, resampleFreq: latestFrequency.current, selectedMeasures: latestMeasures.current}))
+        from: leftSide, to: rightSide, resampleFreq: latestFrequency.current, selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
       }
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
@@ -389,11 +394,11 @@ export const Chart = () => {
         }%`,
         offset: 0,
         plotBands:
-          measure in filters
+          measure in filter
             ? [
               {
-                from: filters[measure][0],
-                to: filters[measure][1],
+                from: filter[measure][0],
+                to: filter[measure][1],
               },
             ]
             : null,
@@ -408,11 +413,11 @@ export const Chart = () => {
         height: "100%",
         offset: undefined,
         plotBands:
-          measure in filters
+          measure in filter
             ? [
               {
-                from: filters[measure][0],
-                to: filters[measure][1],
+                from: filter[measure][0],
+                to: filter[measure][1],
               },
             ]
             : null,
@@ -480,6 +485,7 @@ export const Chart = () => {
       onMouseOver={() => blockScroll()}
       onMouseLeave={() => allowScroll()}
     >
+      {console.log(latestFilter.current)}
       {!data ?
         <LinearProgress />
         : <LinearProgress variant="determinate" color="success" value={100} className={"linear-prog-hide"}/>}

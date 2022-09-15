@@ -4,12 +4,11 @@ import java.util.List;
 public class Filter {
 
     private List<Integer> filterMes;
-    private List<Double> filValues;
-
+    private List<Double[]> filValues;
     public Filter() {
     }
 
-    public Filter(List<Integer> filterMes, List<Double> filValues) {
+    public Filter(List<Integer> filterMes, List<Double[]> filValues) {
         this.filterMes = filterMes;
         this.filValues = filValues;
     }
@@ -23,11 +22,11 @@ public class Filter {
         this.filterMes = filterMes;
     }
 
-    public List<Double> getFilValues() {
+    public List<Double[]> getFilValues() {
         return this.filValues;
     }
 
-    public void setFilvalues(List<Double> filValues) {
+    public void setFilvalues(List<Double[]> filValues) {
         this.filValues = filValues;
     }
 
@@ -35,7 +34,7 @@ public class Filter {
     public String toString() {
         return "{" +
             " filterMes=" + getFilterMes() + 
-            ", filvalues=" + getFilValues() +
+            ", filvalues=" + getFilterMes().toString() +
             "}";
     }
     

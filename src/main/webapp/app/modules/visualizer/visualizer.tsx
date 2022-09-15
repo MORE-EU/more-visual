@@ -18,7 +18,7 @@ const mdTheme = createTheme();
 
 export const Visualizer = () => {
 
-  const { wdFiles, dataset } = useAppSelector(state => state.visualizer);
+  const { wdFiles, dataset, filter, queryResults } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const  params: any = useParams();
 
@@ -44,6 +44,7 @@ export const Visualizer = () => {
 
   return dataset !== null && <div>
     <ThemeProvider theme={mdTheme}>
+      {console.log(filter)}
       <Toolbar>
         <Box sx={{
           alignItems: 'center', display: 'flex',
