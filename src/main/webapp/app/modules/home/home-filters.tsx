@@ -1,19 +1,6 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import {
-  Accordion,
-  AccordionDetails,
-  Button,
-  Checkbox,
-  Grid,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Paper,
-  Popper,
-  styled,
-  Typography,
+import React, { useEffect } from 'react';
+import {Accordion,AccordionDetails,Button,Checkbox,Grid,List,ListItem,
+  ListItemButton,ListItemIcon,ListItemText,Paper,Popper,styled,Typography,
 } from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
@@ -21,12 +8,8 @@ import CircleIcon from '@mui/icons-material/Circle';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import useAutocomplete from '@mui/lab/useAutocomplete';
-
-export interface IHomeFilters {
-  allFilters: any[];
-  selected: any[];
-  setSelected?: Dispatch<SetStateAction<any[]>>;
-}
+import { useAppSelector, useAppDispatch } from '../store/storeConfig';
+import { setAnchorEl, setInputValue, setSearch, setSearchResults, setSelected, setSelectedAcc } from '../store/homeSlice';
 
 const AccordionSummary = styled(props => <MuiAccordionSummary expandIcon={<ArrowRightIcon sx={{ fontSize: '0.9rem' }} />} {...props} />)(
   ({ theme }) => ({
@@ -41,36 +24,33 @@ const AccordionSummary = styled(props => <MuiAccordionSummary expandIcon={<Arrow
   })
 );
 
-export const HomeFilters = (props: IHomeFilters) => {
-  const { allFilters, selected } = props;
+export const HomeFilters = () => {
 
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedAcc, setSelectedAcc] = useState("");
-  const [search, setSearch] = useState(null);
-  const [searchResults, setSearchResults] = useState(null);
-  const [inputValue, setInputValue] = useState("");
+  const { anchorEl, selectedAcc, allFilters, selected, search, inputValue, searchResults } = useAppSelector(state => state.home);
+  const dispatch = useAppDispatch();
+
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popper' : undefined;
 
   const handleClick = event => {
-    setAnchorEl(anchorEl ? null : event.currentTarget);
+    dispatch(setAnchorEl(anchorEl ? null : event.currentTarget));
   };
 
   useEffect(() => {
-    !open && setSelectedAcc(null);
-    !open && setInputValue("");
+    !open && dispatch(setSelectedAcc(null));
+    !open && dispatch(setInputValue(""));
   }, [open]);
 
   const handleAccordionClick = e => {
-    selectedAcc !== e.target.innerText ? setSelectedAcc(e.target.innerText) : setSelectedAcc("");
-    selectedAcc !== e.target.innerText && setInputValue("");
-    setSearch(allFilters.filter(fi => fi.category === e.target.innerText)[0].values);
-    setSearchResults(allFilters.filter(fi => fi.category === e.target.innerText)[0].values);
+    selectedAcc !== e.target.innerText ? dispatch(setSelectedAcc(e.target.innerText)) : dispatch(setSelectedAcc(""));
+    selectedAcc !== e.target.innerText && dispatch(setInputValue(""));
+    dispatch(setSearch(allFilters.filter(fi => fi.category === e.target.innerText)[0].values));
+    dispatch(setSearchResults(allFilters.filter(fi => fi.category === e.target.innerText)[0].values));
   };
 
   const handleFilter = (filt, filter) => {
     if (selected.length === 0) {
-      props.setSelected(old => [...old, [filter.category, filt]]);
+      dispatch(setSelected([...selected, [filter.category, filt]]));
     } else {
       let bol = false;
       selected.map(sel => {
@@ -79,20 +59,16 @@ export const HomeFilters = (props: IHomeFilters) => {
         }
       });
       if (bol === false) {
-        props.setSelected(old => [...old, [filter.category, filt]]);
+        dispatch(setSelected([...selected, [filter.category, filt]]));
       } else {
-        props.setSelected(old =>
-          old.filter(item => {
-            return item[1] !== filt;
-          })
-        );
+        dispatch(setSelected(selected.filter(item => item[1] !== filt)));
       }
     }
   };
 
   const handleInputChange = (val, gopts) => {
-    val !== "" ? setSearchResults(gopts) : setSearchResults(search);
-    val !== null && setInputValue(val);
+    val !== "" ? dispatch(setSearchResults(gopts)) : dispatch(setSearchResults(search));
+    val !== null && dispatch(setInputValue(val));
   }
   
   const { getInputProps, groupedOptions } = useAutocomplete({

@@ -1,19 +1,15 @@
-import React, {Dispatch, SetStateAction} from 'react';
+import React from 'react';
 import {Box, Button, Grid, Modal, Typography} from '@mui/material';
-import {updateActiveTool} from '../../visualizer.reducer';
+import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
+import { setOpen, setShowChangePointFunction, updateActiveTool } from 'app/modules/store/visualizerSlice';
 
-export interface IChartDatePickerProps {
-  showChangePointFunction: boolean;
-  setShowChangePointFunction?: Dispatch<SetStateAction<boolean>>;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-  updateActiveTool: typeof updateActiveTool;
-}
+export const ChartChangePointFunctions = () => {
 
-export const ChartChangePointFunctions = (props: IChartDatePickerProps) => {
-  const {showChangePointFunction} = props;
+  const { showChangePointFunction } = useAppSelector(state => state.visualizer);
+  const dispatch = useAppDispatch();
 
   const handleClose = () => {
-    props.setShowChangePointFunction(false);
+    dispatch(setShowChangePointFunction(false));
   };
 
   const style = {
@@ -30,8 +26,8 @@ export const ChartChangePointFunctions = (props: IChartDatePickerProps) => {
 
   return (
     <>
-      <Modal open={showChangePointFunction} onClose={handleClose} aria-labelledby="modal-modal-title"
-             aria-describedby="modal-modal-description">
+      <Modal open={showChangePointFunction} onClose={handleClose} aria-labelledby="modal-title"
+             aria-describedby="modal-description">
         <Box sx={style}>
           <Grid item sx={{textAlign: 'center'}}>
             <Typography variant="h6" component="h2">
@@ -41,7 +37,7 @@ export const ChartChangePointFunctions = (props: IChartDatePickerProps) => {
               size="small"
               variant="contained"
               onClick={() => {
-                props.setShowChangePointFunction(false), props.setOpen(true), props.updateActiveTool(2);
+                dispatch(setShowChangePointFunction(false)), dispatch(setOpen(true)), dispatch(updateActiveTool(2));
               }}
             >
               <Typography variant="overline" component="h2">

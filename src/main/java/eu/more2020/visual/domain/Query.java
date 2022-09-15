@@ -43,6 +43,7 @@ public class Query {
         this.measures = measures;
     }
 
+
     @Override
     public String toString() {
         return "Query{" +
