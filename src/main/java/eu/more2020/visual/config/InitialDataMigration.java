@@ -12,7 +12,7 @@ import java.nio.file.Files;
 public class InitialDataMigration {
 
     private final Logger log = LoggerFactory.getLogger(InitialDataMigration.class);
-    private final ApplicationProperties applicationProperties;
+//    private final ApplicationProperties applicationProperties;
 
     private static void copyFile(File sourceFile, File destinationFile)
         throws IOException {
@@ -44,21 +44,21 @@ public class InitialDataMigration {
     }
 
     public InitialDataMigration(ApplicationProperties applicationProperties) throws IOException {
-        this.applicationProperties = applicationProperties;
-        String initialDataPath = getClass().getClassLoader().getResource("initial-data").getPath();
-
-        File workspaceDirectory = new File(applicationProperties.getWorkspacePath());
-        if (!workspaceDirectory.exists()) {
-            workspaceDirectory.mkdir();
-        }
-        log.debug(workspaceDirectory.toPath().toString());
-        for (File file : new File(initialDataPath).listFiles()) {
-            log.debug("Copying metadata file " + file.getName() + " to workspace directory.");
-            try {
-                copyDirectoryCompatibityMode(file, workspaceDirectory.toPath().resolve(file.getName()).toFile());
-            } catch (FileAlreadyExistsException e) {
-                log.debug("Metadata file " + file.getName() + " already exists in workspace directory.");
-            }
-        }
+//        this.applicationProperties = applicationProperties;
+//        String initialDataPath = getClass().getClassLoader().getResource("initial-data").getPath();
+//
+//        File workspaceDirectory = new File(applicationProperties.getWorkspacePath());
+//        if (!workspaceDirectory.exists()) {
+//            workspaceDirectory.mkdir();
+//        }
+//        log.debug(workspaceDirectory.toPath().toString());
+//        for (File file : new File(initialDataPath).listFiles()) {
+//            log.debug("Copying metadata file " + file.getName() + " to workspace directory.");
+//            try {
+//                copyDirectoryCompatibityMode(file, workspaceDirectory.toPath().resolve(file.getName()).toFile());
+//            } catch (FileAlreadyExistsException e) {
+//                log.debug("Metadata file " + file.getName() + " already exists in workspace directory.");
+//            }
+//        }
     }
 }
