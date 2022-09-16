@@ -376,7 +376,7 @@ export const Chart = () => {
       const sz = chartData !== null ? chartData.length : 0;
       const sData = secondaryData.map((d) => {
         const val = d.values[0];
-        return {x : d.timestamp, y : isNaN(val) ? null : val, name : "Expected Power Loss: " + d.values[1]}
+        return {x : d.timestamp, y : isNaN(val) ? null : val, tt : "Est. Power Loss: " + d.values[1].toFixed(2)}
       });
       // @ts-ignore
       chartData = [...chartData, {data: sData, yAxis: sz, name: 'Soiling Ratio'}]
@@ -554,10 +554,19 @@ export const Chart = () => {
               },
             },
             tooltip: {
-              // formatter: function() {
-              //   if (this.point !== undefined && this.point.tt !== undefined) return this.point.tt;
-              //   return this.y.toString();
-              // }
+              formatter: function () {
+                // The first returned item is the header, subsequent items are the
+                // points
+                return ['<b>' + new Date(this.x) + '</b>'].concat(
+                  this.points ?
+                    this.points.map(function (point) {
+                      let ss = `<span style="color:${point.color}">•</span> ${point.series.name}: ${point.y.toFixed(2)}`;
+                      ss += point.point.tt ? `<br>${point.point.tt}</br>` : "";
+                      return ss;
+                    }) : []
+                );
+              },
+              split: true
             },
             series:
               [
