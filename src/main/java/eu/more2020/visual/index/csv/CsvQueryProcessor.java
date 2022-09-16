@@ -4,7 +4,6 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.domain.DataPoint;
 import eu.more2020.visual.domain.Dataset;
-import eu.more2020.visual.domain.Filter;
 import eu.more2020.visual.domain.Query;
 import eu.more2020.visual.domain.QueryResults;
 import eu.more2020.visual.index.TimeSeriesIndexUtil;
@@ -18,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,7 +33,7 @@ public class CsvQueryProcessor {
     private CsvParser parser;
     private CsvTTI tti;
     private List<Integer> measures;
-    private Filter filter;
+    private HashMap<Integer, Double[]> filter;
 
 
     public CsvQueryProcessor(Query query, Dataset dataset, CsvTTI tti) {
@@ -50,7 +48,7 @@ public class CsvQueryProcessor {
         parser = new CsvParser(parserSettings);
     }
 
-    public QueryResults prepareQueryResults(CsvTreeNode root, Filter filter) throws IOException {
+    public QueryResults prepareQueryResults(CsvTreeNode root, HashMap<Integer, Double[]> filter) throws IOException {
         List<Integer> startLabels = getLabels(query.getRange().getFrom());
         List<Integer> endLabels = getLabels(query.getRange().getTo());
 
@@ -66,21 +64,21 @@ public class CsvQueryProcessor {
         List<Double> filteredVals = new ArrayList<Double>();
         Boolean notApplicable = false;
         if(filter != null){
-            for(Integer measure : filter.getFilterMes()){
-                if(dataset.getMeasures().contains(measure)){
-                Double compareVal = treeNode.getStats().get(measure).getAverage();
-                Double[] compareFil = filter.getFilValues().get(filter.getFilterMes().indexOf(measure));
-                if(!(compareVal > compareFil[0] && compareVal < compareFil[1])){
-                    notApplicable = true;
-                    break;  
-                } 
+            for(Map.Entry<Integer, Double[]> entry : filter.entrySet()){
+                if(dataset.getMeasures().contains(entry.getKey())){
+                    Double compareVal = treeNode.getStats().get(entry.getKey()).getAverage();
+                    Double[] compareFil = entry.getValue();
+                    if(!(compareVal > compareFil[0] && compareVal < compareFil[1])){
+                        notApplicable = true;
+                        break; 
+                    };
+                }
             }
-        }
         if(!notApplicable){
             measures.forEach(mez -> {
                 filteredVals.add(treeNode.getStats().get(mez).getAverage());
             });
-        }
+        };
         return filteredVals.stream().mapToDouble(val -> val).toArray();
         }else{
         return measures.stream()
@@ -91,10 +89,10 @@ public class CsvQueryProcessor {
 
     public double[] nodeSelectionFile(DoubleSummaryStatistics[] statsAccumulators) throws IOException {
         Boolean notApplicable = false;
-        for(Integer measure : filter.getFilterMes()){
-            if(dataset.getMeasures().contains(measure)){
-                Double[] compareFil = filter.getFilValues().get(filter.getFilterMes().indexOf(measure));
-                Double compareVal = statsAccumulators[measures.indexOf(measure)].getAverage();
+        for(Map.Entry<Integer, Double[]> entry : filter.entrySet()){
+            if(dataset.getMeasures().contains(entry.getKey())){
+                Double[] compareFil = entry.getValue();
+                Double compareVal = statsAccumulators[entry.getKey()].getAverage();
                         if(!(compareVal > compareFil[0] && compareVal < compareFil[1])){
                             notApplicable = true;
                             break;

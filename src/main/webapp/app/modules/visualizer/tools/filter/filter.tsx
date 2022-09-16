@@ -32,7 +32,7 @@ export const Filter = () => {
               {dataset.header[col]}
             </Typography>
             <Slider
-              value={!filter.filterMes.includes(col) ? [stats.min, stats.max] : filter.filValues[filter.filterMes.indexOf(col)]}
+              value={!filter.has(col) ? [stats.min, stats.max] : filter.get(col)}
               min={stats.min} max={stats.max}
               // onChange={(e, newRange) => {
               //   dispatch(updateFilters({measureCol: col, range: newRange}));
@@ -42,12 +42,12 @@ export const Filter = () => {
             />
             <Stack direction="row" spacing={2}>
               <TextField id="outlined-basic" label="Min-Value" variant="outlined" size="small"
-                         value={filter.filterMes.includes(col) ? parseFloat(filter.filValues[filter.filterMes.indexOf(col)][0]).toFixed(2) : parseFloat(stats.min).toFixed(2)} onChange={(e) => {
-                dispatch(updateFilters({measureCol: col, range: [e.target.value, filter.filterMes.includes(col) ? filter.filValues[filter.filterMes.indexOf(col)][1] : stats.max]}));
+                         value={filter.has(col) ? parseFloat(filter.get(col)[0]).toFixed(2) : parseFloat(stats.min).toFixed(2)} onChange={(e) => {
+                dispatch(updateFilters({measureCol: col, range: [e.target.value, filter.has(col) ? filter.get(col)[1] : stats.max]}));
               }}/>
               <TextField id="outlined-basic" label="Max-Value" variant="outlined" size="small"
-                         value={filter.filterMes.includes(col) ? parseFloat(filter.filValues[filter.filterMes.indexOf(col)][1]).toFixed(2) : parseFloat(stats.max).toFixed(2)} onChange={(e) => {
-                dispatch(updateFilters({measureCol: col, range: [filter.filterMes.includes(col) ? filter.filValues[filter.filterMes.indexOf(col)][0] : stats.min, e.target.value]}));
+                         value={filter.has(col) ? parseFloat(filter.get(col)[1]).toFixed(2) : parseFloat(stats.max).toFixed(2)} onChange={(e) => {
+                dispatch(updateFilters({measureCol: col, range: [filter.has(col) ? filter.get(col)[0] : stats.min, e.target.value]}));
               }}/>
             </Stack>
             <Divider sx={{mt: 2}}/>

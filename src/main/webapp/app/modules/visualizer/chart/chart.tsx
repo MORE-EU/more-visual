@@ -485,7 +485,6 @@ export const Chart = () => {
       onMouseOver={() => blockScroll()}
       onMouseLeave={() => allowScroll()}
     >
-      {console.log(latestFilter.current)}
       {!data ?
         <LinearProgress />
         : <LinearProgress variant="determinate" color="success" value={100} className={"linear-prog-hide"}/>}

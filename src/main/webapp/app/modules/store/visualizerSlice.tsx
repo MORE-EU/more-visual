@@ -48,7 +48,7 @@ const initialState = {
   directories: [],
   liveData: false,
   resampleFreq: 'minute',
-  filter: {filterMes: [], filValues: []},
+  filter: new Map(),
   patterns: null,
   changeChart: true,
   datasetChoice: 0,
@@ -101,18 +101,17 @@ export const getSampleFile = createAsyncThunk('getSampleFile', async (id: string
 export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
   async (data: { folder: string; id: string[];
-    from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter: object}) => {
+    from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter: Map<number, number[]>}) => {
     const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
-    console.log(filter);
     let query;
     from !== null && to !== null
-      ? (query = {
-          range: { from, to } as ITimeRange,
-          frequency: resampleFreq.toUpperCase(),
-          measures: selectedMeasures,
-          filter,
-        } as IQuery)
-      : (query = defaultQuery);
+    ? (query = {
+      range: { from, to } as ITimeRange,
+      frequency: resampleFreq.toUpperCase(),
+      measures: selectedMeasures,
+      filter,
+    } as IQuery)
+    : (query = defaultQuery);
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
     return response.data;
   }
@@ -204,13 +203,16 @@ const visualizer = createSlice({
       state.resampleFreq = action.payload;
     },
     updateFilters(state, action: {payload: {measureCol: any, range: any}, type: string}) {
-      state.filter = { filterMes: !state.filter.filterMes.includes(action.payload.measureCol) ? 
-      [...state.filter.filterMes, action.payload.measureCol] : [...state.filter.filterMes] , 
-      filValues: state.filter.filterMes.includes(action.payload.measureCol) ?
-      [...state.filter.filValues.slice(0, state.filter.filterMes.indexOf(action.payload.measureCol)), 
-      action.payload.range, ...state.filter.filValues.slice(state.filter.filterMes.indexOf(action.payload.measureCol)+1)] : 
-      [...state.filter.filValues, action.payload.range]};
+      state.filter = state.filter.set(action.payload.measureCol, action.payload.range);
     },
+    // updateFilters(state, action: {payload: {measureCol: any, range: any}, type: string}) {
+    //   state.filter = { filterMes: !state.filter.filterMes.includes(action.payload.measureCol) ? 
+    //   [...state.filter.filterMes, action.payload.measureCol] : [...state.filter.filterMes] , 
+    //   filValues: state.filter.filterMes.includes(action.payload.measureCol) ?
+    //   [...state.filter.filValues.slice(0, state.filter.filterMes.indexOf(action.payload.measureCol)), 
+    //   action.payload.range, ...state.filter.filValues.slice(state.filter.filterMes.indexOf(action.payload.measureCol)+1)] : 
+    //   [...state.filter.filValues, action.payload.range]};
+    // },
     updatePatterns(state, action) {
       state.patterns = action.payload;
     },
