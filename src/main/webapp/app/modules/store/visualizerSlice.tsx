@@ -109,7 +109,7 @@ export const updateQueryResults = createAsyncThunk(
       range: { from, to } as ITimeRange,
       frequency: resampleFreq.toUpperCase(),
       measures: selectedMeasures,
-      filter,
+      filter: Object.fromEntries(filter),
     } as IQuery)
     : (query = defaultQuery);
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
@@ -205,14 +205,6 @@ const visualizer = createSlice({
     updateFilters(state, action: {payload: {measureCol: any, range: any}, type: string}) {
       state.filter = state.filter.set(action.payload.measureCol, action.payload.range);
     },
-    // updateFilters(state, action: {payload: {measureCol: any, range: any}, type: string}) {
-    //   state.filter = { filterMes: !state.filter.filterMes.includes(action.payload.measureCol) ? 
-    //   [...state.filter.filterMes, action.payload.measureCol] : [...state.filter.filterMes] , 
-    //   filValues: state.filter.filterMes.includes(action.payload.measureCol) ?
-    //   [...state.filter.filValues.slice(0, state.filter.filterMes.indexOf(action.payload.measureCol)), 
-    //   action.payload.range, ...state.filter.filValues.slice(state.filter.filterMes.indexOf(action.payload.measureCol)+1)] : 
-    //   [...state.filter.filValues, action.payload.range]};
-    // },
     updatePatterns(state, action) {
       state.patterns = action.payload;
     },
