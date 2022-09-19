@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CsvQueryProcessor {
 
@@ -62,19 +63,11 @@ public class CsvQueryProcessor {
 
     public double[] nodeSelection(CsvTreeNode treeNode) throws IOException {
         List<Double> filteredVals = new ArrayList<Double>();
-        Boolean notApplicable = false;
         if(filter != null){
-            for(Map.Entry<Integer, Double[]> entry : filter.entrySet()){
-                if(dataset.getMeasures().contains(entry.getKey())){
-                    Double compareVal = treeNode.getStats().get(entry.getKey()).getAverage();
-                    Double[] compareFil = entry.getValue();
-                    if(!(compareVal > compareFil[0] && compareVal < compareFil[1])){
-                        notApplicable = true;
-                        break; 
-                    };
-                }
-            }
-        if(!notApplicable){
+            Boolean filterCheck = filter.entrySet().stream().anyMatch(e -> 
+                treeNode.getStats().get(e.getKey()).getAverage() < e.getValue()[0] || 
+                treeNode.getStats().get(e.getKey()).getAverage() > e.getValue()[1]);
+        if(!filterCheck){
             measures.forEach(mez -> {
                 filteredVals.add(treeNode.getStats().get(mez).getAverage());
             });
@@ -88,18 +81,10 @@ public class CsvQueryProcessor {
     }
 
     public double[] nodeSelectionFile(DoubleSummaryStatistics[] statsAccumulators) throws IOException {
-        Boolean notApplicable = false;
-        for(Map.Entry<Integer, Double[]> entry : filter.entrySet()){
-            if(dataset.getMeasures().contains(entry.getKey())){
-                Double[] compareFil = entry.getValue();
-                Double compareVal = statsAccumulators[entry.getKey()].getAverage();
-                        if(!(compareVal > compareFil[0] && compareVal < compareFil[1])){
-                            notApplicable = true;
-                            break;
-                        }
-            }
-        }
-        if(!notApplicable){
+        Boolean filterCheck = filter.entrySet().stream().anyMatch(e -> 
+        statsAccumulators[e.getKey()].getAverage() < e.getValue()[0] ||
+        statsAccumulators[e.getKey()].getAverage() > e.getValue()[1]);
+        if(!filterCheck){
             return Arrays.stream(statsAccumulators).mapToDouble(DoubleSummaryStatistics::getAverage).toArray();
         }else{
             return new ArrayList<Double>().stream().mapToDouble(m -> m).toArray();
@@ -138,7 +123,6 @@ public class CsvQueryProcessor {
                 for (int j = 0; j < measures.size(); j++) {
                     statsAccumulators[j].accept(Double.parseDouble(row[measures.get(j)]));
                 }
-                // nodeSelectionFile(statsAccumulators);
                 if (i == treeNode.getDataPointCount() - 1 && (query.getRange() == null || query.getRange().contains(currentDate))) {
                     queryResults.getData().add(new DataPoint(currentDate, nodeSelectionFile(statsAccumulators)));
                 }
