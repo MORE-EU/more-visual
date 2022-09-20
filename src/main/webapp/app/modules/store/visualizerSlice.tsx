@@ -101,7 +101,7 @@ export const getSampleFile = createAsyncThunk('getSampleFile', async (id: string
 export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
   async (data: { folder: string; id: string[];
-    from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter: Map<number, number[]>}) => {
+    from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter?: Map<number, number[]>}) => {
     const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
     let query;
     from !== null && to !== null
@@ -109,7 +109,7 @@ export const updateQueryResults = createAsyncThunk(
       range: { from, to } as ITimeRange,
       frequency: resampleFreq.toUpperCase(),
       measures: selectedMeasures,
-      filter: Object.fromEntries(filter),
+      filter: filter ? Object.fromEntries(filter) : null,
     } as IQuery)
     : (query = defaultQuery);
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
@@ -204,6 +204,9 @@ const visualizer = createSlice({
     },
     updateFilters(state, action: {payload: {measureCol: any, range: any}, type: string}) {
       state.filter = state.filter.set(action.payload.measureCol, action.payload.range);
+    },
+    resetFilters(state) {
+      state.filter = new Map();
     },
     updatePatterns(state, action) {
       state.patterns = action.payload;
@@ -356,6 +359,6 @@ export const {
   updateActiveTool,updateCompare,updateLiveData,updateData,getPatterns, enableForecasting, enableSoilingDetection,
   enableManualChangepoints, enableChangepointDetection, resetChartValues,
   setShowDatePick,setShowChangePointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
-  setExpand,setOpen, setFolder,
+  setExpand,setOpen, setFolder, resetFilters,
 } = visualizer.actions;
 export default visualizer.reducer;

@@ -44,7 +44,6 @@ export const Visualizer = () => {
 
   return dataset !== null && <div>
     <ThemeProvider theme={mdTheme}>
-      {console.log(filter)}
       <Toolbar>
         <Box sx={{
           alignItems: 'center', display: 'flex',

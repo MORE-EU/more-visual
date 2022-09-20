@@ -557,6 +557,9 @@ export const Chart = () => {
                 connectNulls: false,
                 connectorAllowed: false,
                 maxPointWidth: 80,
+                marker: {
+                  enabled: true
+                }
                 // dataGrouping: {
                 //   units: [[resampleFreq, [1]]],
                 //   forced: true,

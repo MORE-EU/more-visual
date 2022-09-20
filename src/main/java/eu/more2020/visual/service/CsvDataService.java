@@ -48,7 +48,7 @@ public class CsvDataService {
     public QueryResults executeQuery(Dataset dataset, Query query) {
         log.debug(query.toString());
         if (query.getRange() == null) {
-            query.setRange(new TimeRange(dataset.getTimeRange().getTo().minus(7, ChronoUnit.DAYS), dataset.getTimeRange().getTo()));
+            query.setRange(new TimeRange(dataset.getTimeRange().getTo().minus(8, ChronoUnit.DAYS), dataset.getTimeRange().getTo().minus(1, ChronoUnit.DAYS)));
         }
         QueryResults queryResults = new QueryResults();
         queryResults.setTimeRange(dataset.getTimeRange().toList());

@@ -3,12 +3,17 @@ import {Box, Button, Checkbox, Divider, Slider, Stack, Typography} from "@mui/ma
 import List from "@mui/material/List";
 import TextField from "@mui/material/TextField";
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { updateFilters, updateQueryResults } from "app/modules/store/visualizerSlice";
+import { resetFilters, updateFilters, updateQueryResults } from "app/modules/store/visualizerSlice";
 
 export const Filter = () => {
 
   const { queryResults, filter, folder, dataset, from, to, resampleFreq, selectedMeasures } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
+
+  const filterReset = () => {
+    dispatch(resetFilters());
+    dispatch(updateQueryResults({folder, id: dataset.id, from, to, resampleFreq, selectedMeasures}))
+  }
 
   return (
     <Box sx={{pl: 2, pr: 2}}>
@@ -16,12 +21,8 @@ export const Filter = () => {
         Filters
       </Typography>
       <Box>
-        <Typography gutterBottom>
-          Remove filtered points
-        </Typography>
-        <Button variant="contained" onClick={() => 
-          {dispatch(updateQueryResults({folder, id: dataset.id, from, to, resampleFreq, selectedMeasures, filter}))}} >
-          Apply Filters
+        <Button variant="contained" onClick={filterReset} >
+          Reset Filters
           </Button>
       </Box>
       <List dense sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
@@ -34,10 +35,11 @@ export const Filter = () => {
             <Slider
               value={!filter.has(col) ? [stats.min, stats.max] : filter.get(col)}
               min={stats.min} max={stats.max}
-              // onChange={(e, newRange) => {
-              //   dispatch(updateFilters({measureCol: col, range: newRange}));
-              // }}
-              onChangeCommitted={(e, newRange) => dispatch(updateFilters({measureCol: col, range: newRange}))}
+              onChange={(e, newRange) => {
+                dispatch(updateFilters({measureCol: col, range: newRange}));
+              }}
+              onChangeCommitted={() =>
+                dispatch(updateQueryResults({folder, id: dataset.id, from, to, resampleFreq, selectedMeasures, filter}))}
               valueLabelDisplay="auto"
             />
             <Stack direction="row" spacing={2}>
