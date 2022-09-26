@@ -81,6 +81,7 @@ public class CsvQueryProcessor {
     }
 
     public double[] nodeSelectionFile(DoubleSummaryStatistics[] statsAccumulators) throws IOException {
+        if(filter != null){
         Boolean filterCheck = filter.entrySet().stream().anyMatch(e -> 
         statsAccumulators[e.getKey()].getAverage() < e.getValue()[0] ||
         statsAccumulators[e.getKey()].getAverage() > e.getValue()[1]);
@@ -88,6 +89,9 @@ public class CsvQueryProcessor {
             return Arrays.stream(statsAccumulators).mapToDouble(DoubleSummaryStatistics::getAverage).toArray();
         }else{
             return new ArrayList<Double>().stream().mapToDouble(m -> m).toArray();
+        }
+        }else{
+            return Arrays.stream(statsAccumulators).mapToDouble(DoubleSummaryStatistics::getAverage).toArray();
         }
     }
 

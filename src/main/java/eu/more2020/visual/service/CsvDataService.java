@@ -25,7 +25,6 @@ public class CsvDataService {
     private final Logger log = LoggerFactory.getLogger(CsvDataService.class);
     private final ApplicationProperties applicationProperties;
     private HashMap<String, CsvTTI> indexes = new HashMap<>();
-
     public CsvDataService(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
     }

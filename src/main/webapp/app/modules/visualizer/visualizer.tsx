@@ -18,7 +18,7 @@ const mdTheme = createTheme();
 
 export const Visualizer = () => {
 
-  const { wdFiles, dataset, filter, queryResults } = useAppSelector(state => state.visualizer);
+  const { wdFiles, dataset } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const  params: any = useParams();
 

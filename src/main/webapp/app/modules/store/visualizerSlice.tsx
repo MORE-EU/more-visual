@@ -117,6 +117,25 @@ export const updateQueryResults = createAsyncThunk(
   }
 );
 
+export const liveDataImplementation = createAsyncThunk(
+  'liveDataImplementation',
+  async (data: { folder: string; id: string[];
+    from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter?: Map<number, number[]>}) => {
+    const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
+    let query;
+    from !== null && to !== null
+    ? (query = {
+      range: { from, to } as ITimeRange,
+      frequency: resampleFreq.toUpperCase(),
+      measures: selectedMeasures,
+      filter: filter ? Object.fromEntries(filter) : null,
+    } as IQuery)
+    : (query = defaultQuery);
+    const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
+    return response.data;
+  }
+);
+
 export const updateCompareQueryResults = createAsyncThunk(
   'updateCompareQueryResults',
   async (data: { folder: string; id: string[]; from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter: {}; }) => {
@@ -324,11 +343,15 @@ const visualizer = createSlice({
       state.queryResultsLoading = false;
       state.compareData = action.payload;
     })
+    builder.addCase(liveDataImplementation.fulfilled, (state, action) => {
+      state.queryResultsLoading = false;
+      state.data = action.payload.data.length !== 0 ? [...state.data, ...action.payload.data] : state.data;
+    })
     builder.addMatcher(isAnyOf(getDataset.pending, getWdFiles.pending, getDirectories.pending, getSampleFile.pending), state => {
       state.errorMessage = null;
       state.loading = true;
     });
-    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
+    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending, liveDataImplementation.pending), state => {
       state.queryResultsLoading = true;
     });
     builder.addMatcher(
@@ -338,7 +361,7 @@ const visualizer = createSlice({
         state.errorMessage = action.payload;
       }
     );
-    builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected), (state, action) => {
+    builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected, liveDataImplementation.rejected), (state, action) => {
       state.queryResultsLoading = false;
     });
     builder.addMatcher(isAnyOf(applyChangepointDetection.fulfilled), (state, action) => {
