@@ -14,7 +14,6 @@ import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CsvTTI {
 
@@ -131,7 +130,7 @@ public class CsvTTI {
             initialize(query);
         }
         CsvQueryProcessor queryProcessor = new CsvQueryProcessor(query, dataset, this);
-        return queryProcessor.prepareQueryResults(root);
+        return queryProcessor.prepareQueryResults(root, query.getFilter());
     }
 
     public void traverse(TreeNode node) {

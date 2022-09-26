@@ -158,8 +158,9 @@ public class DatasetResource {
     @PostMapping("/datasets/{folder}/{id}/query")
     public ResponseEntity<QueryResults> executeQuery(@PathVariable String folder, @PathVariable String id, @Valid @RequestBody Query query) throws IOException {
         log.debug("REST request to execute Query: {}", query);
-        Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id, folder).map(dataset -> {
-            if (dataset.getType().equals("modelar")) {
+        Optional<QueryResults> queryResultsOptional;
+            queryResultsOptional = datasetRepository.findById(id, folder).map(dataset -> {
+                if (dataset.getType().equals("modelar")) {
                 try {
                     return indexedModelarDataService.executeQuery(dataset, query);
                 } catch (Exception e) {
@@ -173,14 +174,33 @@ public class DatasetResource {
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 
-
     @PostMapping("/tools/cp_detection/{id}")
-    public ResponseEntity<List<Changepoint>> cpDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {
+    public ResponseEntity<List<Changepoint>> changePointDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {
         log.debug("CP for {}", changepoints);
         List<Changepoint> detectedChangepoints = toolsRepository.cpDetection(id, changepoints);
         log.debug("Detected CP for {}", detectedChangepoints);
 
         return new ResponseEntity<>(detectedChangepoints, HttpStatus.OK);
+    }
+
+    @GetMapping("/tools/cp_detection/washes/{id}")
+    public List<Changepoint> getManualChangepoints(@PathVariable String id) throws IOException {
+        log.debug("REST request to get manual changepoints ");
+        return toolsRepository.getManualChangepoints(id);
+    }
+
+    @PostMapping("/tools/forecasting/{id}")
+    public List<DataPoint> forecast(@PathVariable String id) throws IOException {
+        log.debug("REST request to get Forecast");
+        return toolsRepository.forecasting(id);
+    }
+
+
+    @PostMapping("/tools/soiling/{id}")
+    public List<DataPoint> soilingDetection(@PathVariable String id,
+                                            @Valid @RequestBody DeviationDetection deviationDetection) throws IOException {
+        log.debug("REST request to apply Soiling Detection ");
+        return toolsRepository.soilingDetection(id, deviationDetection);
     }
 
 }

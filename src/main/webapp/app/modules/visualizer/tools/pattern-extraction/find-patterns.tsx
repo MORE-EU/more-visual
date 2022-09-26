@@ -1,7 +1,8 @@
 import React from 'react';
-import Highcharts from 'highcharts/highstock'
-import {updatePatterns} from '../../visualizer.reducer';
+import Highcharts from 'highcharts/highstock';
+import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
 import {Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField} from '@mui/material';
+import { updatePatterns } from 'app/modules/store/visualizerSlice';
 
 Highcharts.setOptions({
   time: {
@@ -9,17 +10,13 @@ Highcharts.setOptions({
   }
 });
 
-export interface IFindPatternsProps {
-  data: any,
-  selectedMeasures: number[],
-  updatePatterns: typeof updatePatterns,
-}
-
-
-export const FindPatterns = (props: IFindPatternsProps) => {
-  const {data, selectedMeasures} = props;
+export const FindPatterns = () => {
   const [patternLength, setPatternLength] = React.useState(10);
   const [topPatterns, setTopPatterns] = React.useState(1);
+
+  const {data} = useAppSelector(state => state.visualizer);
+  const dispatch = useAppDispatch();
+
   const findPatterns = (e) => {
     let pattern1 = {start: new Date(data[500][0]), end: new Date(data[500 + patternLength][0])};
     let pattern2 = {start: new Date(data[4000][0]), end: new Date(data[4000 + patternLength][0])};
@@ -37,7 +34,7 @@ export const FindPatterns = (props: IFindPatternsProps) => {
     patternGroup.patterns.push(pattern1);
     patternGroup.patterns.push(pattern2);
     patterns.push(patternGroup);
-    props.updatePatterns(patterns);
+    dispatch(updatePatterns(patterns));
   }
 
   const changePatternLength = (e) => {

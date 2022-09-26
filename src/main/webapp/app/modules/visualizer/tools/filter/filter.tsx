@@ -1,23 +1,19 @@
-import {Box, Checkbox, Divider, Slider, Stack, Typography} from "@mui/material";
+import React from "react";
+import {Box, Button, Checkbox, Divider, Slider, Stack, Typography} from "@mui/material";
 import List from "@mui/material/List";
 import TextField from "@mui/material/TextField";
-import React from "react";
-import {IDataset} from "app/shared/model/dataset.model";
-import {IQueryResults} from "app/shared/model/query-results.model";
-import {filterData, updateFilters} from '../../visualizer.reducer';
+import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
+import { resetFilters, updateFilters, updateQueryResults } from "app/modules/store/visualizerSlice";
 
-export interface IFilterProps {
-  dataset: IDataset,
-  filters: any,
-  queryResults: IQueryResults,
-  updateFilters: typeof updateFilters,
-  filterData: typeof filterData,
-}
+export const Filter = () => {
 
-export const Filter = (props: IFilterProps) => {
+  const { queryResults, filter, folder, dataset, from, to, resampleFreq, selectedMeasures } = useAppSelector(state => state.visualizer);
+  const dispatch = useAppDispatch();
 
-  const {dataset, queryResults, filters} = props;
-  const [removePoints, setRemovePoints] =  React.useState(false);
+  const filterReset = () => {
+    dispatch(resetFilters());
+    dispatch(updateQueryResults({folder, id: dataset.id, from, to, resampleFreq, selectedMeasures}))
+  }
 
   return (
     <Box sx={{pl: 2, pr: 2}}>
@@ -25,10 +21,9 @@ export const Filter = (props: IFilterProps) => {
         Filters
       </Typography>
       <Box>
-        <Typography gutterBottom>
-          Remove filtered points
-        </Typography>
-        <Checkbox/>
+        <Button variant="contained" onClick={filterReset} >
+          Reset Filters
+          </Button>
       </Box>
       <List dense sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
         {queryResults && dataset.measures.map((col, idx) => {
@@ -38,24 +33,23 @@ export const Filter = (props: IFilterProps) => {
               {dataset.header[col]}
             </Typography>
             <Slider
-              value={filters[col] || [stats.min, stats.max]}
+              value={!filter.has(col) ? [stats.min, stats.max] : filter.get(col)}
               min={stats.min} max={stats.max}
               onChange={(e, newRange) => {
-                props.updateFilters(col, newRange);
+                dispatch(updateFilters({measureCol: col, range: newRange}));
               }}
-              onChangeCommitted={() => props.filterData(removePoints)}
+              onChangeCommitted={() =>
+                dispatch(updateQueryResults({folder, id: dataset.id, from, to, resampleFreq, selectedMeasures, filter}))}
               valueLabelDisplay="auto"
             />
             <Stack direction="row" spacing={2}>
               <TextField id="outlined-basic" label="Min-Value" variant="outlined" size="small"
-                         value={filters[col] ? parseFloat(filters[col][0]).toFixed(2) : parseFloat(stats.min).toFixed(2)} onChange={(e) => {
-                props.updateFilters(col, [e.target.value, filters[col] ? filters[col][1] : stats.max]);
-                props.filterData(removePoints);
+                         value={filter.has(col) ? parseFloat(filter.get(col)[0]).toFixed(2) : parseFloat(stats.min).toFixed(2)} onChange={(e) => {
+                dispatch(updateFilters({measureCol: col, range: [e.target.value, filter.has(col) ? filter.get(col)[1] : stats.max]}));
               }}/>
               <TextField id="outlined-basic" label="Max-Value" variant="outlined" size="small"
-                         value={filters[col] ? parseFloat(filters[col][1]).toFixed(2) : parseFloat(stats.max).toFixed(2)} onChange={(e) => {
-                props.updateFilters(col, [filters[col] ? filters[col][0] : stats.min, e.target.value]);
-                props.filterData(removePoints);
+                         value={filter.has(col) ? parseFloat(filter.get(col)[1]).toFixed(2) : parseFloat(stats.max).toFixed(2)} onChange={(e) => {
+                dispatch(updateFilters({measureCol: col, range: [filter.has(col) ? filter.get(col)[0] : stats.min, e.target.value]}));
               }}/>
             </Stack>
             <Divider sx={{mt: 2}}/>

@@ -42,14 +42,13 @@ public class CsvDataService {
                 }
                 return tti;
             }).collect(Collectors.toList());
-
         return ttis;
     }
 
     public QueryResults executeQuery(Dataset dataset, Query query) {
         log.debug(query.toString());
         if (query.getRange() == null) {
-            query.setRange(new TimeRange(dataset.getTimeRange().getTo().minus(7, ChronoUnit.DAYS), dataset.getTimeRange().getTo()));
+            query.setRange(new TimeRange(dataset.getTimeRange().getTo().minus(8, ChronoUnit.DAYS), dataset.getTimeRange().getTo().minus(1, ChronoUnit.DAYS)));
         }
         QueryResults queryResults = new QueryResults();
         queryResults.setTimeRange(dataset.getTimeRange().toList());
@@ -69,7 +68,7 @@ public class CsvDataService {
                     }
                 });
             }
-            queryResults.getMeasureStats().forEach((integer, doubleSummaryStatistics) -> log.debug(doubleSummaryStatistics.toString()));
+            // queryResults.getMeasureStats().forEach((integer, doubleSummaryStatistics) -> log.debug(doubleSummaryStatistics.toString()));
             return queryResults;
         } catch (IOException e) {
             e.printStackTrace();
