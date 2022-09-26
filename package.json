@@ -55,6 +55,7 @@
     "redux-devtools-log-monitor": "1.4.0",
     "redux-promise-middleware": "6.1.2",
     "redux-thunk": "2.3.0",
+    "seedrandom": "^3.0.5",
     "tslib": "1.11.1",
     "uuid": "7.0.3"
   },

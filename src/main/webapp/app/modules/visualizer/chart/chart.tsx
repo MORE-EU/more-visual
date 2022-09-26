@@ -54,9 +54,11 @@ annotationsAdvanced(Highcharts);
 
 export const Chart = () => {
 
-  const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, queryResultsLoading, filters, customChangePoints,
-    queryResults, changeChart, compare, changepointDetectionEnabled, patterns, detectedChangePoints, data, compareData, extraMeasures,
-    forecastData, soilingEnabled, manualChangepointsEnabled, manualChangePoints, secondaryData} = useAppSelector(state => state.visualizer);
+  const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, measureColors,
+    queryResultsLoading, filters, customChangePoints,
+    queryResults, changeChart, compare, changepointDetectionEnabled, patterns, detectedChangePoints, data, compareData,
+    forecastData, soilingEnabled, soilingWeeks, manualChangepointsEnabled, manualChangePoints,
+    secondaryData} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -75,12 +77,12 @@ export const Chart = () => {
   const latestFolder = useRef(null);
   const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
-  const latestExtraMeasures = useRef(extraMeasures);
+  const latestSoilingWeeks = useRef(soilingWeeks);
   const latestCompare = useRef(compare);
   const isChangePointDetectionEnabled = useRef(changepointDetectionEnabled);
   const isSoilingEnabled = useRef(soilingEnabled);
 
-  const manualPlotBands = (manualChangePoints !== null && [].concat(...manualChangePoints.map(date => {
+  const manualPlotBands = ((manualChangePoints !== null && manualChangepointsEnabled) && [].concat(...manualChangePoints.map(date => {
     return {
       color: '#425af5',
       from: date.range.from,
@@ -115,7 +117,7 @@ export const Chart = () => {
 
   // Color Bands for Change-points
   useEffect(() => {
-    let newChangepointPlotBands = (detectedChangePoints !== null ? [].concat(...detectedChangePoints.map((date, idx) => {
+    let newChangepointPlotBands = ((detectedChangePoints !== null && changepointDetectionEnabled) ? [].concat(...detectedChangePoints.map((date, idx) => {
       return {
         color: '#f5dd42',
         from: date.range.from,
@@ -173,7 +175,7 @@ export const Chart = () => {
   useEffect(() => {
     latestMeasures.current = selectedMeasures;
     dispatch(updateQueryResults({folder, id: dataset.id, from: from ? from : null, to: to ? to : null,
-      resampleFreq, selectedMeasures, extraMeasures}));
+      resampleFreq, selectedMeasures}));
     if (compare.length !== 0) {
       dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures}));
     }
@@ -182,6 +184,10 @@ export const Chart = () => {
   useEffect(() => {
     latestCompare.current = compare;
   }, [compare]);
+
+  useEffect(() => {
+    latestSoilingWeeks.current = soilingWeeks;
+  }, [soilingWeeks]);
 
   const getChartRef = (chartR: any) => {
     dispatch(updateChartRef(chartR));
@@ -261,7 +267,7 @@ export const Chart = () => {
       chart.current.showLoading();
       dispatch(updateQueryResults({folder: latestFolder.current, id: latestDatasetId.current,
       from: leftSide, to: rightSide, resampleFreq: latestFrequency.current,
-        selectedMeasures: latestMeasures.current, extraMeasures: latestExtraMeasures.current}));
+        selectedMeasures: latestMeasures.current}));
       dispatch(updateFrom(leftSide));
       dispatch(updateTo(rightSide));
       if (latestCompare.current.length !== 0) {
@@ -276,7 +282,8 @@ export const Chart = () => {
           applyChangepointDetection({id: latestDatasetId.current,
             from: leftSide, to: rightSide, changepoints: customChangePoints})).then((res) => {
           if(isSoilingEnabled.current) dispatch(applyDeviationDetection({id: latestDatasetId.current,
-            folder: latestFolder.current, resampleFreq: latestFrequency.current, from: leftSide, to: rightSide, changepoints: res.payload}));
+            folder: latestFolder.current, resampleFreq: latestFrequency.current, weeks: latestSoilingWeeks.current,
+            from: leftSide, to: rightSide, changepoints: res.payload}));
         });
       };
 
@@ -359,7 +366,6 @@ export const Chart = () => {
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
     };
-
   const computeChartData = () => {
     let chartData = (data !== null) ? selectedMeasures
       .map((measure, index) => ({
@@ -369,6 +375,7 @@ export const Chart = () => {
         }),
         name: dataset.header[measure],
         yAxis: changeChart ? index : 0,
+        color: measureColors[measure],
         zoneAxis: "x",
         zones,
       })) : [];

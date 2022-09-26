@@ -2,9 +2,10 @@ import {Box, Switch, Tooltip, Typography} from "@mui/material";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import React, {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
-import {getManualChangePoints, updateSelectedMeasures,
-  enableChangepointDetection, applyChangepointDetection,
-  enableManualChangepoints,
+import {
+  getManualChangePoints, updateSelectedMeasures,
+  toggleChangepointDetection, applyChangepointDetection,
+  toggleManualChangepoints, toggleSoilingDetection,
 } from "app/modules/store/visualizerSlice";
 
 
@@ -26,24 +27,28 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   const {changepointsName, manualChangepointsName, potentialChangepointsName,
   shownMeasures} = props;
 
-  const [detectIntervals, setDetectIntervals] = useState(false);
-
   useEffect(()=>{
     dispatch(getManualChangePoints(dataset.id));
   }, []);
 
   const handleManualChangepointsChange = () => {
+    const action = !manualChangepointsEnabled;
+    dispatch(toggleManualChangepoints(action));
     dispatch(updateSelectedMeasures(shownMeasures));
-    dispatch(enableManualChangepoints(!manualChangepointsEnabled));
   }
 
   const handleCpDetection = () => {
     const action = !changepointDetectionEnabled;
-    dispatch(enableChangepointDetection(action));
+    dispatch(toggleChangepointDetection(action));
     dispatch(updateSelectedMeasures(shownMeasures));
     if(action)
       dispatch(applyChangepointDetection({id: dataset.id, from, to, changepoints: customChangePoints}));
+    else{
+      dispatch(toggleSoilingDetection(false));
+    }
   }
+
+
   return (
     <Box>
       <Box
@@ -86,22 +91,6 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
           inputProps={{'aria-label': 'controlled'}}
         />
       </Box>
-      {/* <Box sx={{*/}
-      {/*   display: 'flex',*/}
-      {/*     flexDirection: 'row',*/}
-      {/*     justifyContent: 'space-between',*/}
-      {/* }}>*/}
-      {/*   <Box sx={{pt: 1}}>Use Annotations</Box>*/}
-      {/*   <Tooltip describeChild*/}
-      {/*   title={customChangePoints.length === 0 ? "Use Intervals on Chart" : "Select Intervals on the Chart"}>*/}
-      {/*   <Switch*/}
-      {/*     checked={detectIntervals && customChangePoints.length > 0}*/}
-      {/*   onChange={() => setDetectIntervals(!detectIntervals)}*/}
-      {/*   disabled={customChangePoints.length === 0 || changepointDetectionEnabled}*/}
-      {/*   inputProps={{'aria-label': 'controlled'}}*/}
-      {/*   />*/}
-      {/* </Tooltip>*/}
-      {/* </Box>*/}
     </Box>
   );
 

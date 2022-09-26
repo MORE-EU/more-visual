@@ -207,6 +207,8 @@ public class ToolsRepositoryImpl implements ToolsRepository {
                 params.put("cp_starts", deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getFrom().format(formatter)).collect(Collectors.toList()));
                 params.put("cp_ends", deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getTo().format(formatter)).collect(Collectors.toList()));
             }
+            params.put("weeks_train", deviationDetection.getWeeks());
+            log.debug("DV for: " + params);
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(params);
             HttpURLConnection conn = (HttpURLConnection) dataURL.openConnection();

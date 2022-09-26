@@ -1,7 +1,7 @@
 import React from 'react';
 import {Box, Divider, Switch, Tooltip, Typography,} from "@mui/material";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
-import {applyForecasting, enableForecasting} from "app/modules/store/visualizerSlice";
+import {applyForecasting, toggleForecasting} from "app/modules/store/visualizerSlice";
 
 
 
@@ -11,7 +11,7 @@ export const Forecasting = () => {
 
   const handleForecasting = () => {
     const action = !forecasting;
-    dispatch(enableForecasting(action));
+    dispatch(toggleForecasting(action));
     if(action)
       dispatch(applyForecasting(dataset.id));
   }

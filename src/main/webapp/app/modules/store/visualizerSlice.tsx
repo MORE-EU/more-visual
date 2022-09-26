@@ -6,6 +6,27 @@ import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.mod
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import axios from 'axios';
 
+const seedrandom = require('seedrandom');
+const lvl = 64;
+seedrandom('acab', { global: true });
+
+const generateColor = () => {
+  //return ("#" + (Math.floor(seedrandom()*lvl)<<16 | Math.floor(Math.random()*lvl)<<8 | Math.floor(Math.random()*lvl)).toString(16));
+  var lum = -0.25;
+  var hex = String('#' + Math.random().toString(16).slice(2, 8).toUpperCase()).replace(/[^0-9a-f]/gi, '');
+  if (hex.length < 6) {
+    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+  }
+  var rgb = "#",
+    c, i;
+  for (i = 0; i < 3; i++) {
+    c = parseInt(hex.substr(i * 2, 2), 16);
+    c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+    rgb += ("00" + c).substr(c.length);
+  }
+  return rgb;
+}
+
 const initPatterns = (data, length, frequency) => {
   let pattern1 = { start: new Date(data[500].timestamp), end: new Date(data[500 + length].timestamp) };
   let pattern2 = { start: new Date(data[4000].timestamp), end: new Date(data[4000 + length].timestamp) };
@@ -76,6 +97,7 @@ const initialState = {
   compareData: null,
   queryResultsLoading: true,
   selectedMeasures: [],
+  measureColors: [],
   from: null as number,
   to: null as number,
   wdFiles: [],
@@ -103,14 +125,14 @@ const initialState = {
   open: false,
   forecastData: null as IDataPoint[],
   secondaryData: null as IDataPoint[],
-  manualChangePoints: null as IChangePointDate[],
-  customChangePoints: null as IChangePointDate[],
-  detectedChangePoints: null as IChangePointDate[],
+  manualChangePoints: [] as IChangePointDate[],
+  customChangePoints: [] as IChangePointDate[],
+  detectedChangePoints: [] as IChangePointDate[],
+  soilingWeeks: 1,
   changepointDetectionEnabled: false,
   manualChangepointsEnabled: false,
   forecasting: false,
   soilingEnabled: false,
-  extraMeasures: null,
 };
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
@@ -137,15 +159,14 @@ export const getSampleFile = createAsyncThunk('getSampleFile', async (id: string
 export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
   async (data: { folder: string; id: string[];
-    from: number; to: number; resampleFreq: string; selectedMeasures: any[]; extraMeasures: any[]}) => {
-    const { folder, id, from, to, resampleFreq, selectedMeasures, extraMeasures} = data;
+    from: number; to: number; resampleFreq: string; selectedMeasures: any[]}) => {
+    const { folder, id, from, to, resampleFreq, selectedMeasures} = data;
     let query;
     from !== null && to !== null
       ? (query = {
           range: { from, to } as ITimeRange,
           frequency: resampleFreq.toUpperCase(),
           measures: selectedMeasures,
-          extraMeasures: extraMeasures,
         } as IQuery)
       : (query = defaultQuery);
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
@@ -198,15 +219,18 @@ export const applyForecasting = createAsyncThunk(
 
 export const applyDeviationDetection = createAsyncThunk(
   'applyDeviationDetection',
-  async (data: {folder: string, resampleFreq: string; id: string, from : number, to : number, changepoints : IChangePointDate[]}) => {
+  async (data: {folder: string, resampleFreq: string; id: string,
+      from : number, to : number, weeks : number, changepoints : IChangePointDate[]}) => {
     const requestUrl = `api/tools/soiling/${data.folder}/${data.id}`;
     const range = {from: data.from, to: data.to} as unknown as ITimeRange;
     const changepoints = data.changepoints;
     const frequency = data.resampleFreq;
+    const weeks = data.weeks;
     const response = await axios.post(requestUrl, {
       range,
       frequency,
       changepoints,
+      weeks,
     });
     return response.data;
   });
@@ -251,6 +275,9 @@ const visualizer = createSlice({
     updateDatasetChoice(state, action) {
       state.datasetChoice = action.payload;
     },
+    updateDatasetMeasures(state, action) {
+      state.dataset.measures = action.payload
+    },
     updatePatternNav(state, action) {
       state.patternNav = action.payload;
     },
@@ -259,6 +286,9 @@ const visualizer = createSlice({
     },
     updateCustomChangePoints(state, action) {
       state.customChangePoints = action.payload;
+    },
+    updateManualChangepoints(state, action) {
+      state.manualChangePoints = action.payload;
     },
     updateActiveTool(state, action) {
       state.activeTool = action.payload;
@@ -273,6 +303,12 @@ const visualizer = createSlice({
     },
     updateData(state, action) {
       state.data = [...state.data, action.payload];
+    },
+    updateSecondaryData(state, action) {
+      state.secondaryData = action.payload
+    },
+    updateSoilingWeeks(state, action) {
+      state.soilingWeeks = action.payload
     },
     getPatterns(state, action: {payload: {data: IDataPoint[], val: number, resampleFreq: string}, type: string}) {
       state.patterns = initPatterns(action.payload.data, action.payload.val, action.payload.resampleFreq);
@@ -307,17 +343,17 @@ const visualizer = createSlice({
     setFolder(state, action) {
       state.folder = action.payload;
     },
-    enableChangepointDetection(state, action) {
+    toggleChangepointDetection(state, action) {
       state.changepointDetectionEnabled = action.payload;
     },
-    enableSoilingDetection(state, action){
+    toggleSoilingDetection(state, action){
       state.soilingEnabled = action.payload;
-      state.extraMeasures = null;
+      state.secondaryData = state.soilingEnabled ? state.secondaryData : null;
     },
-    enableForecasting(state, action){
+    toggleForecasting(state, action){
       state.forecasting = action.payload;
     },
-    enableManualChangepoints(state, action){
+    toggleManualChangepoints(state, action){
       state.manualChangepointsEnabled = action.payload;
     },
     resetChartValues(state) {
@@ -336,7 +372,8 @@ const visualizer = createSlice({
     builder.addCase(getDataset.fulfilled, (state, action) => {
       state.loading = false;
       state.dataset = action.payload.data;
-      state.selectedMeasures = [action.payload.data.measures[0]];
+      state.measureColors = [...state.dataset.header.map(() => generateColor())]
+      state.selectedMeasures = [...action.payload.data.measures];
     });
     builder.addCase(getWdFiles.fulfilled, (state, action) => {
       state.loading = false;
@@ -379,24 +416,24 @@ const visualizer = createSlice({
       state.queryResultsLoading = false;
     });
     builder.addMatcher(isAnyOf(applyChangepointDetection.fulfilled), (state, action) => {
-      state.detectedChangePoints = action.payload;
+      state.detectedChangePoints = action.payload.length === 0 ? null : action.payload;
     });
     builder.addMatcher(isAnyOf(getManualChangePoints.fulfilled), (state, action) => {
-      state.manualChangePoints = action.payload;
+      state.manualChangePoints = action.payload.length === 0 ? null : action.payload;
     });
     builder.addMatcher(isAnyOf(applyDeviationDetection.fulfilled), (state, action) => {
-      //state.extraMeasures = action.payload;
-      state.secondaryData = action.payload;
+      state.secondaryData = action.payload.length === 0 ? null : action.payload;
     });
   },
 });
 
 export const {
-  resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilters,
-  updatePatterns,updateChangeChart,updateDatasetChoice,updatePatternNav,updateChartRef,updateCustomChangePoints,
-  updateActiveTool,updateCompare,updateLiveData,updateData,getPatterns, enableForecasting, enableSoilingDetection,
-  enableManualChangepoints, enableChangepointDetection, resetChartValues,
+  filterData, resetChartValues, resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilters,
+  updatePatterns,updateChangeChart,updateDatasetChoice,updateDatasetMeasures, updatePatternNav,updateChartRef,updateCustomChangePoints,
+  updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateLiveData,
+  updateData, updateSoilingWeeks,
+  toggleForecasting, toggleSoilingDetection, toggleManualChangepoints, toggleChangepointDetection,
   setShowDatePick,setShowChangePointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
-  setExpand,setOpen,filterData, setFolder,
+  setExpand,setOpen, setFolder, getPatterns,
 } = visualizer.actions;
 export default visualizer.reducer;

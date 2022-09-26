@@ -8,7 +8,7 @@
     "baseName": "VfTool",
     "packageName": "gr.athenarc.imsi.visualfacts.tool",
     "packageFolder": "gr/athenarc/imsi/visualfacts/tool",
-    "serverPort": "8080",
+    "serverPort": "8090",
     "authenticationType": "jwt",
     "cacheProvider": "no",
     "websocket": false,

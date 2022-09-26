@@ -19,13 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -119,8 +115,6 @@ public class DatasetResource {
         log.debug("REST request to get Dataset : {}", id);
         log.debug("REST request to get Dataset : {}", folder);
         Optional<Dataset> dataset = datasetRepository.findById(id, folder);
-
-
         log.debug(dataset.toString());
         return ResponseUtil.wrapOrNotFound(dataset);
     }
