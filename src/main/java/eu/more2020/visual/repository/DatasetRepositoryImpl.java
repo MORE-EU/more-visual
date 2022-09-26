@@ -84,26 +84,27 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
 
-    public Farm getFarm(String folder) throws IOException {
-        Farm farm = new Farm();
+    @Override
+    public Optional<Farm> findFarm(String farmName) throws IOException {
+        Farm farm = null;
         ObjectMapper mapper = new ObjectMapper();
-        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + folder, folder + ".meta.json");
+        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName, farmName + ".meta.json");
 
         if (metadataFile.exists()) {
             FileReader reader = new FileReader(metadataFile);
             farm = mapper.readValue(reader, Farm.class);
         }
-        return farm;
+        return Optional.ofNullable(farm);
     }
 
     @Override
-    public Optional<Dataset> findById(String id, String folder) throws IOException {
+    public Optional<Dataset> findById(String id, String farmName) throws IOException {
         Assert.notNull(id, "Id must not be null!");
         ObjectMapper mapper = new ObjectMapper();
         Dataset dataset = null;
         List<Dataset> allDatasets = null;
         Farm farm = new Farm();
-        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + folder, folder + ".meta.json");
+        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName, farmName + ".meta.json");
 
         if (metadataFile.exists()) {
             FileReader reader = new FileReader(metadataFile);
@@ -134,7 +135,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                     }
                     break;
                 default:
-                    File file = new File(applicationProperties.getWorkspacePath() + "/" + folder, dataset.getName());
+                    File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, dataset.getName());
                     if (!file.isDirectory()) {
                         DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
                         fillDataFileInfo(dataset, dataFileInfo);
@@ -197,7 +198,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         return dataset;
     }
 
-    @Override
+/*    @Override
     public List<String> findFiles(String folder) throws IOException {
         File file = new File(applicationProperties.getWorkspacePath() + "/" + folder);
         FileFilter fileFilter = f -> !f.isDirectory() && f.getName().endsWith(".csv") && !f.getName().contains("sample");
@@ -207,11 +208,11 @@ public class DatasetRepositoryImpl implements DatasetRepository {
             fileList.add(newFile.getName().toString());
         }
         return fileList;
-    }
+    }*/
 
     @Override
-    public List<Sample> findSample(String folder) throws IOException {
-        File f = new File(applicationProperties.getWorkspacePath() + "/" + folder);
+    public List<Sample> findSample(String farmName) throws IOException {
+        File f = new File(applicationProperties.getWorkspacePath() + "/" + farmName);
         File[] matchingFiles = f.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.contains("sample") && name.endsWith("csv");

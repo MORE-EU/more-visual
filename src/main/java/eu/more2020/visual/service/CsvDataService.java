@@ -30,8 +30,8 @@ public class CsvDataService {
         this.applicationProperties = applicationProperties;
     }
 
-    public void removeIndex(String id, String folder) {
-        indexes.remove(id, folder);
+    public void removeIndex(String id, String farmName) {
+        indexes.remove(id, farmName);
     }
 
     private synchronized List<CsvTTI> getIndexes(Dataset dataset, Query query) throws IOException {
