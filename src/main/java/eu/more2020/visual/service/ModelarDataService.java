@@ -137,7 +137,7 @@ public class ModelarDataService {
                 DoubleSummaryStatistics measureStats = new DoubleSummaryStatistics(((BigIntVector) vsr.getVector("count")).get(row),
                     ((Float4Vector) vsr.getVector("min_value")).get(row),
                     ((Float4Vector) vsr.getVector("max_value")).get(row),
-                    ((Float8Vector) vsr.getVector("sum")).get(row));
+                    ((Float8Vector) vsr.getVector("sum_value")).get(row));
                 measureStatsMap.put(tid, measureStats);
             }
             flightStream.close();
