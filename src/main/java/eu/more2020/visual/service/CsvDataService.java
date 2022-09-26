@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
@@ -45,10 +47,18 @@ public class CsvDataService {
         return ttis;
     }
 
+    public TimeRange getTimeRangeInit (TimeRange timeRange, Dataset dataset) {
+        if(Duration.between(timeRange.getFrom(), timeRange.getTo()).toDays() >= 1){
+            return new TimeRange(dataset.getTimeRange().getTo().minus(8, ChronoUnit.DAYS), dataset.getTimeRange().getTo().minus(1, ChronoUnit.DAYS));
+        }else{
+            return new TimeRange(dataset.getTimeRange().getTo().minus(7, ChronoUnit.DAYS), dataset.getTimeRange().getTo());
+        }
+    }
+
     public QueryResults executeQuery(Dataset dataset, Query query) {
         log.debug(query.toString());
         if (query.getRange() == null) {
-            query.setRange(new TimeRange(dataset.getTimeRange().getTo().minus(8, ChronoUnit.DAYS), dataset.getTimeRange().getTo().minus(1, ChronoUnit.DAYS)));
+            query.setRange(getTimeRangeInit(dataset.getTimeRange(), dataset));
         }
         QueryResults queryResults = new QueryResults();
         queryResults.setTimeRange(dataset.getTimeRange().toList());
