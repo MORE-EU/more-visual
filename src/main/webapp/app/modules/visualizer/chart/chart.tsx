@@ -22,7 +22,8 @@ import {
   updateResampleFreq,
   updateTo,
   applyChangepointDetection,
-  applyDeviationDetection
+  applyDeviationDetection,
+  liveDataImplementation
 } from "app/modules/store/visualizerSlice";
 import CloseIcon from "@mui/icons-material/Close";
 HighchartsMore(Highcharts);
@@ -79,6 +80,8 @@ export const Chart = () => {
   const latestFilter = useRef(filter);
   const isChangePointDetectionEnabled = useRef(changepointDetectionEnabled);
   const isSoilingEnabled = useRef(soilingEnabled);
+  const lastDataTimestamp = useRef(null);
+  const point = useRef(null);
   const extraMeasures = [isSoilingEnabled.current];
 
   const manualPlotBands = (manualChangePoints !== null && [].concat(...manualChangePoints.map(date => {
@@ -168,6 +171,10 @@ export const Chart = () => {
     !queryResultsLoading && chartRef.hideLoading();
     }
   }, [queryResultsLoading])
+
+  useEffect(() => {
+    if(data !== null && lastDataTimestamp.current === null) lastDataTimestamp.current = data[data.length - 1].timestamp;
+  }, [data])
 
   useEffect(() => {
     if (compare.length !== 0) {
@@ -268,11 +275,10 @@ export const Chart = () => {
       from: leftSide, to: rightSide, resampleFreq: latestFrequency.current,
         selectedMeasures: latestMeasures.current, filter: latestFilter.current}));
       dispatch(updateFrom(leftSide));
-      dispatch(updateTo(rightSide));
-      if (latestCompare.current.length !== 0) {
-        dispatch(updateCompareQueryResults({folder: latestFolder.current, id: latestCompare.current,
-        from: leftSide, to: rightSide, resampleFreq: latestFrequency.current, selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
-      }
+      dispatch(updateTo(rightSide));     
+      if (latestCompare.current.length !== 0) dispatch(updateCompareQueryResults({folder: latestFolder.current, 
+        id: latestCompare.current, from: leftSide, to: rightSide, resampleFreq: latestFrequency.current, 
+        selectedMeasures: latestMeasures.current, filter: latestFilter.current}));
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
       if(isChangePointDetectionEnabled.current) dispatch(applyChangepointDetection({id: latestDatasetId.current, from: leftSide, to: rightSide, changepoints: customChangePoints}));
@@ -282,11 +288,11 @@ export const Chart = () => {
     const getSides = (max: number, min: number, p: number) => {
       const pad = (max - min) + ((max - min) * p);
       const leftSide = Math.max(Math.min(min - pad, (timeRange.current[0] + min - pad)), timeRange.current[0]);
-      const rightSide = Math.min(max + pad, timeRange.current[1]);
+      const rightSide = Math.min(max + pad, data[data.length-1].timestamp);
       return {leftSide, rightSide};
     }
 
-    const checkForData = (max: any, min: any) => {
+    const checkForData = (max: number, min: number) => {
       const {leftSide, rightSide} = getSides(max, min, 0.25);
       latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
       latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
@@ -334,14 +340,16 @@ export const Chart = () => {
 
     // CHART: ZOOM FUNCTION
     Highcharts.addEvent(chart.current.container, "wheel", (event: WheelEvent) => {
+      const p = chart.current.xAxis[0].toValue(chart.current.pointer.normalize(event).chartX);
       const {min, max} = chart.current.xAxis[0].getExtremes();
-      const step = (max - min) / 10;
+      const stepleft = (p - min) * 0.25;
+      const stepright = (max - p) * 0.25;
       if(!chart.current.loadingShown){
-      if (event.deltaY < 0) { // in
-        chart.current.xAxis[0].setExtremes( min + step, max - step, true, false);
+      if (event.deltaY < 0 && (max - min) > 10000) { // in, 10000 is the max range on a zoom level
+        chart.current.xAxis[0].setExtremes( min + stepleft, max - stepright, true, false);
       } else if (event.deltaY > 0) { // out
-        chart.current.xAxis[0].setExtremes(Math.max(min - step, timeRange.current[0]),
-          Math.min(max + step, timeRange.current[1]), true, false)
+        chart.current.xAxis[0].setExtremes(Math.max(min - stepleft, timeRange.current[0]),
+          Math.min(max + stepright, timeRange.current[1]), true, false)
       }
       checkForDataOnZoom();
     }
@@ -354,6 +362,32 @@ export const Chart = () => {
       checkForDataOnPan();
       }
     });
+
+    // const calculateStep = (freq, refreshVal) => {
+    //   const step = 1000 * refreshVal;
+    //   if (freq === "hour"){
+    //     return step * Math.pow(60, 2);
+    //   }
+    //   else if(freq === "minute"){
+    //     return step * 60;
+    //   }
+    //   else if(freq === "second"){
+    //     return step;
+    //   }
+    // }
+
+    // // TODO: LIVE DATA IMPLEMENTATION
+    // setInterval(() => {
+    //     const {max, min, dataMax} = chart.current.xAxis[0].getExtremes(); 
+
+    //     if( max >= data[data.length - 1].timestamp || dataMax === timeRange.current[1]){ 
+    //     dispatch(liveDataImplementation(
+    //       {folder: latestFolder.current, id: latestDatasetId.current,
+    //       from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 10), resampleFreq: latestFrequency.current,
+    //       selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
+    //       chart.current.xAxis[0].setExtremes(min + calculateStep(latestFrequency.current, 10), dataMax, false, false);
+    //     }
+    // }, 1000);
 
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
