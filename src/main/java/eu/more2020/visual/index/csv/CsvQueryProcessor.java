@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CsvQueryProcessor {
 
@@ -64,8 +63,8 @@ public class CsvQueryProcessor {
     public double[] nodeSelection(CsvTreeNode treeNode) throws IOException {
         List<Double> filteredVals = new ArrayList<Double>();
         if(filter != null){
-            Boolean filterCheck = filter.entrySet().stream().anyMatch(e -> 
-                treeNode.getStats().get(e.getKey()).getAverage() < e.getValue()[0] || 
+            Boolean filterCheck = filter.entrySet().stream().anyMatch(e ->
+                treeNode.getStats().get(e.getKey()).getAverage() < e.getValue()[0] ||
                 treeNode.getStats().get(e.getKey()).getAverage() > e.getValue()[1]);
         if(!filterCheck){
             measures.forEach(mez -> {
@@ -81,19 +80,19 @@ public class CsvQueryProcessor {
     }
 
     public double[] nodeSelectionFile(DoubleSummaryStatistics[] statsAccumulators) throws IOException {
-        Boolean filterCheck = filter.entrySet().stream().anyMatch(e -> 
-        statsAccumulators[e.getKey()].getAverage() < e.getValue()[0] ||
-        statsAccumulators[e.getKey()].getAverage() > e.getValue()[1]);
-        if(!filterCheck){
+        Boolean filterCheck = filter != null && filter.entrySet().stream().anyMatch(e ->
+            statsAccumulators[e.getKey()].getAverage() < e.getValue()[0] ||
+                statsAccumulators[e.getKey()].getAverage() > e.getValue()[1]);
+        if (!filterCheck) {
             return Arrays.stream(statsAccumulators).mapToDouble(DoubleSummaryStatistics::getAverage).toArray();
-        }else{
+        } else {
             return new ArrayList<Double>().stream().mapToDouble(m -> m).toArray();
         }
     }
 
     public void processNode(CsvTreeNode treeNode) throws IOException {
         if (treeNode.getLevel() == freqLevel) {
-            queryResults.getData().add(new DataPoint(getCurrentNodeDateTime(), nodeSelection(treeNode))); 
+            queryResults.getData().add(new DataPoint(getCurrentNodeDateTime(), nodeSelection(treeNode)));
         } else {
             fileInputStream.getChannel().position(treeNode.getFileOffsetStart());
             String[] row;
@@ -147,7 +146,7 @@ public class CsvQueryProcessor {
         /* We filter in each level only in the first node and the last. If we are on the first node, we get everything that is from the start filter
          * and after. Else if we are in the last node we get everything before the end filter. Finally, if we re in intermediary nodes we get all children
          * that are below the filtered values of the current node.*/
-        
+
         if (isFirst)
             children = children.stream().filter(child -> child.getLabel() >= start).collect(Collectors.toList());
         if (isLast)
