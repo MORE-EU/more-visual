@@ -43,11 +43,13 @@ public class CsvTreeNode extends TreeNode {
     @Override
     public String toString() {
         return "{" +
+            " level='" + getLevel() + "'" +
+            " label='" + getLabel() + "'" +
             " fileOffsetStart='" + getFileOffsetStart() + "'" +
             ", dataPointCount='" + getDataPointCount() + "'" +
             "}";
     }
-    
+
     @Override
 
     public TreeNode createChild(int label, int level){

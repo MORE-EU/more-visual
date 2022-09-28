@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 
 public class CsvTTI {
@@ -39,16 +41,16 @@ public class CsvTTI {
             root = new CsvTreeNode(0, 0);
         }
 
-        CsvTreeNode node = root;
-        if (node.getDataPointCount() == 0) {
-            node.setFileOffsetStart(fileOffset);
+        // adjust root node meta
+        if (root.getDataPointCount() == 0) {
+            root.setFileOffsetStart(fileOffset);
         }
-        node.setDataPointCount(node.getDataPointCount() + 1);
-        node.adjustStats(row, dataset);
+        root.setDataPointCount(root.getDataPointCount() + 1);
+        root.adjustStats(row, dataset);
 
+        CsvTreeNode node = root;
         for (Integer label : labels) {
-            CsvTreeNode child = (CsvTreeNode) node.getOrAddChild(label);
-            node = child;
+            node = (CsvTreeNode) node.getOrAddChild(label);
             if (node.getDataPointCount() == 0) {
                 node.setFileOffsetStart(fileOffset);
             }
@@ -59,12 +61,18 @@ public class CsvTTI {
     }
 
     public void initialize(Query q0) throws IOException {
+
+
+        // truncate q0 time range to query frequency level
+
+        TemporalUnit temporalUnit = TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(TimeSeriesIndexUtil.getTemporalLevelIndex(q0.getFrequency()) - 1).getBaseUnit();
+        TimeRange timeRange = new TimeRange(q0.getRange().getFrom().truncatedTo(temporalUnit), q0.getRange().getTo().truncatedTo(temporalUnit));
+
         measureStats = new HashMap<>();
         for (Integer measureIndex : dataset.getMeasures()) {
             measureStats.put(measureIndex, new DoubleSummaryStatistics());
         }
-        LocalDateTime from = LocalDateTime.MIN;
-        LocalDateTime to = LocalDateTime.MAX;
+
 
         CsvParserSettings parserSettings = createCsvParserSettings();
         // to be able to get file offset of first measurement
@@ -84,13 +92,9 @@ public class CsvTTI {
         int queryFrequencyLevel = TimeSeriesIndexUtil.getTemporalLevelIndex(q0.getFrequency()) + 1;
         while ((row = parser.parseNext()) != null) {
             LocalDateTime dateTime = parseStringToDate(row[dataset.getTimeCol()]);
-            if (dateTime.isBefore(from)) {
-                from = dateTime;
-            } else if (dateTime.isAfter(to)) {
-                to = dateTime;
-            }
+
             Stack<Integer> labels = new Stack<>();
-            int lastIndex = q0.getRange() != null && q0.getRange().contains(dateTime) ? queryFrequencyLevel : queryFrequencyLevel - 1;
+            int lastIndex = timeRange.contains(dateTime.truncatedTo(temporalUnit)) ? queryFrequencyLevel : queryFrequencyLevel - 1;
             for (int i = 0; i < lastIndex; i++) {
                 labels.add(dateTime.get(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(i)));
             }
@@ -134,7 +138,7 @@ public class CsvTTI {
     }
 
     public void traverse(TreeNode node) {
-        LOG.debug(node);
+        LOG.debug(node.toString());
         Collection<TreeNode> children = node.getChildren();
         if (children != null && !children.isEmpty()) {
             for (TreeNode child : children) {

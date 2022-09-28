@@ -37,7 +37,7 @@ public class TimeRange implements Serializable {
     }
 
     public boolean contains(LocalDateTime x) {
-        return from.isBefore(x) && to.isAfter(x);
+        return (from.isBefore(x) && to.isAfter(x)) || from.isEqual(x) || to.isEqual(x);
     }
 
     public boolean intersects(TimeRange other) {
