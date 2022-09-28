@@ -15,13 +15,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 
 public class CsvTTI {
 
     private static final Logger LOG = LogManager.getLogger(CsvTTI.class);
-
-
     protected CsvTreeNode root;
     private Map<Integer, DoubleSummaryStatistics> measureStats;
     private Dataset dataset;
@@ -38,7 +37,8 @@ public class CsvTTI {
                 .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
                 .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
                 .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-                .toFormatter();    }
+                .toFormatter();
+    }
 
     private TreeNode addPoint(Stack<Integer> labels, long fileOffset, String[] row) {
         if (root == null) {
@@ -72,10 +72,7 @@ public class CsvTTI {
     }
 
     public void initialize(Query q0) throws IOException {
-
-
         // truncate q0 time range to query frequency level
-
         TemporalUnit temporalUnit = TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(TimeSeriesIndexUtil.getTemporalLevelIndex(q0.getFrequency()) - 1).getBaseUnit();
         TimeRange timeRange = new TimeRange(q0.getRange().getFrom().truncatedTo(temporalUnit), q0.getRange().getTo().truncatedTo(temporalUnit));
 
@@ -83,7 +80,6 @@ public class CsvTTI {
         for (Integer measureIndex : dataset.getMeasures()) {
             measureStats.put(measureIndex, new DoubleSummaryStatistics());
         }
-
 
         CsvParserSettings parserSettings = createCsvParserSettings();
         // to be able to get file offset of first measurement
