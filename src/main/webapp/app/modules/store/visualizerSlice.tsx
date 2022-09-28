@@ -43,7 +43,7 @@ const initialState = {
   selectedMeasures: [],
   from: null as number,
   to: null as number,
-  wdFiles: [],
+  wdFiles: [] as any[],
   sampleFile: [],
   directories: [],
   liveData: false,
@@ -322,7 +322,7 @@ const visualizer = createSlice({
     });
     builder.addCase(getWdFiles.fulfilled, (state, action) => {
       state.loading = false;
-      state.wdFiles = action.payload.data;
+      state.wdFiles = action.payload.data.data.map(file => file.id);
     });
     builder.addCase(getDirectories.fulfilled, (state, action) => {
       state.loading = false;

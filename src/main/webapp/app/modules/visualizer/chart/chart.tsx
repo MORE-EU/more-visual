@@ -363,31 +363,31 @@ export const Chart = () => {
       }
     });
 
-    // const calculateStep = (freq, refreshVal) => {
-    //   const step = 1000 * refreshVal;
-    //   if (freq === "hour"){
-    //     return step * Math.pow(60, 2);
-    //   }
-    //   else if(freq === "minute"){
-    //     return step * 60;
-    //   }
-    //   else if(freq === "second"){
-    //     return step;
-    //   }
-    // }
+    const calculateStep = (freq, refreshVal) => {
+      const step = 1000 * refreshVal;
+      if (freq === "hour"){
+        return step * Math.pow(60, 2);
+      }
+      else if(freq === "minute"){
+        return step * 60;
+      }
+      else if(freq === "second"){
+        return step;
+      }
+    }
 
-    // // TODO: LIVE DATA IMPLEMENTATION
-    // setInterval(() => {
-    //     const {max, min, dataMax} = chart.current.xAxis[0].getExtremes(); 
+    // TODO: LIVE DATA IMPLEMENTATION
+    setInterval(() => {
+        const {max, min, dataMax} = chart.current.xAxis[0].getExtremes(); 
 
-    //     if( max >= data[data.length - 1].timestamp || dataMax === timeRange.current[1]){ 
-    //     dispatch(liveDataImplementation(
-    //       {folder: latestFolder.current, id: latestDatasetId.current,
-    //       from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 10), resampleFreq: latestFrequency.current,
-    //       selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
-    //       chart.current.xAxis[0].setExtremes(min + calculateStep(latestFrequency.current, 10), dataMax, false, false);
-    //     }
-    // }, 1000);
+        if( max >= data[data.length - 1].timestamp){ 
+        dispatch(liveDataImplementation(
+          {folder: latestFolder.current, id: latestDatasetId.current,
+          from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: latestFrequency.current,
+          selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
+          chart.current.xAxis[0].setExtremes(min + calculateStep(latestFrequency.current, 30), dataMax, false, false);
+        }
+    }, 5000);
 
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);

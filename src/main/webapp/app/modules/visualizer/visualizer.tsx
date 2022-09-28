@@ -28,7 +28,7 @@ export const Visualizer = () => {
     }, [params.folder]);
     return wdFiles.length !== 0 &&
       <div>
-        <Redirect to={`${params.folder}/${wdFiles[0].substring(0, wdFiles[0].indexOf("."))}`}/>
+        <Redirect to={`${params.folder}/${wdFiles[0]}`}/>
       </div>;
   }
 
@@ -39,7 +39,7 @@ export const Visualizer = () => {
   }, [params.id !== undefined]);
 
   useEffect(() => {
-    wdFiles.length !== 0 && dispatch(updateDatasetChoice(wdFiles.indexOf(params.id + ".csv")));
+    wdFiles.length !== 0 && dispatch(updateDatasetChoice(wdFiles.indexOf(params.id)));
   }, [wdFiles])
 
   return dataset !== null && <div>

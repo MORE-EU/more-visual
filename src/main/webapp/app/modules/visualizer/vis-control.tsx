@@ -55,7 +55,7 @@ export const VisControl = () => {
       </FormControl>
     </Grid>
     <Grid item xs={11}>
-      {wdFiles !== [] &&
+      {wdFiles.length !== 0 &&
         <>
           <Typography variant="h6" gutterBottom>
             {dataset.farmName}
@@ -66,9 +66,9 @@ export const VisControl = () => {
                 key={idx}
                 selected={datasetChoice === idx}
                 component={Link}
-                to={`/visualize/${folder}/${file.substring(0, file.indexOf("."))}`}
+                to={`/visualize/${folder}/${file}`}
                 onClick={() => {
-                  handleDataset(idx), dispatch(getDataset({folder, id: file.substring(0, file.indexOf("."))}))
+                  handleDataset(idx), dispatch(getDataset({folder, id: file}))
                 }}
                 divider
               >
