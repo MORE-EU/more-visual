@@ -382,17 +382,17 @@ export const Chart = () => {
     }
 
     // TODO: LIVE DATA IMPLEMENTATION
-    setInterval(() => {
-        const {max, min, dataMax} = chart.current.xAxis[0].getExtremes(); 
+    // setInterval(() => {
+    //     const {max, min, dataMax} = chart.current.xAxis[0].getExtremes(); 
 
-        if( max >= data[data.length - 1].timestamp){ 
-        dispatch(liveDataImplementation(
-          {folder: latestFolder.current, id: latestDatasetId.current,
-          from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: latestFrequency.current,
-          selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
-          chart.current.xAxis[0].setExtremes(min + calculateStep(latestFrequency.current, 30), dataMax, false, false);
-        }
-    }, 5000);
+    //     if( max >= data[data.length - 1].timestamp){ 
+    //     dispatch(liveDataImplementation(
+    //       {folder: latestFolder.current, id: latestDatasetId.current,
+    //       from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: latestFrequency.current,
+    //       selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
+    //       chart.current.xAxis[0].setExtremes(min + calculateStep(latestFrequency.current, 30), dataMax, false, false);
+    //     }
+    // }, 5000);
 
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
