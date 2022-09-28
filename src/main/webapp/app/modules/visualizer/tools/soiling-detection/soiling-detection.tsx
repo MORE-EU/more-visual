@@ -1,5 +1,4 @@
-import React, {useState} from 'react';
-import {IDataset} from "app/shared/model/dataset.model";
+import React, {useEffect, useState} from 'react';
 import {
   Box,
   Button,
@@ -17,29 +16,34 @@ import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import HelpIcon from "@mui/icons-material/Help";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {
-  enableSoilingDetection,
+  toggleSoilingDetection,
   applyDeviationDetection,
+  updateSecondaryData, updateSoilingWeeks,
 } from "app/modules/store/visualizerSlice";
 
 
 export const SoilingDetection = () => {
-  const { dataset, from, to,
-    detectedChangePoints} = useAppSelector(state => state.visualizer);
+  const {folder, dataset, from, to, resampleFreq,
+    soilingEnabled, soilingWeeks,
+    detectedChangePoints, changepointDetectionEnabled} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
-  const [weeks, setWeeks] = useState(1);
-  const [soilingIsEnabled, setSoilingIsEnabled] = useState(false);
-
   const handleWeeksChange = (e) => {
-    setWeeks(e.target.value);
+    const newSoilingWeeks = e.target.value;
+    dispatch(updateSoilingWeeks(newSoilingWeeks))
+    if(soilingEnabled)
+      dispatch(applyDeviationDetection({folder, id: dataset.id, from, to, resampleFreq, weeks : newSoilingWeeks, changepoints : detectedChangePoints}));
   }
 
+  useEffect(()=>{
+    if (detectedChangePoints === null) dispatch(updateSecondaryData(null));
+  },[detectedChangePoints]);
+
   const handleEnableSoiling = () => {
-    const action = !soilingIsEnabled;
-    setSoilingIsEnabled(action);
-    dispatch(enableSoilingDetection(action));
+    const action = !soilingEnabled;
+    dispatch(toggleSoilingDetection(action));
     if(action)
-      dispatch(applyDeviationDetection({id: dataset.id, from, to, changepoints : detectedChangePoints}));
+      dispatch(applyDeviationDetection({folder, id: dataset.id, from, to, resampleFreq, weeks : soilingWeeks, changepoints : detectedChangePoints}));
   }
 
   return (
@@ -83,7 +87,7 @@ export const SoilingDetection = () => {
             <Select
               labelId="select-weeks"
               id="select-weeks-id"
-              value={weeks}
+              value={soilingWeeks}
               onChange={handleWeeksChange}
               label="Weeks"
             >
@@ -104,7 +108,8 @@ export const SoilingDetection = () => {
         }}>
           <Box sx={{pt: 1}}>Enable</Box>
           <Switch
-            checked={soilingIsEnabled}
+            checked={soilingEnabled}
+            disabled={!changepointDetectionEnabled}
             onChange={() => handleEnableSoiling()}
             inputProps={{'aria-label': 'controlled'}}
           />

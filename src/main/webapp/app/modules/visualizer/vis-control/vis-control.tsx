@@ -1,36 +1,27 @@
 import React, { useEffect } from 'react';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import Checkbox from '@mui/material/Checkbox';
-import {FormControl, Grid, InputLabel, ListItemIcon, MenuItem, Select, Tooltip, Typography} from "@mui/material";
+import {Box, Button, FormControl, Grid, InputLabel, ListItemIcon, MenuItem, Popover, Select, Tooltip, Typography} from "@mui/material";
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import {Link, useLocation} from "react-router-dom";
-import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { getDataset, resetChartValues, updateDatasetChoice, updateResampleFreq, updateSelectedMeasures } from '../store/visualizerSlice';
+import { useAppDispatch, useAppSelector } from '../../store/storeConfig';
+import { getDataset, resetChartValues, updateDatasetChoice, updateResampleFreq, updateSelectedMeasures } from '../../store/visualizerSlice';
+import VisMeasures from "app/modules/visualizer/vis-control/vis-measures";
 
 export const VisControl = () => {
 
   const { folder, dataset, selectedMeasures, compare, datasetChoice, resampleFreq, wdFiles } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     dispatch(resetChartValues());
   }, [location])
 
 
-  const handleToggle = (col) => () => {
-    const currentIndex = selectedMeasures.indexOf(col);
-    const newChecked = [...selectedMeasures];
-    if (currentIndex === -1) {
-      newChecked.push(col);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-    dispatch(updateSelectedMeasures(newChecked));
-  };
+
 
   const handleDataset = (idx) => {
     if (datasetChoice !== idx) {
@@ -38,6 +29,20 @@ export const VisControl = () => {
     }
   }
 
+
+  const handleEditMeasures = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseEditMeasures = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
+
+  // @ts-ignore
   return <Grid container spacing={3}>
     <Grid item xs={12}>
       <FormControl variant="standard" sx={{m: 1, minWidth: 180}}>
@@ -55,20 +60,21 @@ export const VisControl = () => {
       </FormControl>
     </Grid>
     <Grid item xs={11}>
-      {wdFiles !== [] &&
+      {wdFiles.length !== 0 &&
         <>
           <Typography variant="h6" gutterBottom>
             {dataset.farmName}
-          </Typography><List disablePadding dense={true}>
+          </Typography>
+          <List disablePadding dense={true}>
           {wdFiles.map((file, idx) => {
             return (
               <ListItemButton
                 key={idx}
                 selected={datasetChoice === idx}
                 component={Link}
-                to={`/visualize/${folder}/${file.substring(0, file.indexOf("."))}`}
+                to={`/visualize/${folder}/${file}`}
                 onClick={() => {
-                  handleDataset(idx), dispatch(getDataset({folder, id: file.substring(0, file.indexOf("."))}))
+                  handleDataset(idx), dispatch(getDataset({folder, id: file}))
                 }}
                 divider
               >
@@ -86,33 +92,16 @@ export const VisControl = () => {
         </>
       }
     </Grid>
-    <Grid item xs={12}>
+    <Grid item container xs={12}>
       <Typography variant="h6" gutterBottom>
         Measures
       </Typography>
-      <List dense sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper', maxHeight: 200, overflowY: "scroll"}}>
-        {dataset.measures.map((col) => {
-          const labelId = `checkbox-list-secondary-label-${col}`;
-          return (
-            <ListItem
-              key={col}
-              secondaryAction={
-                <Checkbox
-                  edge="end"
-                  checked={selectedMeasures.includes(col)}
-                  onChange={handleToggle(col)}
-                  inputProps={{'aria-labelledby': labelId}}
-                />
-              }
-              disablePadding
-            >
-              <ListItemButton>
-                <ListItemText id={labelId} primary={`${dataset.header[col]}`}/>
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List></Grid>
+      <Grid item container
+            pb = {2}
+            xs = {12}>
+        <VisMeasures />
+      </Grid>
+      </Grid>
   </Grid>;
 };
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {Button, Grid, TextField, Typography} from '@mui/material';
 import {ChartDatePicker} from './chart-control-buttons/chart-datepicker';
 import {ChartCompare} from './chart-control-buttons/chart-compare';
@@ -10,9 +10,11 @@ import { updateChangeChart, updateQueryResults } from 'app/modules/store/visuali
 
 export const ChartControl = () => {
 
-  const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, 
-  queryResults, changeChart, showChangePointFunction, showCompare, showDatePick } = useAppSelector(state => state.visualizer);
+  const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures,
+  queryResults, changeChart, showChangePointFunction, showCompare, showDatePick, soilingEnabled } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
+  const isSoilingEnabled = useRef(soilingEnabled);
+  const activeTools = [isSoilingEnabled.current];
 
   const handleOnAccept = (e, category) => {
     if(category === "from"){

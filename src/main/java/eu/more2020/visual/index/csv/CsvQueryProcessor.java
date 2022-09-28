@@ -80,7 +80,7 @@ public class CsvQueryProcessor {
         }
     }
 
-    public double[] nodeSelectionFile(DoubleSummaryStatistics[] statsAccumulators) throws IOException {
+    public double[] nodeSelectionFromFile(DoubleSummaryStatistics[] statsAccumulators) throws IOException {
         if(filter != null){
         Boolean filterCheck = filter.entrySet().stream().anyMatch(e -> 
         statsAccumulators[e.getKey()].getAverage() < e.getValue()[0] ||
@@ -117,7 +117,7 @@ public class CsvQueryProcessor {
                 currentDate = tti.parseStringToDate(row[dataset.getTimeCol()]).truncatedTo(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(freqLevel - 1).getBaseUnit());
                 if (!currentDate.equals(previousDate) && previousDate != null) {
                     if (query.getRange() == null || query.getRange().contains(previousDate)) {
-                        queryResults.getData().add(new DataPoint(previousDate, nodeSelectionFile(statsAccumulators)));
+                        queryResults.getData().add(new DataPoint(previousDate, nodeSelectionFromFile(statsAccumulators)));
                     }
                     statsAccumulators = new DoubleSummaryStatistics[measures.size()];
                     for (int j = 0; j < statsAccumulators.length; j++) {
@@ -128,7 +128,7 @@ public class CsvQueryProcessor {
                     statsAccumulators[j].accept(Double.parseDouble(row[measures.get(j)]));
                 }
                 if (i == treeNode.getDataPointCount() - 1 && (query.getRange() == null || query.getRange().contains(currentDate))) {
-                    queryResults.getData().add(new DataPoint(currentDate, nodeSelectionFile(statsAccumulators)));
+                    queryResults.getData().add(new DataPoint(currentDate, nodeSelectionFromFile(statsAccumulators)));
                 }
             }
         }

@@ -7,7 +7,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
 import {Redirect, useParams} from 'react-router-dom';
 import {ChartContainer} from './chart/chart-container';
-import VisControl from "app/modules/visualizer/vis-control";
+import VisControl from "app/modules/visualizer/vis-control/vis-control";
 import Toolkit from "app/modules/visualizer/tools/toolkit";
 import HomeIcon from '@mui/icons-material/Home';
 import {Breadcrumbs, Divider, Link, Typography} from "@mui/material";
@@ -28,7 +28,7 @@ export const Visualizer = () => {
     }, [params.folder]);
     return wdFiles.length !== 0 &&
       <div>
-        <Redirect to={`${params.folder}/${wdFiles[0].substring(0, wdFiles[0].indexOf("."))}`}/>
+        <Redirect to={`${params.folder}/${wdFiles[0]}`}/>
       </div>;
   }
 
@@ -39,7 +39,7 @@ export const Visualizer = () => {
   }, [params.id !== undefined]);
 
   useEffect(() => {
-    wdFiles.length !== 0 && dispatch(updateDatasetChoice(wdFiles.indexOf(params.id + ".csv")));
+    wdFiles.length !== 0 && dispatch(updateDatasetChoice(wdFiles.indexOf(params.id)));
   }, [wdFiles])
 
   return dataset !== null && <div>
