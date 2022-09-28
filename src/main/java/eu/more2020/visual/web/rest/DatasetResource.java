@@ -161,7 +161,7 @@ public class DatasetResource {
             queryResultsOptional = datasetRepository.findById(id, farmName).map(dataset -> {
                 if (dataset.getType().equals("modelar")) {
                 try {
-                    return indexedModelarDataService.executeQuery(dataset, query);
+                    return modelarDataService.executeQuery(dataset, query);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
