@@ -194,11 +194,34 @@ public class DatasetResource {
         return toolsRepository.forecasting(id);
     }
 
+//    @PostMapping("/tools/soiling/{folder}/{id}")
+//    public List<String> soilingDetection(@PathVariable String folder, @PathVariable String id,
+//                                            @Valid @RequestBody DeviationDetection deviationDetection) throws IOException {
+//        List<String> extraMeasures = new ArrayList<>();
+//        extraMeasures.add("soiling1");
+//        extraMeasures.add("soiling2");
+//        log.debug("REST request to apply Soiling Detection ");
+//        String soilingPath =  toolsRepository.soilingDetection(id, deviationDetection);
+//        datasetRepository.findById(id, folder).map(dataset -> {
+//            try {
+//                if (dataset.getType().equals("modelar")) {
+//                    return null;
+//                }
+//                else {
+//                    TimeseriesTreeIndex index = csvDataService.getIndex(folder, dataset);
+//                    index.enhance(soilingPath, deviationDetection.getFrequency(), deviationDetection.getRange());
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            return extraMeasures;
+//        });
+//        return extraMeasures;
+//    }
 
-    @PostMapping("/tools/soiling/{id}")
-    public List<DataPoint> soilingDetection(@PathVariable String id,
-                                            @Valid @RequestBody DeviationDetection deviationDetection) throws IOException {
-        log.debug("REST request to apply Soiling Detection ");
+    @PostMapping("/tools/soiling/{folder}/{id}")
+    public List<DataPoint> soilingDetection(@PathVariable String folder, @PathVariable String id,
+                                         @Valid @RequestBody DeviationDetection deviationDetection) {
         return toolsRepository.soilingDetection(id, deviationDetection);
     }
 

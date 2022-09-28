@@ -68,7 +68,7 @@ module.exports = options => ({
         enforce: 'pre',
         test: /\.jsx?$/,
         loader: 'babel-loader',
-        include: [utils.root('node_modules/@react-leaflet')],
+        include: [utils.root('node_modules/react-leaflet'), utils.root('node_modules/@react-leaflet')],
         options: {
           plugins: [
             '@babel/plugin-proposal-nullish-coalescing-operator',

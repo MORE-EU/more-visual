@@ -7,7 +7,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
 import {Redirect, useParams} from 'react-router-dom';
 import {ChartContainer} from './chart/chart-container';
-import VisControl from "app/modules/visualizer/vis-control";
+import VisControl from "app/modules/visualizer/vis-control/vis-control";
 import Toolkit from "app/modules/visualizer/tools/toolkit";
 import HomeIcon from '@mui/icons-material/Home';
 import {Breadcrumbs, Divider, Link, Typography} from "@mui/material";

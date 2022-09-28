@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.*;
 
 public class CsvTTI {
@@ -31,8 +33,12 @@ public class CsvTTI {
     public CsvTTI(String csv, Dataset dataset) {
         this.dataset = dataset;
         this.csv = csv;
-        this.formatter = DateTimeFormatter.ofPattern(dataset.getTimeFormat(), Locale.ENGLISH);
-    }
+        this.formatter =
+            new DateTimeFormatterBuilder().appendPattern(dataset.getTimeFormat())
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                .toFormatter();    }
 
     private TreeNode addPoint(Stack<Integer> labels, long fileOffset, String[] row) {
         if (root == null) {
