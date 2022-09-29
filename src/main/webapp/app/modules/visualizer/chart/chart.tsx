@@ -354,17 +354,39 @@ export const Chart = () => {
         chart.current.xAxis[0].setExtremes( min + stepleft, max - stepright, true, false);
       } else if (event.deltaY > 0) { // out
         chart.current.xAxis[0].setExtremes(Math.max(min - stepleft, timeRange.current[0]),
-          Math.min(max + stepright, timeRange.current[1]), true, false)
+          Math.min(max + stepright, data[data.length -1].timestamp), true, false) // timeRange.current[1]
       }
       checkForDataOnZoom();
     }
     });
+
+    const renderLabelForLiveData = () => {
+      const {max} = chart.current.xAxis[0].getExtremes();
+      let label;
+      if( max >= data[data.length -1].timestamp){
+       label = chart.current.renderer.label('Live Data Mode', (chart.current.chartWidth / 2) , 10)
+                  .attr({
+                      fill: Highcharts.getOptions().colors[1],
+                      padding: 10,
+                      r: 5,
+                      zIndex: 10
+                  })
+                  .css({
+                      color: '#FFFFFF'
+                  })
+                  .add();
+                  setTimeout(function () {
+                      label.fadeOut();
+                  }, 2000);
+      }
+    }
 
     // CHART: PAN FUNCTION
     Highcharts.wrap(Highcharts.Chart.prototype, "pan", function (proceed, ...args) {
       if(!chart.current.loadingShown){
       proceed.apply(this, args);
       checkForDataOnPan();
+      renderLabelForLiveData();
       }
     });
 
@@ -381,18 +403,18 @@ export const Chart = () => {
       }
     }
 
-    // TODO: LIVE DATA IMPLEMENTATION
-    // setInterval(() => {
-    //     const {max, min, dataMax} = chart.current.xAxis[0].getExtremes(); 
-
-    //     if( max >= data[data.length - 1].timestamp){ 
-    //     dispatch(liveDataImplementation(
-    //       {folder: latestFolder.current, id: latestDatasetId.current,
-    //       from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: latestFrequency.current,
-    //       selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
-    //       chart.current.xAxis[0].setExtremes(min + calculateStep(latestFrequency.current, 30), dataMax, false, false);
-    //     }
-    // }, 5000);
+    // LIVE DATA IMPLEMENTATION
+    setInterval(() => {
+        const {max, min, dataMax} = chart.current.xAxis[0].getExtremes(); 
+        console.log(max, data[data.length-1].timestamp);
+        if( max >= data[data.length - 1].timestamp){ 
+        dispatch(liveDataImplementation(
+          {folder: latestFolder.current, id: latestDatasetId.current,
+          from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: latestFrequency.current,
+          selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
+          chart.current.xAxis[0].setExtremes(min + calculateStep(latestFrequency.current, 30), dataMax, false, false);
+        }
+    }, 5000);
 
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
@@ -584,7 +606,7 @@ export const Chart = () => {
                 connectorAllowed: false,
                 maxPointWidth: 80,
                 marker: {
-                  enabled: true
+                  enabled: filter.size != 0 ? true : false
                 }
                 // dataGrouping: {
                 //   units: [[resampleFreq, [1]]],
