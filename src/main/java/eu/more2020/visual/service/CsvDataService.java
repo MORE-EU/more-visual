@@ -4,48 +4,81 @@ import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Query;
 import eu.more2020.visual.domain.QueryResults;
-import eu.more2020.visual.index.TimeseriesTreeIndex;
-import org.apache.commons.collections.map.MultiKeyMap;
+import eu.more2020.visual.domain.TimeRange;
+import eu.more2020.visual.index.csv.CsvTTI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.DoubleSummaryStatistics;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CsvDataService {
 
     private final Logger log = LoggerFactory.getLogger(CsvDataService.class);
-    private final ApplicationProperties applicationProperties;
-    private MultiKeyMap indexes = new MultiKeyMap();
+    private HashMap<String, CsvTTI> indexes = new HashMap<>();
 
-    public CsvDataService(ApplicationProperties applicationProperties) {
-        this.applicationProperties = applicationProperties;
+
+    public void removeIndex(String id, String farmName) {
+        indexes.remove(id, farmName);
     }
 
-    public void removeIndex(String id, String folder) {
-        indexes.remove(id, folder);
+    private synchronized List<CsvTTI> getIndexes(Dataset dataset, Query query) throws IOException {
+        List<CsvTTI> ttis = dataset.getFileInfoList().stream().filter(dataFileInfo -> dataFileInfo.getTimeRange().intersects(query.getRange()))
+            .map(dataFileInfo -> {
+                CsvTTI tti = indexes.get(dataFileInfo.getFilePath());
+                if (tti == null) {
+                    tti = new CsvTTI(dataFileInfo.getFilePath(), dataset);
+                    this.indexes.put(dataFileInfo.getFilePath(), tti);
+                }
+                return tti;
+            }).collect(Collectors.toList());
+        return ttis;
     }
 
-    public synchronized TimeseriesTreeIndex getIndex(String folder, Dataset dataset) throws IOException {
-        TimeseriesTreeIndex index = (TimeseriesTreeIndex) indexes.get(dataset.getId(), folder);
-        if (index != null) {
-            return index;
+    public TimeRange getTimeRangeInit (TimeRange timeRange, Dataset dataset) {
+        if(Duration.between(timeRange.getFrom(), timeRange.getTo()).toDays() >= 1){
+            return new TimeRange(dataset.getTimeRange().getTo().minus(8, ChronoUnit.DAYS), dataset.getTimeRange().getTo().minus(1, ChronoUnit.DAYS));
+        }else{
+            return new TimeRange(dataset.getTimeRange().getTo().minus(7, ChronoUnit.DAYS), dataset.getTimeRange().getTo());
         }
-        index = new TimeseriesTreeIndex(applicationProperties.getWorkspacePath() + "/" + folder + "/" + dataset.getName(), dataset);
-        this.indexes.put(dataset.getId(), folder, index);
-        return index;
     }
 
-    public QueryResults executeQuery(String folder, Dataset dataset, Query query) {
+    public QueryResults executeQuery(Dataset dataset, Query query) {
         log.debug(query.toString());
+        if (query.getRange() == null) {
+            query.setRange(getTimeRangeInit(dataset.getTimeRange(), dataset));
+        }
+        QueryResults queryResults = new QueryResults();
+        queryResults.setTimeRange(dataset.getTimeRange().toList());
+        queryResults.setMeasureStats(new HashMap<>());
+
         try {
-            TimeseriesTreeIndex index = this.getIndex(folder, dataset);
-            return index.executeQuery(query);
+            List<CsvTTI> ttis = this.getIndexes(dataset, query);
+            for (CsvTTI tti : ttis) {
+                QueryResults partialResults = tti.executeQuery(query);
+                queryResults.getData().addAll(partialResults.getData());
+                partialResults.getMeasureStats().forEach((measure, statistics) -> {
+                    DoubleSummaryStatistics currentStatistics = queryResults.getMeasureStats().get(measure);
+                    if (currentStatistics == null) {
+                        queryResults.getMeasureStats().put(measure, statistics);
+                    } else {
+                        currentStatistics.combine(statistics);
+                    }
+                });
+            }
+            // queryResults.getMeasureStats().forEach((integer, doubleSummaryStatistics) -> log.debug(doubleSummaryStatistics.toString()));
+            return queryResults;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
-
 }

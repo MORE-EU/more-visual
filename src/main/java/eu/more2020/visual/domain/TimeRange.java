@@ -24,12 +24,12 @@ public class TimeRange implements Serializable {
         return from;
     }
 
-    public LocalDateTime getTo() {
-        return to;
-    }
-
     public void setFrom(LocalDateTime from) {
         this.from = from;
+    }
+
+    public LocalDateTime getTo() {
+        return to;
     }
 
     public void setTo(LocalDateTime to) {
@@ -37,7 +37,7 @@ public class TimeRange implements Serializable {
     }
 
     public boolean contains(LocalDateTime x) {
-        return from.isBefore(x) && to.isAfter(x);
+        return (from.isBefore(x) && to.isAfter(x)) || from.isEqual(x) || to.isEqual(x);
     }
 
     public boolean intersects(TimeRange other) {
@@ -48,6 +48,19 @@ public class TimeRange implements Serializable {
         return (this.from.isBefore(other.from) && this.to.isAfter(other.to));
     }
 
+    public TimeRange span(TimeRange other) {
+        int fromCmp = from.compareTo(other.from);
+        int toCmp = to.compareTo(other.to);
+        if (fromCmp <= 0 && toCmp >= 0) {
+            return this;
+        } else if (fromCmp >= 0 && toCmp <= 0) {
+            return other;
+        } else {
+            LocalDateTime newFrom = (fromCmp <= 0) ? from : other.from;
+            LocalDateTime newTo = (toCmp >= 0) ? to : other.to;
+            return new TimeRange(newFrom, newTo);
+        }
+    }
 
     public float getSize() {
         return to.getNano() - from.getNano();

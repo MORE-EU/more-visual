@@ -1,6 +1,7 @@
 package eu.more2020.visual.service;
 
 import eu.more2020.visual.domain.*;
+import eu.more2020.visual.index.TimeSeriesIndexUtil;
 import org.apache.arrow.flight.FlightClient;
 import org.apache.arrow.flight.FlightStream;
 import org.apache.arrow.flight.Location;
@@ -29,29 +30,35 @@ public class ModelarDataService {
     @Value("${application.modelardb.port}")
     private Integer modelarPort = 9999;
 
+    public String getSqlQuery(List<Integer> measures, String frequency, List<TimeRange> timeRanges) {
+        String sql = "SELECT tid,  DATE_TRUNC('" + frequency + "', timestamp) AS ts, COUNT(1) AS count, MIN(value) min, MAX(value) max, SUM(value) sum FROM DataPoint "
+            + " WHERE tid IN ("
+            + measures.stream().map(i -> i.toString()).collect(Collectors.joining(",")) + ") ";
+        if (timeRanges != null && timeRanges.size() > 0) {
+            sql += " AND (";
+            sql += timeRanges.stream().map(timeRange -> " (timestamp >= '"
+                    + TimeSeriesIndexUtil.truncate(timeRange.getFrom(), frequency).toInstant(ZoneOffset.UTC) + "' AND timestamp < '"
+                    + TimeSeriesIndexUtil.truncate(timeRange.getTo().plus(1, TimeSeriesIndexUtil.getTemporalFieldByName(frequency).getBaseUnit()), frequency).toInstant(ZoneOffset.UTC) + "') ")
+                .collect(Collectors.joining(" OR "));
+            sql += ") ";
+        }
+        sql += " GROUP BY tid, ts ORDER BY ts, tid";
+        return sql;
+    }
 
     public QueryResults executeQuery(Dataset dataset, Query query) throws Exception {
         log.debug(query.toString());
         Location location = Location.forGrpcInsecure(modelarUrl, modelarPort);
         List<Integer> measures = query.getMeasures() != null ? query.getMeasures() : dataset.getMeasures();
-        // " + query.getFrequency() + "
 
-        String sql = "SELECT tid,  DATE_TRUNC('" + query.getFrequency() + "', timestamp) AS ts, AVG(value) AS value FROM DataPoint "
-            + " WHERE tid IN ("
-            + measures.stream().map(i -> i.toString()).collect(Collectors.joining(",")) + ") ";
+        List<TimeRange> intervals = new ArrayList<>();
         if (query.getRange() != null) {
-            sql += " AND timestamp BETWEEN '"
-                + query.getRange().getFrom().toInstant(ZoneOffset.UTC) + "' AND '"
-                + query.getRange().getTo().toInstant(ZoneOffset.UTC) + "' ";
+            intervals.add(query.getRange());
         }
-        sql += " GROUP BY tid, ts ORDER BY ts, tid";
-        log.debug("Executing SQL query: " + sql);
-        RootAllocator rootAllocator = new RootAllocator();
-        FlightClient flightClient = FlightClient.builder()
-            .location(location).allocator(rootAllocator).build();
-        //Query
-        Ticket ticket = new Ticket(sql.getBytes());
-        FlightStream flightStream = flightClient.getStream(ticket);
+        String sql = getSqlQuery(measures, query.getFrequency(), intervals);
+
+        FlightStream flightStream = this.executeSqlQuery(sql);
+
 
         QueryResults queryResults = new QueryResults();
         List<DataPoint> dataPoints = new ArrayList<>();
@@ -78,8 +85,9 @@ public class ModelarDataService {
                     timeStamp = currentTimeStamp;
                 }
                 int tid = ((IntVector) vsr.getVector("tid")).get(row);
-                Double value = ((Float8Vector) vsr.getVector("value")).get(row);
-                measureMap.put(tid, value);
+                Double sum = ((Float8Vector) vsr.getVector("sum")).get(row);
+                Long count = ((BigIntVector) vsr.getVector("count")).get(row);
+                measureMap.put(tid, sum / count);
                 // System.out.println(tid + " | " + timeStamp + " | " + value);
             }
             flightStream.close();
@@ -92,46 +100,50 @@ public class ModelarDataService {
         return queryResults;
     }
 
+    public FlightStream executeSqlQuery(String sql) throws Exception {
+        Location location = Location.forGrpcInsecure(modelarUrl, modelarPort);
+        log.debug("Executing SQL query: " + sql);
+        RootAllocator rootAllocator = new RootAllocator();
+        FlightClient flightClient = FlightClient.builder()
+            .location(location).allocator(rootAllocator).build();
+        //Query
+        Ticket ticket = new Ticket(sql.getBytes());
+        return flightClient.getStream(ticket);
+    }
+
     public void fillDatasetStats(Dataset dataset) throws Exception {
         List<Integer> measures = dataset.getMeasures();
 
-        String sql = "SELECT tid, MIN(value) as min_value, MAX(value) as max_value, AVG(value) as mean_value, MIN(timestamp) as min_timestamp, MAX(timestamp) as max_timestamp FROM DataPoint "
+        String sql = "SELECT tid, MIN(value) as min_value, MAX(value) as max_value, SUM(value) as sum_value, COUNT(1) as count, MIN(timestamp) as min_timestamp, MAX(timestamp) as max_timestamp FROM DataPoint "
             + " WHERE tid IN ("
             + measures.stream().map(i -> i.toString()).collect(Collectors.joining(",")) + ")  GROUP BY tid";
 
-        log.debug("Executing SQL query to get dataset metadata: " + sql);
+        FlightStream flightStream = this.executeSqlQuery(sql);
 
-        RootAllocator rootAllocator = new RootAllocator();
-        FlightClient flightClient = FlightClient.builder()
-            .location(Location.forGrpcInsecure(modelarUrl, modelarPort)).allocator(rootAllocator).build();
-        //Query
-        Ticket ticket = new Ticket(sql.getBytes());
-        FlightStream flightStream = flightClient.getStream(ticket);
-
-        Map<Integer, MeasureStats> measureStatsMap = new HashMap<>();
+        Map<Integer, DoubleSummaryStatistics> measureStatsMap = new HashMap<>();
 
         TimeRange timeRange = null;
 
         while (flightStream.next()) {
             VectorSchemaRoot vsr = flightStream.getRoot();
             int rowCount = vsr.getRowCount();
-            LocalDateTime timeStamp = null;
             for (int row = 0; row < rowCount; row++) {
                 if (timeRange == null) {
-                        timeRange = new TimeRange();
-                        timeRange.setFrom(Instant.ofEpochMilli(((TimeStampVector) vsr.getVector("min_timestamp")).get(row)).atZone(ZoneOffset.UTC).toLocalDateTime());
-                        timeRange.setTo(Instant.ofEpochMilli(((TimeStampVector) vsr.getVector("max_timestamp")).get(row)).atZone(ZoneOffset.UTC).toLocalDateTime());
+                    timeRange = new TimeRange();
+                    timeRange.setFrom(Instant.ofEpochMilli(((TimeStampVector) vsr.getVector("min_timestamp")).get(row)).atZone(ZoneOffset.UTC).toLocalDateTime());
+                    timeRange.setTo(Instant.ofEpochMilli(((TimeStampVector) vsr.getVector("max_timestamp")).get(row)).atZone(ZoneOffset.UTC).toLocalDateTime());
                 }
                 int tid = ((IntVector) vsr.getVector("tid")).get(row);
-                MeasureStats measureStats = new MeasureStats(((Float8Vector) vsr.getVector("mean_value")).get(row),
+                DoubleSummaryStatistics measureStats = new DoubleSummaryStatistics(((BigIntVector) vsr.getVector("count")).get(row),
                     ((Float4Vector) vsr.getVector("min_value")).get(row),
-                    ((Float4Vector) vsr.getVector("max_value")).get(row));
+                    ((Float4Vector) vsr.getVector("max_value")).get(row),
+                    ((Float8Vector) vsr.getVector("sum_value")).get(row));
                 measureStatsMap.put(tid, measureStats);
             }
             flightStream.close();
         }
 
-        dataset.setMeasureStats(measureStatsMap);
+        // dataset.setMeasureStats(measureStatsMap);
         dataset.setTimeRange(timeRange);
     }
 

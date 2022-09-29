@@ -5,6 +5,7 @@ export interface IQuery {
   range?: ITimeRange;
   frequency: string;
   measures?: number[];
+  filter?: {};
   secondaryMeasures?: number[];
 }
 

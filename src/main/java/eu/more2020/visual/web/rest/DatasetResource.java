@@ -1,12 +1,10 @@
 package eu.more2020.visual.web.rest;
 
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.domain.*;
-import eu.more2020.visual.index.TimeseriesTreeIndex;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.ToolsRepository;
 import eu.more2020.visual.service.CsvDataService;
+import eu.more2020.visual.service.IndexedModelarDataService;
 import eu.more2020.visual.service.ModelarDataService;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
@@ -37,6 +35,7 @@ public class DatasetResource {
     private final ToolsRepository toolsRepository;
     private final CsvDataService csvDataService;
     private final ModelarDataService modelarDataService;
+    private final IndexedModelarDataService indexedModelarDataService;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -46,11 +45,12 @@ public class DatasetResource {
 
     public DatasetResource(DatasetRepository datasetRepository,
                            ToolsRepository toolsRepository,
-                           CsvDataService csvDataService, ModelarDataService modelarDataService) {
+                           CsvDataService csvDataService, ModelarDataService modelarDataService, IndexedModelarDataService indexedModelarDataService) {
         this.datasetRepository = datasetRepository;
         this.toolsRepository = toolsRepository;
         this.csvDataService = csvDataService;
         this.modelarDataService = modelarDataService;
+        this.indexedModelarDataService = indexedModelarDataService;
     }
 
     /**
@@ -106,29 +106,30 @@ public class DatasetResource {
 
     /**
      * {@code GET  /datasets/:id} : get the "id" dataset.
-     *
+     * @param farmName the name of the farm
      * @param id the id of the dataset to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the dataset, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/datasets/{folder}/{id}")
-    public ResponseEntity<Dataset> getDataset(@PathVariable String folder, @PathVariable String id) throws IOException {
-        log.debug("REST request to get Dataset : {}", id);
-        log.debug("REST request to get Dataset : {}", folder);
-        Optional<Dataset> dataset = datasetRepository.findById(id, folder);
+    @GetMapping("/datasets/{farmName}/{id}")
+    public ResponseEntity<Dataset> getDataset(@PathVariable String farmName, @PathVariable String id) throws IOException {
+        log.debug("REST request to get Dataset : {}/{}", farmName, id);
+        Optional<Dataset> dataset = datasetRepository.findById(id, farmName);
+
+
         log.debug(dataset.toString());
         return ResponseUtil.wrapOrNotFound(dataset);
     }
 
-    @GetMapping("/datasets/{folder}")
-    public List<String> getFolder(@PathVariable String folder) throws IOException {
-        log.debug("REST request to get Available Files");
-        return datasetRepository.findFiles(folder);
+    @GetMapping("/datasets/{farmName}")
+    public ResponseEntity<Farm> getFarm(@PathVariable String farmName) throws IOException {
+        log.debug("REST request to get farm metadata");
+        return ResponseUtil.wrapOrNotFound(datasetRepository.findFarm(farmName));
     }
 
-    @GetMapping("/datasets/{folder}/sample")
-    public List<Sample> getSample(@PathVariable String folder) throws IOException {
+    @GetMapping("/datasets/{farmName}/sample")
+    public List<Sample> getSample(@PathVariable String farmName) throws IOException {
         log.debug("REST request to get Sample File");
-        return datasetRepository.findSample(folder);
+        return datasetRepository.findSample(farmName);
     }
 
     @GetMapping("/datasets/directories")
@@ -153,24 +154,24 @@ public class DatasetResource {
     /**
      * POST executeQuery
      */
-    @PostMapping("/datasets/{folder}/{id}/query")
-    public ResponseEntity<QueryResults> executeQuery(@PathVariable String folder, @PathVariable String id, @Valid @RequestBody Query query) throws IOException {
+    @PostMapping("/datasets/{farmName}/{id}/query")
+    public ResponseEntity<QueryResults> executeQuery(@PathVariable String farmName, @PathVariable String id, @Valid @RequestBody Query query) throws IOException {
         log.debug("REST request to execute Query: {}", query);
-        Optional<QueryResults> queryResultsOptional = datasetRepository.findById(id, folder).map(dataset -> {
-            if (dataset.getType().equals("modelar")) {
+        Optional<QueryResults> queryResultsOptional;
+            queryResultsOptional = datasetRepository.findById(id, farmName).map(dataset -> {
+                if (dataset.getType().equals("modelar")) {
                 try {
                     return modelarDataService.executeQuery(dataset, query);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else {
-                return csvDataService.executeQuery(folder, dataset, query);
+                return csvDataService.executeQuery(dataset, query);
             }
         });
         // queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
-
 
     @PostMapping("/tools/cp_detection/{id}")
     public ResponseEntity<List<Changepoint>> changePointDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {

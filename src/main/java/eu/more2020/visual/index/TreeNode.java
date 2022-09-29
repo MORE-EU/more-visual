@@ -1,12 +1,10 @@
 package eu.more2020.visual.index;
 
-import com.google.common.math.StatsAccumulator;
-import eu.more2020.visual.domain.Dataset;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.DoubleSummaryStatistics;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -16,56 +14,32 @@ public class TreeNode {
     private final int label;
 
     private final int level;
-
-
-    private long fileOffsetStart;
-
-    private int dataPointCount = 0;
-
-
+    protected Map<Integer, DoubleSummaryStatistics> statisticsMap;
     private Int2ObjectSortedMap<TreeNode> children;
-
-    private Map<Integer, StatsAccumulator> stats;
 
     public TreeNode(int label, int level) {
         this.label = label;
         this.level = level;
     }
 
+    public Map<Integer, DoubleSummaryStatistics> getStats() {
+        return statisticsMap;
+    }
 
-    public void adjustStats(String[] row, Dataset dataset) {
-        if (stats == null) {
-            stats = new HashMap<>();
-        }
-        for (int colIndex : dataset.getMeasures()) {
-            StatsAccumulator statsAcc = stats.computeIfAbsent(colIndex, i -> new StatsAccumulator());
-
-            statsAcc.add(Double.parseDouble(row[colIndex]));
-        }
+    public void setStats(Map<Integer, DoubleSummaryStatistics> statisticsMap) {
+        this.statisticsMap = statisticsMap;
     }
 
     public boolean hasStats() {
-        return stats != null;
+        return statisticsMap != null;
     }
 
-    public long getFileOffsetStart() {
-        return fileOffsetStart;
-    }
-
-    public void setFileOffsetStart(long fileOffsetStart) {
-        this.fileOffsetStart = fileOffsetStart;
-    }
-
-    public int getDataPointCount() {
-        return dataPointCount;
-    }
-
-    public void setDataPointCount(int dataPointCount) {
-        this.dataPointCount = dataPointCount;
-    }
-
-    public Map<Integer, StatsAccumulator> getStats() {
-        return stats;
+    public void adjustStats(Map<Integer, DoubleSummaryStatistics> statisticsMap) {
+        if (this.statisticsMap == null) {
+            this.statisticsMap = statisticsMap;
+        } else {
+            statisticsMap.forEach((k, v) -> this.statisticsMap.get(k).combine(v));
+        }
     }
 
     public TreeNode getChild(Integer label) {
@@ -78,7 +52,7 @@ public class TreeNode {
         }
         TreeNode child = getChild(label);
         if (child == null) {
-            child = new TreeNode(label, level + 1);
+            child = this.createChild(label, level + 1);
             children.put(label, child);
         }
         return child;
@@ -96,15 +70,21 @@ public class TreeNode {
         return level;
     }
 
+    public Map<Integer, DoubleSummaryStatistics> getStatisticsMap() {
+        return statisticsMap;
+    }
+
+    public TreeNode createChild(int label, int level){
+        return new TreeNode(label, level);
+    }
+
 
     @Override
     public String toString() {
         return "TreeNode{" +
             "label=" + label +
             ", level=" + level +
-            ", fileOffsetStart=" + fileOffsetStart +
-            ", dataPointCount=" + dataPointCount +
-            ", stats = " + (stats == null ? null : "{" + stats.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue().mean()).collect(Collectors.joining(", ")) + "}") +
+            ", stats = " + (statisticsMap == null ? null : "{" + statisticsMap.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue().getAverage()).collect(Collectors.joining(", ")) + "}") +
             "}";
     }
 }

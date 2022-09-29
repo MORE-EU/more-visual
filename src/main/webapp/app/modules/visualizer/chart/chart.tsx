@@ -21,7 +21,9 @@ import {
   updateResampleFreq,
   updateTo,
   applyChangepointDetection,
-  applyDeviationDetection, toggleCustomChangepoints
+  toggleCustomChangepoints
+  applyDeviationDetection,
+  liveDataImplementation
 } from "app/modules/store/visualizerSlice";
 import CloseIcon from "@mui/icons-material/Close";
 HighchartsMore(Highcharts);
@@ -51,10 +53,9 @@ annotationsAdvanced(Highcharts);
 export const Chart = () => {
 
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, measureColors,
-    queryResultsLoading, filters, customChangepointsEnabled,
-    queryResults, changeChart, compare, changepointDetectionEnabled, patterns, detectedChangePoints, data, compareData,
-    forecastData, soilingEnabled, soilingWeeks, manualChangepointsEnabled, manualChangePoints,
-    secondaryData} = useAppSelector(state => state.visualizer);
+    queryResultsLoading, filter, queryResults, changeChart, compare, changepointDetectionEnabled,
+    patterns, detectedChangePoints, data, compareData, forecastData, soilingEnabled, soilingWeeks, 
+    manualChangepointsEnabled, manualChangePoints, secondaryData} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -78,6 +79,7 @@ export const Chart = () => {
   const latestMeasures = useRef(selectedMeasures);
   const latestSoilingWeeks = useRef(soilingWeeks);
   const latestCompare = useRef(compare);
+  const latestFilter = useRef(filter);
   const isChangePointDetectionEnabled = useRef(changepointDetectionEnabled);
   const isSoilingEnabled = useRef(soilingEnabled);
 
@@ -134,10 +136,10 @@ export const Chart = () => {
           // mouseup(e) {
           //   handlePlotBandsSelection(this.id);
           // }
-          mouseover: function(e) {
+          mouseover(e) {
             this.svgElem.attr('fill', new Highcharts.Color(this.options.color).brighten(0.1).get());
           },
-          mouseout: function(e) {
+          mouseout(e) {
             this.svgElem.attr('fill', this.options.color);
           },
         }
@@ -162,6 +164,10 @@ export const Chart = () => {
   }, [soilingEnabled]);
 
   useEffect(() => {
+    latestFilter.current = filter;
+  }, [filter])
+
+  useEffect(() => {
     if(chartRef !== null){
     !queryResultsLoading && chartRef.hideLoading();
     }
@@ -169,16 +175,16 @@ export const Chart = () => {
 
   useEffect(() => {
     if (compare.length !== 0) {
-      dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures}));
+      dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures, filter}));
     }
   }, [compare])
 
   useEffect(() => {
     latestMeasures.current = selectedMeasures;
     dispatch(updateQueryResults({folder, id: dataset.id, from: from ? from : null, to: to ? to : null,
-      resampleFreq, selectedMeasures}));
+      resampleFreq, selectedMeasures, filter}));
     if (compare.length !== 0) {
-      dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures}));
+      dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures, filter}));
     }
   }, [dataset, selectedMeasures]);
 
@@ -303,14 +309,12 @@ export const Chart = () => {
       chart.current.showLoading();
       dispatch(updateQueryResults({folder: latestFolder.current, id: latestDatasetId.current,
       from: leftSide, to: rightSide, resampleFreq: latestFrequency.current,
-        selectedMeasures: latestMeasures.current}));
+        selectedMeasures: latestMeasures.current, filter: latestFilter.current}));
       dispatch(updateFrom(leftSide));
-      dispatch(updateTo(rightSide));
-      if (latestCompare.current.length !== 0) {
-        dispatch(updateCompareQueryResults({folder: latestFolder.current, id: latestCompare.current,
-        from: leftSide, to: rightSide, resampleFreq: latestFrequency.current,
-          selectedMeasures: latestMeasures.current}))
-      }
+      dispatch(updateTo(rightSide));     
+      if (latestCompare.current.length !== 0) dispatch(updateCompareQueryResults({folder: latestFolder.current, 
+        id: latestCompare.current, from: leftSide, to: rightSide, resampleFreq: latestFrequency.current, 
+        selectedMeasures: latestMeasures.current, filter: latestFilter.current}));
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
       if(isChangePointDetectionEnabled.current)
@@ -326,11 +330,11 @@ export const Chart = () => {
     const getSides = (max: number, min: number, p: number) => {
       const pad = (max - min) + ((max - min) * p);
       const leftSide = Math.max(Math.min(min - pad, (timeRange.current[0] + min - pad)), timeRange.current[0]);
-      const rightSide = Math.min(max + pad, timeRange.current[1]);
+      const rightSide = Math.min(max + pad, data[data.length-1].timestamp);
       return {leftSide, rightSide};
     }
 
-    const checkForData = (max: any, min: any) => {
+    const checkForData = (max: number, min: number) => {
       const {leftSide, rightSide} = getSides(max, min, 0.25);
       latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
       latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
@@ -378,14 +382,16 @@ export const Chart = () => {
 
     // CHART: ZOOM FUNCTION
     Highcharts.addEvent(chart.current.container, "wheel", (event: WheelEvent) => {
+      const p = chart.current.xAxis[0].toValue(chart.current.pointer.normalize(event).chartX);
       const {min, max} = chart.current.xAxis[0].getExtremes();
-      const step = (max - min) / 10;
+      const stepleft = (p - min) * 0.25;
+      const stepright = (max - p) * 0.25;
       if(!chart.current.loadingShown){
-      if (event.deltaY < 0) { // in
-        chart.current.xAxis[0].setExtremes( min + step, max - step, true, false);
+      if (event.deltaY < 0 && (max - min) > 10000) { // in, 10000 is the max range on a zoom level
+        chart.current.xAxis[0].setExtremes( min + stepleft, max - stepright, true, false);
       } else if (event.deltaY > 0) { // out
-        chart.current.xAxis[0].setExtremes(Math.max(min - step, timeRange.current[0]),
-          Math.min(max + step, timeRange.current[1]), true, false)
+        chart.current.xAxis[0].setExtremes(Math.max(min - stepleft, timeRange.current[0]),
+          Math.min(max + stepright, timeRange.current[1]), true, false)
       }
       checkForDataOnZoom();
     }
@@ -398,6 +404,32 @@ export const Chart = () => {
       checkForDataOnPan();
       }
     });
+
+    const calculateStep = (freq, refreshVal) => {
+      const step = 1000 * refreshVal;
+      if (freq === "hour"){
+        return step * Math.pow(60, 2);
+      }
+      else if(freq === "minute"){
+        return step * 60;
+      }
+      else if(freq === "second"){
+        return step;
+      }
+    }
+
+    // TODO: LIVE DATA IMPLEMENTATION
+    // setInterval(() => {
+    //     const {max, min, dataMax} = chart.current.xAxis[0].getExtremes(); 
+
+    //     if( max >= data[data.length - 1].timestamp){ 
+    //     dispatch(liveDataImplementation(
+    //       {folder: latestFolder.current, id: latestDatasetId.current,
+    //       from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: latestFrequency.current,
+    //       selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
+    //       chart.current.xAxis[0].setExtremes(min + calculateStep(latestFrequency.current, 30), dataMax, false, false);
+    //     }
+    // }, 5000);
 
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
@@ -601,6 +633,15 @@ export const Chart = () => {
                 connectNulls: false,
                 connectorAllowed: false,
                 maxPointWidth: 80,
+                marker: {
+                  enabled: true
+                }
+                // dataGrouping: {
+                //   units: [[resampleFreq, [1]]],
+                //   forced: true,
+                //   enabled: resampleFreq !== "none",
+                //   groupAll: true,
+                // },
               },
             },
             tooltip: {

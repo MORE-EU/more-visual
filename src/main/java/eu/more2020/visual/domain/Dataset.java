@@ -1,12 +1,12 @@
 package eu.more2020.visual.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A Dataset.
@@ -19,7 +19,7 @@ public class Dataset implements Serializable {
     private String id;
     @NotNull
     private String name;
-    private Integer resType; // 0: panel, 1: turbine
+    private String resType; // 0: panel, 1: turbine
     private String type = "CSV";
     private Boolean hasHeader;
     private String[] header;
@@ -29,7 +29,11 @@ public class Dataset implements Serializable {
     private String formalName;
     private List<Changepoint>  gtChangepoints;
     private List<Integer> measures = new ArrayList<>();
-    private Map<Integer, MeasureStats> measureStats;
+    private Map<Integer, DoubleSummaryStatistics> measureStats;
+
+    // only used for csv dataset case
+    List<DataFileInfo> fileInfoList = new ArrayList<>();
+
 
     private TimeRange timeRange;
 
@@ -137,11 +141,11 @@ public class Dataset implements Serializable {
         this.gtChangepoints = gtChangepoints;
     }
 
-    public Map<Integer, MeasureStats> getMeasureStats() {
+    public Map<Integer, DoubleSummaryStatistics> getMeasureStats() {
         return measureStats;
     }
 
-    public void setMeasureStats(Map<Integer, MeasureStats> measureStats) {
+    public void setMeasureStats(Map<Integer, DoubleSummaryStatistics> measureStats) {
         this.measureStats = measureStats;
     }
 
@@ -149,16 +153,24 @@ public class Dataset implements Serializable {
         return timeRange;
     }
 
-    public Integer getResType() {
+    public String getResType() {
         return resType;
     }
 
-    public void setResType(Integer resType) {
+    public void setResType(String resType) {
         this.resType = resType;
     }
 
     public void setTimeRange(TimeRange timeRange) {
         this.timeRange = timeRange;
+    }
+
+    public List<DataFileInfo> getFileInfoList() {
+        return fileInfoList;
+    }
+
+    public void setFileInfoList(List<DataFileInfo> fileInfoList) {
+        this.fileInfoList = fileInfoList;
     }
 
     @Override

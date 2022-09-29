@@ -1,10 +1,13 @@
 package eu.more2020.visual.domain;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Query {
 
     private TimeRange range;
+
+    private HashMap<Integer, Double[]> filter;
 
     private List<Integer> measures;
 
@@ -13,10 +16,11 @@ public class Query {
     public Query() {
     }
 
-    public Query(TimeRange range, List<Integer> measures, String frequency) {
+    public Query(TimeRange range, List<Integer> measures, String frequency, HashMap<Integer, Double[]> filter) {
         this.range = range;
         this.measures = measures;
         this.frequency = frequency;
+        this.filter = filter;
     }
 
     public TimeRange getRange() {
@@ -29,6 +33,14 @@ public class Query {
 
     public String getFrequency() {
         return frequency;
+    }
+
+    public HashMap<Integer, Double[]> getFilter() {
+        return this.filter;
+    }
+
+    public void setFilter(HashMap<Integer, Double[]> filter) {
+        this.filter = filter;
     }
 
     public void setFrequency(String frequency) {
@@ -49,7 +61,8 @@ public class Query {
         return "Query{" +
             "range=" + range +
             ", measures=" + measures +
-            ", frequency='" + frequency + '\'' +
+            ", frequency=" + frequency + 
+            ", filter=" + (filter != null ? filter.toString() : "null") +
             '}';
     }
 }
