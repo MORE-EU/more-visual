@@ -1,12 +1,11 @@
 import React, {useRef} from 'react';
 import {Button, Grid, TextField, Typography} from '@mui/material';
-import {ChartDatePicker} from './chart-control-buttons/chart-datepicker';
 import {ChartCompare} from './chart-control-buttons/chart-compare';
 import {ChartChangePointFunctions} from './chart-control-buttons/chart-changepoint-functions';
-import {DateTimePicker, LocalizationProvider} from '@mui/lab';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { updateChangeChart, updateQueryResults } from 'app/modules/store/visualizerSlice';
+import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 
 export const ChartControl = () => {
 
@@ -14,7 +13,6 @@ export const ChartControl = () => {
   queryResults, changeChart, showChangePointFunction, showCompare, showDatePick, soilingEnabled } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const isSoilingEnabled = useRef(soilingEnabled);
-  const activeTools = [isSoilingEnabled.current];
 
   const handleOnAccept = (e, category) => {
     if(category === "from"){
@@ -62,7 +60,7 @@ export const ChartControl = () => {
           dispatch(updateChangeChart(true))
         }} sx={{mr: 1, color: !changeChart ? "#424242" : "#0277bd"}}>Stacked</Button>
       </Grid>
-      {showDatePick && <ChartDatePicker />}
+      {/*{showDatePick && <ChartDatePicker />}*/}
       {showCompare && <ChartCompare />}
       {showChangePointFunction && <ChartChangePointFunctions />}
     </Grid>

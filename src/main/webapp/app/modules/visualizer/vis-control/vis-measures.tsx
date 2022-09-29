@@ -3,7 +3,7 @@ import List from "@mui/material/List";
 import React, {useState} from "react";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {updateSelectedMeasures} from "app/modules/store/visualizerSlice";
-import {Chip, TextField} from "@mui/material";
+import {Chip, TextField, Tooltip} from "@mui/material";
 import {Autocomplete} from "@mui/lab";
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 export const VisMeasures = () => {
@@ -36,17 +36,21 @@ export const VisMeasures = () => {
 
   return (
     <>
-      <Autocomplete
-        filterSelectedOptions
-        id="combo-box-demo"
-        options={shownMeasures}
-        value={null}
-        blurOnSelect={true}
-        sx={{ width: 300 }}
-        onChange={handleAddMeasure}
-        renderInput={(params) =>
-          <TextField {...params} label="Add Measure" />}
-      />
+      <Tooltip
+        title = {selectedMeasures.length === 6 ? "You can only view up to 6 measures at a time" : ""}>
+        <Autocomplete
+          filterSelectedOptions
+          id="combo-box-demo"
+          options={shownMeasures}
+          value={null}
+          disabled={selectedMeasures.length === 6}
+          blurOnSelect={true}
+          sx={{ width: 300 }}
+          onChange={handleAddMeasure}
+          renderInput={(params) =>
+            <TextField {...params} label={"Add Measure"}/>}
+        />
+      </Tooltip>
       <List dense sx={{width: '100%',
         maxWidth: 360,
         mb: 3,
@@ -59,8 +63,11 @@ export const VisMeasures = () => {
                     key = {labelId}
                     sx={{ bgcolor: measureColors[col], color: 'white' , m: 0.5}}
                     variant="outlined"
-
-                    deleteIcon={<HighlightOffIcon style={{color:'white'}}/>}
+                    deleteIcon={
+                      <Tooltip title={selectedMeasures.length === 1 ? "Cannot remove last measure" : ""}>
+                        <HighlightOffIcon style={{color:'white'}}/>
+                      </Tooltip>
+                    }
                     onDelete={handleDelete(col)} />
           );
         })}

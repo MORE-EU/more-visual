@@ -51,7 +51,7 @@ export const IntervalsPicker = () => {
               <FunctionsIcon color='action'/></Button>
           </Tooltip>
         </Box>}
-      {showDatePick && <ChartDatePicker />}
+      {/*{showDatePick && <ChartDatePicker />}*/}
     </Box>
   )
 }

@@ -1,4 +1,4 @@
-import {Box, Switch, Tooltip, Typography} from "@mui/material";
+import {Box, Button, Switch, Tooltip, Typography} from "@mui/material";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import React, {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
@@ -7,6 +7,7 @@ import {
   toggleChangepointDetection, applyChangepointDetection,
   toggleManualChangepoints, toggleSoilingDetection,
 } from "app/modules/store/visualizerSlice";
+import {AddCustomChangepoint} from "./add-custom-changepoint";
 
 
 
@@ -20,7 +21,7 @@ export interface IChangepointDetectionProps {
 export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   const { dataset, from, to,
     changepointDetectionEnabled, manualChangePoints,
-    manualChangepointsEnabled, customChangePoints,
+    manualChangepointsEnabled,
   } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
@@ -42,7 +43,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
     dispatch(toggleChangepointDetection(action));
     dispatch(updateSelectedMeasures(shownMeasures));
     if(action)
-      dispatch(applyChangepointDetection({id: dataset.id, from, to, changepoints: customChangePoints}));
+      dispatch(applyChangepointDetection({id: dataset.id, from, to}));
     else{
       dispatch(toggleSoilingDetection(false));
     }
@@ -91,6 +92,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
           inputProps={{'aria-label': 'controlled'}}
         />
       </Box>
+      <AddCustomChangepoint/>
     </Box>
   );
 

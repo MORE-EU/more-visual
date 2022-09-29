@@ -91,11 +91,11 @@ const initialState = {
   forecastData: null as IDataPoint[],
   secondaryData: null as IDataPoint[],
   manualChangePoints: [] as IChangePointDate[],
-  customChangePoints: [] as IChangePointDate[],
   detectedChangePoints: [] as IChangePointDate[],
   soilingWeeks: 1,
   changepointDetectionEnabled: false,
   manualChangepointsEnabled: false,
+  customChangepointsEnabled: false,
   forecasting: false,
   soilingEnabled: false,
 };
@@ -183,12 +183,11 @@ export const updateCompareQueryResults = createAsyncThunk(
 
 export const applyChangepointDetection = createAsyncThunk(
   'applyChangepointDetection',
-  async (data: { id: string; from: number; to: number; changepoints: IChangePointDate[] }) => {
-    const { id, from, to, changepoints} = data;
+  async (data: { id: string; from: number; to: number;}) => {
+    const { id, from, to} = data;
     const response = await axios
       .post(`api/tools/cp_detection/${id}`, {
         range: { from, to } as ITimeRange,
-        changepoints,
       })
       .then(res => res);
     return response.data;
@@ -273,9 +272,6 @@ const visualizer = createSlice({
     updateChartRef(state, action) {
       state.chartRef = action.payload;
     },
-    updateCustomChangePoints(state, action) {
-      state.customChangePoints = action.payload;
-    },
     updateManualChangepoints(state, action) {
       state.manualChangePoints = action.payload;
     },
@@ -341,6 +337,9 @@ const visualizer = createSlice({
     },
     toggleManualChangepoints(state, action){
       state.manualChangepointsEnabled = action.payload;
+    },
+    toggleCustomChangepoints(state, action){
+      state.customChangepointsEnabled = action.payload;
     },
     resetChartValues(state) {
       state.queryResultsLoading = initialState.queryResultsLoading;
@@ -419,10 +418,10 @@ const visualizer = createSlice({
 
 export const {
   resetChartValues, resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilters,
-  updatePatterns,updateChangeChart,updateDatasetChoice,updateDatasetMeasures, updatePatternNav,updateChartRef,updateCustomChangePoints,
+  updatePatterns,updateChangeChart,updateDatasetChoice,updateDatasetMeasures, updatePatternNav,updateChartRef,
   updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateLiveData,
   updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleManualChangepoints, toggleChangepointDetection,
-  setShowDatePick,setShowChangePointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
+  toggleCustomChangepoints, setShowDatePick,setShowChangePointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
   setExpand,setOpen, setFolder, resetFilters, getPatterns,
 } = visualizer.actions;
 export default visualizer.reducer;
