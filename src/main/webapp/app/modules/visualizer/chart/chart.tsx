@@ -16,13 +16,12 @@ import {
   setShowDatePick,
   updateChartRef,
   updateCompareQueryResults,
-  updateCustomChangePoints,
   updateFrom,
   updateQueryResults,
   updateResampleFreq,
   updateTo,
   applyChangepointDetection,
-  applyDeviationDetection
+  applyDeviationDetection, toggleCustomChangepoints
 } from "app/modules/store/visualizerSlice";
 import CloseIcon from "@mui/icons-material/Close";
 HighchartsMore(Highcharts);
@@ -38,9 +37,6 @@ Highcharts.setOptions({
         splineChart: "Spline Chart",
         areaRangeChart: "Range Area Chart",
         boxPlotChart: "Box Plot",
-        highlightIntervals: "Highlight Intervals",
-        pickIntervals: "Use a Calendar",
-        functionIntervals: "Compare Files",
         compareFiles: "Compare Files",
       },
     },
@@ -55,7 +51,7 @@ annotationsAdvanced(Highcharts);
 export const Chart = () => {
 
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, measureColors,
-    queryResultsLoading, filters, customChangePoints,
+    queryResultsLoading, filters, customChangepointsEnabled,
     queryResults, changeChart, compare, changepointDetectionEnabled, patterns, detectedChangePoints, data, compareData,
     forecastData, soilingEnabled, soilingWeeks, manualChangepointsEnabled, manualChangePoints,
     secondaryData} = useAppSelector(state => state.visualizer);
@@ -65,9 +61,12 @@ export const Chart = () => {
 
   const [zones, setZones] = useState([]);
   const [plotBands, setPlotBands] = useState([]);
+  const [customChangePoints, setCustomChangePoints] = useState([]);
+
   const [type, setType] = useState("line");
   const [sliderVal, setSliderVal] = useState(null);
   const [selectedPlot, setSelectedPlot] = useState(null);
+
   // Refs
   const latestFrequency = useRef(resampleFreq);
   const latestLeftSide = useRef(null);
@@ -117,12 +116,14 @@ export const Chart = () => {
 
   // Color Bands for Change-points
   useEffect(() => {
-    let newChangepointPlotBands = ((detectedChangePoints !== null && changepointDetectionEnabled) ? [].concat(...detectedChangePoints.map((date, idx) => {
+    let allChangepoints = (detectedChangePoints !== null && changepointDetectionEnabled) ?
+      detectedChangePoints.concat((customChangePoints !== null) ? customChangePoints : []) : ((customChangePoints !== null) ? customChangePoints : []);
+    let newChangepointPlotBands =  [].concat(...allChangepoints.map((date, idx) => {
       return {
         color: '#f5dd42',
         from: date.range.from,
         to: date.range.to,
-        id: "pb" + idx,
+        id: date.id,
         // label: {
         //   text: 'plot 1',
         //   align: 'center'
@@ -141,12 +142,12 @@ export const Chart = () => {
           },
         }
       };
-    })) : []);
+    }));
     if(manualChangepointsEnabled) newChangepointPlotBands = newChangepointPlotBands.concat(manualPlotBands);
+    console.log(newChangepointPlotBands);
     setPlotBands(newChangepointPlotBands);
 
-  }, [detectedChangePoints, manualChangepointsEnabled]);
-
+  }, [detectedChangePoints, customChangePoints, manualChangepointsEnabled]);
 
   useEffect(() => {
     isChangePointDetectionEnabled.current = changepointDetectionEnabled;
@@ -189,16 +190,10 @@ export const Chart = () => {
     latestSoilingWeeks.current = soilingWeeks;
   }, [soilingWeeks]);
 
+
   const getChartRef = (chartR: any) => {
     dispatch(updateChartRef(chartR));
   };
-
-  const annotationToDate = (annotation: { startXMin: any; startXMax: any; }, len: any) => {
-    const startPoint = annotation.startXMin,
-      endPoint = annotation.startXMax;
-    return {range: {from: startPoint, to: endPoint} as ITimeRange, id: len};
-  };
-
 
   const handlePlotBandsSelection = (id) => {
     if(typeof id === "string") {
@@ -250,6 +245,46 @@ export const Chart = () => {
     }
   }
 
+  const toast = (chart, text) => {
+    console.log(chart);
+    chart.toast = chart.renderer.label(text, 100, 120)
+      .attr({
+        fill: Highcharts.getOptions().colors[0],
+        padding: 10,
+        r: 5,
+        zIndex: 8
+      })
+      .css({
+        color: '#FFFFFF'
+      })
+      .add();
+
+    setTimeout(function () {
+      chart.toast.fadeOut();
+    }, 2000);
+    setTimeout(function () {
+      chart.toast = chart.toast.destroy();
+    }, 2500);
+  }
+
+  const selectedMeasuresWarning = (e) => {
+    toast(
+      this,
+      `<b>${e.points.length} points selected.</b>
+        <br>Click on empty space to deselect.`
+    );
+  }
+
+  const customChangePointSelection = (event) => {
+      event.preventDefault();
+      const newCustomChangePoint = {range: {from: event.xAxis[0].min, to: event.xAxis[0].max,} as ITimeRange, id: customChangePoints.length};
+      let newCustomChangePoints = [...customChangePoints];
+      newCustomChangePoints.push(newCustomChangePoint);
+      console.log(newCustomChangePoints);
+      setCustomChangePoints(newCustomChangePoints);
+      dispatch(toggleCustomChangepoints(false));
+  }
+
   const chartFunctions = (e: { target: any; }) => {
     chart.current = e.target;
     timeRange.current = queryResults.timeRange;
@@ -262,6 +297,7 @@ export const Chart = () => {
       chart.current.hideLoading();
       Highcharts.removeEvent(chart.current.container, "click");
     });
+
 
     const fetchData = (leftSide: number, rightSide: number) => {
       chart.current.showLoading();
@@ -280,7 +316,7 @@ export const Chart = () => {
       if(isChangePointDetectionEnabled.current)
         dispatch(
           applyChangepointDetection({id: latestDatasetId.current,
-            from: leftSide, to: rightSide, changepoints: customChangePoints})).then((res) => {
+            from: leftSide, to: rightSide})).then((res) => {
           if(isSoilingEnabled.current) dispatch(applyDeviationDetection({id: latestDatasetId.current,
             folder: latestFolder.current, resampleFreq: latestFrequency.current, weeks: latestSoilingWeeks.current,
             from: leftSide, to: rightSide, changepoints: res.payload}));
@@ -365,7 +401,9 @@ export const Chart = () => {
 
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
-    };
+  };
+
+
   const computeChartData = () => {
     let chartData = (data !== null) ? selectedMeasures
       .map((measure, index) => ({
@@ -474,11 +512,22 @@ export const Chart = () => {
     zones,
   }))) : [];
 
+  const handleMouseOverChart = () => {
+    blockScroll();
+    customChangepointsEnabled ?
+      chart.current.chartBackground.htmlCss({cursor:'crosshair'}) :
+      chart.current.chartBackground.htmlCss({cursor:'default'});
+  }
+
+  const handleMouseLeaveChart = () => {
+    allowScroll();
+  }
+
   return (
     <Grid
       sx={{border: "1px solid rgba(0, 0, 0, .1)", minHeight: "700px"}}
-      onMouseOver={() => blockScroll()}
-      onMouseLeave={() => allowScroll()}
+      onMouseOver={() => handleMouseOverChart()}
+      onMouseLeave={() => handleMouseLeaveChart()}
     >
       {!data ?
         <LinearProgress />
@@ -552,12 +601,6 @@ export const Chart = () => {
                 connectNulls: false,
                 connectorAllowed: false,
                 maxPointWidth: 80,
-                // dataGrouping: {
-                //   units: [[resampleFreq, [1]]],
-                //   forced: true,
-                //   enabled: resampleFreq !== "none",
-                //   groupAll: true,
-                // },
               },
             },
             tooltip: {
@@ -586,14 +629,11 @@ export const Chart = () => {
               height: "700px",
               marginTop: 10,
               plotBorderWidth: 0,
-              // panKey: "alt",
-              panning: {
-                enabled: true,
-                type: "x",
-              },
-              zoomType: false,
+              zoomType: customChangepointsEnabled ? 'x' : false,
               events: {
-                load: chartFunctions
+                plotBackgroundColor: "rgba(10,0,0,0)", // dummy color, to create an element
+                load: chartFunctions,
+                selection: customChangePointSelection,
               },
             },
             xAxis: {
@@ -624,12 +664,8 @@ export const Chart = () => {
             stockTools: {
               gui: {
                 enabled: true,
-                // buttons: ['changeType', 'indicators', 'verticalLabels', 'highlightIntervals',
-                //   'separator', 'compareFiles', 'fullScreen',],
                 buttons: [
                   "changeType",
-                  "verticalLabels",
-                  "highlightIntervals",
                   "compareFiles",
                 ],
                 className: "highcharts-bindings-wrapper",
@@ -657,22 +693,6 @@ export const Chart = () => {
                     areaRangeChart: {
                       className: "chart-arearange",
                       symbol: "series-ohlc.svg",
-                    },
-                  },
-                  highlightIntervals: {
-                    items: ["measure", "pickIntervals", "functionIntervals"],
-                    measure: {
-                      className: "highcharts-measure-x",
-                      symbol: "measure-x.svg",
-                    },
-                    pickIntervals: {
-                      className: "pick-intervals",
-                      symbol: "event_note.svg",
-                      width: 10,
-                    },
-                    functionIntervals: {
-                      className: "function-intervals",
-                      symbol: "elliott-5.svg",
                     },
                   },
                   compareFiles: {
@@ -709,56 +729,10 @@ export const Chart = () => {
                     setType("arearange");
                   },
                 },
-                pickIntervals: {
-                  className: "pick-intervals", // needs to be the same with above
-                  init(e: any) {
-                    dispatch(setShowDatePick(true));
-                  },
-                },
-                functionIntervals: {
-                  className: "function-intervals", // needs to be the same with above
-                  init(e: any) {
-                    dispatch(setShowChangePointFunction(true));
-                  },
-                },
                 compareFiles: {
                   className: "compare-files", // needs to be the same with above
                   init(e: any) {
                     dispatch(setCompare(true));
-                  },
-                },
-                measureX: {
-                  annotationsOptions: {
-                    id: customChangePoints !== null  ? customChangePoints.length : 0,
-                    events: {
-                      remove(event: { target: { userOptions: { id: any; }; }; }) {
-                        // get annotations
-                        const annotations = this.chart.annotations.filter(
-                          (a: { userOptions: { id: any; }; }) =>
-                            a.userOptions.id !== event.target.userOptions.id
-                        );
-                        // convert annotations to dates
-                        dispatch(updateCustomChangePoints(
-                          annotations.map((a: any, id: any) => annotationToDate(a, id))
-                        ));
-                      },
-                      afterUpdate(event: { target: { cancelClick: any; }; }) {
-                        // convert annotations to dates
-                        if (event.target.cancelClick !== undefined) {
-                          const annotations = this.chart.annotations;
-                          dispatch(updateCustomChangePoints(
-                            annotations.map((a: any, id: any) => annotationToDate(a, id))
-                          ));
-                        }
-                      },
-                    },
-                  },
-                  end() {
-                    dispatch(updateCustomChangePoints(
-                      this.chart.annotations.map((a: any, id: any) =>
-                        annotationToDate(a, id)
-                      )
-                    ));
                   },
                 },
               },
