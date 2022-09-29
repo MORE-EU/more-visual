@@ -5,7 +5,7 @@ import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {
   getManualChangePoints, updateSelectedMeasures,
   toggleChangepointDetection, applyChangepointDetection,
-  toggleManualChangepoints, toggleSoilingDetection, toggleCustomChangepoints,
+  toggleManualChangepoints, toggleSoilingDetection,
 } from "app/modules/store/visualizerSlice";
 import {AddCustomChangepoint} from "app/modules/visualizer/tools/changepoint-detection/add-custom-changepoint";
 

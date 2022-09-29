@@ -62,7 +62,7 @@ export const ChartControl = () => {
           dispatch(updateChangeChart(true))
         }} sx={{mr: 1, color: !changeChart ? "#424242" : "#0277bd"}}>Stacked</Button>
       </Grid>
-      {showDatePick && <ChartDatePicker />}
+      {/*{showDatePick && <ChartDatePicker />}*/}
       {showCompare && <ChartCompare />}
       {showChangePointFunction && <ChartChangePointFunctions />}
     </Grid>

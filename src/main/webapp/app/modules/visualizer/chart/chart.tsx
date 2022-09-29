@@ -21,7 +21,7 @@ import {
   updateResampleFreq,
   updateTo,
   applyChangepointDetection,
-  toggleCustomChangepoints
+  toggleCustomChangepoints,
   applyDeviationDetection,
   liveDataImplementation
 } from "app/modules/store/visualizerSlice";
@@ -54,8 +54,8 @@ export const Chart = () => {
 
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, measureColors,
     queryResultsLoading, filter, queryResults, changeChart, compare, changepointDetectionEnabled,
-    patterns, detectedChangePoints, data, compareData, forecastData, soilingEnabled, soilingWeeks, 
-    manualChangepointsEnabled, manualChangePoints, secondaryData} = useAppSelector(state => state.visualizer);
+    customChangepointsEnabled, patterns, detectedChangePoints, data, compareData, forecastData, soilingEnabled,
+    soilingWeeks, manualChangepointsEnabled, manualChangePoints, secondaryData} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -311,9 +311,9 @@ export const Chart = () => {
       from: leftSide, to: rightSide, resampleFreq: latestFrequency.current,
         selectedMeasures: latestMeasures.current, filter: latestFilter.current}));
       dispatch(updateFrom(leftSide));
-      dispatch(updateTo(rightSide));     
-      if (latestCompare.current.length !== 0) dispatch(updateCompareQueryResults({folder: latestFolder.current, 
-        id: latestCompare.current, from: leftSide, to: rightSide, resampleFreq: latestFrequency.current, 
+      dispatch(updateTo(rightSide));
+      if (latestCompare.current.length !== 0) dispatch(updateCompareQueryResults({folder: latestFolder.current,
+        id: latestCompare.current, from: leftSide, to: rightSide, resampleFreq: latestFrequency.current,
         selectedMeasures: latestMeasures.current, filter: latestFilter.current}));
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
@@ -420,9 +420,9 @@ export const Chart = () => {
 
     // TODO: LIVE DATA IMPLEMENTATION
     // setInterval(() => {
-    //     const {max, min, dataMax} = chart.current.xAxis[0].getExtremes(); 
+    //     const {max, min, dataMax} = chart.current.xAxis[0].getExtremes();
 
-    //     if( max >= data[data.length - 1].timestamp){ 
+    //     if( max >= data[data.length - 1].timestamp){
     //     dispatch(liveDataImplementation(
     //       {folder: latestFolder.current, id: latestDatasetId.current,
     //       from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: latestFrequency.current,

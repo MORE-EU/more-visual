@@ -421,7 +421,7 @@ export const {
   updatePatterns,updateChangeChart,updateDatasetChoice,updateDatasetMeasures, updatePatternNav,updateChartRef,
   updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateLiveData,
   updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleManualChangepoints, toggleChangepointDetection,
-  setShowDatePick,setShowChangePointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
+  toggleCustomChangepoints, setShowDatePick,setShowChangePointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
   setExpand,setOpen, setFolder, resetFilters, getPatterns,
 } = visualizer.actions;
 export default visualizer.reducer;
