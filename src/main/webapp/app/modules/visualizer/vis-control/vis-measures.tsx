@@ -3,8 +3,7 @@ import List from "@mui/material/List";
 import React, {useState} from "react";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {updateSelectedMeasures} from "app/modules/store/visualizerSlice";
-import {Chip, TextField, Tooltip} from "@mui/material";
-import {Autocomplete} from "@mui/lab";
+import {Autocomplete, Chip, TextField, Tooltip} from "@mui/material";
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 export const VisMeasures = () => {
 

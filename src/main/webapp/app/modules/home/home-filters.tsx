@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
-import {Accordion,AccordionDetails,Button,Checkbox,Grid,List,ListItem,
-  ListItemButton,ListItemIcon,ListItemText,Paper,Popper,styled,Typography,
+import {
+  Accordion, AccordionDetails, Button, Checkbox, Grid, List, ListItem,
+  ListItemButton, ListItemIcon, ListItemText, Paper, Popper, styled, Typography, useAutocomplete,
 } from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CircleIcon from '@mui/icons-material/Circle';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
-import useAutocomplete from '@mui/lab/useAutocomplete';
 import { useAppSelector, useAppDispatch } from '../store/storeConfig';
 import { setAnchorEl, setInputValue, setSearch, setSearchResults, setSelected, setSelectedAcc } from '../store/homeSlice';
 
@@ -70,7 +70,7 @@ export const HomeFilters = () => {
     val !== "" ? dispatch(setSearchResults(gopts)) : dispatch(setSearchResults(search));
     val !== null && dispatch(setInputValue(val));
   }
-  
+
   const { getInputProps, groupedOptions } = useAutocomplete({
     id: 'autocomplete',
     options: search,
