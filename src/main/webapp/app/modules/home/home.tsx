@@ -19,11 +19,8 @@ export const Home = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(getWdFiles(directories[0]));
-  }, [directories])
-
-  useEffect(() => {
     if (directories.length !== 0) {
+      dispatch(getWdFiles(directories[0]));
       dispatch(setSelectedDir(directories[0]));
     }
   }, [directories])
