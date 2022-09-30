@@ -31,6 +31,7 @@ const FlyComponent = props => {
 export const FarmMap = () => {
 
   const { fly, items, selected } = useAppSelector(state => state.home);
+  const { wdFiles } = useAppSelector(state => state.visualizer);
 
   const icon = new L.Icon({
     iconUrl: '../../../content/images/leaflet-icons/marker-icon.png',
@@ -54,7 +55,7 @@ export const FarmMap = () => {
           (
             <MarkerClusterGroup showCoverageOnHover={true} key={itemIdx}>
               {item.farmInfo.map((info, locIdx) => {
-                const rand = Math.floor((Math.random() * 3) + 1);
+                const rand = Math.floor((Math.random() * (wdFiles.length - 1)) + 0);
                 let count = 0;
                 const count1 = [];
                 selected.map(sele => {
@@ -86,7 +87,7 @@ export const FarmMap = () => {
                       {/* <Tooltip direction="top"> */}
                       <Popup>
                         <Paper elevation={0} sx={{textAlign: "center"}}>
-                          <Link to={`/visualize/bbz/bbz${rand}cut`}>
+                          <Link to={`/visualize/bbz/${wdFiles[rand]}`}>
                             <Typography variant="overline" sx={{textDecoration: "none"}}>Detailed View
                             </Typography>
                           </Link> <br/>

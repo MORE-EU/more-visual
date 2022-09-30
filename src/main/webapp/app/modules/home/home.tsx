@@ -15,9 +15,12 @@ export const Home = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(getWdFiles('bbz'));
     dispatch(getDirectories());
   }, []);
+
+  useEffect(() => {
+    dispatch(getWdFiles(directories[0]));
+  }, [directories])
 
   useEffect(() => {
     if (directories.length !== 0) {
@@ -27,6 +30,7 @@ export const Home = () => {
 
   useEffect(() => {
     selectedDir.length !== 0 && dispatch(getSampleFile(selectedDir))
+    dispatch(getWdFiles(selectedDir))
   }, [selectedDir])
 
   useEffect(() => {

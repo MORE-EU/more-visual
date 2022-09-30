@@ -68,7 +68,6 @@ const initialState = {
   wdFiles: [] as any[],
   sampleFile: [],
   directories: [],
-  liveData: false,
   resampleFreq: 'minute',
   filter: new Map(),
   patterns: null,
@@ -283,9 +282,6 @@ const visualizer = createSlice({
         ? [...state.compare, action.payload]
         : state.compare.filter(comp => comp !== action.payload);
     },
-    updateLiveData(state) {
-      state.liveData = !state.liveData;
-    },
     updateData(state, action) {
       state.data = [...state.data, action.payload];
     },
@@ -419,7 +415,7 @@ const visualizer = createSlice({
 export const {
   resetChartValues, resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilters,
   updatePatterns,updateChangeChart,updateDatasetChoice,updateDatasetMeasures, updatePatternNav,updateChartRef,
-  updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateLiveData,
+  updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare,
   updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleManualChangepoints, toggleChangepointDetection,
   toggleCustomChangepoints, setShowDatePick,setShowChangePointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
   setExpand,setOpen, setFolder, resetFilters, getPatterns,

@@ -146,7 +146,6 @@ export const Chart = () => {
       };
     }));
     if(manualChangepointsEnabled) newChangepointPlotBands = newChangepointPlotBands.concat(manualPlotBands);
-    console.log(newChangepointPlotBands);
     setPlotBands(newChangepointPlotBands);
 
   }, [detectedChangePoints, customChangePoints, manualChangepointsEnabled]);
@@ -252,7 +251,6 @@ export const Chart = () => {
   }
 
   const toast = (chart, text) => {
-    console.log(chart);
     chart.toast = chart.renderer.label(text, 100, 120)
       .attr({
         fill: Highcharts.getOptions().colors[0],
@@ -345,7 +343,7 @@ export const Chart = () => {
     const checkForDataOnPan = () => {
       const {dataMax, dataMin, max, min} = chart.current.xAxis[0].getExtremes();
       // Conditions for loading new data
-      if ((dataMax - max < 2 || min - dataMin < 2)) {
+      if ((data[data.length - 1].timestamp - max < 2 || min - dataMin < 2)) { //dataMAx
         checkForData(max, min);
       }
     }
@@ -399,9 +397,8 @@ export const Chart = () => {
 
     const renderLabelForLiveData = () => {
       const {max} = chart.current.xAxis[0].getExtremes();
-      let label;
       if( max >= data[data.length -1].timestamp){
-       label = chart.current.renderer.label('Live Data Mode', (chart.current.chartWidth / 2) , 10)
+      const label = chart.current.renderer.label('Live Data Mode', (chart.current.chartWidth / 2) , 10)
                   .attr({
                       fill: Highcharts.getOptions().colors[1],
                       padding: 10,
@@ -443,13 +440,12 @@ export const Chart = () => {
     // LIVE DATA IMPLEMENTATION
     setInterval(() => {
         const {max, min, dataMax} = chart.current.xAxis[0].getExtremes(); 
-        console.log(max, data[data.length-1].timestamp);
         if( max >= data[data.length - 1].timestamp){ 
         dispatch(liveDataImplementation(
           {folder: latestFolder.current, id: latestDatasetId.current,
-          from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: latestFrequency.current,
+          from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: "SECOND",
           selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
-          chart.current.xAxis[0].setExtremes(min + calculateStep(latestFrequency.current, 30), dataMax, false, false);
+          chart.current.xAxis[0].setExtremes(min, dataMax, true, true);
         }
     }, 5000);
 
