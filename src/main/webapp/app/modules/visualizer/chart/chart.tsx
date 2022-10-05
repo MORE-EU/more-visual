@@ -3,7 +3,7 @@ import "../visualizer.scss";
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
-import {Grid, Slider, LinearProgress} from "@mui/material";
+import {Grid, LinearProgress} from "@mui/material";
 import annotationsAdvanced from "highcharts/modules/annotations-advanced";
 import stockTools from "highcharts/modules/stock-tools";
 import {useScrollBlock} from "app/shared/util/useScrollBlock";
@@ -12,8 +12,6 @@ import moment from "moment";
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
 import {
   setCompare,
-  setShowChangePointFunction,
-  setShowDatePick,
   updateChartRef,
   updateCompareQueryResults,
   updateFrom,
@@ -25,7 +23,10 @@ import {
   applyDeviationDetection,
   liveDataImplementation
 } from "app/modules/store/visualizerSlice";
-import CloseIcon from "@mui/icons-material/Close";
+import {ChartPlotBands} from "app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands";
+import {Simulate} from "react-dom/test-utils";
+import select = Simulate.select;
+
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
   time: {
@@ -45,8 +46,6 @@ Highcharts.setOptions({
   },
 });
 
-// TODO: FIX FULLSCREEN
-
 stockTools(Highcharts);
 annotationsAdvanced(Highcharts);
 
@@ -54,21 +53,19 @@ export const Chart = () => {
 
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, measureColors,
     queryResultsLoading, filter, queryResults, changeChart, compare, changepointDetectionEnabled,
-    customChangepointsEnabled, patterns, detectedChangePoints, data, compareData, forecastData, soilingEnabled,
-    soilingWeeks, manualChangepointsEnabled, manualChangePoints, secondaryData} = useAppSelector(state => state.visualizer);
+    customChangepointsEnabled, patterns, data, compareData, forecastData, soilingEnabled,
+    soilingWeeks, secondaryData} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const [blockScroll, allowScroll] = useScrollBlock();
 
-  const [zones, setZones] = useState([]);
-  const [plotBands, setPlotBands] = useState([]);
-  const [customChangePoints, setCustomChangePoints] = useState([]);
-
   const [type, setType] = useState("line");
-  const [sliderVal, setSliderVal] = useState(null);
-  const [selectedPlot, setSelectedPlot] = useState(null);
-
-  // Refs
+  const [zones, setZones] = useState([]);
+  const [customPlotBands, setCustomPlotBands] = useState([]);
+  const [manualPlotBands, setManualPlotBands] = useState([]);
+  const [detectedPlotBands, setDetectedPlotBands] = useState([]);
+  const [changepointHighlight, setChangepointHighlight] = useState(false);
+  //Refs
   const latestFrequency = useRef(resampleFreq);
   const latestLeftSide = useRef(null);
   const chart = useRef(chartRef);
@@ -80,24 +77,15 @@ export const Chart = () => {
   const latestSoilingWeeks = useRef(soilingWeeks);
   const latestCompare = useRef(compare);
   const latestFilter = useRef(filter);
-  const isChangePointDetectionEnabled = useRef(changepointDetectionEnabled);
-  const isSoilingEnabled = useRef(soilingEnabled);
 
-  const manualPlotBands = ((manualChangePoints !== null && manualChangepointsEnabled) && [].concat(...manualChangePoints.map(date => {
-    return {
-      color: '#425af5',
-      from: date.range.from,
-      to: date.range.to,
-      label: {
-        // text: 'I am a label 2', // Content of the label.
-        // align: 'left', // Positioning of the label.
-      }
-    };
-  })));
+  const latestCustomChangepoints = useRef([])
+  const isSoilingEnabled = useRef(soilingEnabled);
+  const isChangepointDetectionEnabled = useRef(changepointDetectionEnabled);
+
 
   // Color Zones For Patterns
   useEffect(() => {
-  const newZones =
+    const newZones =
       patterns !== null &&
       []
         .concat(
@@ -116,47 +104,6 @@ export const Chart = () => {
     setZones(newZones);
   }, [patterns]);
 
-  // Color Bands for Change-points
-  useEffect(() => {
-    let allChangepoints = (detectedChangePoints !== null && changepointDetectionEnabled) ?
-      detectedChangePoints.concat((customChangePoints !== null) ? customChangePoints : []) : ((customChangePoints !== null) ? customChangePoints : []);
-    let newChangepointPlotBands =  [].concat(...allChangepoints.map((date, idx) => {
-      return {
-        color: '#f5dd42',
-        from: date.range.from,
-        to: date.range.to,
-        id: date.id,
-        // label: {
-        //   text: 'plot 1',
-        //   align: 'center'
-        // },
-        borderWidth: 0,
-        borderColor: 'black',
-        events: {
-          // mouseup(e) {
-          //   handlePlotBandsSelection(this.id);
-          // }
-          mouseover(e) {
-            this.svgElem.attr('fill', new Highcharts.Color(this.options.color).brighten(0.1).get());
-          },
-          mouseout(e) {
-            this.svgElem.attr('fill', this.options.color);
-          },
-        }
-      };
-    }));
-    if(manualChangepointsEnabled) newChangepointPlotBands = newChangepointPlotBands.concat(manualPlotBands);
-    setPlotBands(newChangepointPlotBands);
-
-  }, [detectedChangePoints, customChangePoints, manualChangepointsEnabled]);
-
-  useEffect(() => {
-    isChangePointDetectionEnabled.current = changepointDetectionEnabled;
-    if(!changepointDetectionEnabled){
-      if(manualChangepointsEnabled) setPlotBands(manualPlotBands);
-      else setPlotBands([]);
-    }
-  }, [changepointDetectionEnabled, manualChangepointsEnabled]);
 
   useEffect(() => {
     isSoilingEnabled.current = soilingEnabled;
@@ -185,6 +132,7 @@ export const Chart = () => {
     if (compare.length !== 0) {
       dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures, filter}));
     }
+    if(selectedMeasures.length === 6) toast("You can only view up to 6 measures at a time.");
   }, [dataset, selectedMeasures]);
 
   useEffect(() => {
@@ -195,98 +143,55 @@ export const Chart = () => {
     latestSoilingWeeks.current = soilingWeeks;
   }, [soilingWeeks]);
 
+  useEffect(() => {
+    if(!changepointDetectionEnabled) setDetectedPlotBands([]);
+    isChangepointDetectionEnabled.current = changepointDetectionEnabled;
+  }, [changepointDetectionEnabled]);
+
+  useEffect(() => {
+    if(customChangepointsEnabled && changepointHighlight === false){
+      toast("Highlight a region on the chart");
+      setChangepointHighlight(true);
+    }
+  }, [customChangepointsEnabled]);
 
   const getChartRef = (chartR: any) => {
     dispatch(updateChartRef(chartR));
   };
 
-  const handlePlotBandsSelection = (id) => {
-    if(typeof id === "string") {
-      const idx = plotBands.findIndex(x => x.id === id);
-      if(idx !== selectedPlot){
-        setSelectedPlot(idx);
-        setSliderVal([plotBands[idx].from, plotBands[idx].to])
-        setPlotBands([...plotBands].map(object => {
-          if(object.id === id) {
-            return {
-              ...object,
-              borderWidth: 1,
-            }
-          }else if(object.id !== id && object.borderWidth === 1){
-            return {
-              ...object,
-              borderWidth: 0,
-            }
-          }
-          else return object;
-        }))
-      }
-    }
-    else if(Array.isArray(id)) {
-      setSliderVal(id);
-      setPlotBands([...plotBands].map((object, idx) => {
-        if(idx === selectedPlot) {
-          return {
-            ...object,
-            from: id[0],
-            to: id[1]
-          }
-        }
-        else return object;
-      }))
-    }
-    else {
-      setSliderVal(null);
-      setSelectedPlot(null);
-      setPlotBands([...plotBands].map((object, idx) => {
-        if(object.borderWidth === 1) {
-          return {
-            ...object,
-            borderWidth: 0
-          }
-        }
-        else return object;
-      }))
+  const toast = (toastMessage) => {
+    if(chart.current) {
+      const left =  chart.current.plotWidth / 2;
+      chart.current.toast = chart.current.renderer.label(toastMessage, left, 0)
+        .attr({
+          fill: Highcharts.getOptions().colors[1],
+          padding: 10,
+          r: 5,
+          zIndex: 8
+        })
+        .css({
+          color: '#FFFFFF'
+        })
+        .add();
+      setTimeout(function () {
+        chart.current.toast.fadeOut();
+      }, 2000);
+      setTimeout(function () {
+        chart.current.toast = chart.current.toast.destroy();
+      }, 2500);
     }
   }
 
-  const toast = (chart, text) => {
-    chart.toast = chart.renderer.label(text, 100, 120)
-      .attr({
-        fill: Highcharts.getOptions().colors[0],
-        padding: 10,
-        r: 5,
-        zIndex: 8
-      })
-      .css({
-        color: '#FFFFFF'
-      })
-      .add();
-
-    setTimeout(function () {
-      chart.toast.fadeOut();
-    }, 2000);
-    setTimeout(function () {
-      chart.toast = chart.toast.destroy();
-    }, 2500);
+  const customChangepointSelection = (event) => {
+    event.preventDefault();
+    const newCustomChangepoint = {range: {from: event.xAxis[0].min, to: event.xAxis[0].max,} as ITimeRange, id: latestCustomChangepoints.current.length, custom: true};
+    latestCustomChangepoints.current.push(newCustomChangepoint);
+    dispatch(toggleCustomChangepoints(false));
   }
 
-  const selectedMeasuresWarning = (e) => {
-    toast(
-      this,
-      `<b>${e.points.length} points selected.</b>
-        <br>Click on empty space to deselect.`
-    );
-  }
 
-  const customChangePointSelection = (event) => {
-      event.preventDefault();
-      const newCustomChangePoint = {range: {from: event.xAxis[0].min, to: event.xAxis[0].max,} as ITimeRange, id: customChangePoints.length};
-      let newCustomChangePoints = [...customChangePoints];
-      newCustomChangePoints.push(newCustomChangePoint);
-      console.log(newCustomChangePoints);
-      setCustomChangePoints(newCustomChangePoints);
-      dispatch(toggleCustomChangepoints(false));
+  const setCustomChangepoints = (newCustomChangepoints) => {
+    latestCustomChangepoints.current = newCustomChangepoints;
   }
 
   const chartFunctions = (e: { target: any; }) => {
@@ -302,7 +207,6 @@ export const Chart = () => {
       Highcharts.removeEvent(chart.current.container, "click");
     });
 
-
     const fetchData = (leftSide: number, rightSide: number) => {
       chart.current.showLoading();
       dispatch(updateQueryResults({folder: latestFolder.current, id: latestDatasetId.current,
@@ -315,7 +219,7 @@ export const Chart = () => {
         selectedMeasures: latestMeasures.current, filter: latestFilter.current}));
       latestLeftSide.current = leftSide;
       latestRightSide.current = rightSide;
-      if(isChangePointDetectionEnabled.current)
+      if(isChangepointDetectionEnabled.current)
         dispatch(
           applyChangepointDetection({id: latestDatasetId.current,
             from: leftSide, to: rightSide})).then((res) => {
@@ -398,20 +302,7 @@ export const Chart = () => {
     const renderLabelForLiveData = () => {
       const {max} = chart.current.xAxis[0].getExtremes();
       if( max >= data[data.length -1].timestamp){
-      const label = chart.current.renderer.label('Live Data Mode', (chart.current.chartWidth / 2) , 10)
-                  .attr({
-                      fill: Highcharts.getOptions().colors[1],
-                      padding: 10,
-                      r: 5,
-                      zIndex: 10
-                  })
-                  .css({
-                      color: '#FFFFFF'
-                  })
-                  .add();
-                  setTimeout(function () {
-                      label.fadeOut();
-                  }, 2000);
+        toast('Live Data Mode');
       }
     }
 
@@ -439,11 +330,11 @@ export const Chart = () => {
 
     // LIVE DATA IMPLEMENTATION
     setInterval(() => {
-        const {max, min, dataMax} = chart.current.xAxis[0].getExtremes(); 
-        if( max >= data[data.length - 1].timestamp){ 
+        const {max, min, dataMax} = chart.current.xAxis[0].getExtremes();
+        if( max >= data[data.length - 1].timestamp){
         dispatch(liveDataImplementation(
           {folder: latestFolder.current, id: latestDatasetId.current,
-          from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: "SECOND",
+          from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: 'SECOND',
           selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
           chart.current.xAxis[0].setExtremes(min, dataMax, true, true);
         }
@@ -564,7 +455,8 @@ export const Chart = () => {
 
   const handleMouseOverChart = () => {
     blockScroll();
-    customChangepointsEnabled ?
+    (customChangepointsEnabled && chart.current)
+      ?
       chart.current.chartBackground.htmlCss({cursor:'crosshair'}) :
       chart.current.chartBackground.htmlCss({cursor:'default'});
   }
@@ -692,14 +584,17 @@ export const Chart = () => {
               events: {
                 plotBackgroundColor: "rgba(10,0,0,0)", // dummy color, to create an element
                 load: chartFunctions,
-                selection: customChangePointSelection,
+                selection: customChangepointSelection,
               },
             },
             xAxis: {
               ordinal: false,
               type: "datetime",
-              // range: graphZoom !== null ? graphZoom : Number.MAX_SAFE_INTEGER,
-              plotBands,
+              plotBands: [
+                ...manualPlotBands,
+                ...detectedPlotBands,
+                ...customPlotBands
+              ],
             },
             yAxis: computeYAxisData(),
             rangeSelector: {
@@ -799,18 +694,15 @@ export const Chart = () => {
           }}
         />
       )}
-      {sliderVal &&
-        <Grid sx={{ml: 3, mr: 3, display: "flex"}}>
-          <CloseIcon onClick={() => {handlePlotBandsSelection(null)}}/>
-          <Slider
-            value={sliderVal}
-            onChange={(e, newVal) => {handlePlotBandsSelection(newVal)}}
-            min={parseInt(data[0].timestamp, 10)}
-            max={parseInt(data[data.length-1].timestamp, 10)}
-            valueLabelDisplay="auto"
-            valueLabelFormat={x => `${new Date(x)}`}
-          />
-        </Grid>}
+      <ChartPlotBands
+        manualPlotBands={manualPlotBands}
+        setManualPlotBands={setManualPlotBands}
+        detectedPlotBands={detectedPlotBands}
+        setDetectedPlotBands={setDetectedPlotBands}
+        customPlotBands={customPlotBands}
+        setCustomPlotBands={setManualPlotBands}
+        customChangepoints={latestCustomChangepoints.current}
+        setCustomChangepoints={setCustomChangepoints}/>
     </Grid>
   );
 };

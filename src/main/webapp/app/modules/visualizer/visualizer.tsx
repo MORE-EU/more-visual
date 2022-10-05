@@ -18,7 +18,7 @@ const mdTheme = createTheme();
 
 export const Visualizer = () => {
 
-  const { wdFiles, dataset } = useAppSelector(state => state.visualizer);
+  const { wdFiles, dataset, openToolkit} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const  params: any = useParams();
 
@@ -95,17 +95,19 @@ export const Visualizer = () => {
           </Paper>
         </Box>
         <Box
-          sx={{maxWidth: open ? "70%" : "80%", pl: 2, flexGrow: 1}}>
-          <Paper sx={{
-            p: 2,
+          sx={{maxWidth: openToolkit ? "65%" : "80%", p: 1, flexGrow: 1}}>
+          <Paper
+            sx={{
+              p: 1,
             display: 'flex',
             flexDirection: 'column',
-
           }}>
             <ChartContainer />
           </Paper>
         </Box>
-        <Toolkit />
+        <Box>
+          <Toolkit />
+        </Box>
       </Box>
     </ThemeProvider>
   </div>;

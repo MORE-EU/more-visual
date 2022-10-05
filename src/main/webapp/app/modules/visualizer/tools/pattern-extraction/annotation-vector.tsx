@@ -2,10 +2,10 @@ import React, {useState} from "react";
 import {Button, FormControl, Grid, InputLabel, MenuItem, Select} from "@mui/material";
 import ModalStyles from "app/shared/layout/ModalStyle";
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import { setOpen } from "app/modules/store/visualizerSlice";
+import { setOpenToolkit } from "app/modules/store/visualizerSlice";
 
 export const AnnotationVector = () => {
-  
+
   const {patterns} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
@@ -15,7 +15,7 @@ export const AnnotationVector = () => {
   const applyAV = (e, p) => {
     // TODO: API CALL
     p.corrected.annotationVector = {func: e.target.value};
-    dispatch(setOpen(false));
+    dispatch(setOpenToolkit(false));
   }
 
   const classes = ModalStyles();

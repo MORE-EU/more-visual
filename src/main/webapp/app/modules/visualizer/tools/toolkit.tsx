@@ -12,9 +12,9 @@ import TimelineIcon from '@mui/icons-material/Timeline'; // segmentation
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ActiveTool from "app/modules/visualizer/tools/active-tool";
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { setOpen, updateActiveTool } from 'app/modules/store/visualizerSlice';
+import { setOpenToolkit, updateActiveTool } from 'app/modules/store/visualizerSlice';
 
-const drawerWidth = 300;
+const drawerWidth = "15%";
 
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -66,25 +66,25 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
 
 const Toolkit = () => {
 
-  const {open, activeTool} = useAppSelector(state => state.visualizer);
+  const {openToolkit, activeTool} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const handleDrawer = () => {
-    dispatch(setOpen(!open));
+    dispatch(setOpenToolkit(!openToolkit));
     dispatch(updateActiveTool(-1));
   };
 
   const handleToolClick = (key) => {
-    dispatch(setOpen(true));
+    dispatch(setOpenToolkit(true));
     dispatch(updateActiveTool(key));
   }
   return (
     <Box>
       <CssBaseline/>
-      <Drawer variant="permanent" open={open} anchor="right">
+      <Drawer variant="permanent" open={openToolkit} anchor="right">
         <DrawerHeader>
           <IconButton onClick={handleDrawer}>
-            {open ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
+            {openToolkit ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
           </IconButton>
         </DrawerHeader>
         <Divider/>

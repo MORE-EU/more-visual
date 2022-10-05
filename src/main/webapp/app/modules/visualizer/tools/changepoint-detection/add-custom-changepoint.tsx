@@ -1,15 +1,15 @@
 import {Box, Button} from "@mui/material";
 import React from "react";
 import {toggleCustomChangepoints} from "app/modules/store/visualizerSlice";
-import {useAppDispatch} from "app/modules/store/storeConfig";
+import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 export const AddCustomChangepoint = () => {
-
+  const {customChangepointsEnabled, anchorEl} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const handleCustomChangepointsChange = () => {
-    dispatch(toggleCustomChangepoints(true));
+    dispatch(toggleCustomChangepoints(!customChangepointsEnabled));
   }
 
   return (
@@ -22,7 +22,9 @@ export const AddCustomChangepoint = () => {
       <Button
         onClick={() => handleCustomChangepointsChange()}
       >
-        <AddCircleOutlineIcon color={"primary"}/>
+        {(customChangepointsEnabled && anchorEl === null)
+          ?  <HighlightOffIcon /> : <AddCircleOutlineIcon color={"primary"}/>
+        }
       </Button>
     </Box>
   );

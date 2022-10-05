@@ -25,25 +25,25 @@ import {
 export const SoilingDetection = () => {
   const {folder, dataset, from, to, resampleFreq,
     soilingEnabled, soilingWeeks,
-    detectedChangePoints, changepointDetectionEnabled} = useAppSelector(state => state.visualizer);
+    detectedChangepoints, changepointDetectionEnabled} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const handleWeeksChange = (e) => {
     const newSoilingWeeks = e.target.value;
     dispatch(updateSoilingWeeks(newSoilingWeeks))
     if(soilingEnabled)
-      dispatch(applyDeviationDetection({folder, id: dataset.id, from, to, resampleFreq, weeks : newSoilingWeeks, changepoints : detectedChangePoints}));
+      dispatch(applyDeviationDetection({folder, id: dataset.id, from, to, resampleFreq, weeks : newSoilingWeeks, changepoints : detectedChangepoints}));
   }
 
   useEffect(()=>{
-    if (detectedChangePoints === null) dispatch(updateSecondaryData(null));
-  },[detectedChangePoints]);
+    if (detectedChangepoints === null) dispatch(updateSecondaryData(null));
+  },[detectedChangepoints]);
 
   const handleEnableSoiling = () => {
     const action = !soilingEnabled;
     dispatch(toggleSoilingDetection(action));
     if(action)
-      dispatch(applyDeviationDetection({folder, id: dataset.id, from, to, resampleFreq, weeks : soilingWeeks, changepoints : detectedChangePoints}));
+      dispatch(applyDeviationDetection({folder, id: dataset.id, from, to, resampleFreq, weeks : soilingWeeks, changepoints : detectedChangepoints}));
   }
 
   return (

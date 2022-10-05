@@ -3,7 +3,7 @@ import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import React, {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {
-  getManualChangePoints, updateSelectedMeasures,
+  getManualChangepoints, updateSelectedMeasures,
   toggleChangepointDetection, applyChangepointDetection,
   toggleManualChangepoints, toggleSoilingDetection,
 } from "app/modules/store/visualizerSlice";
@@ -20,7 +20,7 @@ export interface IChangepointDetectionProps {
 
 export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   const { dataset, from, to,
-    changepointDetectionEnabled, manualChangePoints,
+    changepointDetectionEnabled, manualChangepoints,
     manualChangepointsEnabled,
   } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
@@ -29,7 +29,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   shownMeasures} = props;
 
   useEffect(()=>{
-    dispatch(getManualChangePoints(dataset.id));
+    dispatch(getManualChangepoints(dataset.id));
   }, []);
 
   const handleManualChangepointsChange = () => {
@@ -71,11 +71,11 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
         justifyContent: 'space-between',
       }}>
         <Box sx={{pt: 1}}>{manualChangepointsName}</Box>
-        <Tooltip describeChild title={manualChangePoints ? "Show " + manualChangepointsName : "No Data Found"}>
+        <Tooltip describeChild title={manualChangepoints ? "Show " + manualChangepointsName : "No Data Found"}>
           <Switch
             checked={manualChangepointsEnabled}
             onChange={() => handleManualChangepointsChange()}
-            disabled={manualChangePoints === null}
+            disabled={manualChangepoints === null}
             inputProps={{'aria-label': 'controlled'}}
           />
         </Tooltip>

@@ -174,7 +174,7 @@ public class DatasetResource {
     }
 
     @PostMapping("/tools/cp_detection/{id}")
-    public ResponseEntity<List<Changepoint>> changePointDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {
+    public ResponseEntity<List<Changepoint>> changepointDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {
         log.debug("CP for {}", changepoints);
         List<Changepoint> detectedChangepoints = toolsRepository.cpDetection(id, changepoints);
         log.debug("Detected CP for {}", detectedChangepoints);

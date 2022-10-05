@@ -14,12 +14,12 @@ export const Scores = () => {
   const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [scores, setScores] = React.useState({});
-  const [changePointDates, setChangePointDates] = React.useState([]);
+  const [changepointDates, setChangepointDates] = React.useState([]);
 
   const getLabels = () => {
     const labels = [];
-    for (let j = 0; j < changePointDates.length; j++) {
-      const name = changePointDates[j].start.toUTCString().concat(" -<br>", changePointDates[j].end.toUTCString())
+    for (let j = 0; j < changepointDates.length; j++) {
+      const name = changepointDates[j].start.toUTCString().concat(" -<br>", changepointDates[j].end.toUTCString())
       labels.push(name);
     }
     return labels;
@@ -29,7 +29,7 @@ export const Scores = () => {
     for (let i = 0; i < functions.length; i++) {
       const func = functions[i];
       const score = [];
-      for (let j = 0; j < changePointDates.length; j++) {
+      for (let j = 0; j < changepointDates.length; j++) {
         score.push({name: "Interval".concat(" ", (j + 1).toString(10)), y: Math.random()});
       }
       scores[func] = score;
@@ -77,7 +77,7 @@ export const Scores = () => {
   return (
     <Box sx={{textAlign: "center"}}>
       <p>Training Complete</p>
-      <p>Found predictions for {changePointDates.length} dates</p>
+      <p>Found predictions for {changepointDates.length} dates</p>
       <Button onClick={() => setOpen(true)}>Show Scores</Button>
       <Modal
         aria-labelledby="transition-modal-title"

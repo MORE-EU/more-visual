@@ -99,8 +99,8 @@ const home = createSlice({
     }
 });
 
-export const {setFly, setBounds, setAllFilters, setFilSamples, 
-setItems, setSelected, setSelectedDir, setAnchorEl, setInputValue, 
+export const {setFly, setBounds, setAllFilters, setFilSamples,
+setItems, setSelected, setSelectedDir, setAnchorEl, setInputValue,
 setSearch, setSearchResults, setSelectedAcc, setStatCateg, setStatSelect,
 setChartCateg, setChartCategYaxis, setChartData, setChartType, setOption1,
 setOption2, setOption3, setOption4 } = home.actions;
