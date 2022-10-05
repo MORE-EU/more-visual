@@ -135,3 +135,5 @@ export const ChartPlotBands = (props:IChartPlotBandsProps) => {
     </Popover>
   );
 }
+
+export default  ChartPlotBands;

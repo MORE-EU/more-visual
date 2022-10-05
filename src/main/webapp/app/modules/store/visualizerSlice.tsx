@@ -419,7 +419,7 @@ const visualizer = createSlice({
 export const {
   resetChartValues, resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq, updateFilters,
   updatePatterns, updateChangeChart,updateDatasetChoice, updateDatasetMeasures, updatePatternNav,updateChartRef,
-  updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateLiveData, updateAnchorEl,
+  updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateAnchorEl,
   updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleManualChangepoints, toggleChangepointDetection,
   toggleCustomChangepoints, setShowDatePick,setShowChangepointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
   setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns,
