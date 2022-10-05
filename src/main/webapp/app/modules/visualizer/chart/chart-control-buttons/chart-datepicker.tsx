@@ -17,7 +17,7 @@ export const ChartDatePicker = () => {
   // };
   //
   // useEffect(() => {
-  //   dispatch(updateCustomChangePoints(dateValues));
+  //   dispatch(updateCustomChangepoints(dateValues));
   // }, [dateValues]);
   //
   // const handleCalendarChange = e => {

@@ -1,15 +1,15 @@
 import React from 'react';
 import {Box, Button, Grid, Modal, Typography} from '@mui/material';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { setOpen, setShowChangePointFunction, updateActiveTool } from 'app/modules/store/visualizerSlice';
+import { setOpenToolkit, setShowChangepointFunction, updateActiveTool } from 'app/modules/store/visualizerSlice';
 
-export const ChartChangePointFunctions = () => {
+export const ChartChangepointFunctions = () => {
 
-  const { showChangePointFunction } = useAppSelector(state => state.visualizer);
+  const { showChangepointFunction } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const handleClose = () => {
-    dispatch(setShowChangePointFunction(false));
+    dispatch(setShowChangepointFunction(false));
   };
 
   const style = {
@@ -26,7 +26,7 @@ export const ChartChangePointFunctions = () => {
 
   return (
     <>
-      <Modal open={showChangePointFunction} onClose={handleClose} aria-labelledby="modal-title"
+      <Modal open={showChangepointFunction} onClose={handleClose} aria-labelledby="modal-title"
              aria-describedby="modal-description">
         <Box sx={style}>
           <Grid item sx={{textAlign: 'center'}}>
@@ -37,7 +37,7 @@ export const ChartChangePointFunctions = () => {
               size="small"
               variant="contained"
               onClick={() => {
-                dispatch(setShowChangePointFunction(false)), dispatch(setOpen(true)), dispatch(updateActiveTool(2));
+                dispatch(setShowChangepointFunction(false)), dispatch(setOpenToolkit(true)), dispatch(updateActiveTool(2));
               }}
             >
               <Typography variant="overline" component="h2">

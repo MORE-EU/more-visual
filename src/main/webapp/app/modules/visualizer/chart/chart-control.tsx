@@ -1,7 +1,7 @@
 import React, {useRef} from 'react';
 import {Button, Grid, TextField, Typography} from '@mui/material';
 import {ChartCompare} from './chart-control-buttons/chart-compare';
-import {ChartChangePointFunctions} from './chart-control-buttons/chart-changepoint-functions';
+import {ChartChangepointFunctions} from './chart-control-buttons/chart-changepoint-functions';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { updateChangeChart, updateQueryResults } from 'app/modules/store/visualizerSlice';
 import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
@@ -10,7 +10,7 @@ import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 export const ChartControl = () => {
 
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures,
-  queryResults, changeChart, showChangePointFunction, showCompare, showDatePick, soilingEnabled } = useAppSelector(state => state.visualizer);
+  queryResults, changeChart, showChangepointFunction, showCompare, showDatePick, soilingEnabled } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const isSoilingEnabled = useRef(soilingEnabled);
 
@@ -62,7 +62,7 @@ export const ChartControl = () => {
       </Grid>
       {/*{showDatePick && <ChartDatePicker />}*/}
       {showCompare && <ChartCompare />}
-      {showChangePointFunction && <ChartChangePointFunctions />}
+      {showChangepointFunction && <ChartChangepointFunctions />}
     </Grid>
   );
 };

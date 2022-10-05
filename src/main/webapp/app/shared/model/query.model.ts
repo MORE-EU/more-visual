@@ -1,5 +1,5 @@
 import { ITimeRange } from './time-range.model';
-import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
+import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
 
 export interface IQuery {
   range?: ITimeRange;

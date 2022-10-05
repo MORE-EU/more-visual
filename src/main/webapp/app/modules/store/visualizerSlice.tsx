@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
-import { IChangePointDate } from 'app/shared/model/changepoint-date.model';
+import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
 import { IQueryResults } from 'app/shared/model/query-results.model';
 import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
@@ -81,23 +81,24 @@ const initialState = {
   compare: [],
   chartRef: null,
   showDatePick: false,
-  showChangePointFunction: false,
+  showChangepointFunction: false,
   showCompare: false,
   singleDateValue: {start: null, end: null},
   dateValues: [],
   fixedWidth: 0,
   expand: false,
-  open: false,
+  openToolkit: false,
   forecastData: null as IDataPoint[],
   secondaryData: null as IDataPoint[],
-  manualChangePoints: [] as IChangePointDate[],
-  detectedChangePoints: [] as IChangePointDate[],
+  manualChangepoints: [] as IChangepointDate[],
+  detectedChangepoints: [] as IChangepointDate[],
   soilingWeeks: 1,
   changepointDetectionEnabled: false,
   manualChangepointsEnabled: false,
   customChangepointsEnabled: false,
   forecasting: false,
   soilingEnabled: false,
+  anchorEl: null,
 };
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
@@ -205,7 +206,7 @@ export const applyForecasting = createAsyncThunk(
 export const applyDeviationDetection = createAsyncThunk(
   'applyDeviationDetection',
   async (data: {folder: string, resampleFreq: string; id: string,
-      from : number, to : number, weeks : number, changepoints : IChangePointDate[]}) => {
+      from : number, to : number, weeks : number, changepoints : IChangepointDate[]}) => {
     const requestUrl = `api/tools/soiling/${data.folder}/${data.id}`;
     const range = {from: data.from, to: data.to} as unknown as ITimeRange;
     const changepoints = data.changepoints;
@@ -220,8 +221,8 @@ export const applyDeviationDetection = createAsyncThunk(
     return response.data;
   });
 
-export const getManualChangePoints = createAsyncThunk(
-  'getManualChangePoints',
+export const getManualChangepoints = createAsyncThunk(
+  'getManualChangepoints',
   async (id: string) => {
     const requestUrl = `api/tools/cp_detection/washes/${id}`;
     const response = await axios.get(requestUrl);
@@ -273,7 +274,7 @@ const visualizer = createSlice({
       state.chartRef = action.payload;
     },
     updateManualChangepoints(state, action) {
-      state.manualChangePoints = action.payload;
+      state.manualChangepoints = action.payload;
     },
     updateActiveTool(state, action) {
       state.activeTool = action.payload;
@@ -290,7 +291,10 @@ const visualizer = createSlice({
       state.data = [...state.data, action.payload];
     },
     updateSecondaryData(state, action) {
-      state.secondaryData = action.payload
+      state.secondaryData = action.payload;
+    },
+    updateAnchorEl(state, action) {
+      state.anchorEl = action.payload;
     },
     updateSoilingWeeks(state, action) {
       state.soilingWeeks = action.payload
@@ -301,8 +305,8 @@ const visualizer = createSlice({
     setShowDatePick(state, action) {
       state.showDatePick = action.payload;
     },
-    setShowChangePointFunction(state, action) {
-      state.showChangePointFunction = action.payload;
+    setShowChangepointFunction(state, action) {
+      state.showChangepointFunction = action.payload;
     },
     setCompare(state, action) {
       state.showCompare = action.payload;
@@ -319,8 +323,8 @@ const visualizer = createSlice({
     setExpand(state, action) {
       state.expand = action.payload;
     },
-    setOpen(state, action) {
-      state.open = action.payload;
+    setOpenToolkit(state, action) {
+      state.openToolkit = action.payload;
     },
     setFolder(state, action) {
       state.folder = action.payload;
@@ -405,10 +409,10 @@ const visualizer = createSlice({
       state.queryResultsLoading = false;
     });
     builder.addMatcher(isAnyOf(applyChangepointDetection.fulfilled), (state, action) => {
-      state.detectedChangePoints = action.payload.length === 0 ? null : action.payload;
+      state.detectedChangepoints = action.payload.length === 0 ? null : action.payload;
     });
-    builder.addMatcher(isAnyOf(getManualChangePoints.fulfilled), (state, action) => {
-      state.manualChangePoints = action.payload.length === 0 ? null : action.payload;
+    builder.addMatcher(isAnyOf(getManualChangepoints.fulfilled), (state, action) => {
+      state.manualChangepoints = action.payload.length === 0 ? null : action.payload;
     });
     builder.addMatcher(isAnyOf(applyDeviationDetection.fulfilled), (state, action) => {
       state.secondaryData = action.payload.length === 0 ? null : action.payload;
@@ -417,11 +421,11 @@ const visualizer = createSlice({
 });
 
 export const {
-  resetChartValues, resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilters,
-  updatePatterns,updateChangeChart,updateDatasetChoice,updateDatasetMeasures, updatePatternNav,updateChartRef,
-  updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateLiveData,
+  resetChartValues, resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq, updateFilters,
+  updatePatterns, updateChangeChart,updateDatasetChoice, updateDatasetMeasures, updatePatternNav,updateChartRef,
+  updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateLiveData, updateAnchorEl,
   updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleManualChangepoints, toggleChangepointDetection,
-  toggleCustomChangepoints, setShowDatePick,setShowChangePointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
-  setExpand,setOpen, setFolder, resetFilters, getPatterns,
+  toggleCustomChangepoints, setShowDatePick,setShowChangepointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
+  setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns,
 } = visualizer.actions;
 export default visualizer.reducer;

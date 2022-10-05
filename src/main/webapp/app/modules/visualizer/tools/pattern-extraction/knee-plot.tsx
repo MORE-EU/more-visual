@@ -5,10 +5,10 @@ import React, {useState} from "react";
 import ModalStyles from "app/shared/layout/ModalStyle";
 import DimensionSelector from "app/shared/layout/DimensionSelector";
 import { useAppSelector, useAppDispatch } from 'app/modules/store/storeConfig';
-import { setOpen, updateSelectedMeasures } from "app/modules/store/visualizerSlice";
+import { setOpenToolkit, updateSelectedMeasures } from "app/modules/store/visualizerSlice";
 
 export const KneePlot = () => {
-  
+
   const {patterns, dataset} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
@@ -36,7 +36,7 @@ export const KneePlot = () => {
     patterns.corrected.knee = knee; // api call
     dispatch(updateSelectedMeasures(dimensions));
     setCorrected(true);
-    dispatch(setOpen(false));
+    dispatch(setOpenToolkit(false));
   }
 
   const createData = () => {
