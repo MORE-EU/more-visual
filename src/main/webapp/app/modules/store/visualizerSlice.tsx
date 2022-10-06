@@ -168,7 +168,7 @@ export const liveDataImplementation = createAsyncThunk(
       measures: selectedMeasures,
       filter: filter ? Object.fromEntries(filter) : null,
     } as IQuery)
-    : (query = { range: null, frequency: "Hour" });
+    : (query = { range: null, frequency: resampleFreq.toUpperCase() });
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
     return response.data;
   }
@@ -186,7 +186,7 @@ export const updateCompareQueryResults = createAsyncThunk(
           measures: selectedMeasures,
           filter
         } as IQuery)
-      : (query = defaultQuery);
+      : (query = { range: null, frequency: resampleFreq.toUpperCase() });
     const response = Promise.all(
       id.map(name => {
         return axios.post(`api/datasets/${folder}/${name}/query`, query).then(res => res.data);
