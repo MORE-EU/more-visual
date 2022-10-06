@@ -44,7 +44,7 @@ export const VisControl = () => {
 
   // @ts-ignore
   return <Grid container spacing={3}>
-    <Grid item xs={12}>
+    {/* <Grid item xs={12}>
       <FormControl variant="standard" sx={{m: 1, minWidth: 180}}>
         <InputLabel>Sample Frequency</InputLabel>
         <Select
@@ -56,9 +56,8 @@ export const VisControl = () => {
           <MenuItem value="minute">Minute</MenuItem>
           <MenuItem value="hour">Hour</MenuItem>
         </Select>
-
       </FormControl>
-    </Grid>
+    </Grid> */}
     <Grid item xs={11}>
       {wdFiles.length !== 0 &&
         <>

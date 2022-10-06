@@ -5,6 +5,7 @@ import { IQueryResults } from 'app/shared/model/query-results.model';
 import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import axios from 'axios';
+import moment, { Moment } from "moment";
 
 const seedrandom = require('seedrandom');
 const lvl = 64;
@@ -25,6 +26,20 @@ const generateColor = () => {
     rgb += ("00" + c).substr(c.length);
   }
   return rgb;
+}
+
+const calculateFreqFromDiff = (timeRange: any) => {
+  const diff = moment.duration(moment(timeRange.to).diff(moment(timeRange.from))).humanize();
+  if (diff.includes("month") || diff.includes("day")){
+    return "hour";
+  }
+  else if(diff.includes("hour")){
+    return "minute";
+  }
+  else if(diff.includes("minute") || diff.includes("second")){
+    return "second";
+  }
+  return "hour";
 }
 
 const initPatterns = (data, length, frequency) => {
@@ -68,7 +83,7 @@ const initialState = {
   wdFiles: [] as any[],
   sampleFile: [],
   directories: [],
-  resampleFreq: 'minute',
+  resampleFreq: '',
   filter: new Map(),
   patterns: null,
   changeChart: true,
@@ -134,7 +149,7 @@ export const updateQueryResults = createAsyncThunk(
       measures: selectedMeasures,
       filter: filter ? Object.fromEntries(filter) : null,
     } as IQuery)
-    : (query = defaultQuery);
+    : (query = { range: null, frequency: resampleFreq.toUpperCase() });
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
     return response.data;
   }
@@ -153,7 +168,7 @@ export const liveDataImplementation = createAsyncThunk(
       measures: selectedMeasures,
       filter: filter ? Object.fromEntries(filter) : null,
     } as IQuery)
-    : (query = defaultQuery);
+    : (query = { range: null, frequency: "Hour" });
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
     return response.data;
   }
@@ -347,7 +362,6 @@ const visualizer = createSlice({
       state.data = initialState.data;
       state.from = initialState.from;
       state.to = initialState.to;
-      state.resampleFreq = initialState.resampleFreq;
       state.compareData = initialState.compareData;
       state.compare = initialState.compare;
       state.chartRef = initialState.chartRef;
@@ -358,7 +372,8 @@ const visualizer = createSlice({
       state.loading = false;
       state.dataset = action.payload.data;
       state.measureColors = [...state.dataset.header.map(() => generateColor())]
-      state.selectedMeasures = [...action.payload.data.measures];
+      state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
+      state.selectedMeasures = [action.payload.data.measures[0]]
     });
     builder.addCase(getWdFiles.fulfilled, (state, action) => {
       state.loading = false;

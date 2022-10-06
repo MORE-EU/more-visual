@@ -160,6 +160,7 @@ export const Chart = () => {
   };
 
   const toast = (toastMessage) => {
+    chart.current.toast && chart.current.toast.destroy();
     if(chart.current) {
       const left =  chart.current.plotWidth / 2;
       chart.current.toast = chart.current.renderer.label(toastMessage, left, 0)
@@ -174,10 +175,10 @@ export const Chart = () => {
         })
         .add();
       setTimeout(function () {
-        chart.current.toast.fadeOut();
+        chart.current.toast && chart.current.toast.fadeOut();
       }, 2000);
       setTimeout(function () {
-        chart.current.toast = chart.current.toast.destroy();
+        if(chart.current.toast)chart.current.toast = chart.current.toast.destroy();
       }, 2500);
     }
   }
@@ -277,6 +278,7 @@ export const Chart = () => {
          (max > dataMax && max !== timeRange.current[1]) ||
          (min < dataMin && min !== timeRange.current[0])) {
         latestFrequency.current = newFreq;
+        toast(`Frequency: ${newFreq}`);
         dispatch(updateResampleFreq(newFreq));
         checkForData(max, min);
       }
@@ -301,7 +303,7 @@ export const Chart = () => {
 
     const renderLabelForLiveData = () => {
       const {max} = chart.current.xAxis[0].getExtremes();
-      if( max >= data[data.length -1].timestamp){
+      if( max >= data[data.length -1].timestamp && latestFrequency.current === "second"){
         toast('Live Data Mode');
       }
     }
@@ -331,12 +333,12 @@ export const Chart = () => {
     // LIVE DATA IMPLEMENTATION
     setInterval(() => {
         const {max, min, dataMax} = chart.current.xAxis[0].getExtremes();
-        if( max >= data[data.length - 1].timestamp){
+        if( max >= data[data.length - 1].timestamp && latestFrequency.current === "second"){
         dispatch(liveDataImplementation(
           {folder: latestFolder.current, id: latestDatasetId.current,
           from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: 'SECOND',
           selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
-          chart.current.xAxis[0].setExtremes(min, dataMax, true, true);
+          chart.current.xAxis[0].setExtremes(min, dataMax, false, true);
         }
     }, 5000);
 
