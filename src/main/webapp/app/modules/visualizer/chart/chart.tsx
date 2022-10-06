@@ -24,8 +24,6 @@ import {
   liveDataImplementation
 } from "app/modules/store/visualizerSlice";
 import {ChartPlotBands} from "app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands";
-import {Simulate} from "react-dom/test-utils";
-import select = Simulate.select;
 
 HighchartsMore(Highcharts);
 Highcharts.setOptions({

@@ -10,7 +10,7 @@ import Forecasting from "app/modules/visualizer/tools/forecasting/forecasting";
 
 const ActiveTool = () => {
 
-  const {activeTool} = useAppSelector(state => state.visualizer);
+  const {dataset, activeTool} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const goBack = () => {
