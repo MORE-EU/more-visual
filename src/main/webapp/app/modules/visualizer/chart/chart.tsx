@@ -5,7 +5,7 @@ import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
 import {Grid, LinearProgress} from "@mui/material";
 import annotationsAdvanced from "highcharts/modules/annotations-advanced";
-import stockTools from "highcharts/modules/stock-tools";
+// import stockTools from "highcharts/modules/stock-tools";
 import {useScrollBlock} from "app/shared/util/useScrollBlock";
 import {ITimeRange} from "app/shared/model/time-range.model";
 import moment from "moment";
@@ -46,7 +46,7 @@ Highcharts.setOptions({
   },
 });
 
-stockTools(Highcharts);
+// stockTools(Highcharts);
 annotationsAdvanced(Highcharts);
 
 export const Chart = () => {
@@ -54,12 +54,11 @@ export const Chart = () => {
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, measureColors,
     queryResultsLoading, filter, queryResults, changeChart, compare, changepointDetectionEnabled,
     customChangepointsEnabled, patterns, data, compareData, forecastData, soilingEnabled,
-    soilingWeeks, secondaryData} = useAppSelector(state => state.visualizer);
+    soilingWeeks, secondaryData, chartType} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const [blockScroll, allowScroll] = useScrollBlock();
 
-  const [type, setType] = useState("line");
   const [zones, setZones] = useState([]);
   const [customPlotBands, setCustomPlotBands] = useState([]);
   const [manualPlotBands, setManualPlotBands] = useState([]);
@@ -155,6 +154,10 @@ export const Chart = () => {
     }
   }, [customChangepointsEnabled]);
 
+  useEffect(() => {
+    chart.current && toast(`Frequency: ${latestFrequency.current}`)
+  }, [latestFrequency.current])
+
   const getChartRef = (chartR: any) => {
     dispatch(updateChartRef(chartR));
   };
@@ -248,7 +251,8 @@ export const Chart = () => {
     const checkForDataOnPan = () => {
       const {dataMax, dataMin, max, min} = chart.current.xAxis[0].getExtremes();
       // Conditions for loading new data
-      if ((data[data.length - 1].timestamp - max < 2 || min - dataMin < 2)) { //dataMAx
+      if ((dataMax - max < 2 || min - dataMin < 2)
+      && (max < data[data.length - 1].timestamp)) { //dataMAx
         checkForData(max, min);
       }
     }
@@ -278,7 +282,6 @@ export const Chart = () => {
          (max > dataMax && max !== timeRange.current[1]) ||
          (min < dataMin && min !== timeRange.current[0])) {
         latestFrequency.current = newFreq;
-        toast(`Frequency: ${newFreq}`);
         dispatch(updateResampleFreq(newFreq));
         checkForData(max, min);
       }
@@ -444,7 +447,7 @@ export const Chart = () => {
       zones,
     })) : [];
 
-  const compareChartData = (compareData !== null) ? compareData.map((compData, idx) => selectedMeasures.map((measure, index) => ({
+    const compareChartData = (compareData !== null && compare.length !== 0) ? [...[].concat(...compareData.map((compData, idx) => selectedMeasures.map((measure, index) => ({
     data: compData.map(d => {
       const val = d.values[index];
       return [d.timestamp,isNaN(val) ? null : val];
@@ -453,7 +456,7 @@ export const Chart = () => {
     yAxis: changeChart ? index : 0,
     zoneAxis: "x",
     zones,
-  }))) : [];
+  }))))] : [];
 
   const handleMouseOverChart = () => {
     blockScroll();
@@ -578,7 +581,7 @@ export const Chart = () => {
                 ...compareChartData
               ],
             chart: {
-              type,
+              type: chartType,
               height: "700px",
               marginTop: 10,
               plotBorderWidth: 0,
@@ -617,82 +620,82 @@ export const Chart = () => {
             credits: {
               enabled: false,
             },
-            stockTools: {
-              gui: {
-                enabled: true,
-                buttons: [
-                  "changeType",
-                  "compareFiles",
-                ],
-                className: "highcharts-bindings-wrapper",
-                toolbarClassName: "stocktools-toolbar",
-                definitions: {
-                  changeType: {
-                    items: [
-                      "lineChart",
-                      "splineChart",
-                      "boxPlotChart",
-                      "areaRangeChart",
-                    ],
-                    lineChart: {
-                      className: "chart-line",
-                      symbol: "series-line.svg",
-                    },
-                    splineChart: {
-                      className: "chart-spline",
-                      symbol: "line.svg",
-                    },
-                    boxPlotChart: {
-                      className: "chart-boxplot",
-                      symbol: "series-ohlc.svg",
-                    },
-                    areaRangeChart: {
-                      className: "chart-arearange",
-                      symbol: "series-ohlc.svg",
-                    },
-                  },
-                  compareFiles: {
-                    className: "compare-files",
-                    symbol: "comparison.svg",
-                  },
-                },
-              },
-            },
-            navigation: {
-              iconsURL: "../../../../content/images/stock-icons/",
-              bindings: {
-                line: {
-                  className: "chart-line", // needs to be the same with above
-                  init(e: any) {
-                    setType("line");
-                  },
-                },
-                spline: {
-                  className: "chart-spline", // needs to be the same with above
-                  init(e: any) {
-                    setType("spline");
-                  },
-                },
-                boxPlot: {
-                  className: "chart-boxplot", // needs to be the same with above
-                  init(e: any) {
-                    setType("boxplot");
-                  },
-                },
-                areaRange: {
-                  className: "chart-arearange",
-                  init(e: any) {
-                    setType("arearange");
-                  },
-                },
-                compareFiles: {
-                  className: "compare-files", // needs to be the same with above
-                  init(e: any) {
-                    dispatch(setCompare(true));
-                  },
-                },
-              },
-            },
+            // stockTools: {
+            //   gui: {
+            //     enabled: true,
+            //     buttons: [
+            //       "changeType",
+            //       "compareFiles",
+            //     ],
+            //     className: "highcharts-bindings-wrapper",
+            //     toolbarClassName: "stocktools-toolbar",
+            //     definitions: {
+            //       changeType: {
+            //         items: [
+            //           "lineChart",
+            //           "splineChart",
+            //           "boxPlotChart",
+            //           "areaRangeChart",
+            //         ],
+            //         lineChart: {
+            //           className: "chart-line",
+            //           symbol: "series-line.svg",
+            //         },
+            //         splineChart: {
+            //           className: "chart-spline",
+            //           symbol: "line.svg",
+            //         },
+            //         boxPlotChart: {
+            //           className: "chart-boxplot",
+            //           symbol: "series-ohlc.svg",
+            //         },
+            //         areaRangeChart: {
+            //           className: "chart-arearange",
+            //           symbol: "series-ohlc.svg",
+            //         },
+            //       },
+            //       compareFiles: {
+            //         className: "compare-files",
+            //         symbol: "comparison.svg",
+            //       },
+            //     },
+            //   },
+            // },
+            // navigation: {
+            //   iconsURL: "../../../../content/images/stock-icons/",
+            //   bindings: {
+            //     line: {
+            //       className: "chart-line", // needs to be the same with above
+            //       init(e: any) {
+            //         setType("line");
+            //       },
+            //     },
+            //     spline: {
+            //       className: "chart-spline", // needs to be the same with above
+            //       init(e: any) {
+            //         setType("spline");
+            //       },
+            //     },
+            //     boxPlot: {
+            //       className: "chart-boxplot", // needs to be the same with above
+            //       init(e: any) {
+            //         setType("boxplot");
+            //       },
+            //     },
+            //     areaRange: {
+            //       className: "chart-arearange",
+            //       init(e: any) {
+            //         setType("arearange");
+            //       },
+            //     },
+            //     compareFiles: {
+            //       className: "compare-files", // needs to be the same with above
+            //       init(e: any) {
+            //         dispatch(setCompare(true));
+            //       },
+            //     },
+            //   },
+            // },
           }}
         />
       )}

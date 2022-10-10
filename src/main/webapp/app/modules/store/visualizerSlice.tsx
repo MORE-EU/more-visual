@@ -72,6 +72,7 @@ const initialState = {
   loading: true,
   errorMessage: null,
   dataset: null,
+  chartType: "line",
   queryResults: null as IQueryResults,
   data: null as any,
   compareData: null,
@@ -340,6 +341,9 @@ const visualizer = createSlice({
     setFolder(state, action) {
       state.folder = action.payload;
     },
+    setChartType(state, action) {
+      state.chartType = action.payload;
+    },
     toggleChangepointDetection(state, action) {
       state.changepointDetectionEnabled = action.payload;
     },
@@ -437,6 +441,6 @@ export const {
   updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateAnchorEl,
   updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleManualChangepoints, toggleChangepointDetection,
   toggleCustomChangepoints, setShowDatePick,setShowChangepointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
-  setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns,
+  setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns, setChartType,
 } = visualizer.actions;
 export default visualizer.reducer;

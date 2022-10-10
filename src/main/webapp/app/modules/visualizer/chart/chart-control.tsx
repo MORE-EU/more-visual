@@ -1,11 +1,12 @@
 import React, {useRef} from 'react';
-import {Button, Grid, TextField, Typography} from '@mui/material';
+import {Button, Grid, IconButton, TextField, Tooltip, Typography} from '@mui/material';
 import {ChartCompare} from './chart-control-buttons/chart-compare';
 import {ChartChangepointFunctions} from './chart-control-buttons/chart-changepoint-functions';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { updateChangeChart, updateQueryResults } from 'app/modules/store/visualizerSlice';
+import { setCompare, updateChangeChart, updateQueryResults } from 'app/modules/store/visualizerSlice';
 import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
+import { ChartType } from './chart-control-buttons/chart-type-picker';
 
 export const ChartControl = () => {
 
@@ -51,6 +52,8 @@ export const ChartControl = () => {
               inputFormat="dd/MM/yyyy hh:mm a"
             />
           </LocalizationProvider>
+          <ChartCompare />
+          <ChartType />
       </Grid>
       <Grid item>
         <Button variant="text" size="small" onClick={() => {
@@ -61,7 +64,6 @@ export const ChartControl = () => {
         }} sx={{mr: 1, color: !changeChart ? "#424242" : "#0277bd"}}>Stacked</Button>
       </Grid>
       {/*{showDatePick && <ChartDatePicker />}*/}
-      {showCompare && <ChartCompare />}
       {showChangepointFunction && <ChartChangepointFunctions />}
     </Grid>
   );
