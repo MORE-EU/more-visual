@@ -1,6 +1,7 @@
 export interface IDataset {
   id?: string;
   name?: string;
+  resType?: number;
   formalName?: string;
   farmName?: string;
   timeCol?: number;

@@ -32,7 +32,7 @@ export const SoilingDetection = () => {
     const newSoilingWeeks = e.target.value;
     dispatch(updateSoilingWeeks(newSoilingWeeks))
     if(soilingEnabled)
-      dispatch(applyDeviationDetection({folder, id: dataset.id, from, to, resampleFreq, weeks : newSoilingWeeks, changepoints : detectedChangepoints}));
+      dispatch(applyDeviationDetection({id: dataset.id, from, to, weeks : newSoilingWeeks, changepoints : detectedChangepoints}));
   }
 
   useEffect(()=>{
@@ -43,7 +43,7 @@ export const SoilingDetection = () => {
     const action = !soilingEnabled;
     dispatch(toggleSoilingDetection(action));
     if(action)
-      dispatch(applyDeviationDetection({folder, id: dataset.id, from, to, resampleFreq, weeks : soilingWeeks, changepoints : detectedChangepoints}));
+      dispatch(applyDeviationDetection({id: dataset.id, from, to, weeks : soilingWeeks, changepoints : detectedChangepoints}));
   }
 
   return (

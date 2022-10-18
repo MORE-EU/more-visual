@@ -113,6 +113,7 @@ const initialState = {
   customChangepointsEnabled: false,
   forecasting: false,
   soilingEnabled: false,
+  yawMisalignmentEnabled: false,
   anchorEl: null,
 };
 
@@ -202,7 +203,8 @@ export const applyChangepointDetection = createAsyncThunk(
   async (data: { id: string; from: number; to: number;}) => {
     const { id, from, to} = data;
     const response = await axios
-      .post(`api/tools/cp_detection/${id}`, {
+      .post(`api/tools/changepoint_detection`, {
+        id,
         range: { from, to } as ITimeRange,
       })
       .then(res => res);
@@ -220,21 +222,34 @@ export const applyForecasting = createAsyncThunk(
 
 export const applyDeviationDetection = createAsyncThunk(
   'applyDeviationDetection',
-  async (data: {folder: string, resampleFreq: string; id: string,
-      from : number, to : number, weeks : number, changepoints : IChangepointDate[]}) => {
-    const requestUrl = `api/tools/soiling/${data.folder}/${data.id}`;
+  async (data: {id: string, from : number, to : number, weeks : number, changepoints : IChangepointDate[]}) => {
+    const requestUrl = `api/tools/soiling`;
+    const id = data.id;
     const range = {from: data.from, to: data.to} as unknown as ITimeRange;
     const changepoints = data.changepoints;
-    const frequency = data.resampleFreq;
     const weeks = data.weeks;
     const response = await axios.post(requestUrl, {
+      id,
       range,
-      frequency,
       changepoints,
       weeks,
     });
     return response.data;
   });
+
+export const applyYawMisalignmentDetection = createAsyncThunk(
+  'applyYawMisalignmentDetection',
+  async(data: {id: string, from: number, to: number}) => {
+    const requestUrl = `api/tools/yaw_misalignment`;
+    const id = data.id;
+    const range = {from: data.from, to: data.to} as unknown as ITimeRange;
+    const response = await axios.post(requestUrl, {
+      id,
+      range,
+    });
+    return response.data;
+  }
+)
 
 export const getManualChangepoints = createAsyncThunk(
   'getManualChangepoints',
@@ -351,6 +366,9 @@ const visualizer = createSlice({
       state.soilingEnabled = action.payload;
       state.secondaryData = state.soilingEnabled ? state.secondaryData : null;
     },
+    toggleYawMisalignmentDetection(state, action){
+      state.yawMisalignmentEnabled = action.payload;
+    },
     toggleForecasting(state, action){
       state.forecasting = action.payload;
     },
@@ -429,7 +447,7 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(getManualChangepoints.fulfilled), (state, action) => {
       state.manualChangepoints = action.payload.length === 0 ? null : action.payload;
     });
-    builder.addMatcher(isAnyOf(applyDeviationDetection.fulfilled), (state, action) => {
+    builder.addMatcher(isAnyOf(applyDeviationDetection.fulfilled, applyYawMisalignmentDetection.fulfilled), (state, action) => {
       state.secondaryData = action.payload.length === 0 ? null : action.payload;
     });
   },
@@ -439,8 +457,9 @@ export const {
   resetChartValues, resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq, updateFilters,
   updatePatterns, updateChangeChart,updateDatasetChoice, updateDatasetMeasures, updatePatternNav,updateChartRef,
   updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateAnchorEl,
-  updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleManualChangepoints, toggleChangepointDetection,
-  toggleCustomChangepoints, setShowDatePick,setShowChangepointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
-  setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns, setChartType,
+  updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleChangepointDetection,
+  toggleYawMisalignmentDetection, toggleManualChangepoints,  toggleCustomChangepoints,
+  setShowDatePick,setShowChangepointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
+  setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns,
 } = visualizer.actions;
 export default visualizer.reducer;

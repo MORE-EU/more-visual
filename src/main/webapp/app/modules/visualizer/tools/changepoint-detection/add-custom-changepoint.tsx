@@ -18,7 +18,9 @@ export const AddCustomChangepoint = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
     }}>
-      <Box sx={{pt: 1}}>Add Custom</Box>
+      <Box sx={{pt: 1}}>Add New
+
+      </Box>
       <Button
         onClick={() => handleCustomChangepointsChange()}
       >

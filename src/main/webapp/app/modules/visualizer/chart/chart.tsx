@@ -21,11 +21,9 @@ import {
   applyChangepointDetection,
   toggleCustomChangepoints,
   applyDeviationDetection,
-  liveDataImplementation
+  liveDataImplementation, applyYawMisalignmentDetection
 } from "app/modules/store/visualizerSlice";
-import {Simulate} from "react-dom/test-utils";
-import select = Simulate.select;
-import ChartPlotBands from "app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands";
+import {ChartPlotBands} from "app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands";
 
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
@@ -54,7 +52,8 @@ export const Chart = () => {
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, measureColors,
     queryResultsLoading, filter, queryResults, changeChart, compare, changepointDetectionEnabled,
     customChangepointsEnabled, patterns, data, compareData, forecastData, soilingEnabled,
-    soilingWeeks, secondaryData, chartType} = useAppSelector(state => state.visualizer);
+    soilingWeeks, yawMisalignmentEnabled, secondaryData, chartType} = useAppSelector(state => state.visualizer);
+  
   const dispatch = useAppDispatch();
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -79,7 +78,9 @@ export const Chart = () => {
 
   const latestCustomChangepoints = useRef([])
   const isSoilingEnabled = useRef(soilingEnabled);
+  const isYawMisalignmentEnabled = useRef(yawMisalignmentEnabled);
   const isChangepointDetectionEnabled = useRef(changepointDetectionEnabled);
+
 
 
   // Color Zones For Patterns
@@ -109,6 +110,10 @@ export const Chart = () => {
   }, [soilingEnabled]);
 
   useEffect(() => {
+    isYawMisalignmentEnabled.current = yawMisalignmentEnabled;
+  }, [yawMisalignmentEnabled]);
+
+  useEffect(() => {
     latestFilter.current = filter;
   }, [filter])
 
@@ -131,7 +136,7 @@ export const Chart = () => {
     if (compare.length !== 0) {
       dispatch(updateCompareQueryResults({folder, id: compare, from, to, resampleFreq, selectedMeasures, filter}));
     }
-    if(selectedMeasures.length === 6) toast("You can only view up to 6 measures at a time.");
+    if(selectedMeasures.length === 6) toast("Maximum number of measures reached");
   }, [dataset, selectedMeasures]);
 
   useEffect(() => {
@@ -228,9 +233,11 @@ export const Chart = () => {
           applyChangepointDetection({id: latestDatasetId.current,
             from: leftSide, to: rightSide})).then((res) => {
           if(isSoilingEnabled.current) dispatch(applyDeviationDetection({id: latestDatasetId.current,
-            folder: latestFolder.current, resampleFreq: latestFrequency.current, weeks: latestSoilingWeeks.current,
-            from: leftSide, to: rightSide, changepoints: res.payload}));
+            weeks: latestSoilingWeeks.current, from: leftSide, to: rightSide, changepoints: res.payload}));
         });
+      if(isYawMisalignmentEnabled.current)
+        dispatch(applyYawMisalignmentDetection({id: latestDatasetId.current,
+          from: leftSide, to: rightSide}));
       };
 
     const getSides = (max: number, min: number, p: number) => {
@@ -349,6 +356,10 @@ export const Chart = () => {
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
   };
 
+  const getSecondaryText = () => {
+    if(isYawMisalignmentEnabled.current) return "Yaw Angle";
+    if(isSoilingEnabled.current) return "Soiling Ratio";
+  }
 
   const computeChartData = () => {
     let chartData = (data !== null) ? selectedMeasures
@@ -367,10 +378,10 @@ export const Chart = () => {
       const sz = chartData !== null ? chartData.length : 0;
       const sData = secondaryData.map((d) => {
         const val = d.values[0];
-        return {x : d.timestamp, y : isNaN(val) ? null : val, tt : "Est. Power Loss: " + d.values[1].toFixed(2)}
+        return {x : d.timestamp, y : isNaN(val) ? null : val,  tt : d.values[1] ?  "Est. Power Loss: " + d.values[1].toFixed(2) : null}
       });
       // @ts-ignore
-      chartData = [...chartData, {data: sData, yAxis: sz, name: 'Soiling Ratio'}]
+      chartData = [...chartData, {data: sData, yAxis: sz, name: getSecondaryText()}]
     }
     return chartData;
   }
@@ -407,7 +418,7 @@ export const Chart = () => {
       const newAxis = {
         title: {
           enabled: true,
-          text: "Soiling Ratio",
+          text: getSecondaryText(),
         },
         opposite: false,
         top: `0%`,
@@ -548,6 +559,7 @@ export const Chart = () => {
                 connectNulls: false,
                 connectorAllowed: false,
                 maxPointWidth: 80,
+                turboThreshold: 100000, // TODO: REMOVE THIS IS ONLY FOR ALEX YAW
                 marker: {
                   enabled: filter.size != 0 ? true : false
                 }

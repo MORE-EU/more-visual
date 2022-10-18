@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.*;
 
+import eu.more2020.visual.domain.Detection.ChangepointDetection;
+import eu.more2020.visual.domain.Detection.DeviationDetection;
+import eu.more2020.visual.domain.Detection.RangeDetection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.format.datetime.joda.LocalDateTimeParser;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -146,17 +148,16 @@ public class ToolsRepositoryImpl implements ToolsRepository {
     }
 
     @Override
-    public List<Changepoint> cpDetection(String id, ChangepointDetection changepoints) {
+    public List<Changepoint> changepointDetection(ChangepointDetection changepointDetection) {
         List<Changepoint> detectedChangepoints = new ArrayList<>();
-
         try {
-            URL dataURL = new URL(applicationProperties.getToolApi() + "cp_detection/" + id);
+            URL dataURL = new URL(applicationProperties.getToolApi() + "cp_detection/" + changepointDetection.getId());
             Map<String, Object> params = new LinkedHashMap<>();
-            params.put("start_date", changepoints.getRange().getFrom().format(formatter));
-            params.put("end_date", changepoints.getRange().getTo().format(formatter));
-            if (changepoints.getChangepoints() != null) {
-                params.put("c_starts", changepoints.getChangepoints().stream().map(changepoint -> changepoint.getRange().getFrom().format(formatter)).collect(Collectors.toList()));
-                params.put("c_ends", changepoints.getChangepoints().stream().map(changepoint -> changepoint.getRange().getTo().format(formatter)).collect(Collectors.toList()));
+            params.put("start_date", changepointDetection.getRange().getFrom().format(formatter));
+            params.put("end_date", changepointDetection.getRange().getTo().format(formatter));
+            if (changepointDetection.getChangepoints() != null) {
+                params.put("c_starts", changepointDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getFrom().format(formatter)).collect(Collectors.toList()));
+                params.put("c_ends", changepointDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getTo().format(formatter)).collect(Collectors.toList()));
             }
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(params);
@@ -184,8 +185,6 @@ public class ToolsRepositoryImpl implements ToolsRepository {
             Integer noOfIntervals = starts.size();
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
-//                detectedChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
-//                    LocalDateTime.parse(ends.get(ii).asText(), formatter)), scores.get(ii).asDouble()));
                 detectedChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
                     LocalDateTime.parse(ends.get(ii).asText(), formatter)), 0.0));
             }
@@ -196,10 +195,10 @@ public class ToolsRepositoryImpl implements ToolsRepository {
     }
 
     @Override
-    public List<DataPoint> soilingDetection(String id, DeviationDetection deviationDetection) {
+    public List<DataPoint> soilingDetection(DeviationDetection deviationDetection) {
         List<DataPoint> dataPoints = new ArrayList<>();
         try {
-            URL dataURL = new URL(applicationProperties.getToolApi() + "power_index/" + id);
+            URL dataURL = new URL(applicationProperties.getToolApi() + "power_index/" + deviationDetection.getId());
             Map<String, Object> params = new LinkedHashMap<>();
             params.put("start_date", deviationDetection.getRange().getFrom().format(formatter));
             params.put("end_date", deviationDetection.getRange().getTo().format(formatter));
@@ -235,13 +234,54 @@ public class ToolsRepositoryImpl implements ToolsRepository {
                 dataPoints.add(dataPoint);
             }
             in.close();
-            //return applicationProperties.getWorkspacePath() + content;
         }
         catch (Exception e){
             e.printStackTrace();
         }
         return dataPoints;
-        //return "";
+    }
+
+    @Override
+    public List<DataPoint> yawMisalignmentDetection(RangeDetection rangeDetection) {
+        List<DataPoint> dataPoints = new ArrayList<>();
+        try {
+            URL dataURL = new URL(applicationProperties.getToolApi() + "yaw_misalignment/" + rangeDetection.getId());
+            Map<String, Object> params = new LinkedHashMap<>();
+            params.put("start_date", rangeDetection.getRange().getFrom().format(formatter));
+            params.put("end_date", rangeDetection.getRange().getTo().format(formatter));
+
+            log.debug("YAW for: " + params);
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(params);
+            HttpURLConnection conn = (HttpURLConnection) dataURL.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setDoOutput(true);
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = json.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+            BufferedReader in = new BufferedReader(
+                new InputStreamReader(conn.getInputStream()));
+            String inputLine;
+            StringBuffer content = new StringBuffer();
+
+            // Write CSV to local file
+            String[] header = in.readLine().split(","); // read header
+
+            while ((inputLine = in.readLine()) != null) {
+                String[] splitted = inputLine.split(",");
+                DataPoint dataPoint = new DataPoint(LocalDateTime.parse(splitted[0], formatter),
+                    Arrays.stream(splitted).skip(1).mapToDouble(Double::parseDouble).toArray());
+                dataPoints.add(dataPoint);
+            }
+            in.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return dataPoints;
     }
 
 

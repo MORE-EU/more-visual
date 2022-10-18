@@ -66,7 +66,7 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
 
 const Toolkit = () => {
 
-  const {openToolkit, activeTool} = useAppSelector(state => state.visualizer);
+  const {dataset, openToolkit, activeTool} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const handleDrawer = () => {
@@ -96,19 +96,25 @@ const Toolkit = () => {
               </ListItemIcon>
               <ListItemText primary={"Pattern Extraction"}/>
             </ListItem>
-            <ListItem button key={1} onClick={() => handleToolClick(1)}>
+            {dataset.resType === 0 && <ListItem button key={1} onClick={() => handleToolClick(1)}>
               <ListItemIcon>
                 <ManageSearchIcon/>
               </ListItemIcon>
               <ListItemText primary={"Soiling Detection"}/>
-            </ListItem>
-            <ListItem button key={2} onClick={() => handleToolClick(2)}>
+            </ListItem>}
+            {dataset.resType === 1 && <ListItem button key={2} onClick={() => handleToolClick(2)}>
+              <ListItemIcon>
+                <ManageSearchIcon/>
+              </ListItemIcon>
+              <ListItemText primary={"Yaw Misalignment"}/>
+            </ListItem>}
+            <ListItem button key={3} onClick={() => handleToolClick(3)}>
               <ListItemIcon>
                 <TimelineIcon/>
               </ListItemIcon>
               <ListItemText primary={"Forecasting"}/>
             </ListItem>
-            <ListItem button key={3} onClick={() => handleToolClick(3)}>
+            <ListItem button key={4} onClick={() => handleToolClick(4)}>
               <ListItemIcon>
                 <FilterAltIcon/>
               </ListItemIcon>
