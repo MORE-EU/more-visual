@@ -1,9 +1,9 @@
 package eu.more2020.visual.repository;
 
-import eu.more2020.visual.domain.Changepoint;
-import eu.more2020.visual.domain.ChangepointDetection;
-import eu.more2020.visual.domain.DataPoint;
-import eu.more2020.visual.domain.DeviationDetection;
+import eu.more2020.visual.domain.*;
+import eu.more2020.visual.domain.Detection.ChangepointDetection;
+import eu.more2020.visual.domain.Detection.DeviationDetection;
+import eu.more2020.visual.domain.Detection.RangeDetection;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,8 +18,10 @@ public interface ToolsRepository {
 
     List<DataPoint> forecasting(String id);
 
-    List<Changepoint> cpDetection(String id, ChangepointDetection changepoints) throws IOException;
+    List<Changepoint> changepointDetection(ChangepointDetection changepoints) throws IOException;
 
-    List<DataPoint> soilingDetection(String id, DeviationDetection deviationDetection);
+    List<DataPoint> soilingDetection(DeviationDetection deviationDetection);
+
+    List<DataPoint> yawMisalignmentDetection(RangeDetection rangeDetection);
 
 }

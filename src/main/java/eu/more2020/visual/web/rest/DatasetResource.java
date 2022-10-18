@@ -1,6 +1,9 @@
 package eu.more2020.visual.web.rest;
 
 import eu.more2020.visual.domain.*;
+import eu.more2020.visual.domain.Detection.ChangepointDetection;
+import eu.more2020.visual.domain.Detection.DeviationDetection;
+import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.ToolsRepository;
 import eu.more2020.visual.service.CsvDataService;
@@ -173,16 +176,16 @@ public class DatasetResource {
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 
-    @PostMapping("/tools/cp_detection/{id}")
-    public ResponseEntity<List<Changepoint>> changepointDetection(@PathVariable String id, @Valid @RequestBody ChangepointDetection changepoints) throws IOException {
+    @PostMapping("/tools/changepoint_detection")
+    public ResponseEntity<List<Changepoint>> changepointDetection(@Valid @RequestBody ChangepointDetection changepoints) throws IOException {
         log.debug("CP for {}", changepoints);
-        List<Changepoint> detectedChangepoints = toolsRepository.cpDetection(id, changepoints);
+        List<Changepoint> detectedChangepoints = toolsRepository.changepointDetection(changepoints);
         log.debug("Detected CP for {}", detectedChangepoints);
 
         return new ResponseEntity<>(detectedChangepoints, HttpStatus.OK);
     }
 
-    @GetMapping("/tools/cp_detection/washes/{id}")
+    @GetMapping("/tools/changepoint_detection/washes/{id}")
     public List<Changepoint> getManualChangepoints(@PathVariable String id) throws IOException {
         log.debug("REST request to get manual changepoints ");
         return toolsRepository.getManualChangepoints(id);
@@ -194,35 +197,15 @@ public class DatasetResource {
         return toolsRepository.forecasting(id);
     }
 
-//    @PostMapping("/tools/soiling/{folder}/{id}")
-//    public List<String> soilingDetection(@PathVariable String folder, @PathVariable String id,
-//                                            @Valid @RequestBody DeviationDetection deviationDetection) throws IOException {
-//        List<String> extraMeasures = new ArrayList<>();
-//        extraMeasures.add("soiling1");
-//        extraMeasures.add("soiling2");
-//        log.debug("REST request to apply Soiling Detection ");
-//        String soilingPath =  toolsRepository.soilingDetection(id, deviationDetection);
-//        datasetRepository.findById(id, folder).map(dataset -> {
-//            try {
-//                if (dataset.getType().equals("modelar")) {
-//                    return null;
-//                }
-//                else {
-//                    TimeseriesTreeIndex index = csvDataService.getIndex(folder, dataset);
-//                    index.enhance(soilingPath, deviationDetection.getFrequency(), deviationDetection.getRange());
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            return extraMeasures;
-//        });
-//        return extraMeasures;
-//    }
+    @PostMapping("/tools/soiling")
+    public List<DataPoint> soilingDetection(@Valid @RequestBody DeviationDetection deviationDetection) {
+        return toolsRepository.soilingDetection(deviationDetection);
+    }
 
-    @PostMapping("/tools/soiling/{folder}/{id}")
-    public List<DataPoint> soilingDetection(@PathVariable String folder, @PathVariable String id,
-                                         @Valid @RequestBody DeviationDetection deviationDetection) {
-        return toolsRepository.soilingDetection(id, deviationDetection);
+
+    @PostMapping("/tools/yaw_misalignment")
+    public List<DataPoint> yawMisalignmentDetection(@Valid @RequestBody RangeDetection yawMisalignmentDetection) {
+        return toolsRepository.yawMisalignmentDetection(yawMisalignmentDetection);
     }
 
 }
