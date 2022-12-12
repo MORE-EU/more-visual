@@ -4,6 +4,7 @@ import eu.more2020.visual.domain.*;
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
+import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.ToolsRepository;
 import eu.more2020.visual.service.CsvDataService;
@@ -39,6 +40,7 @@ public class DatasetResource {
     private final CsvDataService csvDataService;
     private final ModelarDataService modelarDataService;
     private final IndexedModelarDataService indexedModelarDataService;
+    private final AlertRepository alertRepository;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -48,12 +50,14 @@ public class DatasetResource {
 
     public DatasetResource(DatasetRepository datasetRepository,
                            ToolsRepository toolsRepository,
-                           CsvDataService csvDataService, ModelarDataService modelarDataService, IndexedModelarDataService indexedModelarDataService) {
+                           CsvDataService csvDataService, ModelarDataService modelarDataService, 
+                           IndexedModelarDataService indexedModelarDataService, AlertRepository alertRepository) {
         this.datasetRepository = datasetRepository;
         this.toolsRepository = toolsRepository;
         this.csvDataService = csvDataService;
         this.modelarDataService = modelarDataService;
         this.indexedModelarDataService = indexedModelarDataService;
+        this.alertRepository = alertRepository;
     }
 
     /**
@@ -206,6 +210,30 @@ public class DatasetResource {
     @PostMapping("/tools/yaw_misalignment")
     public List<DataPoint> yawMisalignmentDetection(@Valid @RequestBody RangeDetection yawMisalignmentDetection) {
         return toolsRepository.yawMisalignmentDetection(yawMisalignmentDetection);
+    }
+
+    @GetMapping("/alerts/{datasetId}")
+    public List<Alert> getAlerts(@PathVariable String datasetId) throws IOException {
+        log.debug("REST request to find alerts for {} dataset", datasetId);
+        return alertRepository.getAlerts(datasetId);
+    }
+
+    @PostMapping("/alerts/add")
+    public List<Alert> saveAlert(@Valid @RequestBody Alert alertInfo) throws IOException {
+        log.debug("REST request to add alert with name: {}", alertInfo.getName());
+        return alertRepository.saveAlert(alertInfo);
+    }
+
+    @PostMapping("/alerts/remove/{alertName}")
+    public List<Alert> deleteAlert(@PathVariable String alertName) throws IOException {
+        log.debug("REST request to remove alert with name: {}", alertName);
+        return alertRepository.deleteAlert(alertName);
+    }
+    
+    @PostMapping("/alerts/edit")
+    public List<Alert> deleteAlert(@Valid @RequestBody Alert editedAlert) throws IOException {
+        log.debug("REST request to remove alert with name: {}", editedAlert.getName());
+        return alertRepository.editAlert(editedAlert);
     }
 
 }

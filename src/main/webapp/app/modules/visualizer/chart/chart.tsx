@@ -21,9 +21,10 @@ import {
   applyChangepointDetection,
   toggleCustomChangepoints,
   applyDeviationDetection,
-  liveDataImplementation, applyYawMisalignmentDetection
+  liveDataImplementation, applyYawMisalignmentDetection, updateAlertResults, setAlertingPreview, setAlertingPlotMode
 } from "app/modules/store/visualizerSlice";
 import {ChartPlotBands} from "app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands";
+import chartAlertingChecker, { alertingPlotBandsCreator } from "./chart-alerting/chart-alerting-functions";
 
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
@@ -51,8 +52,8 @@ export const Chart = () => {
 
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, measureColors,
     queryResultsLoading, filter, queryResults, changeChart, compare, changepointDetectionEnabled,
-    customChangepointsEnabled, patterns, data, compareData, forecastData, soilingEnabled,
-    soilingWeeks, yawMisalignmentEnabled, secondaryData, chartType} = useAppSelector(state => state.visualizer);
+    customChangepointsEnabled, patterns, data, compareData, forecastData, soilingEnabled, alertingPlotMode, alertResults,
+    soilingWeeks, yawMisalignmentEnabled, secondaryData, chartType, liveDataImplLoading, alerts, alertingPreview} = useAppSelector(state => state.visualizer);
   
   const dispatch = useAppDispatch();
 
@@ -61,6 +62,7 @@ export const Chart = () => {
   const [zones, setZones] = useState([]);
   const [customPlotBands, setCustomPlotBands] = useState([]);
   const [manualPlotBands, setManualPlotBands] = useState([]);
+  const [alertingPlotBands, setAlertingPlotBands] = useState([]);
   const [detectedPlotBands, setDetectedPlotBands] = useState([]);
   const [changepointHighlight, setChangepointHighlight] = useState(false);
   //Refs
@@ -75,7 +77,7 @@ export const Chart = () => {
   const latestSoilingWeeks = useRef(soilingWeeks);
   const latestCompare = useRef(compare);
   const latestFilter = useRef(filter);
-
+  const latestPreview = useRef(alertingPreview);
   const latestCustomChangepoints = useRef([])
   const isSoilingEnabled = useRef(soilingEnabled);
   const isYawMisalignmentEnabled = useRef(yawMisalignmentEnabled);
@@ -106,8 +108,22 @@ export const Chart = () => {
 
 
   useEffect(() => {
+    latestPreview.current = alertingPreview;
+  }, [alertingPreview]);
+
+  useEffect(() => {
     isSoilingEnabled.current = soilingEnabled;
   }, [soilingEnabled]);
+  
+  useEffect(() => {
+    !liveDataImplLoading && data && alerts &&
+    dispatch(updateAlertResults(chartAlertingChecker(data, alerts, dataset, selectedMeasures)));
+  }, [liveDataImplLoading, selectedMeasures, alerts]);
+  
+  useEffect(() => {
+    alertingPlotMode && data && Object.keys(alertResults).length > 0 &&
+    setAlertingPlotBands(alertingPlotBandsCreator(alertResults));
+  }, [alertingPlotMode, selectedMeasures, alertResults]);
 
   useEffect(() => {
     isYawMisalignmentEnabled.current = yawMisalignmentEnabled;
@@ -208,7 +224,6 @@ export const Chart = () => {
     timeRange.current = queryResults.timeRange;
     latestDatasetId.current = dataset.id;
     latestFolder.current = folder;
-
     // CHART: INSTRUCTIONS
     chart.current.showLoading("Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear");
     Highcharts.addEvent(chart.current.container, "click", (event: MouseEvent) => {
@@ -321,6 +336,7 @@ export const Chart = () => {
     // CHART: PAN FUNCTION
     Highcharts.wrap(Highcharts.Chart.prototype, "pan", function (proceed, ...args) {
       if(!chart.current.loadingShown){
+      latestPreview.current && (dispatch(setAlertingPreview(false)), dispatch(setAlertingPlotMode(false)), setAlertingPlotBands([]));
       proceed.apply(this, args);
       checkForDataOnPan();
       renderLabelForLiveData();
@@ -342,15 +358,20 @@ export const Chart = () => {
 
     // LIVE DATA IMPLEMENTATION
     setInterval(() => {
+        if(!latestPreview.current){
         const {max, min, dataMax} = chart.current.xAxis[0].getExtremes();
         if( max >= data[data.length - 1].timestamp && latestFrequency.current === "second"){
         dispatch(liveDataImplementation(
           {folder: latestFolder.current, id: latestDatasetId.current,
           from: dataMax, to: dataMax + calculateStep(latestFrequency.current, 30), resampleFreq: 'SECOND',
           selectedMeasures: latestMeasures.current, filter: latestFilter.current}))
-          chart.current.xAxis[0].setExtremes(min, dataMax, false, true);
+          max === dataMax && chart.current.xAxis[0].setExtremes(min, (dataMax + calculateStep(latestFrequency.current, 30)), true, true);
         }
-    }, 5000);
+      }
+      // else{
+      //   chart.current.toast !== "Preview Mode" && toast('Preview Mode');
+      // }
+    }, 500);
 
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
@@ -471,7 +492,7 @@ export const Chart = () => {
 
   const handleMouseOverChart = () => {
     blockScroll();
-    (customChangepointsEnabled && chart.current)
+    (customChangepointsEnabled && chart.current.chartBackground !== null)
       ?
       chart.current.chartBackground.htmlCss({cursor:'crosshair'}) :
       chart.current.chartBackground.htmlCss({cursor:'default'});
@@ -610,7 +631,8 @@ export const Chart = () => {
               plotBands: [
                 ...manualPlotBands,
                 ...detectedPlotBands,
-                ...customPlotBands
+                ...customPlotBands,
+                ...alertingPlotBands
               ],
             },
             yAxis: computeYAxisData(),

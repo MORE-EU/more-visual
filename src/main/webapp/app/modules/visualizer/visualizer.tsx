@@ -12,13 +12,13 @@ import Toolkit from "app/modules/visualizer/tools/toolkit";
 import HomeIcon from '@mui/icons-material/Home';
 import {Breadcrumbs, Divider, Link, Typography} from "@mui/material";
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { getDataset, getWdFiles, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getWdFiles, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
 
 const mdTheme = createTheme();
 
 export const Visualizer = () => {
 
-  const { wdFiles, dataset, openToolkit} = useAppSelector(state => state.visualizer);
+  const { wdFiles, dataset, openToolkit, selectedMeasures} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const  params: any = useParams();
 
@@ -37,6 +37,10 @@ export const Visualizer = () => {
     dispatch(setFolder(params.folder));
     dispatch(getDataset({folder: params.folder, id: params.id}));
   }, [params.id !== undefined]);
+
+  useEffect(() => {
+    dataset && dispatch(getAlerts(dataset.id))
+  }, [dataset])
 
   useEffect(() => {
     wdFiles.length !== 0 && dispatch(updateDatasetChoice(wdFiles.indexOf(params.id)));

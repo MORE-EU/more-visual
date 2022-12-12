@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { IAlerts } from 'app/shared/model/alert.model';
 import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
 import { IQueryResults } from 'app/shared/model/query-results.model';
@@ -76,6 +77,7 @@ const initialState = {
   queryResults: null as IQueryResults,
   data: null as any,
   compareData: null,
+  liveDataImplLoading: false,
   queryResultsLoading: true,
   selectedMeasures: [],
   measureColors: [],
@@ -115,6 +117,11 @@ const initialState = {
   soilingEnabled: false,
   yawMisalignmentEnabled: false,
   anchorEl: null,
+  alerts: [] as IAlerts[],
+  alertsLoading: false,
+  alertingPreview: false,
+  alertResults: {},
+  alertingPlotMode: false,
 };
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
@@ -135,6 +142,26 @@ export const getDirectories = createAsyncThunk('getDirectories', async () => {
 
 export const getSampleFile = createAsyncThunk('getSampleFile', async (id: string) => {
   const response = await axios.get(`api/datasets/${id}/sample`).then(res => res);
+  return response;
+});
+
+export const getAlerts = createAsyncThunk('getAlerts', async (datasetId: String) => {
+  const response = await axios.get(`api/alerts/${datasetId}`).then(res => res);
+  return response;
+});
+
+export const saveAlert = createAsyncThunk('saveAlert', async (alertInfo: IAlerts) => {
+  const response = await axios.post(`api/alerts/add`, alertInfo).then(res => res);
+  return response;
+});
+
+export const editAlert = createAsyncThunk('editAlert', async (alertInfo: IAlerts) => {
+  const response = await axios.post(`api/alerts/edit`, alertInfo).then(res => res);
+  return response;
+});
+
+export const deleteAlert = createAsyncThunk('deleteAlert', async (alertName: String) => {
+  const response = await axios.post(`api/alerts/remove/${alertName}`).then(res => res);
   return response;
 });
 
@@ -326,6 +353,9 @@ const visualizer = createSlice({
     updateSoilingWeeks(state, action) {
       state.soilingWeeks = action.payload
     },
+    updateAlertResults(state, action) {
+      state.alertResults = {...action.payload}
+    },
     getPatterns(state, action: {payload: {data: IDataPoint[], val: number, resampleFreq: string}, type: string}) {
       state.patterns = initPatterns(action.payload.data, action.payload.val, action.payload.resampleFreq);
     },
@@ -349,6 +379,12 @@ const visualizer = createSlice({
     },
     setExpand(state, action) {
       state.expand = action.payload;
+    },
+    setAlertingPreview(state, action) {
+      state.alertingPreview = action.payload;
+    },
+    setAlertingPlotMode(state, action) {
+      state.alertingPlotMode = action.payload;
     },
     setOpenToolkit(state, action) {
       state.openToolkit = action.payload;
@@ -409,6 +445,22 @@ const visualizer = createSlice({
       state.loading = false;
       state.sampleFile = action.payload.data;
     });
+    builder.addCase(getAlerts.fulfilled, (state, action) => {
+      state.alertsLoading = false;
+      state.alerts = action.payload.data;
+    });
+    builder.addCase(editAlert.fulfilled, (state, action) => {
+      state.alertsLoading = false;
+      state.alerts = action.payload.data;
+    });
+    builder.addCase(saveAlert.fulfilled, (state, action) => {
+      state.alertsLoading = false;
+      state.alerts = action.payload.data;
+    });
+    builder.addCase(deleteAlert.fulfilled, (state, action) => {
+      state.alertsLoading = false;
+      state.alerts = action.payload.data;
+    });
     builder.addCase(updateQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;
       state.queryResults = action.payload;
@@ -421,25 +473,39 @@ const visualizer = createSlice({
       state.compareData = action.payload;
     })
     builder.addCase(liveDataImplementation.fulfilled, (state, action) => {
+      state.liveDataImplLoading = false;
       state.queryResultsLoading = false;
-      state.data = action.payload.data.length !== 0 ? [...state.data, ...action.payload.data] : state.data;
+      state.data = action.payload.data.length !== 0 ? [...state.data, ...action.payload.data.slice(0)] : state.data;
     })
     builder.addMatcher(isAnyOf(getDataset.pending, getWdFiles.pending, getDirectories.pending, getSampleFile.pending), state => {
       state.errorMessage = null;
       state.loading = true;
     });
-    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending, liveDataImplementation.pending), state => {
+    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
       state.queryResultsLoading = true;
     });
-    builder.addMatcher(
-      isAnyOf(getDataset.rejected, getWdFiles.rejected, getDirectories.pending, getSampleFile.rejected),
+    builder.addMatcher(isAnyOf(liveDataImplementation.pending), state => {
+      state.liveDataImplLoading = true;
+      state.queryResultsLoading = true;
+    });
+    builder.addMatcher(isAnyOf(saveAlert.pending, deleteAlert.pending, getAlerts.pending, editAlert.pending), state => {
+      state.alertsLoading = true;
+    });
+    builder.addMatcher(isAnyOf(getDataset.rejected, getWdFiles.rejected, getDirectories.pending, getSampleFile.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.payload;
       }
     );
-    builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected, liveDataImplementation.rejected), (state, action) => {
+    builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected), (state, action) => {
       state.queryResultsLoading = false;
+    });
+    builder.addMatcher(isAnyOf(liveDataImplementation.rejected), (state, action) => {
+      state.liveDataImplLoading = false;
+      state.queryResultsLoading = false;
+    });
+    builder.addMatcher(isAnyOf(saveAlert.rejected, deleteAlert.rejected, getAlerts.rejected, editAlert.rejected), (state, action) => {
+      state.alertsLoading = false;
     });
     builder.addMatcher(isAnyOf(applyChangepointDetection.fulfilled), (state, action) => {
       state.detectedChangepoints = action.payload.length === 0 ? null : action.payload;
@@ -459,7 +525,7 @@ export const {
   updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateAnchorEl,
   updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleChangepointDetection,
   toggleYawMisalignmentDetection, toggleManualChangepoints,  toggleCustomChangepoints,
-  setShowDatePick,setShowChangepointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth,
-  setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns,
+  setShowDatePick,setShowChangepointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth, setAlertingPlotMode,
+  setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns, setChartType, setAlertingPreview, updateAlertResults
 } = visualizer.actions;
 export default visualizer.reducer;

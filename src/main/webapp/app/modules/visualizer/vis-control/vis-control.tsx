@@ -2,16 +2,16 @@ import React, { useEffect } from 'react';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import {Box, Button, FormControl, Grid, InputLabel, ListItemIcon, MenuItem, Popover, Select, Tooltip, Typography} from "@mui/material";
+import { Grid, ListItemIcon, Tooltip, Typography} from "@mui/material";
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import {Link, useLocation} from "react-router-dom";
 import { useAppDispatch, useAppSelector } from '../../store/storeConfig';
-import { getDataset, resetChartValues, updateDatasetChoice, updateResampleFreq, updateSelectedMeasures } from '../../store/visualizerSlice';
+import { getDataset, resetChartValues, updateDatasetChoice } from '../../store/visualizerSlice';
 import VisMeasures from "app/modules/visualizer/vis-control/vis-measures";
 
 export const VisControl = () => {
 
-  const { folder, dataset, selectedMeasures, compare, datasetChoice, resampleFreq, wdFiles } = useAppSelector(state => state.visualizer);
+  const { folder, dataset, compare, datasetChoice, wdFiles } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const location = useLocation();
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);

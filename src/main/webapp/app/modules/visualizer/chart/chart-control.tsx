@@ -7,6 +7,7 @@ import { setCompare, updateChangeChart, updateQueryResults } from 'app/modules/s
 import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import { ChartType } from './chart-control-buttons/chart-type-picker';
+import { ChartAlerting } from './chart-control-buttons/chart-alerting-button';
 
 export const ChartControl = () => {
 
@@ -54,8 +55,9 @@ export const ChartControl = () => {
           </LocalizationProvider>
           <ChartCompare />
           <ChartType />
+          <ChartAlerting />
       </Grid>
-      <Grid item>
+      <Grid item sx={{alignSelf: "center"}}>
         <Button variant="text" size="small" onClick={() => {
           dispatch(updateChangeChart(false))
         }} sx={{mr: 1, color: changeChart ? "#424242" : "#0277bd"}}>Overlay</Button>

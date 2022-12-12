@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CsvQueryProcessor {
 
@@ -35,6 +34,7 @@ public class CsvQueryProcessor {
     private CsvTTI tti;
     private List<Integer> measures;
     private HashMap<Integer, Double[]> filter;
+    private Integer accumulatorCounter;
 
 
     public CsvQueryProcessor(Query query, Dataset dataset, CsvTTI tti) {
@@ -44,6 +44,7 @@ public class CsvQueryProcessor {
         this.queryResults = new QueryResults();
         this.dataset = dataset;
         this.tti = tti;
+        this.accumulatorCounter = 0;
         this.freqLevel = TimeSeriesIndexUtil.getTemporalLevelIndex(query.getFrequency()) + 1;
         CsvParserSettings parserSettings = tti.createCsvParserSettings();
         parser = new CsvParser(parserSettings);
@@ -82,9 +83,12 @@ public class CsvQueryProcessor {
 
     public double[] nodeSelectionFromFile(DoubleSummaryStatistics[] statsAccumulators) throws IOException {
         if(filter != null){
-        Boolean filterCheck = filter.entrySet().stream().anyMatch(e -> 
-        statsAccumulators[e.getKey()].getAverage() < e.getValue()[0] ||
-        statsAccumulators[e.getKey()].getAverage() > e.getValue()[1]);
+        Boolean filterCheck = filter.entrySet().stream().anyMatch(e -> {
+           accumulatorCounter++;
+           return (statsAccumulators[accumulatorCounter - 1].getAverage() < e.getValue()[0] ||
+            statsAccumulators[accumulatorCounter - 1].getAverage() > e.getValue()[1]);
+        });
+        accumulatorCounter = 0;
         if(!filterCheck){
             return Arrays.stream(statsAccumulators).mapToDouble(DoubleSummaryStatistics::getAverage).toArray();
         }else{
