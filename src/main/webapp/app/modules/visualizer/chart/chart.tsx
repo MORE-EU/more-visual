@@ -371,7 +371,7 @@ export const Chart = () => {
       // else{
       //   chart.current.toast !== "Preview Mode" && toast('Preview Mode');
       // }
-    }, 500);
+    }, 5000);
 
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
