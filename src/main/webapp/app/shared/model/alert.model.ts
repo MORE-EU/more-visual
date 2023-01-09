@@ -6,6 +6,8 @@ export interface IAlerts {
   duration: number;
   dateCreated: number;
   datasetId: string;
+  color: string;
+  severity: number;
   active: boolean;
 }
 
@@ -17,5 +19,7 @@ export const defaultValue: Readonly<IAlerts> = {
   duration: null,
   dateCreated: null,
   datasetId: null,
+  color: '#333333',
+  severity: 1,
   active: true,
 };

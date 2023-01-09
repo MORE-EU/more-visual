@@ -24,7 +24,7 @@ const style = {
   bgcolor: 'background.paper',
   borderRadius: '10px',
   boxShadow: 10,
-  maxWidth: 900,
+  width: 980,
   p: 4,
 };
 
@@ -71,19 +71,17 @@ export const ChartAlerting = () => {
 
   const getAlertsLength = () => {
     return Object.values(alertResults)
-      .map((ar: []) => ar.length)
+      .map((ar: {}) => ar["results"].length)
       .reduce((a, b) => a + b, 0);
   };
 
   const badgeColor = () => {
-    const alertResultsLength = getAlertsLength();
-    if (alertResultsLength <= 5) {
-      return 'primary';
-    } else if (alertResultsLength > 5 && alertResultsLength <= 10) {
-      return 'warning';
-    } else {
-      return 'error';
+    const colorMap = {
+      1: "primary",
+      2: "warning",
+      3: "error"
     }
+    return colorMap[Math.max(...Object.values(alertResults).map((res: {severity: number}) => res.severity))];
   };
 
   return (
@@ -114,7 +112,7 @@ export const ChartAlerting = () => {
             <Grid item xs={12} sx={{ mb: 2 }}>
               <AlertsTable setAlertInfo={setAlertInfo} setValue={setValue} setAlertPreviewName={setAlertPreviewName} />
             </Grid>
-            <Grid item xs={12} sx={{ mb: 2, height: 310, width: 753 }}>
+            <Grid item xs={12} sx={{ mb: 2, height: 388, width: 753 }}>
               <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                   <Tab label="Add" {...a11yProps(0)} />

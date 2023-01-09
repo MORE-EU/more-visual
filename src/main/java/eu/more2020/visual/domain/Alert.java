@@ -53,9 +53,26 @@ public class Alert implements Serializable {
     private String operation;
     private AlertValues values;
     private String datasetId;
+    private String color;
+    private Integer severity;
     private Boolean active;
 
 
+    public String getColor() {
+        return this.color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public Integer getSeverity() {
+        return this.severity;
+    }
+
+    public void setSeverity(Integer severity) {
+        this.severity = severity;
+    }
 
     public Boolean isActive() {
         return this.active;

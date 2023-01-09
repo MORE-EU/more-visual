@@ -15,6 +15,10 @@ import SaveAsIcon from '@mui/icons-material/SaveAs';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { editAlert, getAlerts, saveAlert } from 'app/modules/store/visualizerSlice';
 import React, { useEffect, useState } from 'react';
+import { ChromePicker } from 'react-color';
+import Button from '@mui/material/Button';
+import Popper from '@mui/material/Popper';
+import Fade from '@mui/material/Fade';
 
 export interface IAlertAddEditProps {
   action: string;
@@ -30,6 +34,10 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
   const [operationSel, setOperationSel] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.operation : 'over');
   const [duration, setDuration] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.duration : 10);
   const [values, setValues] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.values : { value1: '', value2: '' });
+  const [color, setColor] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.color : '#333333');
+  const [severity, setSeverity] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.severity : 1);
+  const [colorOpen, setColorOpen] = useState(false);
+  const [popperAnchor, setPopperAnchor] = useState(null);
   const [errorVals, setErrorVals] = useState(new Map());
 
   const resetEntries = () => {
@@ -52,6 +60,19 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
         newState.delete(name);
         return newState;
       });
+  };
+
+  const handleColorChange = newColor => {
+    setColor(newColor.hex);
+  };
+
+  const handleColorClick = event => {
+    setPopperAnchor(event.currentTarget);
+    setColorOpen(previousOpen => !previousOpen);
+  };
+
+  const handleSeverity = e => {
+    setSeverity(e.target.value);
   };
 
   const checkIfNameExists = name => {
@@ -140,8 +161,10 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
       },
       operation: operationSel,
       duration,
-      dateCreated: data[data.length - 1].timestamp,
+      dateCreated: props.action === 'edit' && props.alertInfo ? props.alertInfo.dateCreated : data[data.length - 1].timestamp,
       datasetId: dataset.id,
+      color,
+      severity,
       active: true,
     };
     const alertErrors = new Map();
@@ -170,6 +193,15 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
         </>
       ) : (
         <>
+          <Popper id="Color-Popper" open={colorOpen} anchorEl={popperAnchor} transition placement="right" sx={{ zIndex: 1500 }}>
+            {({ TransitionProps }) => (
+              <Fade {...TransitionProps} timeout={350}>
+                <Box sx={{ bgcolor: 'background.paper' }}>
+                  <ChromePicker color={color} onChange={handleColorChange} />
+                </Box>
+              </Fade>
+            )}
+          </Popper>
           <Grid item xs={12} sx={{ textAlign: 'left', flex: 1, display: 'flex' }}>
             <Typography id="modal-modal-title" variant="h5" sx={{ alignSelf: 'center' }} component={'span'}>
               Alert Config
@@ -231,6 +263,41 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
                 <MenuItem value={20}>20s</MenuItem>
                 <MenuItem value={30}>30s</MenuItem>
                 <MenuItem value={60}>1m</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+            <Box sx={{ backgroundColor: '#eeeeee', pl: 2, pr: 3, pt: 1, pb: 1, mr: 1 }}>
+              <Typography id="modal-modal-description" component={'span'} variant="subtitle1" fontSize={18}>
+                Color
+              </Typography>
+            </Box>
+            <Button sx={{ backgroundColor: '#f5f5f5', borderColor: '#eeeeee' }} variant="outlined" disableRipple onClick={handleColorClick}>
+              <div
+                style={{ backgroundColor: color, paddingRight: 20, paddingLeft: 20, color: 'transparent', paddingTop: 4, paddingBottom: 4 }}
+              >
+                .
+              </div>
+            </Button>
+            <Box sx={{ backgroundColor: '#eeeeee', pl: 2, pr: 3, pt: 1, pb: 1, ml: 1, mr: 1 }}>
+              <Typography id="modal-modal-description" component={'span'} variant="subtitle1" fontSize={18}>
+                Severity
+              </Typography>
+            </Box>
+            <FormControl size="small">
+              <InputLabel id="demo-simple-select-label">Duration</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={severity}
+                label="Duration"
+                variant="outlined"
+                sx={{ backgroundColor: '#f5f5f5' }}
+                onChange={handleSeverity}
+              >
+                <MenuItem value={1}>low</MenuItem>
+                <MenuItem value={2}>medium</MenuItem>
+                <MenuItem value={3}>high</MenuItem>
               </Select>
             </FormControl>
           </Grid>

@@ -46,8 +46,8 @@ const AlertingInfo = props => {
                 onClick={() => {
                   props.setOpen(false);
                   props.chartRef.xAxis[0].setExtremes(
-                    props.alertResults[props.alertPreviewName][0][0],
-                    props.alertResults[props.alertPreviewName][props.alertResults[props.alertPreviewName].length - 1][1],
+                    props.alertResults[props.alertPreviewName].results[0][0],
+                    props.alertResults[props.alertPreviewName].results[props.alertResults[props.alertPreviewName].results.length - 1][1],
                     true,
                     false
                   );
@@ -69,7 +69,7 @@ const AlertingInfo = props => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {props.alertResults.hasOwnProperty(props.alertPreviewName) && props.alertResults[props.alertPreviewName].map((item, idx) => (
+                  {props.alertResults.hasOwnProperty(props.alertPreviewName) && props.alertResults[props.alertPreviewName].results.map((item, idx) => (
                     <TableRow key={`row-result-${idx}`} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                       <TableCell align="left">{moment(item[0]).format('YYYY-MM-DD HH:mm:ss').toString()}</TableCell>
                       <TableCell align="left">{moment(item[1]).format('YYYY-MM-DD HH:mm:ss').toString()}</TableCell>
