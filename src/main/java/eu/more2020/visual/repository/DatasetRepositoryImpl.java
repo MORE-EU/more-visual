@@ -135,7 +135,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                     }
                     break;
                 default:
-                    File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, dataset.getName());
+                    File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, dataset.getPath());
                     if (!file.isDirectory()) {
                         DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
                         fillDataFileInfo(dataset, dataFileInfo);

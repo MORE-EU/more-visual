@@ -16,8 +16,10 @@ public class Dataset implements Serializable {
     private static final long serialVersionUID = 1L;
     public String samplingFreq;
     public String delimiter;
+    @NotNull
     private String id;
     @NotNull
+    private String path;
     private String name;
     private Integer resType; // 0: panel, 1: turbine
     private String type = "CSV";
@@ -27,7 +29,6 @@ public class Dataset implements Serializable {
     private String timeFormat;
     private String farmName;
     private String formalName;
-    private List<Changepoint>  gtChangepoints;
     private List<Integer> measures = new ArrayList<>();
     private Map<Integer, DoubleSummaryStatistics> measureStats;
 
@@ -133,12 +134,12 @@ public class Dataset implements Serializable {
         this.delimiter = delimiter;
     }
 
-    public List<Changepoint> getgtChangepoints() {
-        return gtChangepoints;
+    public String getPath() {
+        return path;
     }
 
-    public void setGtChangepoints(List<Changepoint>  gtChangepoints) {
-        this.gtChangepoints = gtChangepoints;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public Map<Integer, DoubleSummaryStatistics> getMeasureStats() {
@@ -204,7 +205,6 @@ public class Dataset implements Serializable {
             ", measures=" + measures +
             ", samplingFreq='" + samplingFreq + '\'' +
             ", delimiter='" + delimiter + '\'' +
-            ", gtChangepoints=" + gtChangepoints +
             '}';
     }
 }

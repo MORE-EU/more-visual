@@ -7,18 +7,9 @@ import java.util.List;
 
 public class ChangepointDetection extends AbstractDetection {
 
-    TimeRange range;
-
     List<Changepoint> changepoints;
 
-
     public ChangepointDetection() {}
-
-    public ChangepointDetection(TimeRange range, List<Changepoint> changepoints) {
-        this.range = range;
-        this.changepoints = changepoints;
-    }
-
 
     public List<Changepoint> getChangepoints() {
         return changepoints;
@@ -32,7 +23,8 @@ public class ChangepointDetection extends AbstractDetection {
     @Override
     public String toString() {
         return "ChangepointDetection{" +
-            "range=" + range +
+            "id=" + id +
+            ", range=" + range +
             ", changepoints=" + changepoints +
             '}';
     }

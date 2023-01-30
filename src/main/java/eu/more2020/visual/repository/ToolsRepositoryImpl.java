@@ -180,8 +180,8 @@ public class ToolsRepositoryImpl implements ToolsRepository {
             in.close();
             JsonNode responseObject = objectMapper.readTree(content.toString());
             JsonNode scores = responseObject.get("Score");
-            JsonNode starts = responseObject.get("Starting_date");
-            JsonNode ends = responseObject.get("Ending_date");
+            JsonNode starts = responseObject.get("Starting date");
+            JsonNode ends = responseObject.get("Ending date");
             Integer noOfIntervals = starts.size();
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
