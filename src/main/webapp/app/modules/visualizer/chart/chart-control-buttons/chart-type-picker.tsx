@@ -3,7 +3,7 @@ import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import CandlestickChartIcon from '@mui/icons-material/CandlestickChart';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
-import { setChartType } from 'app/modules/store/visualizerSlice';
+import {setChartType} from "app/modules/store/homeSlice";
 
 
 export const ChartType = () => {

@@ -178,6 +178,7 @@ public class ToolsRepositoryImpl implements ToolsRepository {
                 content.append(inputLine);
             }
             in.close();
+
             JsonNode responseObject = objectMapper.readTree(content.toString());
             JsonNode scores = responseObject.get("Score");
             JsonNode starts = responseObject.get("Starting date");
@@ -186,7 +187,7 @@ public class ToolsRepositoryImpl implements ToolsRepository {
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
                 detectedChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
-                    LocalDateTime.parse(ends.get(ii).asText(), formatter)), 0.0));
+                    LocalDateTime.parse(ends.get(ii).asText(), formatter)), scores.get(ii).asDouble()));
             }
         } catch (Exception e) {
             e.printStackTrace();

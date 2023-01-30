@@ -11,7 +11,6 @@ import {ITimeRange} from "app/shared/model/time-range.model";
 import moment from "moment";
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
 import {
-  setCompare,
   updateChartRef,
   updateCompareQueryResults,
   updateFrom,
@@ -25,6 +24,8 @@ import {
 } from "app/modules/store/visualizerSlice";
 import {ChartPlotBands} from "app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands";
 import chartAlertingChecker, { alertingPlotBandsCreator } from "./chart-alerting/chart-alerting-functions";
+
+import {filterChangepoints} from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
 
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
@@ -51,10 +52,10 @@ annotationsAdvanced(Highcharts);
 export const Chart = () => {
 
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, measureColors,
-    queryResultsLoading, filter, queryResults, changeChart, compare, changepointDetectionEnabled,
+    queryResultsLoading, filter, queryResults, changeChart, compare, changepointDetectionEnabled, detectedChangepointFilter,
     customChangepointsEnabled, patterns, data, compareData, forecastData, soilingEnabled, alertingPlotMode, alertResults,
     soilingWeeks, yawMisalignmentEnabled, secondaryData, chartType, liveDataImplLoading, alerts, alertingPreview} = useAppSelector(state => state.visualizer);
-  
+
   const dispatch = useAppDispatch();
 
   const [blockScroll, allowScroll] = useScrollBlock();
@@ -114,12 +115,12 @@ export const Chart = () => {
   useEffect(() => {
     isSoilingEnabled.current = soilingEnabled;
   }, [soilingEnabled]);
-  
+
   useEffect(() => {
     !liveDataImplLoading && data && alerts &&
     dispatch(updateAlertResults(chartAlertingChecker(data, alerts, dataset, selectedMeasures)));
   }, [liveDataImplLoading, selectedMeasures, alerts]);
-  
+
   useEffect(() => {
     alertingPlotMode && data && Object.keys(alertResults).length > 0 &&
     setAlertingPlotBands(alertingPlotBandsCreator(alertResults));
@@ -248,7 +249,7 @@ export const Chart = () => {
           applyChangepointDetection({id: latestDatasetId.current,
             from: leftSide, to: rightSide})).then((res) => {
           if(isSoilingEnabled.current) dispatch(applyDeviationDetection({id: latestDatasetId.current,
-            weeks: latestSoilingWeeks.current, from: leftSide, to: rightSide, changepoints: res.payload}));
+            weeks: latestSoilingWeeks.current, from: leftSide, to: rightSide, changepoints: filterChangepoints(res.payload, detectedChangepointFilter)}));
         });
       if(isYawMisalignmentEnabled.current)
         dispatch(applyYawMisalignmentDetection({id: latestDatasetId.current,
@@ -479,7 +480,7 @@ export const Chart = () => {
       zones,
     })) : [];
 
-    const compareChartData = (compareData !== null && compare.length !== 0) ? [...[].concat(...compareData.map((compData, idx) => selectedMeasures.map((measure, index) => ({
+  const compareChartData = (compareData !== null && compare.length !== 0) ? [...[].concat(...compareData.map((compData, idx) => selectedMeasures.map((measure, index) => ({
     data: compData.map(d => {
       const val = d.values[index];
       return [d.timestamp,isNaN(val) ? null : val];
