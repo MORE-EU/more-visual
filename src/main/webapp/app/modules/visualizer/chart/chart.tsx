@@ -740,7 +740,7 @@ export const Chart = () => {
         detectedPlotBands={detectedPlotBands}
         setDetectedPlotBands={setDetectedPlotBands}
         customPlotBands={customPlotBands}
-        setCustomPlotBands={setManualPlotBands}
+        setCustomPlotBands={setCustomPlotBands}
         customChangepoints={latestCustomChangepoints.current}
         setCustomChangepoints={setCustomChangepoints}/>
     </Grid>

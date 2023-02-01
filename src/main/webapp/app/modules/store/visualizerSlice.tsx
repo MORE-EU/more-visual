@@ -282,7 +282,7 @@ export const applyYawMisalignmentDetection = createAsyncThunk(
 export const getManualChangepoints = createAsyncThunk(
   'getManualChangepoints',
   async (id: string) => {
-    const requestUrl = `api/tools/cp_detection/washes/${id}`;
+    const requestUrl = `api/tools/changepoint_detection/washes/${id}`;
     const response = await axios.get(requestUrl);
     return response.data;
   });
@@ -530,6 +530,6 @@ export const {
   updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleChangepointDetection,
   toggleYawMisalignmentDetection, toggleManualChangepoints,  toggleCustomChangepoints,
   setShowDatePick,setShowChangepointFunction, setComparePopover, setSingleDateValue,setDateValues,setFixedWidth, setAlertingPlotMode,
-  setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns, setChartType, setAlertingPreview, updateAlertResults
+  setDetectedChangepointFilter, setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns, setChartType, setAlertingPreview, updateAlertResults
 } = visualizer.actions;
 export default visualizer.reducer;

@@ -70,8 +70,8 @@ public class ToolsRepositoryImpl implements ToolsRepository {
             in.close();
             con.disconnect();
             JsonNode responseObject = objectMapper.readTree(content.toString());
-            JsonNode starts = responseObject.get("Starting_date");
-            JsonNode ends = responseObject.get("Ending_date");
+            JsonNode starts = responseObject.get("Starting date");
+            JsonNode ends = responseObject.get("Ending date");
             Integer noOfIntervals = starts.size();
             List<Changepoint> gtChangepoints = new ArrayList<>();
             for (Integer i = 0; i < noOfIntervals; i++) {
