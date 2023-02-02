@@ -100,7 +100,7 @@ const initialState = {
   chartRef: null,
   showDatePick: false,
   showChangepointFunction: false,
-  showCompare: false,
+  comparePopover: false,
   singleDateValue: {start: null, end: null},
   dateValues: [],
   fixedWidth: 0,
@@ -114,6 +114,7 @@ const initialState = {
   changepointDetectionEnabled: false,
   manualChangepointsEnabled: false,
   customChangepointsEnabled: false,
+  detectedChangepointFilter: 90,
   forecasting: false,
   soilingEnabled: false,
   yawMisalignmentEnabled: false,
@@ -282,7 +283,7 @@ export const applyYawMisalignmentDetection = createAsyncThunk(
 export const getManualChangepoints = createAsyncThunk(
   'getManualChangepoints',
   async (id: string) => {
-    const requestUrl = `api/tools/cp_detection/washes/${id}`;
+    const requestUrl = `api/tools/changepoint_detection/washes/${id}`;
     const response = await axios.get(requestUrl);
     return response.data;
   });
@@ -366,8 +367,8 @@ const visualizer = createSlice({
     setShowChangepointFunction(state, action) {
       state.showChangepointFunction = action.payload;
     },
-    setCompare(state, action) {
-      state.showCompare = action.payload;
+    setComparePopover(state, action) {
+      state.comparePopover = action.payload;
     },
     setSingleDateValue(state, action) {
       state.singleDateValue = action.payload;
@@ -395,6 +396,9 @@ const visualizer = createSlice({
     },
     setChartType(state, action) {
       state.chartType = action.payload;
+    },
+    setDetectedChangepointFilter(state, action) {
+      state.detectedChangepointFilter = action.payload;
     },
     toggleChangepointDetection(state, action) {
       state.changepointDetectionEnabled = action.payload;
@@ -523,11 +527,11 @@ const visualizer = createSlice({
 
 export const {
   resetChartValues, resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq, updateFilters,
-  updatePatterns, updateChangeChart,updateDatasetChoice, updateDatasetMeasures, updatePatternNav,updateChartRef,
+  updatePatterns, updateChangeChart,updateDatasetChoice, updateDatasetMeasures, updatePatternNav, updateChartRef,
   updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateAnchorEl,
   updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleChangepointDetection,
   toggleYawMisalignmentDetection, toggleManualChangepoints,  toggleCustomChangepoints,
-  setShowDatePick,setShowChangepointFunction,setCompare,setSingleDateValue,setDateValues,setFixedWidth, setAlertingPlotMode,
-  setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns, setChartType, setAlertingPreview, updateAlertResults
+  setShowDatePick,setShowChangepointFunction, setComparePopover, setSingleDateValue,setDateValues,setFixedWidth, setAlertingPlotMode,
+  setDetectedChangepointFilter, setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns, setChartType, setAlertingPreview, updateAlertResults
 } = visualizer.actions;
 export default visualizer.reducer;

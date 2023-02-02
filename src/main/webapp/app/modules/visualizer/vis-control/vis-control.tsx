@@ -8,6 +8,7 @@ import {Link, useLocation} from "react-router-dom";
 import { useAppDispatch, useAppSelector } from '../../store/storeConfig';
 import { getDataset, resetChartValues, updateDatasetChoice } from '../../store/visualizerSlice';
 import VisMeasures from "app/modules/visualizer/vis-control/vis-measures";
+import ChartStatistics from "app/modules/visualizer/chart/chart-statistics";
 
 export const VisControl = () => {
 
@@ -100,7 +101,10 @@ export const VisControl = () => {
             xs = {12}>
         <VisMeasures />
       </Grid>
-      </Grid>
+    </Grid>
+    {/*<Grid item container xs={12}>*/}
+    {/*  <ChartStatistics />*/}
+    {/*</Grid>*/}
   </Grid>;
 };
 

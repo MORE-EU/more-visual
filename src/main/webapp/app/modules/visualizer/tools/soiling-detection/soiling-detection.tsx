@@ -20,30 +20,45 @@ import {
   applyDeviationDetection,
   updateSecondaryData, updateSoilingWeeks,
 } from "app/modules/store/visualizerSlice";
-
+import {filterChangepoints} from "../changepoint-detection/changepoint-detection";
 
 export const SoilingDetection = () => {
-  const {folder, dataset, from, to, resampleFreq,
-    soilingEnabled, soilingWeeks,
+  const {dataset, from, to,
+    soilingEnabled, soilingWeeks, detectedChangepointFilter,
     detectedChangepoints, changepointDetectionEnabled} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
-  const handleWeeksChange = (e) => {
-    const newSoilingWeeks = e.target.value;
-    dispatch(updateSoilingWeeks(newSoilingWeeks))
+
+  useEffect(() => {
     if(soilingEnabled)
-      dispatch(applyDeviationDetection({id: dataset.id, from, to, weeks : newSoilingWeeks, changepoints : detectedChangepoints}));
-  }
+      dispatch(applyDeviationDetection({id: dataset.id,
+        from, to,
+        weeks : soilingWeeks,
+        changepoints : filterChangepoints(detectedChangepoints, detectedChangepointFilter)}));
+    }, [detectedChangepointFilter]);
 
   useEffect(()=>{
     if (detectedChangepoints === null) dispatch(updateSecondaryData(null));
   },[detectedChangepoints]);
 
+  const handleWeeksChange = (e) => {
+    const newSoilingWeeks = e.target.value;
+    dispatch(updateSoilingWeeks(newSoilingWeeks))
+    if(soilingEnabled)
+      dispatch(applyDeviationDetection({id: dataset.id,
+        from, to,
+        weeks : newSoilingWeeks,
+        changepoints : filterChangepoints(detectedChangepoints, detectedChangepointFilter)}));
+  }
+
   const handleEnableSoiling = () => {
     const action = !soilingEnabled;
     dispatch(toggleSoilingDetection(action));
     if(action)
-      dispatch(applyDeviationDetection({id: dataset.id, from, to, weeks : soilingWeeks, changepoints : detectedChangepoints}));
+      dispatch(applyDeviationDetection({id: dataset.id,
+        from, to,
+        weeks : soilingWeeks,
+        changepoints : filterChangepoints(detectedChangepoints, detectedChangepointFilter)}));
   }
 
   return (

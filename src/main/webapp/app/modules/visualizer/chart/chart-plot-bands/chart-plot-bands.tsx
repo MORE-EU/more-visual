@@ -5,7 +5,7 @@ import Highcharts from "highcharts/highstock";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {IChangepointDate} from "app/shared/model/changepoint-date.model";
 import {toggleCustomChangepoints, updateAnchorEl} from "app/modules/store/visualizerSlice";
-
+import {filterChangepoints} from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
 
 export interface IChartPlotBandsProps {
   customPlotBands: any,
@@ -23,7 +23,7 @@ export const ChartPlotBands = (props:IChartPlotBandsProps) => {
 
   const {manualChangepoints, manualChangepointsEnabled,
     detectedChangepoints, changepointDetectionEnabled,
-    customChangepointsEnabled, anchorEl} = useAppSelector(state => state.visualizer);
+    customChangepointsEnabled, detectedChangepointFilter, anchorEl} = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
 
@@ -53,11 +53,13 @@ export const ChartPlotBands = (props:IChartPlotBandsProps) => {
   // Color Bands for Detected Changepoints
   useEffect(() => {
     let newPlotBands =  (detectedChangepoints !== null && changepointDetectionEnabled) ? [].concat(...detectedChangepoints.map((date, idx) => {
+
       return {
         color: '#0479cc',
         from: date.range.from,
         to: date.range.to,
         id: date.id,
+        score: date.score,
         borderWidth: 0,
         borderColor: 'black',
         events: {
@@ -70,8 +72,10 @@ export const ChartPlotBands = (props:IChartPlotBandsProps) => {
         }
       };
     })) : [];
+    newPlotBands = filterChangepoints(newPlotBands, detectedChangepointFilter);
+    // newPlotBands.filter(plotBand.score )
     props.setDetectedPlotBands(newPlotBands);
-  }, [detectedChangepoints]);
+  }, [detectedChangepoints, detectedChangepointFilter]);
 
 
   // Color Bands for Custom Changepoints
