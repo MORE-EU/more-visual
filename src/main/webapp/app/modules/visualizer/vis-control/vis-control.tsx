@@ -2,17 +2,17 @@ import React, { useEffect } from 'react';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { Grid, ListItemIcon, Tooltip, Typography} from "@mui/material";
+import {FormControl, Grid, InputLabel, ListItemIcon, MenuItem, Select, Tooltip, Typography} from "@mui/material";
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import {Link, useLocation} from "react-router-dom";
 import { useAppDispatch, useAppSelector } from '../../store/storeConfig';
-import { getDataset, resetChartValues, updateDatasetChoice } from '../../store/visualizerSlice';
+import { getDataset, resetChartValues, updateDatasetChoice, updateResampleFreq } from '../../store/visualizerSlice';
 import VisMeasures from "app/modules/visualizer/vis-control/vis-measures";
-import ChartStatistics from "app/modules/visualizer/chart/chart-statistics";
 
 export const VisControl = () => {
 
-  const { folder, dataset, compare, datasetChoice, wdFiles } = useAppSelector(state => state.visualizer);
+  const { folder, dataset, compare, resampleFreq,
+    datasetChoice, wdFiles } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const location = useLocation();
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -45,20 +45,6 @@ export const VisControl = () => {
 
   // @ts-ignore
   return <Grid container spacing={3}>
-    {/* <Grid item xs={12}>
-      <FormControl variant="standard" sx={{m: 1, minWidth: 180}}>
-        <InputLabel>Sample Frequency</InputLabel>
-        <Select
-          value={resampleFreq}
-          label="Sample Frequency"
-          onChange={(e) => dispatch(updateResampleFreq(e.target.value))}
-        >
-          <MenuItem value="second">Second</MenuItem>
-          <MenuItem value="minute">Minute</MenuItem>
-          <MenuItem value="hour">Hour</MenuItem>
-        </Select>
-      </FormControl>
-    </Grid> */}
     <Grid item xs={11}>
       {wdFiles.length !== 0 &&
         <>
@@ -92,6 +78,20 @@ export const VisControl = () => {
         </>
       }
     </Grid>
+    <Grid item xs={12}>
+      <FormControl variant="standard" sx={{m: 1, minWidth: 180}}>
+        <InputLabel>Sample Frequency</InputLabel>
+        <Select
+          value={resampleFreq}
+          label="Sample Frequency"
+          onChange={(e) => dispatch(updateResampleFreq(e.target.value))}
+        >
+          <MenuItem value="second">Second</MenuItem>
+          <MenuItem value="minute">Minute</MenuItem>
+          <MenuItem value="hour">Hour</MenuItem>
+        </Select>
+      </FormControl>
+    </Grid>
     <Grid item container xs={12}>
       <Typography variant="h6" gutterBottom>
         Measures
@@ -102,6 +102,7 @@ export const VisControl = () => {
         <VisMeasures />
       </Grid>
     </Grid>
+
     {/*<Grid item container xs={12}>*/}
     {/*  <ChartStatistics />*/}
     {/*</Grid>*/}
