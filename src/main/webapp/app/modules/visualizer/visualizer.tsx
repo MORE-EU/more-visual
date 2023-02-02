@@ -67,16 +67,17 @@ export const Visualizer = () => {
               underline="hover"
               sx={{display: 'flex', alignItems: 'center'}}
               color="inherit"
+              href={`/dashboard/${params.folder}`}
             >
 
-              {dataset.farmName}
+              {params.folder}
             </Link>
             <Typography
               sx={{display: 'flex', alignItems: 'center'}}
               color="text.primary"
             >
 
-              {dataset.formalName}
+              {params.id}
             </Typography>
           </Breadcrumbs>
         </Box>

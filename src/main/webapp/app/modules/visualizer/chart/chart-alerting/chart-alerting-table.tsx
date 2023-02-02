@@ -17,7 +17,6 @@ import { getMatchedMeasures } from './chart-alerting-functions';
 import Switch from '@mui/material/Switch';
 import { grey } from '@mui/material/colors';
 import Badge from '@mui/material/Badge';
-import Paper from '@mui/material/Paper';
 
 const AlertsTable = props => {
   const { alerts, selectedMeasures, dataset, alertResults } = useAppSelector(state => state.visualizer);

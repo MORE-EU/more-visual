@@ -14,6 +14,10 @@ public class Farm implements Serializable {
 
     private String id;
 
+    private Float latitude;
+    
+    private Float longitude;
+
     @NotNull
     private String name;
 
@@ -22,6 +26,14 @@ public class Farm implements Serializable {
 
     private ArrayList<Dataset> data;
 
+    public Float getLatitude() {
+        return this.latitude;
+    }
+
+    public Float getLongitude() {
+        return this.longitude;
+    }
+    
     public String getId() {
         return id;
     }

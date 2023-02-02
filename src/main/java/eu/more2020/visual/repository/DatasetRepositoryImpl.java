@@ -85,14 +85,14 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
 
     @Override
-    public Optional<Farm> findFarm(String farmName) throws IOException {
-        Farm farm = null;
+    public Optional<FarmMeta> findFarm(String farmName) throws IOException {
+        FarmMeta farm = null;
         ObjectMapper mapper = new ObjectMapper();
         File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName, farmName + ".meta.json");
 
         if (metadataFile.exists()) {
             FileReader reader = new FileReader(metadataFile);
-            farm = mapper.readValue(reader, Farm.class);
+            farm = mapper.readValue(reader, FarmMeta.class);
         }
         return Optional.ofNullable(farm);
     }

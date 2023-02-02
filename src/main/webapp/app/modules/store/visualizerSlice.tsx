@@ -84,6 +84,7 @@ const initialState = {
   from: null as number,
   to: null as number,
   wdFiles: [] as any[],
+  farmMetaFile: null,
   sampleFile: [],
   directories: [],
   resampleFreq: '',
@@ -436,6 +437,7 @@ const visualizer = createSlice({
     builder.addCase(getWdFiles.fulfilled, (state, action) => {
       state.loading = false;
       state.wdFiles = action.payload.data.data.map(file => file.id);
+      state.farmMetaFile = action.payload.data;
     });
     builder.addCase(getDirectories.fulfilled, (state, action) => {
       state.loading = false;

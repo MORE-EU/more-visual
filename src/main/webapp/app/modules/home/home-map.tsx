@@ -3,7 +3,6 @@ import {MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents, ZoomContro
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import {Link} from 'react-router-dom';
 import L from 'leaflet';
-import './map.scss';
 import 'leaflet/dist/leaflet.css';
 import {Paper, Typography} from '@mui/material';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
@@ -28,17 +27,18 @@ const FlyComponent = props => {
   return null;
 };
 
-export const FarmMap = () => {
+export const icon = new L.Icon({
+  iconUrl: '../../../content/images/leaflet-icons/marker-icon.png',
+  shadowUrl: '../../../content/images/leaflet-icons/marker-shadow.png',
+  iconSize: [18, 28],
+  shadowSize: [18, 28],
+});
+
+export const HomeMap = () => {
 
   const { fly, items, selected } = useAppSelector(state => state.home);
   const { wdFiles } = useAppSelector(state => state.visualizer);
 
-  const icon = new L.Icon({
-    iconUrl: '../../../content/images/leaflet-icons/marker-icon.png',
-    shadowUrl: '../../../content/images/leaflet-icons/marker-shadow.png',
-    iconSize: [18, 28],
-    shadowSize: [18, 28],
-  });
 
   // const history = useHistory();
 
