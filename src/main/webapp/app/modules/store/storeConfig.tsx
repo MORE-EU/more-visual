@@ -9,6 +9,8 @@ import promiseMiddleware from 'redux-promise-middleware';
 import errorMiddleware from 'app/config/error-middleware';
 import loggerMiddleware from 'app/config/logger-middleware';
 import home from "./homeSlice";
+import fileManagement from "./fileManagementSlice"
+import uploadFarm from "./uploadFarmSlice";
 
 enableMapSet();
 
@@ -18,6 +20,8 @@ export const store = configureStore({
         applicationProfile,
         visualizer,
         home,
+        fileManagement,
+        uploadFarm
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false

@@ -1,12 +1,15 @@
 import './home.scss';
 import React, {useEffect} from 'react';
-import {FarmMap} from './map/farm-map';
+import {HomeMap} from './home-map';
 import {HomeLeftMenu} from './home-left-menu';
 import {HomeRightStatsPanel} from './home-right-stats-panel';
 import {HomeRightChartPanel} from './home-right-chart-panel';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import { getDirectories, getSampleFile, getWdFiles } from '../store/visualizerSlice';
 import { setAllFilters, setFilSamples, setItems, setSelectedDir } from '../store/homeSlice';
+import 'simplebar-react/dist/simplebar.min.css';
+import EditFarmModal from './home-edit-modal';
+import HomeEditFarmModal from './home-edit-modal';
 
 export const Home = () => {
 
@@ -27,7 +30,7 @@ export const Home = () => {
 
   useEffect(() => {
     selectedDir.length !== 0 && dispatch(getSampleFile(selectedDir))
-    dispatch(getWdFiles(selectedDir))
+    selectedDir.length !== 0 && dispatch(getWdFiles(selectedDir))
   }, [selectedDir])
 
   useEffect(() => {
@@ -102,7 +105,8 @@ export const Home = () => {
         <HomeLeftMenu />
         <HomeRightStatsPanel />
         <HomeRightChartPanel />
-        <FarmMap />
+        <HomeEditFarmModal />
+        <HomeMap />
       </div>
     )
   );

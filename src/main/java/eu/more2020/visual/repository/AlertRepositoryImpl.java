@@ -55,6 +55,7 @@ public class AlertRepositoryImpl implements AlertRepository {
             FileReader fr = new FileReader(alertFile);
             List<Alert> alerts = mapper.readValue(fr, new TypeReference<List<Alert>>() {});
             alerts.removeIf(al -> al.getName().equals(alertName));
+            alerts.forEach(alz -> System.out.println(alz.getName()));
             FileWriter fw = new FileWriter(alertFile);
             mapper.writeValue(fw, alerts);
             fr.close();

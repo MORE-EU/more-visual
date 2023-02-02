@@ -285,7 +285,7 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
               </Typography>
             </Box>
             <FormControl size="small">
-              <InputLabel id="demo-simple-select-label">Duration</InputLabel>
+              <InputLabel id="demo-simple-select-label">Rank</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"

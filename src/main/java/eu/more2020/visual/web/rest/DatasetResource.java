@@ -6,6 +6,7 @@ import eu.more2020.visual.domain.Detection.DeviationDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
+import eu.more2020.visual.repository.FileHandlingRepository;
 import eu.more2020.visual.repository.ToolsRepository;
 import eu.more2020.visual.service.CsvDataService;
 import eu.more2020.visual.service.IndexedModelarDataService;
@@ -19,11 +20,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +47,7 @@ public class DatasetResource {
     private final ModelarDataService modelarDataService;
     private final IndexedModelarDataService indexedModelarDataService;
     private final AlertRepository alertRepository;
+    private final FileHandlingRepository fileHandlingRepository;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -51,13 +58,15 @@ public class DatasetResource {
     public DatasetResource(DatasetRepository datasetRepository,
                            ToolsRepository toolsRepository,
                            CsvDataService csvDataService, ModelarDataService modelarDataService, 
-                           IndexedModelarDataService indexedModelarDataService, AlertRepository alertRepository) {
+                           IndexedModelarDataService indexedModelarDataService, AlertRepository alertRepository,
+                           FileHandlingRepository fileHandlingRepository) {
         this.datasetRepository = datasetRepository;
         this.toolsRepository = toolsRepository;
         this.csvDataService = csvDataService;
         this.modelarDataService = modelarDataService;
         this.indexedModelarDataService = indexedModelarDataService;
         this.alertRepository = alertRepository;
+        this.fileHandlingRepository = fileHandlingRepository;
     }
 
     /**
@@ -121,14 +130,12 @@ public class DatasetResource {
     public ResponseEntity<Dataset> getDataset(@PathVariable String farmName, @PathVariable String id) throws IOException {
         log.debug("REST request to get Dataset : {}/{}", farmName, id);
         Optional<Dataset> dataset = datasetRepository.findById(id, farmName);
-
-
         log.debug(dataset.toString());
         return ResponseUtil.wrapOrNotFound(dataset);
     }
 
     @GetMapping("/datasets/{farmName}")
-    public ResponseEntity<Farm> getFarm(@PathVariable String farmName) throws IOException {
+    public ResponseEntity<FarmMeta> getFarm(@PathVariable String farmName) throws IOException {
         log.debug("REST request to get farm metadata");
         return ResponseUtil.wrapOrNotFound(datasetRepository.findFarm(farmName));
     }
@@ -231,9 +238,39 @@ public class DatasetResource {
     }
     
     @PostMapping("/alerts/edit")
-    public List<Alert> deleteAlert(@Valid @RequestBody Alert editedAlert) throws IOException {
-        log.debug("REST request to remove alert with name: {}", editedAlert.getName());
+    public List<Alert> editAlert(@Valid @RequestBody Alert editedAlert) throws IOException {
+        log.debug("REST request to edit alert with name: {}", editedAlert.getName());
         return alertRepository.editAlert(editedAlert);
     }
 
+    @PostMapping("/files/upload/{farmName}")
+    public ResponseEntity<FarmMeta> saveUploadedFile (@PathVariable String farmName, @RequestParam("files") MultipartFile[] files) throws URISyntaxException, IOException {
+    log.debug("Rest request to save uploaded file to {} farm", farmName);
+    try {
+      List<String> fileNames = new ArrayList<>();
+      Arrays.asList(files).stream().forEach(file -> {
+        fileHandlingRepository.saveFile(farmName, file, null);
+        fileNames.add(file.getOriginalFilename());
+      });
+      log.debug("Uploaded the files successfully: {}", fileNames);
+      return ResponseUtil.wrapOrNotFound(datasetRepository.findFarm(farmName));
+    } catch (Exception e) {
+      log.debug("Fail to upload files!");
+      return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+    }
+    }
+    
+    @PostMapping("/files/upload/farm")
+    public ResponseEntity<FarmMeta> createNewFarm (@RequestParam("meta") String metaInfo, @RequestParam("files") MultipartFile[] files) throws URISyntaxException, IOException {
+    ObjectMapper ob = new ObjectMapper();
+    FarmMeta m = ob.readValue(metaInfo, FarmMeta.class);
+    log.debug("Rest request to save farm with name {}", m.getName());
+    try {
+      fileHandlingRepository.saveFarm(m, files);
+      return ResponseUtil.wrapOrNotFound(datasetRepository.findFarm(m.getName()));
+    } catch (Exception e) {
+      log.debug("Fail to upload files! {}", e.getMessage());
+      return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+    }
+    }
 }

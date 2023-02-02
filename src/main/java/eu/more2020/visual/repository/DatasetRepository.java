@@ -2,6 +2,7 @@ package eu.more2020.visual.repository;
 
 import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Farm;
+import eu.more2020.visual.domain.FarmMeta;
 import eu.more2020.visual.domain.Sample;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -24,7 +25,7 @@ public interface DatasetRepository {
 
     List<String> findDirectories() throws IOException;
 
-    Optional<Farm> findFarm(String farmName) throws IOException;
+    Optional<FarmMeta> findFarm(String farmName) throws IOException;
 
     @Cacheable(cacheNames = DATASETS_CACHE)
     Optional<Dataset> findById(String id, String farmName) throws IOException;
