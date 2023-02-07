@@ -36,7 +36,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import { setLoadingButton, uploadFile } from '../store/fileManagementSlice';
 import { styled } from '@mui/material/styles';
 
-const CircularProgressWithLabel = props => (
+export const CircularProgressWithLabel = props => (
   <Box sx={{ position: 'relative', display: 'inline-flex' }}>
     <CircularProgress variant="determinate" color={props.value === 100 ? 'success' : 'primary'} {...props} />
     <Box

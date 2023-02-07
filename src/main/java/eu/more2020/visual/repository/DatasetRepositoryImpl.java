@@ -105,7 +105,6 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         List<Dataset> allDatasets = null;
         Farm farm = new Farm();
         File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName, farmName + ".meta.json");
-
         if (metadataFile.exists()) {
             FileReader reader = new FileReader(metadataFile);
             farm = mapper.readValue(reader, Farm.class);
@@ -135,7 +134,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                     }
                     break;
                 default:
-                    File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, dataset.getPath());
+                    File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, id + ".csv");
                     if (!file.isDirectory()) {
                         DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
                         fillDataFileInfo(dataset, dataFileInfo);

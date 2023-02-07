@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
-import {Redirect, useParams} from 'react-router-dom';
+import {useHistory, useParams} from 'react-router-dom';
 import {ChartContainer} from './chart/chart-container';
 import VisControl from "app/modules/visualizer/vis-control/vis-control";
 import Toolkit from "app/modules/visualizer/tools/toolkit";
@@ -18,22 +18,17 @@ const mdTheme = createTheme();
 
 export const Visualizer = () => {
 
-  const { wdFiles, dataset, openToolkit, selectedMeasures} = useAppSelector(state => state.visualizer);
+  const { wdFiles, dataset, openToolkit} = useAppSelector(state => state.visualizer);
+  const { loadingButton} = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
   const  params: any = useParams();
-
-  if (params.id === undefined) {
-    useEffect(() => {
-      dispatch(getWdFiles(params.folder));
-    }, [params.folder]);
-    return wdFiles.length !== 0 &&
-      <div>
-        <Redirect to={`${params.folder}/${wdFiles[0]}`}/>
-      </div>;
-  }
+  const history = useHistory();
 
   useEffect(() => {
-    wdFiles.length === 0 && dispatch(getWdFiles(params.folder));
+    dispatch(getWdFiles(params.folder));
+  }, []);
+
+  useEffect(() => {
     dispatch(setFolder(params.folder));
     dispatch(getDataset({folder: params.folder, id: params.id}));
   }, [params.id !== undefined]);
@@ -43,8 +38,13 @@ export const Visualizer = () => {
   }, [dataset])
 
   useEffect(() => {
+    params.id === undefined && wdFiles.length !== 0 && history.push(`${params.folder}/${wdFiles[0]}`)
     wdFiles.length !== 0 && dispatch(updateDatasetChoice(wdFiles.indexOf(params.id)));
   }, [wdFiles])
+
+  useEffect(() => {
+    !loadingButton && wdFiles.length !== 0 && dispatch(getWdFiles(params.folder))
+  }, [loadingButton])
 
   return dataset !== null && <div>
     <ThemeProvider theme={mdTheme}>
@@ -69,14 +69,12 @@ export const Visualizer = () => {
               color="inherit"
               href={`/dashboard/${params.folder}`}
             >
-
               {params.folder}
             </Link>
             <Typography
               sx={{display: 'flex', alignItems: 'center'}}
               color="text.primary"
             >
-
               {params.id}
             </Typography>
           </Breadcrumbs>

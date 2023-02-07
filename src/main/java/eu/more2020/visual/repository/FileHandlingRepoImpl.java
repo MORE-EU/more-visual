@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import eu.more2020.visual.config.ApplicationProperties;
+import eu.more2020.visual.domain.FarmInfo;
 import eu.more2020.visual.domain.FarmMeta;
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -63,6 +66,22 @@ public class FileHandlingRepoImpl implements FileHandlingRepository {
             this.saveFile(metaInfo.getName(), file, metaInfo.getData().get(Arrays.asList(files).indexOf(file)).getName());
           }
         );
+    } catch (Exception e) {
+      log.debug("Fail to upload files!");
+    }
+  }
+
+  public void uploadDataset(FarmInfo metaInfo, MultipartFile file, String farmName) throws StreamWriteException, DatabindException, IOException {
+    Path rootLocation = Paths.get(applicationProperties.getWorkspacePath());
+    File metaFile = new File(rootLocation + "/" + farmName + "/" + farmName + ".meta.json");
+    ObjectMapper obm = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+    FarmMeta thisFarm = obm.readValue(metaFile, FarmMeta.class);
+    List<FarmInfo> farmData = thisFarm.getData();
+    farmData.add(metaInfo);
+    thisFarm.setData(farmData);
+    obm.writeValue(metaFile, thisFarm);
+    try {
+    this.saveFile(farmName, file, metaInfo.getName());
     } catch (Exception e) {
       log.debug("Fail to upload files!");
     }

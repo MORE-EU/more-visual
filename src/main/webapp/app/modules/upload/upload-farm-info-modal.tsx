@@ -1,15 +1,5 @@
 import React, { useState } from 'react';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Papa from 'papaparse';
-import Fab from '@mui/material/Fab';
-import SaveIcon from '@mui/icons-material/Save';
-import CheckIcon from '@mui/icons-material/Check';
 import Box from '@mui/material/Box';
-import green from '@mui/material/colors/green';
-import CircularProgress from '@mui/material/CircularProgress';
-import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { setCsvSample, setFiles } from '../store/uploadFarmSlice';
 import { grey } from '@mui/material/colors';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';

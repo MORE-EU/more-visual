@@ -144,7 +144,6 @@ const HomeEditFarmModal = () => {
 
   return (
     <>
-      {console.log(formData)}
       <Modal
         open={openHomeModal}
         onClose={handleOnCloseModal}

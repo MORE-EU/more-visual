@@ -9,8 +9,6 @@ import {
 } from "@mui/material";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {setComparePopover, updateCompare} from "app/modules/store/visualizerSlice";
-import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
-import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import AddchartIcon from "@mui/icons-material/Addchart";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";

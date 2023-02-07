@@ -273,4 +273,18 @@ public class DatasetResource {
       return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
     }
+
+    @PostMapping("/files/upload/dataset")
+    public ResponseEntity<FarmMeta> uploadDataset (@RequestParam("meta") String metaInfo, @RequestParam("farmName") String farmName, @RequestParam("file") MultipartFile file) throws URISyntaxException, IOException {
+    ObjectMapper ob = new ObjectMapper();
+    FarmInfo m = ob.readValue(metaInfo, FarmInfo.class);
+    log.debug("Rest request to save dataset with name {}", m.getName());
+    try {
+      fileHandlingRepository.uploadDataset(m, file, farmName);
+      return ResponseUtil.wrapOrNotFound(datasetRepository.findFarm(farmName));
+    } catch (Exception e) {
+      log.debug("Fail to upload files! {}", e.getMessage());
+      return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+    }
+    }
 }
