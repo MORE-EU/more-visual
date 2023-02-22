@@ -4,8 +4,9 @@ import java.util.List;
 
 public class FarmInfo {
     private String id;
+    private String path;
+    private String type;
     private String name;
-    private String formalName;
     private Boolean hasHeader;
     private List<Integer> measures;
     private Integer timeCol;
@@ -24,14 +25,6 @@ public class FarmInfo {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getFormalName() {
-        return this.formalName;
-    }
-
-    public void setFormalName(String formalName) {
-        this.formalName = formalName;
     }
 
     public Boolean isHasHeader() {
@@ -60,15 +53,31 @@ public class FarmInfo {
 
     public void setTimeCol(Integer timeCol) {
         this.timeCol = timeCol;
-    }            
+    }
 
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     @Override
     public String toString() {
         return "{" +
             " id='" + getId() + "'" +
             ", name='" + getName() + "'" +
-            ", formalName='" + getFormalName() + "'" +
+            ", type='" + getType() + "'" +
+            ", path='" + getPath() + "'" +
             ", hasHeader='" + isHasHeader() + "'" +
             ", measures='" + getMeasures() + "'" +
             ", timeCol='" + getTimeCol() + "'" +

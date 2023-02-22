@@ -28,7 +28,6 @@ public class Dataset implements Serializable {
     private Integer timeCol;
     private String timeFormat;
     private String farmName;
-    private String formalName;
     private List<Integer> measures = new ArrayList<>();
     private Map<Integer, DoubleSummaryStatistics> measureStats;
 
@@ -108,14 +107,6 @@ public class Dataset implements Serializable {
 
     public void setFarmName(String farmName) {
         this.farmName = farmName;
-    }
-
-    public String getFormalName() {
-        return formalName;
-    }
-
-    public void setFormalName(String formalName) {
-        this.formalName = formalName;
     }
 
     public String getSamplingFreq() {
@@ -201,7 +192,6 @@ public class Dataset implements Serializable {
             ", timeCol=" + timeCol +
             ", timeFormat='" + timeFormat + '\'' +
             ", farmName='" + farmName + '\'' +
-            ", formalName='" + formalName + '\'' +
             ", measures=" + measures +
             ", samplingFreq='" + samplingFreq + '\'' +
             ", delimiter='" + delimiter + '\'' +
