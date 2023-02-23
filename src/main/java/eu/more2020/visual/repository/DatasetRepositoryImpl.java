@@ -168,6 +168,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     private void fillDataFileInfo(Dataset dataset, DataFileInfo dataFileInfo) throws IOException {
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.getFormat().setDelimiter(',');
+        parserSettings.setLineSeparatorDetectionEnabled(true);
         parserSettings.setIgnoreLeadingWhitespaces(false);
         parserSettings.setIgnoreTrailingWhitespaces(false);
         CsvParser parser = new CsvParser(parserSettings);

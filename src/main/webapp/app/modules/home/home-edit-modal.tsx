@@ -19,10 +19,11 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputAdornment from '@mui/material/InputAdornment';
 import Checkbox from '@mui/material/Checkbox';
+import Chip from '@mui/material/Chip';
 
 const style = {
   position: 'absolute',
-  top: '40%',
+  top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   bgcolor: 'background.paper',
@@ -37,15 +38,15 @@ const style = {
 const menuButtonStyle = {
   color: grey[700],
   textTransform: 'none',
-  fontSize: 20,
-  borderRadius: 20,
+  fontSize: 12,
+  borderRadius: 4,
   border: '1px solid rgb(0, 0, 0, 0.2)',
   ':hover': {
     border: '2px solid rgb(95, 158, 160, 1)',
     bgColor: 'rgb(95, 158, 160, 0.2)',
   },
-  mr: '3px',
-  p: 2,
+  ml: '10px',
+  p: 0,
 };
 
 const inputSx = {
@@ -88,6 +89,7 @@ const CircularProgressWithLabel = props => (
 const HomeEditFarmModal = () => {
   const { loadingButton, uploadState } = useAppSelector(state => state.fileManagement);
   const { selectedDir, openHomeModal } = useAppSelector(state => state.home);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const { farmMetaFile } = useAppSelector(state => state.visualizer);
   const [popper, setPopper] = useState(false);
   const [anchorEl, setAnchorEl] = useState({ input: null, name: null });
@@ -99,14 +101,19 @@ const HomeEditFarmModal = () => {
   };
 
   const handleUploadChange = e => {
-    dispatch(setLoadingButton(true));
-    const files = new FormData();
-    for (let i = 0; i < e.target.files.length; i++) {
-      files.append('files', e.target.files[i]);
-    }
-    files.append('farmName', selectedDir);
-    const data = { farmName: selectedDir, fileData: files };
-    dispatch(uploadFile(data));
+    // dispatch(setLoadingButton(true));
+    // const files = new FormData();
+    // for (let i = 0; i < e.target.files.length; i++) {
+    //   files.append('files', e.target.files[i]);
+    // }
+    // files.append('farmName', selectedDir);
+    // const data = { farmName: selectedDir, fileData: files };
+    // dispatch(uploadFile(data));
+    setSelectedFiles([...e.target.files]);
+  };
+
+  const handleChipDelete = () => e => {
+    console.log(e);
   };
 
   const handleInputChanges = (fileName: string, property: string) => e => {
@@ -144,6 +151,7 @@ const HomeEditFarmModal = () => {
 
   return (
     <>
+      {console.log(selectedFiles)}
       <Modal
         open={openHomeModal}
         onClose={handleOnCloseModal}
@@ -153,18 +161,28 @@ const HomeEditFarmModal = () => {
       >
         <Box sx={style}>
           <Grid xs={12} sx={{ height: '20%' }}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Add files
+            <Grid sx={{ display: 'flex', mb: 2, height: "20%" }}>
+              <Typography id="modal-modal-title" variant="subtitle1" fontSize={25} sx={{ color: grey[700] }}>
+                Add files
+              </Typography>
+              {!loadingButton ? (
+                <Button size="medium" component="label" sx={menuButtonStyle}>
+                  <input hidden multiple type="file" accept=".csv" onChange={handleUploadChange} />
+                  <FileUploadRoundedIcon fontSize="small" sx={{ color: grey[800] }} />
+                </Button>
+              ) : (
+                <CircularProgressWithLabel value={uploadState} />
+              )}
+            </Grid>
+            <Grid sx={{d: "flex", flexDirection: "row", height: "80%", alignItems: "center", m: "auto"}}>
+            <Typography id="modal-modal-title" variant="subtitle1" fontSize={20}>
+              Selected Files
             </Typography>
-            {!loadingButton ? (
-              <Button size="medium" component="label" sx={menuButtonStyle}>
-                <input hidden multiple type="file" accept=".csv" onChange={handleUploadChange} />
-                <FileUploadRoundedIcon fontSize="large" sx={{ color: grey[800] }} />
-                Upload More Files
-              </Button>
-            ) : (
-              <CircularProgressWithLabel value={uploadState} />
-            )}
+            </Grid>
+            <Grid>
+              {selectedFiles.length > 0 &&
+                selectedFiles.map(file => <Chip label={`${file.name}`} variant="outlined" onDelete={handleChipDelete} />)}
+            </Grid>
           </Grid>
           <Grid xs={12} sx={{ height: '80%' }}>
             <Grid sx={{ display: 'flex', alignItems: 'center', height: '10%' }}>

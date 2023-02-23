@@ -58,12 +58,22 @@ interface IVisUploadDataset {
   setUploadFile: Dispatch<SetStateAction<any>>;
 }
 
+interface metaSchema {
+  id: string;
+  path: string;
+  name: string;
+  type: "CSV" | "PARQUET";
+  hasHeader: boolean;
+  timeCol: number;
+  measures: number[];
+}
+
 const VisUploadDataset = (props: IVisUploadDataset) => {
   const { uploadModalOpen, setUploadModalOpen, uploadFile, setUploadFile } = props;
   const { loadingButton, uploadState } = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
   const [csvSample, setCsvSample] = useState(null);
-  const [formData, setFormData] = useState(null);
+  const [formData, setFormData] = useState<metaSchema>(null);
   const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState(null);
   const params: any = useParams();
@@ -134,8 +144,9 @@ const VisUploadDataset = (props: IVisUploadDataset) => {
     csvSample &&
       setFormData({
         id: uploadFile[0].name.replace(".csv", ""),
-        name: uploadFile[0].name,
-        formalName: '',
+        path: uploadFile[0].name,
+        type: "CSV",
+        name: '',
         hasHeader: true,
         timeCol: 0,
         measures: csvSample.meta.fields.map((f, idx) => idx).filter(val => val !== 0),
@@ -144,7 +155,7 @@ const VisUploadDataset = (props: IVisUploadDataset) => {
 
   return (
     <>
-    {console.log(loadingButton)}
+    {console.log(formData)}
       <Modal
         open={uploadModalOpen}
         onClose={handleOnCloseModal}
@@ -243,24 +254,27 @@ const VisUploadDataset = (props: IVisUploadDataset) => {
                             />
                           </FormControl>
                           <Typography variant="subtitle1" fontWeight={800} sx={inputSx}>
-                            *File Name:
+                            Type:
                           </Typography>
-                          <FormControl variant="standard" sx={{ m: 1, width: '15ch' }}>
-                            <Input
-                              id="standard-adornment-weight"
-                              aria-describedby="standard-weight-helper-text"
-                              inputProps={{
-                                'aria-label': 'weight',
-                              }}
-                              endAdornment={<InputAdornment position="end">.csv</InputAdornment>}
-                              value={formData.name.substring(0, formData.name.indexOf('.'))}
-                              onChange={handleInputChanges('name')}
-                            />
+                          <FormControl sx={{ m: 1, width: '20ch' }} size="small">
+                            <Select
+                              labelId="demo-simple-select-label"
+                              id="demo-simple-select"
+                              value={formData.type}
+                              onChange={handleInputChanges('type')}
+                            >
+                                <MenuItem key="Csv-menu-item" value={"CSV"}>
+                                CSV
+                                </MenuItem>
+                                <MenuItem key="Parquet-menu-item" value={"PARQUET"}>
+                                Parquet
+                                </MenuItem>
+                            </Select>
                           </FormControl>
                         </Grid>
                         <Grid sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                           <Typography variant="subtitle1" fontWeight={800} sx={inputSx}>
-                            *Formal Name:
+                            *Name:
                           </Typography>
                           <FormControl variant="standard" sx={{ m: 1, width: '15ch' }}>
                             <Input
@@ -269,8 +283,8 @@ const VisUploadDataset = (props: IVisUploadDataset) => {
                               inputProps={{
                                 'aria-label': 'weight',
                               }}
-                              onChange={handleInputChanges('formalName')}
-                              value={formData.formalName}
+                              onChange={handleInputChanges('name')}
+                              value={formData.name}
                             />
                           </FormControl>
                           <Typography variant="subtitle1" fontWeight={800} sx={inputSx}>

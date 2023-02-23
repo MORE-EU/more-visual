@@ -42,7 +42,7 @@ public class FileHandlingRepoImpl implements FileHandlingRepository {
       if (file.isEmpty()) {
         throw new RuntimeException("Failed to store file " + file.getOriginalFilename() + "Error: File is Empty");
       }
-      Files.copy(file.getInputStream(), rootLocation.resolve(farmName + "/" + newName), StandardCopyOption.REPLACE_EXISTING);
+      Files.copy(file.getInputStream(), rootLocation.resolve(farmName + "/" + file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
     } catch (Exception e) {
       throw new RuntimeException("Failed to store file " + file.getOriginalFilename() + "Error:" + e.getMessage());
     }
