@@ -5,7 +5,7 @@ import {HomeLeftMenu} from './home-left-menu';
 import {HomeRightStatsPanel} from './home-right-stats-panel';
 import {HomeRightChartPanel} from './home-right-chart-panel';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { getDirectories, getSampleFile, getWdFiles } from '../store/visualizerSlice';
+import { getDirectories, getSampleFile, getFarmMeta } from '../store/visualizerSlice';
 import { setAllFilters, setFilSamples, setItems, setSelectedDir } from '../store/homeSlice';
 import 'simplebar-react/dist/simplebar.min.css';
 import EditFarmModal from './home-edit-modal';
@@ -23,14 +23,14 @@ export const Home = () => {
 
   useEffect(() => {
     if (directories.length !== 0) {
-      dispatch(getWdFiles(directories[0]));
+      dispatch(getFarmMeta(directories[0]));
       dispatch(setSelectedDir(directories[0]));
     }
   }, [directories])
 
   useEffect(() => {
     selectedDir.length !== 0 && dispatch(getSampleFile(selectedDir))
-    selectedDir.length !== 0 && dispatch(getWdFiles(selectedDir))
+    selectedDir.length !== 0 && dispatch(getFarmMeta(selectedDir))
   }, [selectedDir])
 
   useEffect(() => {

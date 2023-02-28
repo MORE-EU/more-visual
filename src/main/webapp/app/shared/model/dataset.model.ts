@@ -1,13 +1,11 @@
 export interface IDataset {
   id?: string;
+  path?: string;
+  type?: string;
   name?: string;
-  resType?: number;
-  formalName?: string;
-  farmName?: string;
-  timeCol?: number;
+  hasHeader?: boolean;
   measures?: number[];
-  header?: string[];
-  washes?: boolean;
+  timeCol?: number;
 }
 
 export const defaultValue: Readonly<IDataset> = {};

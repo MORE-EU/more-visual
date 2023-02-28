@@ -5,40 +5,35 @@ import {
   ToggleButton,
   Popover,
   FormControl,
-  Typography, FormControlLabel, MenuItem, ListItemText
-} from "@mui/material";
-import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
-import {setComparePopover, updateCompare} from "app/modules/store/visualizerSlice";
-import AddchartIcon from "@mui/icons-material/Addchart";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+  Typography,
+  FormControlLabel,
+  MenuItem,
+  ListItemText,
+} from '@mui/material';
+import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
+import { setComparePopover, updateCompare } from 'app/modules/store/visualizerSlice';
+import AddchartIcon from '@mui/icons-material/Addchart';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
-export interface  IChartCompareMenuProps {
-  anchorEl: any,
+export interface IChartCompareMenuProps {
+  anchorEl: any;
 }
 
 export const ChartComparePopover = (props: IChartCompareMenuProps) => {
   const dispatch = useAppDispatch();
 
-  const { wdFiles, from, to, dataset, comparePopover, compare} = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, comparePopover, compare } = useAppSelector(state => state.visualizer);
 
-  const {anchorEl} = props;
+  const { anchorEl } = props;
 
-  const [view, setView] = React.useState('chart');
-
-  const handleViewSelection = (e) => {
-    setView(e.target.value);
-  };
-
-
-  const handleOnClick = e => {
-    dispatch(updateCompare(e.target.innerText.replace('.csv', '')));
+  const handleOnClick = (id) => (e) => {
+    dispatch(updateCompare(id));
   };
 
   const handleClose = () => {
     dispatch(setComparePopover(false));
   };
-
 
   return (
     <Popover
@@ -63,12 +58,14 @@ export const ChartComparePopover = (props: IChartCompareMenuProps) => {
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'left',
-          alignItems: 'left',
-          p: 1,
+          alignItems: 'top',
+          pl: 1,
+          pr: 1,
+          pt: 1
         }}
       >
-        <AddchartIcon sx={{pr: 1}}/>
-        <Typography variant="body1" gutterBottom sx={{fontWeight: 600, fontSize: "1.2em"}}>
+        <AddchartIcon sx={{ pr: 1 }} />
+        <Typography variant="body1" gutterBottom sx={{ fontWeight: 600, fontSize: '1em' }}>
           Compare
         </Typography>
       </Box>
@@ -79,22 +76,20 @@ export const ChartComparePopover = (props: IChartCompareMenuProps) => {
           justifyContent: 'left',
           alignItems: 'left',
           p: 1,
-        }}>
-      {/*<Typography variant="body1" gutterBottom sx={{fontWeight: 600}}>*/}
-      {/*  Datasets*/}
-      {/*</Typography>*/}
-        {wdFiles.map(
+        }}
+      >
+        {farmMeta.data.map(
           (file, idx) =>
-            file.replace('.csv', '') !== dataset.id && (
-              <MenuItem key={`${file}-${idx}`} selected={compare.includes(file.replace('.csv', ''))} onClick={handleOnClick}>
-                <ListItemText>{file}</ListItemText>
-                {compare.includes(file.replace('.csv', '')) ? <CheckCircleOutlineIcon /> : <RadioButtonUncheckedIcon />}
+            file.id !== dataset.id && (
+              <MenuItem key={`${file.id}-${idx}`} selected={compare.includes(file.id)} onClick={handleOnClick(file.id)}>
+                <ListItemText>{file.name}</ListItemText>
+                {compare.includes(file.id) ? <CheckCircleOutlineIcon /> : <RadioButtonUncheckedIcon />}
               </MenuItem>
             )
         )}
       </Box>
     </Popover>
-    );
-}
+  );
+};
 
-export default  ChartComparePopover;
+export default ChartComparePopover;

@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { IAlerts } from 'app/shared/model/alert.model';
 import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
+import { IFarmMeta } from 'app/shared/model/farmMeta.model';
 import { IQueryResults } from 'app/shared/model/query-results.model';
 import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
 import { ITimeRange } from 'app/shared/model/time-range.model';
@@ -83,8 +84,7 @@ const initialState = {
   measureColors: [],
   from: null as number,
   to: null as number,
-  wdFiles: [] as any[],
-  farmMetaFile: null,
+  farmMeta: null as IFarmMeta,
   sampleFile: [],
   directories: [],
   resampleFreq: '',
@@ -132,7 +132,7 @@ export const getDataset = createAsyncThunk('getDataset', async (data: { folder: 
   return response;
 });
 
-export const getWdFiles = createAsyncThunk('getWdFiles', async (folder: string) => {
+export const getFarmMeta = createAsyncThunk('getFarmMeta', async (folder: string) => {
   const response = await axios.get(`api/datasets/${folder}`).then(res => res);
   return response;
 });
@@ -438,10 +438,9 @@ const visualizer = createSlice({
       state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
       state.selectedMeasures = [action.payload.data.measures[0]]
     });
-    builder.addCase(getWdFiles.fulfilled, (state, action) => {
+    builder.addCase(getFarmMeta.fulfilled, (state, action) => {
       state.loading = false;
-      state.wdFiles = action.payload.data.data.map(file => file.id);
-      state.farmMetaFile = action.payload.data;
+      state.farmMeta = action.payload.data;
     });
     builder.addCase(getDirectories.fulfilled, (state, action) => {
       state.loading = false;
@@ -483,7 +482,7 @@ const visualizer = createSlice({
       state.queryResultsLoading = false;
       state.data = action.payload.data.length !== 0 ? [...state.data, ...action.payload.data.slice(0)] : state.data;
     })
-    builder.addMatcher(isAnyOf(getDataset.pending, getWdFiles.pending, getDirectories.pending, getSampleFile.pending), state => {
+    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending), state => {
       state.errorMessage = null;
       state.loading = true;
     });
@@ -497,7 +496,7 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(saveAlert.pending, deleteAlert.pending, getAlerts.pending, editAlert.pending), state => {
       state.alertsLoading = true;
     });
-    builder.addMatcher(isAnyOf(getDataset.rejected, getWdFiles.rejected, getDirectories.pending, getSampleFile.rejected),
+    builder.addMatcher(isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.payload;

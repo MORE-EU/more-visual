@@ -37,7 +37,7 @@ export const icon = new L.Icon({
 export const HomeMap = () => {
 
   const { fly, items, selected } = useAppSelector(state => state.home);
-  const { wdFiles } = useAppSelector(state => state.visualizer);
+  const { farmMeta } = useAppSelector(state => state.visualizer);
 
 
   // const history = useHistory();
@@ -55,7 +55,7 @@ export const HomeMap = () => {
           (
             <MarkerClusterGroup showCoverageOnHover={true} key={itemIdx}>
               {item.farmInfo.map((info, locIdx) => {
-                const rand = Math.floor((Math.random() * (wdFiles.length - 1)) + 0);
+                const rand = Math.floor((Math.random() * (farmMeta.data.length - 1)) + 0);
                 let count = 0;
                 const count1 = [];
                 selected.map(sele => {
@@ -87,7 +87,7 @@ export const HomeMap = () => {
                       {/* <Tooltip direction="top"> */}
                       <Popup>
                         <Paper elevation={0} sx={{textAlign: "center"}}>
-                          <Link to={`/visualize/bbz/${wdFiles[rand]}`}>
+                          <Link to={`/visualize/bbz/${farmMeta.data[rand].id}`}>
                             <Typography variant="overline" sx={{textDecoration: "none"}}>Detailed View
                             </Typography>
                           </Link> <br/>

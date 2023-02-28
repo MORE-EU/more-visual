@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { Button, FormControl, Grid, Input, InputLabel, ListItemIcon, MenuItem, Select, Tooltip, Typography } from '@mui/material';
+import { FormControl, Grid, InputLabel, ListItemIcon, MenuItem, Select, Tooltip, Typography } from '@mui/material';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import { Link, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/storeConfig';
@@ -13,10 +13,9 @@ import ControlPointIcon from '@mui/icons-material/ControlPoint';
 
 
 export const VisControl = () => {
-  const { folder, dataset, compare, resampleFreq, datasetChoice, wdFiles } = useAppSelector(state => state.visualizer);
+  const { folder, dataset, compare, resampleFreq, datasetChoice, farmMeta } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
 
@@ -35,17 +34,6 @@ export const VisControl = () => {
     setUploadFile(e.target.files);
   };
 
-  const handleEditMeasures = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseEditMeasures = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
-
   // @ts-ignore
   return (
     <Grid container spacing={3}>
@@ -58,25 +46,25 @@ export const VisControl = () => {
             setUploadFile={setUploadFile}
           />
         )}
-        {wdFiles.length !== 0 && (
+        {farmMeta && (
           <>
             <Typography variant="h6" gutterBottom>
               {dataset.farmName}
             </Typography>
             <List disablePadding dense={true}>
-              {wdFiles.map((file, idx) => (
+              {farmMeta.data.map((file, idx) => (
                 <ListItemButton
                   key={idx}
                   selected={datasetChoice === idx}
                   component={Link}
-                  to={`/visualize/${folder}/${file}`}
+                  to={`/visualize/${folder}/${file.id}`}
                   onClick={() => {
-                    handleDataset(idx), dispatch(getDataset({ folder, id: file }));
+                    handleDataset(idx), dispatch(getDataset({ folder, id: file.id }));
                   }}
                   divider
                 >
-                  <ListItemText primary={`${file}`} sx={{ pl: 4 }} />
-                  {compare.includes(file.replace('.csv', '')) && (
+                  <ListItemText primary={`${file.name}`} sx={{ pl: 4 }} />
+                  {compare.includes(file.id) && (
                     <Tooltip title="Currently comparing this file">
                       <ListItemIcon>
                         <CompareArrowsIcon />

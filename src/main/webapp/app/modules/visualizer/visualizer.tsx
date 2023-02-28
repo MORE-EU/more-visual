@@ -12,20 +12,20 @@ import Toolkit from "app/modules/visualizer/tools/toolkit";
 import HomeIcon from '@mui/icons-material/Home';
 import {Breadcrumbs, Divider, Link, Typography} from "@mui/material";
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { getAlerts, getDataset, getWdFiles, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
 
 const mdTheme = createTheme();
 
 export const Visualizer = () => {
 
-  const { wdFiles, dataset, openToolkit} = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, openToolkit, datasetChoice} = useAppSelector(state => state.visualizer);
   const { loadingButton} = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
   const  params: any = useParams();
   const history = useHistory();
 
   useEffect(() => {
-    dispatch(getWdFiles(params.folder));
+    dispatch(getFarmMeta(params.folder));
   }, []);
 
   useEffect(() => {
@@ -38,15 +38,15 @@ export const Visualizer = () => {
   }, [dataset])
 
   useEffect(() => {
-    params.id === undefined && wdFiles.length !== 0 && history.push(`${params.folder}/${wdFiles[0]}`)
-    wdFiles.length !== 0 && dispatch(updateDatasetChoice(wdFiles.indexOf(params.id)));
-  }, [wdFiles])
+    params.id === undefined && farmMeta && history.push(`${params.folder}/${farmMeta.data[0].id}`)
+    farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
+  }, [farmMeta])
 
   useEffect(() => {
-    !loadingButton && wdFiles.length !== 0 && dispatch(getWdFiles(params.folder))
+    !loadingButton && farmMeta && dispatch(getFarmMeta(params.folder))
   }, [loadingButton])
 
-  return dataset !== null && <div>
+  return dataset !== null && farmMeta && <div>
     <ThemeProvider theme={mdTheme}>
       <Toolbar>
         <Box sx={{
@@ -69,13 +69,13 @@ export const Visualizer = () => {
               color="inherit"
               href={`/dashboard/${params.folder}`}
             >
-              {params.folder}
+              {farmMeta.name}
             </Link>
             <Typography
               sx={{display: 'flex', alignItems: 'center'}}
               color="text.primary"
             >
-              {params.id}
+              {farmMeta.data[datasetChoice].name}
             </Typography>
           </Breadcrumbs>
         </Box>

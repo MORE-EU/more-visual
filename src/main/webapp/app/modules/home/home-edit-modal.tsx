@@ -90,7 +90,7 @@ const HomeEditFarmModal = () => {
   const { loadingButton, uploadState } = useAppSelector(state => state.fileManagement);
   const { selectedDir, openHomeModal } = useAppSelector(state => state.home);
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const { farmMetaFile } = useAppSelector(state => state.visualizer);
+  const { farmMeta } = useAppSelector(state => state.visualizer);
   const [popper, setPopper] = useState(false);
   const [anchorEl, setAnchorEl] = useState({ input: null, name: null });
   const [formData, setFormData] = useState(null);
@@ -145,9 +145,8 @@ const HomeEditFarmModal = () => {
   };
 
   useEffect(() => {
-    setFormData(farmMetaFile);
-    console.log(farmMetaFile);
-  }, [farmMetaFile]);
+    setFormData(farmMeta);
+  }, [farmMeta]);
 
   return (
     <>
@@ -161,7 +160,7 @@ const HomeEditFarmModal = () => {
       >
         <Box sx={style}>
           <Grid xs={12} sx={{ height: '20%' }}>
-            <Grid sx={{ display: 'flex', mb: 2, height: "20%" }}>
+            <Grid sx={{ display: 'flex', mb: 2, height: '20%' }}>
               <Typography id="modal-modal-title" variant="subtitle1" fontSize={25} sx={{ color: grey[700] }}>
                 Add files
               </Typography>
@@ -174,12 +173,10 @@ const HomeEditFarmModal = () => {
                 <CircularProgressWithLabel value={uploadState} />
               )}
             </Grid>
-            <Grid sx={{d: "flex", flexDirection: "row", height: "80%", alignItems: "center", m: "auto"}}>
-            <Typography id="modal-modal-title" variant="subtitle1" fontSize={20}>
-              Selected Files
-            </Typography>
-            </Grid>
-            <Grid>
+            <Grid sx={{ d: 'flex', flexDirection: 'row', height: '80%', alignItems: 'center', m: 'auto' }}>
+              <Typography id="modal-modal-title" variant="subtitle1" fontSize={20}>
+                Selected Files
+              </Typography>
               {selectedFiles.length > 0 &&
                 selectedFiles.map(file => <Chip label={`${file.name}`} variant="outlined" onDelete={handleChipDelete} />)}
             </Grid>
