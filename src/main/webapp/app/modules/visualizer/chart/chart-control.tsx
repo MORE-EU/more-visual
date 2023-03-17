@@ -39,7 +39,7 @@ export const ChartControl = () => {
               maxDateTime={queryResults ? queryResults.timeRange[1] : null}
               onAccept={(e) => {handleOnAccept(e, "from")}}
               onChange={(e) => {}}
-              inputFormat="dd/MM/yyyy hh:mm a"
+              inputFormat="dd/MM/yyyy hh:mm a|p"
               />
             <Typography variant="body1" sx={{pl: 1, pr: 1}}>{" - "}</Typography>
             <DateTimePicker
@@ -50,7 +50,7 @@ export const ChartControl = () => {
               maxDateTime={queryResults ? queryResults.timeRange[1] : null}
               onAccept={(e) => {handleOnAccept(e, "to")}}
               onChange={(e) => {}}
-              inputFormat="dd/MM/yyyy hh:mm a"
+              inputFormat="dd/MM/yyyy hh:mm a|p"
             />
           </LocalizationProvider>
           <ChartCompare />
