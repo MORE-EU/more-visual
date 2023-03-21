@@ -12,7 +12,7 @@ export const ChartType = () => {
 
   return (
     <>
-      <ToggleButtonGroup value={chartType} exclusive onChange={(e, newVal) => dispatch(setChartType(newVal))} aria-label="text alignment" sx={{ ml: 5 }}>
+      <ToggleButtonGroup value={chartType} exclusive onChange={(e, newVal) => dispatch(setChartType(newVal))} aria-label="text alignment">
         <ToggleButton value="line" aria-label="left aligned">
           <ShowChartIcon />
         </ToggleButton>

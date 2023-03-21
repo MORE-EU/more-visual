@@ -26,6 +26,7 @@ import {ChartPlotBands} from "app/modules/visualizer/chart/chart-plot-bands/char
 import chartAlertingChecker, { alertingPlotBandsCreator } from "./chart-alerting/chart-alerting-functions";
 
 import {filterChangepoints} from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
+import { grey } from "@mui/material/colors";
 
 HighchartsMore(Highcharts);
 Highcharts.setOptions({
@@ -54,7 +55,7 @@ export const Chart = () => {
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, measureColors,
     queryResultsLoading, filter, queryResults, changeChart, compare, changepointDetectionEnabled, detectedChangepointFilter,
     customChangepointsEnabled, patterns, data, compareData, forecastData, soilingEnabled, alertingPlotMode, alertResults,
-    soilingWeeks, yawMisalignmentEnabled, secondaryData, chartType, liveDataImplLoading, alerts, alertingPreview} = useAppSelector(state => state.visualizer);
+    soilingWeeks, yawMisalignmentEnabled, secondaryData, chartType, liveDataImplLoading, alerts, alertingPreview, autoMLtoggle} = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
 
@@ -107,6 +108,10 @@ export const Chart = () => {
     setZones(newZones);
   }, [patterns]);
 
+
+  useEffect(() => {
+    chartRef && chartRef.reflow()
+  }, [autoMLtoggle])
 
   useEffect(() => {
     latestPreview.current = alertingPreview;
@@ -505,7 +510,7 @@ export const Chart = () => {
 
   return (
     <Grid
-      sx={{border: "1px solid rgba(0, 0, 0, .1)", minHeight: "700px"}}
+      sx={{border: "1px solid rgba(0, 0, 0, .1)", height: autoMLtoggle ? "40%" : "70%", position: "relative"}}
       onMouseOver={() => handleMouseOverChart()}
       onMouseLeave={() => handleMouseLeaveChart()}
     >
@@ -516,7 +521,7 @@ export const Chart = () => {
         <HighchartsReact
           highcharts={Highcharts}
           constructorType={"stockChart"}
-          containerProps={{className: "chartContainer"}}
+          containerProps={{className: "chartContainer", style: {height: "calc(100% - 4px)", position: "absolute", width: "100%"}}}
           allowChartUpdate={true}
           immutable={false}
           callback={getChartRef}
@@ -616,9 +621,9 @@ export const Chart = () => {
               ],
             chart: {
               type: chartType,
-              height: "700px",
               marginTop: 10,
               plotBorderWidth: 0,
+              backgroundColor: !autoMLtoggle ? null : 'rgba(0,0,0, 0.05)',
               zoomType: customChangepointsEnabled ? 'x' : false,
               events: {
                 plotBackgroundColor: "rgba(10,0,0,0)", // dummy color, to create an element
@@ -655,6 +660,15 @@ export const Chart = () => {
             credits: {
               enabled: false,
             },
+            loading: {
+              labelStyle: {
+                  color: 'black',
+                  fontSize: "20px"
+              },
+              style: {
+                  backgroundColor: 'transparent'
+              }
+          },
             // stockTools: {
             //   gui: {
             //     enabled: true,

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, CssBaseline, CSSObject, Divider, List, ListItem, ListItemIcon, ListItemText, Theme} from '@mui/material';
+import {Box, CssBaseline, CSSObject, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Theme, Typography} from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import {styled} from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
@@ -71,7 +71,7 @@ const Toolkit = () => {
 
   const handleDrawer = () => {
     dispatch(setOpenToolkit(!openToolkit));
-    dispatch(updateActiveTool(-1));
+    dispatch(updateActiveTool(null));
   };
 
   const handleToolClick = (key) => {
@@ -79,52 +79,56 @@ const Toolkit = () => {
     dispatch(updateActiveTool(key));
   }
   return (
-    <Box>
-      <CssBaseline/>
-      <Drawer variant="permanent" open={openToolkit} anchor="right">
-        <DrawerHeader>
-          <IconButton onClick={handleDrawer}>
-            {openToolkit ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
-          </IconButton>
-        </DrawerHeader>
-        <Divider/>
-        {activeTool === -1 &&
+    // <Box>
+    //   <CssBaseline/>
+    //   <Drawer variant="permanent" open={openToolkit} anchor="right">
+    //     <DrawerHeader>
+    //       {openToolkit && <Typography variant="subtitle1" fontSize={20} fontWeight={600}>
+    //       Tools
+    //       </Typography>}
+    //       <IconButton onClick={handleDrawer}>
+    //         {openToolkit ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
+    //       </IconButton>
+    //     </DrawerHeader>
+    //     {activeTool === -1 &&
           <List>
-            <ListItem button key={0} onClick={() => handleToolClick(0)}>
+            <ListItemButton key={0} onClick={() => handleToolClick(0)}>
               <ListItemIcon>
                 <PatternIcon/>
               </ListItemIcon>
               <ListItemText primary={"Pattern Extraction"}/>
-            </ListItem>
-            {dataset.resType === 0 && <ListItem button key={1} onClick={() => handleToolClick(1)}>
+            </ListItemButton>
+            {openToolkit && <Divider/>}
+            {dataset.resType === 0 && <><ListItemButton key={1} onClick={() => handleToolClick(1)}>
               <ListItemIcon>
                 <ManageSearchIcon/>
               </ListItemIcon>
               <ListItemText primary={"Soiling Detection"}/>
-            </ListItem>}
-            {dataset.resType === 1 && <ListItem button key={2} onClick={() => handleToolClick(2)}>
+            </ListItemButton><Divider/></>}
+            {dataset.resType === 1 && <><ListItemButton key={2} onClick={() => handleToolClick(2)}>
               <ListItemIcon>
                 <ManageSearchIcon/>
               </ListItemIcon>
               <ListItemText primary={"Yaw Misalignment"}/>
-            </ListItem>}
-            <ListItem button key={3} onClick={() => handleToolClick(3)}>
+            </ListItemButton>{openToolkit && <Divider/>}</>}
+            <ListItemButton key={3} onClick={() => handleToolClick(3)}>
               <ListItemIcon>
                 <TimelineIcon/>
               </ListItemIcon>
               <ListItemText primary={"Forecasting"}/>
-            </ListItem>
-            <ListItem button key={4} onClick={() => handleToolClick(4)}>
+            </ListItemButton>
+            {openToolkit && <Divider/>}
+            <ListItemButton key={4} onClick={() => handleToolClick(4)}>
               <ListItemIcon>
                 <FilterAltIcon/>
               </ListItemIcon>
               <ListItemText primary={"Filtering"}/>
-            </ListItem>
+            </ListItemButton>
           </List>
-        }
-        <ActiveTool />
-      </Drawer>
-    </Box>
+    //     }
+    //     <ActiveTool />
+    //   </Drawer>
+    // </Box>
   );
 }
 

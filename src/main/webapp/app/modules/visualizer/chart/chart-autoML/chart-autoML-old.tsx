@@ -11,6 +11,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Slider from '@mui/material/Slider';
 import Typography from '@mui/material/Typography';
 import HelpIcon from '@mui/icons-material/Help';
+import styled from '@mui/system/styled';
 
 const SelectColumnComp = props => (
   <Select size="small">
@@ -19,6 +20,36 @@ const SelectColumnComp = props => (
     ))}
   </Select>
 );
+
+const DataSplitSlider = styled(Slider)(({ theme }) => ({
+  color: '#3a8589',
+  height: 3,
+  padding: '13px 0',
+  '& .MuiSlider-thumb': {
+    height: 27,
+    width: 27,
+    backgroundColor: '#fff',
+    border: '1px solid currentColor',
+    '&:hover': {
+      boxShadow: '0 0 0 8px rgba(58, 133, 137, 0.16)',
+    },
+    '& .airbnb-bar': {
+      height: 9,
+      width: 1,
+      backgroundColor: 'currentColor',
+      marginLeft: 1,
+      marginRight: 1,
+    },
+  },
+  '& .MuiSlider-track': {
+    height: 2,
+  },
+  '& .MuiSlider-rail': {
+    color: theme.palette.mode === 'dark' ? '#bfbfbf' : '#d8d8d8',
+    opacity: theme.palette.mode === 'dark' ? undefined : 1,
+    height: 3,
+  },
+}));
 
 const ChartML = () => {
   const { queryResults, selectedMeasures } = useAppSelector(state => state.visualizer);
@@ -36,7 +67,6 @@ const ChartML = () => {
                 flexDirection: 'column',
                 rowGap: 2,
                 textAlign: 'center',
-                border: '1px solid rgb(0,0,0)',
               }}
             >
               <Grid sx={{ display: 'flex', gap: 1, justifyContent: 'space-evenly', alignItems: 'center', width: '50%', m: 'auto' }}>
@@ -80,18 +110,18 @@ const ChartML = () => {
                 <Checkbox defaultChecked />
               </Grid>
             </Grid>
-            <Grid className={'Slider-values'} sx={{ width: '100%', textAlign: 'center', border: '1px solid rgb(0,0,0)' }}>
+            <Grid className={'Slider-values'} sx={{ width: '100%', textAlign: 'center' }}>
               <Grid sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '50%', m: 'auto' }}>
                 <Grid sx={{ width: '30%' }}>
                   <Typography variant="subtitle1" fontSize={15}>
-                    Test Size:
+                    Data Split:
                   </Typography>
                 </Grid>
                 <Grid sx={{ width: '70%' }}>
-                  <Slider size="small" defaultValue={0} min={0} max={1} step={0.01} valueLabelDisplay="auto" />
+                  <DataSplitSlider defaultValue={[80, 90]} disableSwap/>
                 </Grid>
               </Grid>
-              <Grid sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '50%', m: 'auto' }}>
+              {/* <Grid sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '50%', m: 'auto' }}>
                 <Grid sx={{ width: '30%' }}>
                   <Typography variant="subtitle1" fontSize={15}>
                     Validation Size:
@@ -100,13 +130,13 @@ const ChartML = () => {
                 <Grid sx={{ width: '70%' }}>
                   <Slider size="small" defaultValue={0} min={0} max={1} step={0.01} valueLabelDisplay="auto" />
                 </Grid>
-              </Grid>
+              </Grid> */}
             </Grid>
             <Grid
               className={'Features-values'}
-              sx={{ width: '100%', border: '1px solid rgb(0,0,0)', display: 'flex', flexDirection: 'column', rowGap: 2 }}
+              sx={{ width: '100%', display: 'flex', flexDirection: 'column', rowGap: 2, textAlign: "center" }}
             >
-              <Grid className={'Features-values-choices'} sx={{ display: 'flex', flexDirection: 'row' }}>
+              <Grid className={'Features-values-choices'} sx={{ display: 'flex', flexDirection: 'row', width: "40%", m: "auto", border: '1px solid rgba(0,0,0,0.3)', borderRadius: 6 }}>
                 <Grid
                   sx={{
                     width: '50%',
@@ -163,7 +193,7 @@ const ChartML = () => {
                     }}
                   >
                     {['Minute', 'Month', 'is Working hour', 'Hour', 'Weekday', 'Is Weekend', 'day', 'Week of year'].map(text => (
-                      <Grid sx={{ display: 'flex', columnGap: 1, alignItems: 'center' }}>
+                      <Grid key={`${text}-Temporal-choice`} sx={{ display: 'flex', columnGap: 1, alignItems: 'center' }}>
                         <Typography variant="subtitle1" fontSize={15}>
                           {text}
                         </Typography>
@@ -179,14 +209,14 @@ const ChartML = () => {
                     Past Metrics
                   </Typography>
                 </Grid>
-                <Grid sx={{ textAlign: 'center', width: '30%', display: 'flex', flexFlow: 'row wrap', m: 'auto' }}>
+                <Grid sx={{ textAlign: 'center', width: '30%', display: 'flex', flexFlow: 'row wrap', m: 'auto', gap: 2, justifyContent: "space-evenly" }}>
                   {['Previous Hour', 'Previous Day', 'Previous Week', 'Previous Month'].map(text => (
-                    <Grid sx={{ display: 'flex', flexDirection: 'column', width: '50%', border: '1px solid rgba(0,0,0,0.3)' }}>
+                    <Grid key={`${text}-Past-Metrics-categories`} sx={{ display: 'flex', flexDirection: 'column', width: '40%', border: '1px solid rgba(0,0,0,0.3)', borderRadius: 6}}>
                       <Typography variant="subtitle1" fontSize={20}>
                         {text}
                       </Typography>
                       {['Actual Load', 'Average Load', 'Min Load', 'Max Load'].map(loadText => (
-                        <Grid sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                        <Grid key={`${loadText}-Past-Metrics-category-choice`} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                           <Checkbox defaultChecked />
                           <Typography variant="subtitle1" fontSize={15}>
                             {loadText}
@@ -205,7 +235,7 @@ const ChartML = () => {
                 </Grid>
                 <Grid sx={{ textAlign: 'center', width: '30%', display: 'flex', flexFlow: 'row wrap', m: 'auto' }}>
                   {['Slope', 'Curvature'].map(text => (
-                    <Grid sx={{ display: 'flex', flexDirection: 'row', width: '50%', justifyContent: 'center', alignItems: 'center' }}>
+                    <Grid key={`${text}-Derivative-choice`} sx={{ display: 'flex', flexDirection: 'row', width: '50%', justifyContent: 'center', alignItems: 'center' }}>
                       <Checkbox defaultChecked />
                       <Typography variant="subtitle1" fontSize={20}>
                         {text}
@@ -219,7 +249,6 @@ const ChartML = () => {
               className={'Categorical-Encoding-values'}
               sx={{
                 width: '100%',
-                border: '1px solid rgb(0,0,0)',
                 display: 'flex',
                 flexDirection: 'column',
                 rowGap: 2,
@@ -232,7 +261,7 @@ const ChartML = () => {
                 </Typography>
                 <Grid sx={{ display: 'flex', flexFlow: 'row wrap', textAlign: 'center' }}>
                   {['Minute', 'Day', 'Weekday', 'Hour', 'Month'].map(categoryText => (
-                    <Grid sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                    <Grid key={`${categoryText}-Categorical-value`} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                       <Checkbox defaultChecked />
                       <Typography variant="subtitle1" fontSize={15}>
                         {categoryText}
@@ -246,7 +275,6 @@ const ChartML = () => {
               className={'Future-predictive-window'}
               sx={{
                 width: '100%',
-                border: '1px solid rgb(0,0,0)',
                 display: 'flex',
                 flexDirection: 'column',
                 rowGap: 2,

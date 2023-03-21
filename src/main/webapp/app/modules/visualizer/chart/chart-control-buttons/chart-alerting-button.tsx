@@ -95,7 +95,6 @@ export const ChartAlerting = () => {
             aria-expanded={open ? 'true' : undefined}
             aria-haspopup="true"
             onClick={handleModal}
-            sx={{ ml: 5 }}
           >
             <NotificationsIcon />
           </IconButton>

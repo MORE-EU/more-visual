@@ -39,7 +39,6 @@ export const ChartCompare = () => {
           aria-expanded={open ? 'true' : undefined}
           aria-haspopup="true"
           onClick={handleOpen}
-          sx={{ ml: 5 }}
         >
           <AddchartIcon />
         </IconButton>

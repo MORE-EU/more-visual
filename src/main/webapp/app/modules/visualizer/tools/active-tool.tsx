@@ -15,15 +15,12 @@ const ActiveTool = () => {
   const dispatch = useAppDispatch();
 
   const goBack = () => {
-    dispatch(updateActiveTool(-1));
+    dispatch(updateActiveTool(null));
   }
   return (
     <Box>
       {activeTool !== -1 &&
         <Box>
-          <IconButton onClick={() => goBack()}>
-            <ArrowBackIosIcon/>
-          </IconButton>
           {activeTool === 0 && <PatternExtraction />}
           {activeTool === 1 && <SoilingDetection />}
           {activeTool === 2 && <YawMisalignment />}

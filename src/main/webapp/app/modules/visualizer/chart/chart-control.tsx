@@ -8,6 +8,7 @@ import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import { ChartType } from './chart-control-buttons/chart-type-picker';
 import { ChartAlerting } from './chart-control-buttons/chart-alerting-button';
+import AutoMLButton from './chart-control-buttons/chart-autoML-button';
 
 export const ChartControl = () => {
 
@@ -27,9 +28,9 @@ export const ChartControl = () => {
   }
 
   return (
-    <Grid container direction="row" sx={{mb: 1}}>
-      <Grid item alignItems="center" sx={{display: "flex", flexGrow: 1, flexDirection: "row"}}>
-        <Typography variant="body1" sx={{pr: 1}}>Time</Typography>
+    <Grid container direction="row">
+      <Grid item alignItems="center" sx={{display: "flex", flex: 1, flexDirection: "row", justifyContent: "flex-start", columnGap: 2}}>
+        <Typography variant="body1" fontWeight={600} fontSize={15} >Time</Typography>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DateTimePicker
               renderInput={(p) => <TextField size="small" {...p} />}
@@ -39,9 +40,9 @@ export const ChartControl = () => {
               maxDateTime={queryResults ? queryResults.timeRange[1] : null}
               onAccept={(e) => {handleOnAccept(e, "from")}}
               onChange={(e) => {}}
-              inputFormat="dd/MM/yyyy hh:mm a|p"
+              inputFormat="dd/MM/yyyy hh:mm a"
               />
-            <Typography variant="body1" sx={{pl: 1, pr: 1}}>{" - "}</Typography>
+            <Typography variant="body1" fontWeight={400} fontSize={30}>{" - "}</Typography>
             <DateTimePicker
               renderInput={(p) => <TextField size="small" {...p} />}
               label="To"
@@ -50,12 +51,13 @@ export const ChartControl = () => {
               maxDateTime={queryResults ? queryResults.timeRange[1] : null}
               onAccept={(e) => {handleOnAccept(e, "to")}}
               onChange={(e) => {}}
-              inputFormat="dd/MM/yyyy hh:mm a|p"
+              inputFormat="dd/MM/yyyy hh:mm a"
             />
           </LocalizationProvider>
-          <ChartCompare />
           <ChartType />
+          <ChartCompare />
           <ChartAlerting />
+          <AutoMLButton />
       </Grid>
       <Grid item sx={{alignSelf: "center"}}>
         <Button variant="text" size="small" onClick={() => {

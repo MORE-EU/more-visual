@@ -95,10 +95,11 @@ const initialState = {
   patternNav: '0',
   folder: '',
   graphZoom: null,
-  activeTool: -1,
+  activeTool: null,
   compare: [],
   chartRef: null,
   showDatePick: false,
+  autoMLtoggle: false,
   showChangepointFunction: false,
   comparePopover: false,
   singleDateValue: {start: null, end: null},
@@ -400,6 +401,9 @@ const visualizer = createSlice({
     setDetectedChangepointFilter(state, action) {
       state.detectedChangepointFilter = action.payload;
     },
+    setAutoMLToggle(state) {
+      state.autoMLtoggle = !state.autoMLtoggle;
+    },
     toggleChangepointDetection(state, action) {
       state.changepointDetectionEnabled = action.payload;
     },
@@ -529,7 +533,7 @@ export const {
   updatePatterns, updateChangeChart,updateDatasetChoice, updateDatasetMeasures, updatePatternNav, updateChartRef,
   updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateAnchorEl,
   updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleChangepointDetection,
-  toggleYawMisalignmentDetection, toggleManualChangepoints,  toggleCustomChangepoints,
+  toggleYawMisalignmentDetection, toggleManualChangepoints,  toggleCustomChangepoints, setAutoMLToggle,
   setShowDatePick,setShowChangepointFunction, setComparePopover, setSingleDateValue,setDateValues,setFixedWidth, setAlertingPlotMode,
   setDetectedChangepointFilter, setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns, setChartType, setAlertingPreview, updateAlertResults
 } = visualizer.actions;

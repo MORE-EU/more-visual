@@ -10,6 +10,7 @@ import { getDataset, resetChartValues, updateDatasetChoice, updateResampleFreq }
 import VisMeasures from 'app/modules/visualizer/vis-control/vis-measures';
 import VisUploadDataset from './vis-upload-dataset';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import Toolkit from '../tools/toolkit';
 
 
 export const VisControl = () => {
@@ -92,11 +93,14 @@ export const VisControl = () => {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item container xs={12}>
+      <Grid item xs={12}>
+        <Toolkit />
+        </Grid>
+      <Grid item xs={12}>
         <Typography variant="h6" gutterBottom>
           Measures
         </Typography>
-        <Grid item container pb={2} xs={12}>
+        <Grid item pb={2} xs={12}>
           <VisMeasures />
         </Grid>
       </Grid>
