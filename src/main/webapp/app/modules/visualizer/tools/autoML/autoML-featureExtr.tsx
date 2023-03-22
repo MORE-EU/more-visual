@@ -1,12 +1,31 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import Grid from '@mui/material/Grid';
 import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import HelpIcon from '@mui/icons-material/Help';
+import { IAutoMLForm } from 'app/shared/model/autoML.model';
 
-const AutoMLFeatureExtr = () => {
+interface IAutoMLFeatureExtr {
+  autoMLForm: IAutoMLForm;
+  setAutoMLForm: Dispatch<SetStateAction<IAutoMLForm>>;
+}
+
+const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
+
+  const {autoMLForm, setAutoMLForm} = props;
+  const hadleFeatureCheckBoxes = value => e => {
+   if(Object.hasOwn(autoMLForm.features, value)){
+    const feat = autoMLForm.features;
+    delete feat[value];
+    setAutoMLForm(state => ({...state, features: feat}))
+   }else{
+    setAutoMLForm(state => ({...state, features: {...autoMLForm.features, [value]: []}}))
+   }
+  }
+
   return (
     <>
+    {console.log(autoMLForm)}
       <Grid className={'Features-values'} sx={{ width: '100%', display: 'flex', flexDirection: 'column', rowGap: 2, textAlign: 'center' }}>
         <Grid
           className={'Features-values-choices'}
@@ -31,24 +50,25 @@ const AutoMLFeatureExtr = () => {
                 Temporal
               </Typography>
               <HelpIcon color="primary" />
-              <Checkbox defaultChecked />
+              <Checkbox value={Object.hasOwn(autoMLForm.features, "temporal")} onChange={hadleFeatureCheckBoxes("temporal")} />
             </Grid>
             <Grid sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Typography variant="subtitle1" fontSize={15}>
                 Past Metrics
               </Typography>
               <HelpIcon color="primary" />
-              <Checkbox defaultChecked />
+              <Checkbox value={Object.hasOwn(autoMLForm.features, "pastMetrics")} onChange={hadleFeatureCheckBoxes("pastMetrics")} />
             </Grid>
             <Grid sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Typography variant="subtitle1" fontSize={15}>
                 Derivatives
               </Typography>
               <HelpIcon color="primary" />
-              <Checkbox defaultChecked />
+              <Checkbox value={Object.hasOwn(autoMLForm.features, "derivatives")} onChange={hadleFeatureCheckBoxes("derivatives")} />
             </Grid>
           </Grid>
         </Grid>
+        {Object.hasOwn(autoMLForm.features, "temporal") && 
         <Grid className={'Features-values-choice-1'} sx={{ display: 'flex', flexDirection: 'column', rowGap: 2, width: '100%' }}>
           <Grid sx={{ textAlign: 'center' }}>
             <Typography variant="subtitle1" fontSize={20}>
@@ -77,8 +97,9 @@ const AutoMLFeatureExtr = () => {
               ))}
             </Grid>
           </Grid>
-        </Grid>
-        <Grid className={'Features-values-choice-2'} sx={{ display: 'flex', flexDirection: 'column', rowGap: 2, width: '100%' }}>
+        </Grid>}
+        {Object.hasOwn(autoMLForm.features, "pastMetrics") && 
+          <Grid className={'Features-values-choice-2'} sx={{ display: 'flex', flexDirection: 'column', rowGap: 2, width: '100%' }}>
           <Grid sx={{ textAlign: 'center' }}>
             <Typography variant="subtitle1" fontSize={20}>
               Past Metrics
@@ -117,7 +138,8 @@ const AutoMLFeatureExtr = () => {
               </Grid>
             ))}
           </Grid>
-        </Grid>
+        </Grid>}
+        {Object.hasOwn(autoMLForm.features, "derivatives") && 
         <Grid className={'Features-values-choice-3'} sx={{ display: 'flex', flexDirection: 'column', rowGap: 2, width: '100%' }}>
           <Grid sx={{ textAlign: 'center' }}>
             <Typography variant="subtitle1" fontSize={20}>
@@ -137,7 +159,7 @@ const AutoMLFeatureExtr = () => {
               </Grid>
             ))}
           </Grid>
-        </Grid>
+        </Grid>}
       </Grid>
     </>
   );

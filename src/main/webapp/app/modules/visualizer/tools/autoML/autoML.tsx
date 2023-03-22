@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -9,6 +9,7 @@ import AutoMLDataPrep from './autoML-dataPrep';
 import Grid from '@mui/material/Grid';
 import AutoMLFeatureExtr from './autoML-featureExtr';
 import AutoMLTrain from './autoML-train';
+import { IAutoMLForm, IAutoMLFormDefault } from 'app/shared/model/autoML.model';
 
 const steps = ['Data Preparation', 'Feature Generation', 'Train'];
 
@@ -18,9 +19,11 @@ const FinishStep = props => (
   </>
 );
 
-export default function AutoML() {
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [skipped, setSkipped] = React.useState(new Set());
+const AutoML = () => {
+
+  const [activeStep, setActiveStep] = useState(0);
+  const [skipped, setSkipped] = useState(new Set());
+  const [autoMLForm, setAutoMLForm] = useState<IAutoMLForm>(IAutoMLFormDefault);
 
   const isStepOptional = step => {
     return step === 1;
@@ -83,9 +86,9 @@ export default function AutoML() {
       </Grid>
       <Grid sx={{ width: '100%', height: '75%', overflowY: 'auto' }}>
         {activeStep === 0 ? (
-          <AutoMLDataPrep />
+          <AutoMLDataPrep autoMLForm={autoMLForm} setAutoMLForm={setAutoMLForm} />
         ) : activeStep === 1 ? (
-          <AutoMLFeatureExtr />
+          <AutoMLFeatureExtr autoMLForm={autoMLForm} setAutoMLForm={setAutoMLForm} />
         ) : activeStep === 2 ? (
           <AutoMLTrain />
         ) : (
@@ -114,3 +117,5 @@ export default function AutoML() {
     </Grid>
   );
 }
+
+export default AutoML;
