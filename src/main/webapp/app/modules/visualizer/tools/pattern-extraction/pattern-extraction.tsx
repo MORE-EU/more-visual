@@ -5,17 +5,8 @@ import VisPatterns from "app/modules/visualizer/tools/pattern-extraction/vis-pat
 export const PatternExtraction = () => {
 
   return (
-    <Box sx={{pl: 2, pr: 2}}>
-      <Box>
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            Pattern Extraction
-          </Typography>
-
-        </Box>
-      </Box>
+    <Box sx={{height: "fit-content", width: "50%", m: "auto", pt: 5}}>
       {<VisPatterns />}
-
     </Box>);
 
 };

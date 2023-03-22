@@ -3,7 +3,7 @@ import {Box, Button, Grid, IconButton, TextField, Tooltip, Typography} from '@mu
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import {MeasureSelection} from "app/shared/layout/MeasureSelection";
 
-
+//TODO: unused
 export const ChartStatistics = () => {
 
   const {} = useAppSelector(state => state.visualizer);

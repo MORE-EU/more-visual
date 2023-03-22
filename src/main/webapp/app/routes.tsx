@@ -7,8 +7,6 @@ import PageNotFound from 'app/shared/error/page-not-found';
 import Visualizer from "app/modules/visualizer/visualizer";
 import Upload from './modules/upload/upload-farm';
 import Dashboard from './modules/dashboard/farm-dashboard';
-import ChartML from './modules/visualizer/chart/chart-autoML/chart-autoML-old';
-import AutoMLStepper from './modules/visualizer/chart/chart-autoML/chart-autoML';
 
 
 const Routes = () => (
@@ -17,7 +15,6 @@ const Routes = () => (
       <ErrorBoundaryRoute path="/" exact component={Home}/>
       <ErrorBoundaryRoute path="/upload" exact component={Upload}/>
       <ErrorBoundaryRoute path="/dashboard/:id" exact component={Dashboard}/>
-      <ErrorBoundaryRoute path="/ml" exact component={AutoMLStepper}/>
       <ErrorBoundaryRoute exact path={"/visualize/:folder/:id?"} component={Visualizer}/>
       <ErrorBoundaryRoute component={PageNotFound}/>
     </Switch>

@@ -8,7 +8,7 @@ import Paper from '@mui/material/Paper';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
-import Toolkit from 'app/modules/visualizer/tools/toolkit';
+import Toolkit from 'app/modules/visualizer/vis-control/vis-control-toolkit';
 import HomeIcon from '@mui/icons-material/Home';
 import { Breadcrumbs, Divider, Grid, Link, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
@@ -103,9 +103,6 @@ export const Visualizer = () => {
                   <ChartContainer />
                 </Paper>
               </Grid>
-              {/* <Grid>
-                <Toolkit />
-              </Grid> */}
             </Grid>
           </Grid>
         </ThemeProvider>

@@ -14,9 +14,9 @@ import HelpIcon from '@mui/icons-material/Help';
 import styled from '@mui/system/styled';
 
 const SelectColumnComp = props => (
-    <Select size="small">
+    <Select size="small" defaultValue={props.selectedMeasures[0]}>
       {props.selectedMeasures.map(measure => (
-        <MenuItem value={measure}>{measure}</MenuItem>
+        <MenuItem key={`${measure}-item`} value={measure}>{measure}</MenuItem>
       ))}
     </Select>
   );

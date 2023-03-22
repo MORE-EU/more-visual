@@ -68,7 +68,7 @@ interface metaSchema {
   measures: number[];
 }
 
-const VisUploadDataset = (props: IVisUploadDataset) => {
+const VisControlDatasetUpload = (props: IVisUploadDataset) => {
   const { uploadModalOpen, setUploadModalOpen, uploadFile, setUploadFile } = props;
   const { loadingButton, uploadState } = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
@@ -155,7 +155,6 @@ const VisUploadDataset = (props: IVisUploadDataset) => {
 
   return (
     <>
-    {console.log(formData)}
       <Modal
         open={uploadModalOpen}
         onClose={handleOnCloseModal}
@@ -341,4 +340,4 @@ const VisUploadDataset = (props: IVisUploadDataset) => {
   );
 };
 
-export default VisUploadDataset;
+export default VisControlDatasetUpload;

@@ -9,7 +9,7 @@ import Highcharts from "highcharts/highstock";
 
 
 const functions = ["R-SQUARED", "MAE", "ME", "MAPE", "MPE"];
-
+//TODO: unused
 export const Scores = () => {
   const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);

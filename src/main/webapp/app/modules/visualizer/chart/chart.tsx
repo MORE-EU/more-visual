@@ -55,7 +55,7 @@ export const Chart = () => {
   const {chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, measureColors,
     queryResultsLoading, filter, queryResults, changeChart, compare, changepointDetectionEnabled, detectedChangepointFilter,
     customChangepointsEnabled, patterns, data, compareData, forecastData, soilingEnabled, alertingPlotMode, alertResults,
-    soilingWeeks, yawMisalignmentEnabled, secondaryData, chartType, liveDataImplLoading, alerts, alertingPreview, autoMLtoggle} = useAppSelector(state => state.visualizer);
+    soilingWeeks, yawMisalignmentEnabled, secondaryData, chartType, liveDataImplLoading, alerts, alertingPreview, activeTool} = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
 
@@ -111,7 +111,7 @@ export const Chart = () => {
 
   useEffect(() => {
     chartRef && chartRef.reflow()
-  }, [autoMLtoggle])
+  }, [activeTool])
 
   useEffect(() => {
     latestPreview.current = alertingPreview;
@@ -510,7 +510,7 @@ export const Chart = () => {
 
   return (
     <Grid
-      sx={{border: "1px solid rgba(0, 0, 0, .1)", height: autoMLtoggle ? "40%" : "70%", position: "relative"}}
+      sx={{border: "1px solid rgba(0, 0, 0, .1)", height: activeTool ? "40%" : "70%", position: "relative"}}
       onMouseOver={() => handleMouseOverChart()}
       onMouseLeave={() => handleMouseLeaveChart()}
     >
@@ -623,7 +623,7 @@ export const Chart = () => {
               type: chartType,
               marginTop: 10,
               plotBorderWidth: 0,
-              backgroundColor: !autoMLtoggle ? null : 'rgba(0,0,0, 0.05)',
+              backgroundColor: !activeTool ? null : 'rgba(0,0,0, 0.05)',
               zoomType: customChangepointsEnabled ? 'x' : false,
               events: {
                 plotBackgroundColor: "rgba(10,0,0,0)", // dummy color, to create an element

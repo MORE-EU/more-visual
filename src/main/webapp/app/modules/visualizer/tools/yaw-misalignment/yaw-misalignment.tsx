@@ -22,14 +22,7 @@ export const YawMisalignment = () => {
   }
 
   return (
-    <Box sx={{pl: 2, pr: 2}}>
-      <Box>
-        <Typography variant="h6" gutterBottom>
-          Yaw Misalignment
-        </Typography>
-        <Divider orientation="horizontal" flexItem>
-        </Divider>
-      </Box>
+    <Box sx={{height: "fit-content", width: "50%", m: "auto", pt: 5}}>
       <Box>
         <Box
           sx={{

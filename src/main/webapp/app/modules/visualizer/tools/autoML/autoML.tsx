@@ -5,10 +5,10 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import AutoMLDataPrep from './chart-autoML-dataPrep';
+import AutoMLDataPrep from './autoML-dataPrep';
 import Grid from '@mui/material/Grid';
-import AutoMLFeatureExtr from './chart-autoML-featureExtr';
-import AutoMLTrain from './chart-autoML-train';
+import AutoMLFeatureExtr from './autoML-featureExtr';
+import AutoMLTrain from './autoML-train';
 
 const steps = ['Data Preparation', 'Feature Generation', 'Train'];
 
@@ -18,7 +18,7 @@ const FinishStep = props => (
   </>
 );
 
-export default function ChartML() {
+export default function AutoML() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
 
@@ -81,7 +81,7 @@ export default function ChartML() {
           })}
         </Stepper>
       </Grid>
-      <Grid sx={{ width: '100%', height: '70%', overflowY: 'auto' }}>
+      <Grid sx={{ width: '100%', height: '75%', overflowY: 'auto' }}>
         {activeStep === 0 ? (
           <AutoMLDataPrep />
         ) : activeStep === 1 ? (
@@ -98,17 +98,17 @@ export default function ChartML() {
           <Button onClick={handleReset}>Reset</Button>
         </Grid>
       ) : (
-        <Grid sx={{ display: 'flex', flexDirection: 'row', height: "15%", pr: 3, pl: 3 }}>
-          <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
+        <Grid sx={{ display: 'flex', flexDirection: 'row', height: "10%", pr: 3, pl: 3 }}>
+          <Button size='small' color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
             Back
           </Button>
           <Grid sx={{ flex: '1 1 auto' }} />
           {isStepOptional(activeStep) && (
-            <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
+            <Button size='small' color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
               Skip
             </Button>
           )}
-          <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Train' : 'Next'}</Button>
+          <Button size='small' onClick={handleNext}>{activeStep === steps.length - 1 ? 'Train' : 'Next'}</Button>
         </Grid>
       )}
     </Grid>

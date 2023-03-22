@@ -3,10 +3,11 @@ import {Box, Button, Tooltip} from '@mui/material';
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import HighlightAltIcon from '@mui/icons-material/HighlightAlt';
 import FunctionsIcon from '@mui/icons-material/Functions';
-import {ChartDatePicker} from "app/modules/visualizer/chart/chart-control-buttons/chart-datepicker";
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { setExpand, setFixedWidth, setShowDatePick } from 'app/modules/store/visualizerSlice';
 
+
+//TODO: unused
 export const IntervalsPicker = () => {
 
   const {expand, showDatePick, fixedWidth} = useAppSelector(state => state.visualizer);

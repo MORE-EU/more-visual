@@ -17,13 +17,7 @@ export const Forecasting = () => {
   }
 
   return (
-    <Box sx={{pl: 2, pr: 2}}>
-      <Box>
-        <Typography variant="h6" gutterBottom>
-          Forecasting
-        </Typography>
-        <Divider/>
-      </Box>
+    <Box sx={{height: "fit-content", width: "50%", m: "auto", pt: 5}}>
       <Box sx={{
         display: 'flex',
         flexDirection: 'row',

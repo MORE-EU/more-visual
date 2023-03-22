@@ -54,9 +54,6 @@ export const Filter = () => {
 
   return (
     <Box sx={{ pl: 2, pr: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        Filters
-      </Typography>
       <Box>
         <Button variant="contained" onClick={filterReset}>
           Reset Filters
