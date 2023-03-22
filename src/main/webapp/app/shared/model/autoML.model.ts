@@ -1,6 +1,6 @@
 interface IFeatures {
   temporal?: string[];
-  pastMetrics?: { prevHour?: string[]; prevDay?: string[]; prevWeek?: string[]; prevMonth: string[] };
+  pastMetrics?: { prevHour?: string[]; prevDay?: string[]; prevWeek?: string[]; prevMonth?: string[] };
   derivatives?: string[];
 }
 

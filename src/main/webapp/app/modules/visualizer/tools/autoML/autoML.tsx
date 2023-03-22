@@ -90,7 +90,7 @@ const AutoML = () => {
         ) : activeStep === 1 ? (
           <AutoMLFeatureExtr autoMLForm={autoMLForm} setAutoMLForm={setAutoMLForm} />
         ) : activeStep === 2 ? (
-          <AutoMLTrain />
+          <AutoMLTrain autoMLForm={autoMLForm} setAutoMLForm={setAutoMLForm} />
         ) : (
           <FinishStep handleReset={handleReset} />
         )}
