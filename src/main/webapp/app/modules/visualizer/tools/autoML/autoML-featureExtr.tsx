@@ -4,6 +4,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import HelpIcon from '@mui/icons-material/Help';
 import { IAutoMLForm } from 'app/shared/model/autoML.model';
+import Tooltip from '@mui/material/Tooltip';
 
 interface IAutoMLFeatureExtr {
   autoMLForm: IAutoMLForm;
@@ -49,21 +50,27 @@ const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
               <Typography variant="subtitle1" fontSize={15}>
                 Temporal
               </Typography>
+              <Tooltip title="any feature that is associated with or changes over time (time-related data), such as hour, minute, day, weekday, etc.." placement="right">
               <HelpIcon color="primary" />
+              </Tooltip>
               <Checkbox value={Object.hasOwn(autoMLForm.features, "temporal")} onChange={hadleFeatureCheckBoxes("temporal")} />
             </Grid>
             <Grid sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Typography variant="subtitle1" fontSize={15}>
                 Past Metrics
               </Typography>
+              <Tooltip title="features associated with the past that happened in the same chronological interval, such as last day, last week, etc." placement="right">
               <HelpIcon color="primary" />
+              </Tooltip>
               <Checkbox value={Object.hasOwn(autoMLForm.features, "pastMetrics")} onChange={hadleFeatureCheckBoxes("pastMetrics")} />
             </Grid>
             <Grid sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Typography variant="subtitle1" fontSize={15}>
                 Derivatives
               </Typography>
+              <Tooltip title="generated features by calculating the first and second derivatives of the input features. The first derivative represents the slope of a curve, while the second derivative represents its curvature." placement="right">
               <HelpIcon color="primary" />
+              </Tooltip>
               <Checkbox value={Object.hasOwn(autoMLForm.features, "derivatives")} onChange={hadleFeatureCheckBoxes("derivatives")} />
             </Grid>
           </Grid>
