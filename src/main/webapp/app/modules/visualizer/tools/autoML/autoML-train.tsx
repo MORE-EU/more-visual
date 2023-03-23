@@ -1,21 +1,25 @@
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import { useAppSelector } from 'app/modules/store/storeConfig';
+import { IAutoMLForm } from 'app/shared/model/autoML.model';
 
-const SelectColumnComp = props => (
-    <Select size="small">
-      {props.selectedMeasures.map(measure => (
-        <MenuItem value={measure}>{measure}</MenuItem>
-      ))}
-    </Select>
-  );
+interface IAutoMLTrain {
+  autoMLForm: IAutoMLForm;
+  setAutoMLForm: Dispatch<SetStateAction<IAutoMLForm>>;
+}
 
-const AutoMLTrain = () => {
+const AutoMLTrain = (props: IAutoMLTrain) => {
     const {selectedMeasures} = useAppSelector(state => state.visualizer);
+    const {autoMLForm, setAutoMLForm} = props;
+
+  const handlePredictions = value => {
+    setAutoMLForm(state => ({...state, predictions: parseInt(value.target.value, 10)}))
+  }
+
   return (
     <>
       <Grid
@@ -32,12 +36,6 @@ const AutoMLTrain = () => {
           <Typography variant="subtitle1" fontSize={20}>
             Future Predictive Window
           </Typography>
-          {/* <Grid sx={{ display: 'flex', gap: 1, justifyContent: 'space-evenly', alignItems: 'center', m: 'auto' }}>
-            <Typography variant="subtitle1" fontSize={15}>
-              Target Column:
-            </Typography>
-            <SelectColumnComp selectedMeasures={selectedMeasures} />
-          </Grid> */}
           <Grid sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', m: 'auto' }}>
             <Grid sx={{ width: '60%' }}>
               <Typography variant="subtitle1" fontSize={15}>
@@ -51,6 +49,7 @@ const AutoMLTrain = () => {
                   shrink: true,
                 }}
                 variant="standard"
+                onChange={handlePredictions}
               />
             </Grid>
           </Grid>
