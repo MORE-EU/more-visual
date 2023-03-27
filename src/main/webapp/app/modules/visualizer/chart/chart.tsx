@@ -97,6 +97,7 @@ export const Chart = () => {
   const [blockScroll, allowScroll] = useScrollBlock();
 
   const [zones, setZones] = useState([]);
+  const [forecastingPlotlines, setForecastingPlotlines] = useState([]);
   const [customPlotBands, setCustomPlotBands] = useState([]);
   const [manualPlotBands, setManualPlotBands] = useState([]);
   const [alertingPlotBands, setAlertingPlotBands] = useState([]);
@@ -144,14 +145,26 @@ export const Chart = () => {
       return [
         { value: autoMLStartDate, color },
         { value: autoMLStartDate + (autoMLEndDate - autoMLStartDate) * (autoMLDataSplit[0] / 100), color: '#00FF00' },
-        { value: autoMLStartDate + ((autoMLEndDate - autoMLStartDate) * (autoMLDataSplit[0] + autoMLDataSplit[1] / 100)) , color: '#ff0000' },
-        { value: autoMLEndDate, color: '#00FFFF'},
-        { value: dataset.timeRange.to, color}
+        {
+          value: autoMLStartDate + (autoMLEndDate - autoMLStartDate) * ((autoMLDataSplit[0] + autoMLDataSplit[1]) / 100),
+          color: '#ff0000',
+        },
+        { value: autoMLEndDate, color: '#00FFFF' },
+        { value: dataset.timeRange.to, color },
       ];
     } else {
       return null;
     }
   };
+
+  useEffect(() => {
+    if (autoMLStartDate !== null && autoMLEndDate !== null) {
+      setForecastingPlotlines([
+        { color: 'red', value: autoMLStartDate, width: 2, label: {text: "start date", verticalAlign: "center", textAlign: "left"} },
+        { color: 'red', value: autoMLEndDate, width: 2, label: {text: "end date", verticalAlign: "center", textAlign: "left"} },
+      ]);
+    }
+  }, [autoMLStartDate, autoMLEndDate]);
 
   useEffect(() => {
     chartRef && chartRef.reflow();
@@ -598,7 +611,6 @@ export const Chart = () => {
       onMouseOver={() => handleMouseOverChart()}
       onMouseLeave={() => handleMouseLeaveChart()}
     >
-      {console.log(dataset)}
       {!data ? <LinearProgress /> : <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />}
       {data && (
         <HighchartsReact
@@ -702,6 +714,7 @@ export const Chart = () => {
               ordinal: false,
               type: 'datetime',
               plotBands: [...manualPlotBands, ...detectedPlotBands, ...customPlotBands, ...alertingPlotBands],
+              plotlines: [...forecastingPlotlines],
             },
             yAxis: computeYAxisData(),
             rangeSelector: {
@@ -731,82 +744,6 @@ export const Chart = () => {
                 backgroundColor: 'transparent',
               },
             },
-            // stockTools: {
-            //   gui: {
-            //     enabled: true,
-            //     buttons: [
-            //       "changeType",
-            //       "compareFiles",
-            //     ],
-            //     className: "highcharts-bindings-wrapper",
-            //     toolbarClassName: "stocktools-toolbar",
-            //     definitions: {
-            //       changeType: {
-            //         items: [
-            //           "lineChart",
-            //           "splineChart",
-            //           "boxPlotChart",
-            //           "areaRangeChart",
-            //         ],
-            //         lineChart: {
-            //           className: "chart-line",
-            //           symbol: "series-line.svg",
-            //         },
-            //         splineChart: {
-            //           className: "chart-spline",
-            //           symbol: "line.svg",
-            //         },
-            //         boxPlotChart: {
-            //           className: "chart-boxplot",
-            //           symbol: "series-ohlc.svg",
-            //         },
-            //         areaRangeChart: {
-            //           className: "chart-arearange",
-            //           symbol: "series-ohlc.svg",
-            //         },
-            //       },
-            //       compareFiles: {
-            //         className: "compare-files",
-            //         symbol: "comparison.svg",
-            //       },
-            //     },
-            //   },
-            // },
-            // navigation: {
-            //   iconsURL: "../../../../content/images/stock-icons/",
-            //   bindings: {
-            //     line: {
-            //       className: "chart-line", // needs to be the same with above
-            //       init(e: any) {
-            //         setType("line");
-            //       },
-            //     },
-            //     spline: {
-            //       className: "chart-spline", // needs to be the same with above
-            //       init(e: any) {
-            //         setType("spline");
-            //       },
-            //     },
-            //     boxPlot: {
-            //       className: "chart-boxplot", // needs to be the same with above
-            //       init(e: any) {
-            //         setType("boxplot");
-            //       },
-            //     },
-            //     areaRange: {
-            //       className: "chart-arearange",
-            //       init(e: any) {
-            //         setType("arearange");
-            //       },
-            //     },
-            //     compareFiles: {
-            //       className: "compare-files", // needs to be the same with above
-            //       init(e: any) {
-            //         dispatch(setCompare(true));
-            //       },
-            //     },
-            //   },
-            // },
           }}
         />
       )}

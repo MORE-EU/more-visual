@@ -5,19 +5,19 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import { useAppSelector } from 'app/modules/store/storeConfig';
-import { IAutoMLForm } from 'app/shared/model/autoML.model';
+import { IForecastingForm } from 'app/shared/model/forecasting.model';
 
-interface IAutoMLTrain {
-  autoMLForm: IAutoMLForm;
-  setAutoMLForm: Dispatch<SetStateAction<IAutoMLForm>>;
+interface IForecastingTrain {
+  forecastingForm: IForecastingForm;
+  setForecastingForm: Dispatch<SetStateAction<IForecastingForm>>;
 }
 
-const AutoMLTrain = (props: IAutoMLTrain) => {
+const ForecastingTrain = (props: IForecastingTrain) => {
     const {selectedMeasures} = useAppSelector(state => state.visualizer);
-    const {autoMLForm, setAutoMLForm} = props;
+    const {forecastingForm, setForecastingForm} = props;
 
   const handlePredictions = value => {
-    setAutoMLForm(state => ({...state, predictions: parseInt(value.target.value, 10)}))
+    setForecastingForm(state => ({...state, predictions: parseInt(value.target.value, 10)}))
   }
 
   return (
@@ -59,4 +59,4 @@ const AutoMLTrain = (props: IAutoMLTrain) => {
   );
 };
 
-export default AutoMLTrain;
+export default ForecastingTrain;

@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import HelpIcon from '@mui/icons-material/Help';
-import { IAutoMLForm } from 'app/shared/model/autoML.model';
+import { IForecastingForm } from 'app/shared/model/forecasting.model';
 import Tooltip from '@mui/material/Tooltip';
 
 const map = {
@@ -13,50 +13,50 @@ const map = {
   'Previous Month': 'prevMonth',
 };
 
-interface IAutoMLFeatureExtr {
-  autoMLForm: IAutoMLForm;
-  setAutoMLForm: Dispatch<SetStateAction<IAutoMLForm>>;
+interface IForecastingFeatureExtr {
+  forecastingForm: IForecastingForm;
+  setForecastingForm: Dispatch<SetStateAction<IForecastingForm>>;
 }
 
-const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
-  const { autoMLForm, setAutoMLForm } = props;
+const ForecastingFeatureExtr = (props: IForecastingFeatureExtr) => {
+  const { forecastingForm, setForecastingForm } = props;
 
   const hadleFeatureCheckBoxes = value => e => {
-    if (Object.hasOwn(autoMLForm.features, value)) {
-      const feat = autoMLForm.features;
+    if (Object.hasOwn(forecastingForm.features, value)) {
+      const feat = forecastingForm.features;
       delete feat[value];
-      setAutoMLForm(state => ({ ...state, features: feat }));
+      setForecastingForm(state => ({ ...state, features: feat }));
     } else {
       if (value === 'pastMetrics') {
-        setAutoMLForm(state => ({
+        setForecastingForm(state => ({
           ...state,
-          features: { ...autoMLForm.features, [value]: { prevDay: [], prevHour: [], prevWeek: [], prevMonth: [] } },
+          features: { ...forecastingForm.features, [value]: { prevDay: [], prevHour: [], prevWeek: [], prevMonth: [] } },
         }));
       } else {
-        setAutoMLForm(state => ({ ...state, features: { ...autoMLForm.features, [value]: [] } }));
+        setForecastingForm(state => ({ ...state, features: { ...forecastingForm.features, [value]: [] } }));
       }
     }
   };
 
   const handleTemporalCheckboxes = value => e => {
-    if (autoMLForm.features.temporal.includes(value)) {
-      setAutoMLForm(state => ({
+    if (forecastingForm.features.temporal.includes(value)) {
+      setForecastingForm(state => ({
         ...state,
         features: { ...state.features, temporal: state.features.temporal.filter(val => val !== value) },
       }));
     } else {
-      setAutoMLForm(state => ({ ...state, features: { ...state.features, temporal: [...state.features.temporal, value] } }));
+      setForecastingForm(state => ({ ...state, features: { ...state.features, temporal: [...state.features.temporal, value] } }));
     }
   };
 
   const handlePastMetricsCheckboxes = (mapValue, value) => e => {
-    if (autoMLForm.features.pastMetrics[map[mapValue]].includes(value)) {
-      setAutoMLForm(state => ({
+    if (forecastingForm.features.pastMetrics[map[mapValue]].includes(value)) {
+      setForecastingForm(state => ({
         ...state,
         features: { ...state.features, pastMetrics: { ...state.features.pastMetrics, [map[mapValue]]:  state.features.pastMetrics[map[mapValue]].filter(val => val !== value)}},
       }));
     } else {
-      setAutoMLForm(state => ({
+      setForecastingForm(state => ({
         ...state,
         features: {
           ...state.features,
@@ -67,13 +67,13 @@ const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
   };
 
   const handleDerivativesCheckboxes = value => e => {
-    if (autoMLForm.features.derivatives.includes(value)) {
-      setAutoMLForm(state => ({
+    if (forecastingForm.features.derivatives.includes(value)) {
+      setForecastingForm(state => ({
         ...state,
         features: { ...state.features, derivatives: state.features.derivatives.filter(val => val !== value) },
       }));
     } else {
-      setAutoMLForm(state => ({ ...state, features: { ...state.features, derivatives: [...state.features.derivatives, value] } }));
+      setForecastingForm(state => ({ ...state, features: { ...state.features, derivatives: [...state.features.derivatives, value] } }));
     }
   }
 
@@ -105,7 +105,7 @@ const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
               <Tooltip title="any feature that is associated with or changes over time (time-related data), such as hour, minute, day, weekday, etc.." placement="right">
               <HelpIcon color="primary" />
               </Tooltip>
-              <Checkbox value={Object.hasOwn(autoMLForm.features, "temporal")} onChange={hadleFeatureCheckBoxes("temporal")} />
+              <Checkbox value={Object.hasOwn(forecastingForm.features, "temporal")} onChange={hadleFeatureCheckBoxes("temporal")} />
             </Grid>
             <Grid sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Typography variant="subtitle1" fontSize={15}>
@@ -114,7 +114,7 @@ const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
               <Tooltip title="features associated with the past that happened in the same chronological interval, such as last day, last week, etc." placement="right">
               <HelpIcon color="primary" />
               </Tooltip>
-              <Checkbox value={Object.hasOwn(autoMLForm.features, "pastMetrics")} onChange={hadleFeatureCheckBoxes("pastMetrics")} />
+              <Checkbox value={Object.hasOwn(forecastingForm.features, "pastMetrics")} onChange={hadleFeatureCheckBoxes("pastMetrics")} />
             </Grid>
             <Grid sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Typography variant="subtitle1" fontSize={15}>
@@ -123,11 +123,11 @@ const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
               <Tooltip title="generated features by calculating the first and second derivatives of the input features. The first derivative represents the slope of a curve, while the second derivative represents its curvature." placement="right">
               <HelpIcon color="primary" />
               </Tooltip>
-              <Checkbox value={Object.hasOwn(autoMLForm.features, "derivatives")} onChange={hadleFeatureCheckBoxes("derivatives")} />
+              <Checkbox value={Object.hasOwn(forecastingForm.features, "derivatives")} onChange={hadleFeatureCheckBoxes("derivatives")} />
             </Grid>
           </Grid>
         </Grid>
-        {Object.hasOwn(autoMLForm.features, 'temporal') && (
+        {Object.hasOwn(forecastingForm.features, 'temporal') && (
           <Grid className={'Features-values-choice-1'} sx={{ display: 'flex', flexDirection: 'column', rowGap: 2, width: '100%' }}>
             <Grid sx={{ textAlign: 'center' }}>
               <Typography variant="subtitle1" fontSize={20}>
@@ -154,14 +154,14 @@ const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
                     <Typography variant="subtitle1" fontSize={15}>
                       {text}
                     </Typography>
-                    <Checkbox value={autoMLForm.features['temporal'].includes(text)} onChange={handleTemporalCheckboxes(text)} />
+                    <Checkbox value={forecastingForm.features['temporal'].includes(text)} onChange={handleTemporalCheckboxes(text)} />
                   </Grid>
                 ))}
               </Grid>
             </Grid>
           </Grid>
         )}
-        {Object.hasOwn(autoMLForm.features, 'pastMetrics') && (
+        {Object.hasOwn(forecastingForm.features, 'pastMetrics') && (
           <Grid className={'Features-values-choice-2'} sx={{ display: 'flex', flexDirection: 'column', rowGap: 2, width: '100%' }}>
             <Grid sx={{ textAlign: 'center' }}>
               <Typography variant="subtitle1" fontSize={20}>
@@ -204,7 +204,7 @@ const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
                         {loadText}
                       </Typography>
                       <Checkbox
-                        value={autoMLForm.features['pastMetrics'][map[text]].includes(loadText)}
+                        value={forecastingForm.features['pastMetrics'][map[text]].includes(loadText)}
                         onChange={handlePastMetricsCheckboxes(text, loadText)}
                       />
                     </Grid>
@@ -214,7 +214,7 @@ const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
             </Grid>
           </Grid>
         )}
-        {Object.hasOwn(autoMLForm.features, 'derivatives') && (
+        {Object.hasOwn(forecastingForm.features, 'derivatives') && (
           <Grid className={'Features-values-choice-3'} sx={{ display: 'flex', flexDirection: 'column', rowGap: 2, width: '100%' }}>
             <Grid sx={{ textAlign: 'center' }}>
               <Typography variant="subtitle1" fontSize={20}>
@@ -245,7 +245,7 @@ const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
                     borderRadius: 6,
                   }}
                 >
-                  <Checkbox value={autoMLForm.features.derivatives.includes(text)} onChange={handleDerivativesCheckboxes(text)}/>
+                  <Checkbox value={forecastingForm.features.derivatives.includes(text)} onChange={handleDerivativesCheckboxes(text)}/>
                   <Typography variant="subtitle1" fontSize={20}>
                     {text}
                   </Typography>
@@ -259,4 +259,4 @@ const AutoMLFeatureExtr = (props: IAutoMLFeatureExtr) => {
   );
 };
 
-export default AutoMLFeatureExtr;
+export default ForecastingFeatureExtr;

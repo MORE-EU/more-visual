@@ -12,7 +12,7 @@ import Slider from '@mui/material/Slider';
 import Typography from '@mui/material/Typography';
 import HelpIcon from '@mui/icons-material/Help';
 import styled from '@mui/system/styled';
-import { IAutoMLForm } from 'app/shared/model/autoML.model';
+import { IForecastingForm } from 'app/shared/model/forecasting.model';
 import { setAutoMLEndDate, setAutoMLStartDate } from 'app/modules/store/visualizerSlice';
 
 const DataSplitSlider = styled(Slider)(({ theme }) => ({
@@ -45,35 +45,35 @@ const DataSplitSlider = styled(Slider)(({ theme }) => ({
   },
 }));
 
-interface IAutoMLDataPrep {
-  autoMLForm: IAutoMLForm;
-  setAutoMLForm: Dispatch<SetStateAction<IAutoMLForm>>;
+interface IForecastingDataPrep {
+  forecastingForm: IForecastingForm;
+  setForecastingForm: Dispatch<SetStateAction<IForecastingForm>>;
 }
 
-const AutoMLDataPrep = (props: IAutoMLDataPrep) => {
+const ForecastingDataPrep = (props: IForecastingDataPrep) => {
   const dispatch = useAppDispatch();
   const { dataset } = useAppSelector(state => state.visualizer);
-  const { autoMLForm, setAutoMLForm } = props;
+  const { forecastingForm, setForecastingForm } = props;
 
   useEffect(() => {
-    setAutoMLForm(state => ({ ...state, TargetColumn: dataset.header[0] }));
+    setForecastingForm(state => ({ ...state, TargetColumn: dataset.header[0] }));
   }, []);
 
   const handleDates = e => value => {
-    e === 'start' && (setAutoMLForm(state => ({ ...state, startDate: new Date(value).getTime() })), dispatch(setAutoMLStartDate(new Date(value).getTime())));
-    e === 'end' && (setAutoMLForm(state => ({ ...state, endDate: new Date(value).getTime() })), dispatch(setAutoMLEndDate(new Date(value).getTime())));
+    e === 'start' && (setForecastingForm(state => ({ ...state, startDate: new Date(value).getTime() })), dispatch(setAutoMLStartDate(new Date(value).getTime())));
+    e === 'end' && (setForecastingForm(state => ({ ...state, endDate: new Date(value).getTime() })), dispatch(setAutoMLEndDate(new Date(value).getTime())));
   };
 
   const handleTargetColumn = e => {
-    setAutoMLForm(state => ({ ...state, TargetColumn: e.target.value }));
+    setForecastingForm(state => ({ ...state, TargetColumn: e.target.value }));
   };
 
   const handleCleanData = e => {
-    setAutoMLForm(state => ({ ...state, cleanData: !autoMLForm.cleanData }));
+    setForecastingForm(state => ({ ...state, cleanData: !forecastingForm.cleanData }));
   };
 
   const handleDataSplit = e => {
-    setAutoMLForm(state => ({ ...state, dataSplit: [e.target.value[0], e.target.value[1] - e.target.value[0], 100 - e.target.value[1]] }));
+    setForecastingForm(state => ({ ...state, dataSplit: [e.target.value[0], e.target.value[1] - e.target.value[0], 100 - e.target.value[1]] }));
   };
 
   return (
@@ -94,11 +94,11 @@ const AutoMLDataPrep = (props: IAutoMLDataPrep) => {
               Start Date:
             </Typography>
             <DateTimePicker
-              label={autoMLForm.startDate ? null : "pick a date"}
+              label={forecastingForm.startDate ? null : "pick a date"}
               minDateTime={dataset.timeRange.from}
-              maxDateTime={autoMLForm.endDate ? autoMLForm.endDate : dataset.timeRange.to}
+              maxDateTime={forecastingForm.endDate ? forecastingForm.endDate : dataset.timeRange.to}
               renderInput={props => <TextField size="small" {...props} />}
-              value={autoMLForm.startDate}
+              value={forecastingForm.startDate}
               onChange={e => {}}
               onAccept={handleDates('start')}
               inputFormat="dd/MM/yyyy hh:mm a"
@@ -109,11 +109,11 @@ const AutoMLDataPrep = (props: IAutoMLDataPrep) => {
               End Date:
             </Typography>
             <DateTimePicker
-              label={autoMLForm.endDate ? null : "pick a date"}
-              minDateTime={autoMLForm.startDate ? autoMLForm.startDate : dataset.timeRange.from}
+              label={forecastingForm.endDate ? null : "pick a date"}
+              minDateTime={forecastingForm.startDate ? forecastingForm.startDate : dataset.timeRange.from}
               maxDateTime={dataset.timeRange.to}
               renderInput={props => <TextField size="small" {...props} />}
-              value={autoMLForm.endDate}
+              value={forecastingForm.endDate}
               onChange={e => {}}
               onAccept={handleDates('end')}
               inputFormat="dd/MM/yyyy hh:mm a"
@@ -123,8 +123,8 @@ const AutoMLDataPrep = (props: IAutoMLDataPrep) => {
             <Typography variant="subtitle1" fontSize={15}>
               Target Column:
             </Typography>
-            {autoMLForm.TargetColumn && (
-              <Select size="small" value={autoMLForm.TargetColumn} onChange={handleTargetColumn}>
+            {forecastingForm.TargetColumn && (
+              <Select size="small" value={forecastingForm.TargetColumn} onChange={handleTargetColumn}>
                 {dataset.header.map(measure => (
                   <MenuItem key={`${measure}-item`} value={measure}>
                     {measure}
@@ -137,7 +137,7 @@ const AutoMLDataPrep = (props: IAutoMLDataPrep) => {
             <Typography variant="subtitle1" fontSize={15}>
               Clean - Prepare Data
             </Typography>
-            <Checkbox value={autoMLForm.cleanData} onChange={handleCleanData} />
+            <Checkbox value={forecastingForm.cleanData} onChange={handleCleanData} />
           </Grid>
           <Grid sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '50%', m: 'auto' }}>
             <Grid sx={{ width: '30%' }}>
@@ -147,7 +147,7 @@ const AutoMLDataPrep = (props: IAutoMLDataPrep) => {
             </Grid>
             <Grid sx={{ width: '70%' }}>
               <DataSplitSlider
-                value={[autoMLForm.dataSplit[0], autoMLForm.dataSplit[0] + autoMLForm.dataSplit[1]]}
+                value={[forecastingForm.dataSplit[0], forecastingForm.dataSplit[0] + forecastingForm.dataSplit[1]]}
                 disableSwap
                 onChange={handleDataSplit}
               />
@@ -159,4 +159,4 @@ const AutoMLDataPrep = (props: IAutoMLDataPrep) => {
   );
 };
 
-export default AutoMLDataPrep;
+export default ForecastingDataPrep;

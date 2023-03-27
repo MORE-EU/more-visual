@@ -4,7 +4,6 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import AutoML from '../tools/autoML/autoML';
 import Filter from '../tools/filter/filter';
 import Forecasting from '../tools/forecasting/forecasting';
 import PatternExtraction from '../tools/pattern-extraction/pattern-extraction';
@@ -37,9 +36,8 @@ const ChartToolsWindow = () => {
           {activeTool === 'Pattern Extraction' && <PatternExtraction />}
           {activeTool === 'Soiling Detection' && <SoilingDetection />}
           {activeTool === 'Yaw Misalignment' && <YawMisalignment />}
-          {activeTool === 'Forecasting' && <AutoML />}
+          {activeTool === 'Forecasting' && <Forecasting />}
           {activeTool === 'Filtering' && <Filter />}
-          {/* {activeTool === 'AutoML' && <AutoML />} */}
         </Grid>
       </Paper>
     </Grid>

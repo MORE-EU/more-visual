@@ -4,7 +4,7 @@ interface IFeatures {
   derivatives?: string[];
 }
 
-export interface IAutoMLForm {
+export interface IForecastingForm {
   startDate: number | null;
   endDate: number | null;
   TargetColumn: string | null;
@@ -14,7 +14,7 @@ export interface IAutoMLForm {
   predictions: number;
 }
 
-export const IAutoMLFormDefault: Readonly<IAutoMLForm> = {
+export const IForecastingDefault: Readonly<IForecastingForm> = {
   startDate: null,
   endDate: null,
   TargetColumn: null,
