@@ -70,6 +70,12 @@ const initPatterns = (data, length, frequency) => {
   return { frequency, length, patternGroups, knee, corrected };
 };
 
+const autoMLInitState = {
+  autoMLStartDate: null,
+  autoMLEndDate: null,
+  autoMLDataSplit: [80, 10, 10]
+}
+
 const initialState = {
   loading: true,
   errorMessage: null,
@@ -124,6 +130,7 @@ const initialState = {
   alertingPreview: false,
   alertResults: {},
   alertingPlotMode: false,
+  ...autoMLInitState
 };
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
@@ -400,6 +407,12 @@ const visualizer = createSlice({
     setDetectedChangepointFilter(state, action) {
       state.detectedChangepointFilter = action.payload;
     },
+    setAutoMLStartDate(state, action) {
+      state.autoMLStartDate = action.payload;
+    },
+    setAutoMLEndDate(state, action) {
+      state.autoMLEndDate = action.payload;
+    },
     toggleChangepointDetection(state, action) {
       state.changepointDetectionEnabled = action.payload;
     },
@@ -529,7 +542,7 @@ export const {
   updatePatterns, updateChangeChart,updateDatasetChoice, updateDatasetMeasures, updatePatternNav, updateChartRef,
   updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateAnchorEl,
   updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleChangepointDetection,
-  toggleYawMisalignmentDetection, toggleManualChangepoints,  toggleCustomChangepoints,
+  toggleYawMisalignmentDetection, toggleManualChangepoints,  toggleCustomChangepoints, setAutoMLStartDate, setAutoMLEndDate,
   setShowDatePick,setShowChangepointFunction, setComparePopover, setSingleDateValue,setDateValues,setFixedWidth, setAlertingPlotMode,
   setDetectedChangepointFilter, setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns, setChartType, setAlertingPreview, updateAlertResults
 } = visualizer.actions;

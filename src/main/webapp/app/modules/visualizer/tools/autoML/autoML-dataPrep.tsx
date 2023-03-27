@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import HelpIcon from '@mui/icons-material/Help';
 import styled from '@mui/system/styled';
 import { IAutoMLForm } from 'app/shared/model/autoML.model';
+import { setAutoMLEndDate, setAutoMLStartDate } from 'app/modules/store/visualizerSlice';
 
 const DataSplitSlider = styled(Slider)(({ theme }) => ({
   color: '#3a8589',
@@ -50,6 +51,7 @@ interface IAutoMLDataPrep {
 }
 
 const AutoMLDataPrep = (props: IAutoMLDataPrep) => {
+  const dispatch = useAppDispatch();
   const { dataset } = useAppSelector(state => state.visualizer);
   const { autoMLForm, setAutoMLForm } = props;
 
@@ -58,8 +60,8 @@ const AutoMLDataPrep = (props: IAutoMLDataPrep) => {
   }, []);
 
   const handleDates = e => value => {
-    e === 'start' && setAutoMLForm(state => ({ ...state, startDate: new Date(value).getTime() }));
-    e === 'end' && setAutoMLForm(state => ({ ...state, endDate: new Date(value).getTime() }));
+    e === 'start' && (setAutoMLForm(state => ({ ...state, startDate: new Date(value).getTime() })), dispatch(setAutoMLStartDate(new Date(value).getTime())));
+    e === 'end' && (setAutoMLForm(state => ({ ...state, endDate: new Date(value).getTime() })), dispatch(setAutoMLEndDate(new Date(value).getTime())));
   };
 
   const handleTargetColumn = e => {
@@ -92,14 +94,14 @@ const AutoMLDataPrep = (props: IAutoMLDataPrep) => {
               Start Date:
             </Typography>
             <DateTimePicker
-              label={null}
+              label={autoMLForm.startDate ? null : "pick a date"}
               minDateTime={dataset.timeRange.from}
-              maxDateTime={dataset.timeRange.to}
+              maxDateTime={autoMLForm.endDate ? autoMLForm.endDate : dataset.timeRange.to}
               renderInput={props => <TextField size="small" {...props} />}
               value={autoMLForm.startDate}
               onChange={e => {}}
               onAccept={handleDates('start')}
-              inputFormat="dd/mm/yyyy hh:mm a"
+              inputFormat="dd/MM/yyyy hh:mm a"
             />
           </Grid>
           <Grid sx={{ display: 'flex', gap: 1, justifyContent: 'space-evenly', alignItems: 'center', width: '50%', m: 'auto' }}>
@@ -107,14 +109,14 @@ const AutoMLDataPrep = (props: IAutoMLDataPrep) => {
               End Date:
             </Typography>
             <DateTimePicker
-              label={null}
-              minDateTime={dataset.timeRange.from}
+              label={autoMLForm.endDate ? null : "pick a date"}
+              minDateTime={autoMLForm.startDate ? autoMLForm.startDate : dataset.timeRange.from}
               maxDateTime={dataset.timeRange.to}
               renderInput={props => <TextField size="small" {...props} />}
               value={autoMLForm.endDate}
               onChange={e => {}}
               onAccept={handleDates('end')}
-              inputFormat="dd/mm/yyyy hh:mm a"
+              inputFormat="dd/MM/yyyy hh:mm a"
             />
           </Grid>
           <Grid sx={{ display: 'flex', gap: 1, justifyContent: 'space-evenly', alignItems: 'center', width: '50%', m: 'auto' }}>

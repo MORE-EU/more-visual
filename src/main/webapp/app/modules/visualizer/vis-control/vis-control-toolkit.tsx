@@ -131,12 +131,12 @@ const VisToolkit = () => {
               </ListItemIcon>
               <ListItemText primary={"Filtering"}/>
             </ListItemButton>
-            <ListItemButton key={5} onClick={handleToolClick("AutoML")}>
+            {/* <ListItemButton key={5} onClick={handleToolClick("AutoML")}>
               <ListItemIcon>
                 <AnalyticsIcon/>
               </ListItemIcon>
               <ListItemText primary={"AutoML"}/>
-            </ListItemButton>
+            </ListItemButton> */}
           </List>     
         </Grid>
     //     }

@@ -24,7 +24,7 @@ const ChartToolsWindow = () => {
   return (
     <Grid sx={{ height: '60%', pt: 2 }}>
       <Paper elevation={1} sx={{ border: '1px solid rgba(0,0,0, 0.1)', height: '100%' }}>
-        <Grid sx={{ height: '10%', textAlign: 'left', display: "flex", bgcolor: grey[300] }}>
+        <Grid sx={{ height: 'fit-content', textAlign: 'left', display: "flex", bgcolor: grey[300] }}>
           <Typography variant="subtitle1" fontSize={25} fontWeight={500} sx={{ color: grey[600], pl: 1, pr: 1 }}>
             {activeTool}
           </Typography>
@@ -37,9 +37,9 @@ const ChartToolsWindow = () => {
           {activeTool === 'Pattern Extraction' && <PatternExtraction />}
           {activeTool === 'Soiling Detection' && <SoilingDetection />}
           {activeTool === 'Yaw Misalignment' && <YawMisalignment />}
-          {activeTool === 'Forecasting' && <Forecasting />}
+          {activeTool === 'Forecasting' && <AutoML />}
           {activeTool === 'Filtering' && <Filter />}
-          {activeTool === 'AutoML' && <AutoML />}
+          {/* {activeTool === 'AutoML' && <AutoML />} */}
         </Grid>
       </Paper>
     </Grid>
