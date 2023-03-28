@@ -70,10 +70,10 @@ const initPatterns = (data, length, frequency) => {
   return { frequency, length, patternGroups, knee, corrected };
 };
 
-const autoMLInitState = {
-  autoMLStartDate: null,
-  autoMLEndDate: null,
-  autoMLDataSplit: [80, 10, 10]
+const forecastingInitialState = {
+  forecastingStartDate: null,
+  forecastingEndDate: null,
+  forecastingDataSplit: [80, 10, 10]
 }
 
 const initialState = {
@@ -130,7 +130,7 @@ const initialState = {
   alertingPreview: false,
   alertResults: {},
   alertingPlotMode: false,
-  ...autoMLInitState
+  ...forecastingInitialState
 };
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
@@ -408,10 +408,13 @@ const visualizer = createSlice({
       state.detectedChangepointFilter = action.payload;
     },
     setAutoMLStartDate(state, action) {
-      state.autoMLStartDate = action.payload;
+      state.forecastingStartDate = action.payload;
     },
     setAutoMLEndDate(state, action) {
-      state.autoMLEndDate = action.payload;
+      state.forecastingEndDate = action.payload;
+    },
+    setForecastingDataSplit(state, action) {
+      state.forecastingDataSplit = action.payload;
     },
     toggleChangepointDetection(state, action) {
       state.changepointDetectionEnabled = action.payload;
@@ -431,6 +434,12 @@ const visualizer = createSlice({
     },
     toggleCustomChangepoints(state, action){
       state.customChangepointsEnabled = action.payload;
+    },
+    resetForecastingState(state) {
+      // remove plotlines from chart when you disable forecasting
+      state.chartRef.xAxis[0].removePlotLine("start")
+      state.chartRef.xAxis[0].removePlotLine("end")
+     return{...state, ...forecastingInitialState}
     },
     resetChartValues(state) {
       state.queryResultsLoading = initialState.queryResultsLoading;
@@ -541,9 +550,9 @@ export const {
   resetChartValues, resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq, updateFilters,
   updatePatterns, updateChangeChart,updateDatasetChoice, updateDatasetMeasures, updatePatternNav, updateChartRef,
   updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateAnchorEl,
-  updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleChangepointDetection,
+  updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleChangepointDetection, setForecastingDataSplit,
   toggleYawMisalignmentDetection, toggleManualChangepoints,  toggleCustomChangepoints, setAutoMLStartDate, setAutoMLEndDate,
-  setShowDatePick,setShowChangepointFunction, setComparePopover, setSingleDateValue,setDateValues,setFixedWidth, setAlertingPlotMode,
+  setShowDatePick,setShowChangepointFunction, setComparePopover, setSingleDateValue,setDateValues,setFixedWidth, setAlertingPlotMode, resetForecastingState,
   setDetectedChangepointFilter, setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns, setChartType, setAlertingPreview, updateAlertResults
 } = visualizer.actions;
 export default visualizer.reducer;

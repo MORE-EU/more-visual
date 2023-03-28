@@ -5,27 +5,13 @@ import HighchartsReact from 'highcharts-react-official';
 import HighchartsMore from 'highcharts/highcharts-more';
 import { Grid, LinearProgress } from '@mui/material';
 import annotationsAdvanced from 'highcharts/modules/annotations-advanced';
-// import stockTools from "highcharts/modules/stock-tools";
 import { useScrollBlock } from 'app/shared/util/useScrollBlock';
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import moment from 'moment';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import {
-  updateChartRef,
-  updateCompareQueryResults,
-  updateFrom,
-  updateQueryResults,
-  updateResampleFreq,
-  updateTo,
-  applyChangepointDetection,
-  toggleCustomChangepoints,
-  applyDeviationDetection,
-  liveDataImplementation,
-  applyYawMisalignmentDetection,
-  updateAlertResults,
-  setAlertingPreview,
-  setAlertingPlotMode,
-} from 'app/modules/store/visualizerSlice';
+import {updateChartRef,updateCompareQueryResults,updateFrom,updateQueryResults,updateResampleFreq,updateTo,
+  applyChangepointDetection,toggleCustomChangepoints,applyDeviationDetection,liveDataImplementation,applyYawMisalignmentDetection,
+  updateAlertResults,setAlertingPreview,setAlertingPlotMode} from 'app/modules/store/visualizerSlice';
 import { ChartPlotBands } from 'app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands';
 import chartAlertingChecker, { alertingPlotBandsCreator } from './chart-alerting/chart-alerting-functions';
 
@@ -33,71 +19,19 @@ import { filterChangepoints } from 'app/modules/visualizer/tools/changepoint-det
 import { grey } from '@mui/material/colors';
 
 HighchartsMore(Highcharts);
-Highcharts.setOptions({
-  time: {
-    useUTC: false,
-  },
-  lang: {
-    stockTools: {
-      gui: {
-        // @ts-ignore
-        lineChart: 'Line Chart',
-        splineChart: 'Spline Chart',
-        areaRangeChart: 'Range Area Chart',
-        boxPlotChart: 'Box Plot',
-        compareFiles: 'Compare Files',
-      },
-    },
-  },
-});
-
-// stockTools(Highcharts);
 annotationsAdvanced(Highcharts);
 
 export const Chart = () => {
-  const {
-    chartRef,
-    folder,
-    dataset,
-    from,
-    to,
-    resampleFreq,
-    selectedMeasures,
-    measureColors,
-    queryResultsLoading,
-    filter,
-    queryResults,
-    changeChart,
-    compare,
-    changepointDetectionEnabled,
-    detectedChangepointFilter,
-    customChangepointsEnabled,
-    patterns,
-    data,
-    compareData,
-    forecastData,
-    soilingEnabled,
-    alertingPlotMode,
-    alertResults,
-    autoMLDataSplit,
-    soilingWeeks,
-    yawMisalignmentEnabled,
-    secondaryData,
-    chartType,
-    liveDataImplLoading,
-    alerts,
-    alertingPreview,
-    activeTool,
-    autoMLStartDate,
-    autoMLEndDate,
-  } = useAppSelector(state => state.visualizer);
+  const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,measureColors,queryResultsLoading,filter,
+    queryResults,changeChart,compare,changepointDetectionEnabled,detectedChangepointFilter,customChangepointsEnabled,patterns,data,compareData,
+    forecastData,soilingEnabled,alertingPlotMode,alertResults,forecastingDataSplit,soilingWeeks,yawMisalignmentEnabled,secondaryData,chartType,
+    liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate} = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
 
   const [blockScroll, allowScroll] = useScrollBlock();
 
   const [zones, setZones] = useState([]);
-  const [forecastingPlotlines, setForecastingPlotlines] = useState([]);
   const [customPlotBands, setCustomPlotBands] = useState([]);
   const [manualPlotBands, setManualPlotBands] = useState([]);
   const [alertingPlotBands, setAlertingPlotBands] = useState([]);
@@ -141,15 +75,15 @@ export const Chart = () => {
 
   //change zones if forecasting is activated and both start & end date is set
   const getZones = color => {
-    if (autoMLStartDate !== null && autoMLEndDate !== null) {
+    if (forecastingStartDate !== null && forecastingEndDate !== null) {
       return [
-        { value: autoMLStartDate, color },
-        { value: autoMLStartDate + (autoMLEndDate - autoMLStartDate) * (autoMLDataSplit[0] / 100), color: '#00FF00' },
+        { value: forecastingStartDate, color },
+        { value: forecastingStartDate + (forecastingEndDate - forecastingStartDate) * (forecastingDataSplit [0] / 100), color: '#00FF00' },
         {
-          value: autoMLStartDate + (autoMLEndDate - autoMLStartDate) * ((autoMLDataSplit[0] + autoMLDataSplit[1]) / 100),
+          value: forecastingStartDate + (forecastingEndDate - forecastingStartDate) * ((forecastingDataSplit [0] + forecastingDataSplit [1]) / 100),
           color: '#ff0000',
         },
-        { value: autoMLEndDate, color: '#00FFFF' },
+        { value: forecastingEndDate, color: '#00FFFF' },
         { value: dataset.timeRange.to, color },
       ];
     } else {
@@ -157,15 +91,19 @@ export const Chart = () => {
     }
   };
 
+  // add plotlines for start & end date if forecasting is enabled
   useEffect(() => {
-    if (autoMLStartDate !== null && autoMLEndDate !== null) {
-      setForecastingPlotlines([
-        { color: 'red', value: autoMLStartDate, width: 2, label: {text: "start date", verticalAlign: "center", textAlign: "left"} },
-        { color: 'red', value: autoMLEndDate, width: 2, label: {text: "end date", verticalAlign: "center", textAlign: "left"} },
-      ]);
+    if (forecastingStartDate !== null && forecastingEndDate !== null) {
+      if(chartRef.xAxis[0].plotLinesAndBands.length > 0){
+        chartRef.xAxis[0].removePlotLine("start")
+        chartRef.xAxis[0].removePlotLine("end")
+      }
+      chartRef.xAxis[0].addPlotLine({id: "start", color: grey[500], value: forecastingStartDate, width: 2, zIndex: 3, label: { text: 'Start Date', verticalAlign: 'center', textAlign: 'left' }})
+      chartRef.xAxis[0].addPlotLine({id: "end",color: grey[500], value: forecastingEndDate, width: 2, zIndex: 3, label: { text: 'End Date', verticalAlign: 'center', textAlign: 'left' }})
     }
-  }, [autoMLStartDate, autoMLEndDate]);
+  }, [forecastingStartDate, forecastingEndDate]);
 
+  // update chart height & width when toolkit window changes
   useEffect(() => {
     chartRef && chartRef.reflow();
   }, [activeTool]);
@@ -596,7 +534,7 @@ export const Chart = () => {
 
   const handleMouseOverChart = () => {
     blockScroll();
-    customChangepointsEnabled && chart.current.chartBackground !== null
+    customChangepointsEnabled && chartRef
       ? chart.current.chartBackground.htmlCss({ cursor: 'crosshair' })
       : chart.current.chartBackground.htmlCss({ cursor: 'default' });
   };
@@ -673,12 +611,6 @@ export const Chart = () => {
                 marker: {
                   enabled: filter.size != 0 ? true : false,
                 },
-                // dataGrouping: {
-                //   units: [[resampleFreq, [1]]],
-                //   forced: true,
-                //   enabled: resampleFreq !== "none",
-                //   groupAll: true,
-                // },
               },
             },
             tooltip: {
@@ -714,11 +646,15 @@ export const Chart = () => {
               ordinal: false,
               type: 'datetime',
               plotBands: [...manualPlotBands, ...detectedPlotBands, ...customPlotBands, ...alertingPlotBands],
-              plotlines: [...forecastingPlotlines],
             },
             yAxis: computeYAxisData(),
             rangeSelector: {
               enabled: false,
+            },
+            subtitle: {
+              text: `Frequency: ${resampleFreq}`,
+              align: 'right',
+              x: 0,
             },
             navigator: {
               enabled: false,

@@ -13,37 +13,38 @@ import Typography from '@mui/material/Typography';
 import HelpIcon from '@mui/icons-material/Help';
 import styled from '@mui/system/styled';
 import { IForecastingForm } from 'app/shared/model/forecasting.model';
-import { setAutoMLEndDate, setAutoMLStartDate } from 'app/modules/store/visualizerSlice';
+import { setAutoMLEndDate, setAutoMLStartDate, setForecastingDataSplit } from 'app/modules/store/visualizerSlice';
+import { grey } from '@mui/material/colors';
 
-const DataSplitSlider = styled(Slider)(({ theme }) => ({
-  color: '#3a8589',
-  height: 3,
-  padding: '13px 0',
-  '& .MuiSlider-thumb': {
-    height: 27,
-    width: 27,
-    backgroundColor: '#fff',
-    border: '1px solid currentColor',
-    '&:hover': {
-      boxShadow: '0 0 0 8px rgba(58, 133, 137, 0.16)',
-    },
-    '& .airbnb-bar': {
-      height: 9,
-      width: 1,
-      backgroundColor: 'currentColor',
-      marginLeft: 1,
-      marginRight: 1,
-    },
-  },
-  '& .MuiSlider-track': {
-    height: 2,
-  },
-  '& .MuiSlider-rail': {
-    color: theme.palette.mode === 'dark' ? '#bfbfbf' : '#d8d8d8',
-    opacity: theme.palette.mode === 'dark' ? undefined : 1,
-    height: 3,
-  },
-}));
+// const DataSplitSlider = styled(Slider)(({ theme }) => ({
+//   color: '#3a8589',
+//   height: 3,
+//   padding: '13px 0',
+//   '& .MuiSlider-thumb': {
+//     height: 27,
+//     width: 27,
+//     backgroundColor: '#fff',
+//     border: '1px solid currentColor',
+//     '&:hover': {
+//       boxShadow: '0 0 0 8px rgba(58, 133, 137, 0.16)',
+//     },
+//     '& .airbnb-bar': {
+//       height: 9,
+//       width: 1,
+//       backgroundColor: 'currentColor',
+//       marginLeft: 1,
+//       marginRight: 1,
+//     },
+//   },
+//   '& .MuiSlider-track': {
+//     height: 2,
+//   },
+//   '& .MuiSlider-rail': {
+//     color: theme.palette.mode === 'dark' ? '#bfbfbf' : '#d8d8d8',
+//     opacity: theme.palette.mode === 'dark' ? undefined : 1,
+//     height: 3,
+//   },
+// }));
 
 interface IForecastingDataPrep {
   forecastingForm: IForecastingForm;
@@ -60,8 +61,12 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
   }, []);
 
   const handleDates = e => value => {
-    e === 'start' && (setForecastingForm(state => ({ ...state, startDate: new Date(value).getTime() })), dispatch(setAutoMLStartDate(new Date(value).getTime())));
-    e === 'end' && (setForecastingForm(state => ({ ...state, endDate: new Date(value).getTime() })), dispatch(setAutoMLEndDate(new Date(value).getTime())));
+    e === 'start' &&
+      (setForecastingForm(state => ({ ...state, startDate: new Date(value).getTime() })),
+      dispatch(setAutoMLStartDate(new Date(value).getTime())));
+    e === 'end' &&
+      (setForecastingForm(state => ({ ...state, endDate: new Date(value).getTime() })),
+      dispatch(setAutoMLEndDate(new Date(value).getTime())));
   };
 
   const handleTargetColumn = e => {
@@ -73,7 +78,41 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
   };
 
   const handleDataSplit = e => {
-    setForecastingForm(state => ({ ...state, dataSplit: [e.target.value[0], e.target.value[1] - e.target.value[0], 100 - e.target.value[1]] }));
+    if(e.target.value[0] >= 60){
+    setForecastingForm(state => ({
+      ...state,
+      dataSplit: [e.target.value[0], e.target.value[1] - e.target.value[0], 100 - e.target.value[1]],
+    }));
+  }
+  };
+
+  const handleDataSplitCommit = (e, value) => {
+    dispatch(setForecastingDataSplit(forecastingForm.dataSplit));
+  };
+
+  const sliderSx = { 
+    '& .MuiSlider-thumb': {
+      height: 20,
+      width: 20,
+      backgroundColor: '#fff',
+      border: `1px solid ${grey[700]}`,
+      '&:hover': {
+        boxShadow: '0 0 0 8px rgba(58, 133, 137, 0.16)',
+      }
+    },
+    '& .MuiSlider-track': {
+      height: 3,
+      background: "#ff0000",
+      borderColor: "white"
+    },
+    "& .MuiSlider-mark": {
+      background: "none"
+    },
+    '& .MuiSlider-rail': {
+      background: `linear-gradient(to right, #00FF00 0% ${forecastingForm.dataSplit[0]}%, #ff0000 ${forecastingForm.dataSplit[0]}% ${forecastingForm.dataSplit[1]}%, #00FFFF ${forecastingForm.dataSplit[1]}% 100%)`,
+      opacity: 1,
+      height: 3,
+    },
   };
 
   return (
@@ -94,7 +133,7 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
               Start Date:
             </Typography>
             <DateTimePicker
-              label={forecastingForm.startDate ? null : "pick a date"}
+              label={forecastingForm.startDate ? null : 'pick a date'}
               minDateTime={dataset.timeRange.from}
               maxDateTime={forecastingForm.endDate ? forecastingForm.endDate : dataset.timeRange.to}
               renderInput={props => <TextField size="small" {...props} />}
@@ -109,7 +148,7 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
               End Date:
             </Typography>
             <DateTimePicker
-              label={forecastingForm.endDate ? null : "pick a date"}
+              label={forecastingForm.endDate ? null : 'pick a date'}
               minDateTime={forecastingForm.startDate ? forecastingForm.startDate : dataset.timeRange.from}
               maxDateTime={dataset.timeRange.to}
               renderInput={props => <TextField size="small" {...props} />}
@@ -146,10 +185,24 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
               </Typography>
             </Grid>
             <Grid sx={{ width: '70%' }}>
-              <DataSplitSlider
+              <Slider
                 value={[forecastingForm.dataSplit[0], forecastingForm.dataSplit[0] + forecastingForm.dataSplit[1]]}
                 disableSwap
                 onChange={handleDataSplit}
+                onChangeCommitted={handleDataSplitCommit}
+                valueLabelDisplay={'auto'}
+                marks={[
+                  { label: `train ${forecastingForm.dataSplit[0]}%`, value: forecastingForm.dataSplit[0] / 2 },
+                  {
+                    label: forecastingForm.dataSplit[1] > 0 ? `test ${forecastingForm.dataSplit[1]}%` : null,
+                    value: forecastingForm.dataSplit[0] + forecastingForm.dataSplit[1] / 2,
+                  },
+                  {
+                    label: forecastingForm.dataSplit[2] > 0 ? `validation` : null,
+                    value: forecastingForm.dataSplit[0] + forecastingForm.dataSplit[1] + forecastingForm.dataSplit[2] / 2,
+                  }
+                ]}
+                sx={sliderSx}
               />
             </Grid>
           </Grid>

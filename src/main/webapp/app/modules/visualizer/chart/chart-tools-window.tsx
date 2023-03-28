@@ -12,13 +12,16 @@ import { YawMisalignment } from '../tools/yaw-misalignment/yaw-misalignment';
 import Box from '@mui/material/Box';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { updateActiveTool } from 'app/modules/store/visualizerSlice';
+import { resetForecastingState, updateActiveTool } from 'app/modules/store/visualizerSlice';
 
 const ChartToolsWindow = () => {
   const { activeTool } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
-  const handleClose = e => dispatch(updateActiveTool(null));
+  const handleClose = e => {
+    dispatch(updateActiveTool(null))
+    dispatch(resetForecastingState());
+  };
 
   return (
     <Grid sx={{ height: '60%', pt: 2 }}>
