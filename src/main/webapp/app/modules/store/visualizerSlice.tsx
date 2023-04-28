@@ -73,7 +73,7 @@ const initPatterns = (data, length, frequency) => {
 const forecastingInitialState = {
   forecastingStartDate: null,
   forecastingEndDate: null,
-  forecastingDataSplit: [80, 10, 10]
+  forecastingDataSplit: [60, 20, 20]
 }
 
 const initialState = {

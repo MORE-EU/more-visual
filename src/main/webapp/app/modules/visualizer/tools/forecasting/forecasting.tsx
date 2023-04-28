@@ -1,17 +1,18 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import AutoMLDataPrep from './forecasting-dataPrep';
+import AutoMLDataPrep from './forecasting-data-preparation/forecasting-dataPrep';
 import Grid from '@mui/material/Grid';
-import AutoMLFeatureExtr from './forecasting-featureExtr';
-import AutoMLTrain from './forecasting-train';
+import AutoMLFeatureExtr from './forecasting-feature-extraction/forecasting-featureExtr';
+import AutoMLTrain from './forecasting-train-results/forecasting-train';
 import { IForecastingForm, IForecastingDefault } from 'app/shared/model/forecasting.model';
+import { useAppSelector } from 'app/modules/store/storeConfig';
 
-const steps = ['Data Preparation', 'Feature Generation', 'Train'];
+const steps = ['Data Selection', 'Feature Selection', 'Train'];
 
 const FinishStep = props => (
   <>
@@ -20,10 +21,23 @@ const FinishStep = props => (
 );
 
 const Forecasting = () => {
-
+  const { selectedMeasures, dataset } = useAppSelector(state => state.visualizer);
   const [activeStep, setActiveStep] = useState(0);
   const [skipped, setSkipped] = useState(new Set());
   const [forecastingForm, setForecastingForm] = useState<IForecastingForm>(IForecastingDefault);
+
+  useEffect(() => {
+    setForecastingForm(state => ({ ...state, TargetColumn: selectedMeasures.map(mez => dataset.header[mez]) }));
+    setForecastingForm(state => ({
+      ...state,
+      features: {
+        ...state.features,
+        columnFeatures: [
+          ...selectedMeasures.map(mez => ({ columnName: dataset.header[mez], features: [] })).filter(mes => !state.features.columnFeatures.includes(mes)),
+        ],
+      },
+    }));
+  }, [selectedMeasures]);
 
   const isStepOptional = step => {
     return step === 1;
@@ -69,22 +83,17 @@ const Forecasting = () => {
 
   return (
     <Grid sx={{ width: '100%', height: '100%' }}>
+      {console.log(forecastingForm)}
       <Grid sx={{ width: '100%', height: '15%' }}>
-        <Stepper activeStep={activeStep} sx={{pl: 3, pr: 3, pt: 2}}>
-          {steps.map((label, index) => {
-            return index === 1 ? (
-              <Step key={label}>
-                <StepLabel optional={<Typography variant="caption">Optional</Typography>}>{label}</StepLabel>
-              </Step>
-            ) : (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            );
-          })}
+        <Stepper activeStep={activeStep} sx={{ pl: 3, pr: 3, pt: 2 }}>
+          {steps.map((label, index) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
         </Stepper>
       </Grid>
-      <Grid sx={{ width: '100%', height: '75%', overflowY: 'auto' }}>
+      <Grid sx={{ width: '100%', height: '70%', overflowY: 'auto' }}>
         {activeStep === 0 ? (
           <AutoMLDataPrep forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
         ) : activeStep === 1 ? (
@@ -101,21 +110,23 @@ const Forecasting = () => {
           <Button onClick={handleReset}>Reset</Button>
         </Grid>
       ) : (
-        <Grid sx={{ display: 'flex', flexDirection: 'row', height: "10%", pr: 3, pl: 3 }}>
-          <Button size='small' color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
+        <Grid sx={{ display: 'flex', flexDirection: 'row', height: '15%', pr: 3, pl: 3 }}>
+          <Button size="small" color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1, fontSize: 12, height: '90%' }}>
             Back
           </Button>
           <Grid sx={{ flex: '1 1 auto' }} />
-          {isStepOptional(activeStep) && (
+          {/* {isStepOptional(activeStep) && (
             <Button size='small' color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
               Skip
             </Button>
-          )}
-          <Button size='small' onClick={handleNext}>{activeStep === steps.length - 1 ? 'Train' : 'Next'}</Button>
+          )} */}
+          <Button size="small" sx={{ fontSize: 12, height: '90%' }} onClick={handleNext}>
+            {activeStep === steps.length - 1 ? 'Train' : 'Next'}
+          </Button>
         </Grid>
       )}
     </Grid>
   );
-}
+};
 
 export default Forecasting;
