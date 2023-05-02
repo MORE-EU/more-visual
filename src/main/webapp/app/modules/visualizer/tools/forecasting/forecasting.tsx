@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AutoMLDataPrep from './forecasting-data-preparation/forecasting-dataPrep';
 import Grid from '@mui/material/Grid';
-import AutoMLFeatureExtr from './forecasting-feature-extraction/forecasting-featureExtr';
+import AutoMLFeatureExtr from './forecasting-feature-extraction/forecasting-feature-extraction';
 import AutoMLTrain from './forecasting-train-results/forecasting-train';
 import { IForecastingForm, IForecastingDefault } from 'app/shared/model/forecasting.model';
 import { useAppSelector } from 'app/modules/store/storeConfig';
