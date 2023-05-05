@@ -4,21 +4,15 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import AutoMLDataPrep from './forecasting-data-preparation/forecasting-dataPrep';
 import Grid from '@mui/material/Grid';
-import AutoMLFeatureExtr from './forecasting-feature-extraction/forecasting-feature-extraction';
-import AutoMLTrain from './forecasting-train-results/forecasting-train';
 import { IForecastingForm, IForecastingDefault } from 'app/shared/model/forecasting.model';
 import { useAppSelector } from 'app/modules/store/storeConfig';
+import ForecastingDataPrep from './forecasting-data-preparation/forecasting-dataPrep';
+import ForecastingFeatureExtr from './forecasting-feature-extraction/forecasting-feature-extraction';
+import ForecastingTrain from './forecasting-train-results/forecasting-train';
+import ForecastingResults from './forecasting-results/forecasting-results';
 
-const steps = ['Data Selection', 'Feature Selection', 'Train'];
-
-const FinishStep = props => (
-  <>
-    <Typography sx={{ mt: 2, mb: 1 }}>All steps completed - you&apos;re finished</Typography>
-  </>
-);
+const steps = ['Data Selection', 'Feature Selection', 'Algorithm Selection'];
 
 const Forecasting = () => {
   const { selectedMeasures, dataset } = useAppSelector(state => state.visualizer);
@@ -27,14 +21,23 @@ const Forecasting = () => {
   const [forecastingForm, setForecastingForm] = useState<IForecastingForm>(IForecastingDefault);
 
   useEffect(() => {
-    setForecastingForm(state => ({ ...state, TargetColumn: selectedMeasures.map(mez => dataset.header[mez]) }));
+    const columnFeat = forecastingForm.features.columnFeatures.map(num => num.columnName);
+    const selMeasures = selectedMeasures.map(mez => dataset.header[mez]);
     setForecastingForm(state => ({
       ...state,
+      targetColumn: selectedMeasures.map(mez => dataset.header[mez]),
       features: {
         ...state.features,
-        columnFeatures: [
-          ...selectedMeasures.map(mez => ({ columnName: dataset.header[mez], features: [] })).filter(mes => !state.features.columnFeatures.includes(mes)),
-        ],
+        columnFeatures: selMeasures.reduce((acc, curval) => {
+          if (columnFeat.includes(curval)) {
+            return [
+              ...acc,
+              forecastingForm.features.columnFeatures[forecastingForm.features.columnFeatures.findIndex(cf => cf.columnName === curval)],
+            ];
+          } else {
+            return [...acc, { columnName: curval, features: [] }];
+          }
+        }, []),
       },
     }));
   }, [selectedMeasures]);
@@ -95,13 +98,13 @@ const Forecasting = () => {
       </Grid>
       <Grid sx={{ width: '100%', height: '70%', overflowY: 'auto' }}>
         {activeStep === 0 ? (
-          <AutoMLDataPrep forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
+          <ForecastingDataPrep forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
         ) : activeStep === 1 ? (
-          <AutoMLFeatureExtr forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
+          <ForecastingFeatureExtr forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
         ) : activeStep === 2 ? (
-          <AutoMLTrain forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
+          <ForecastingTrain forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
         ) : (
-          <FinishStep handleReset={handleReset} />
+          <ForecastingResults />
         )}
       </Grid>
       {activeStep === 3 ? (

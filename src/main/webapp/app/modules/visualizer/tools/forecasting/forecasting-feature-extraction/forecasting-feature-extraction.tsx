@@ -31,7 +31,7 @@ const ForecastingFeatureExtr = (props: IForecastingFeatureExtr) => {
               Features
             </Typography>
           </Grid>
-          <Features />
+          <Features forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
         </Grid>
         <Grid className="optional-feature-extraction" sx={{ display: 'flex', flexDirection: 'column', rowGap: 2 }}>
           <Grid sx={{ width: '90%', borderBottom: '1px solid rgba(0,0,0,0.3)', m: 'auto' }}>

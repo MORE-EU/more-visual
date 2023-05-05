@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
@@ -8,13 +8,12 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { grey } from '@mui/material/colors';
 import { useAppSelector } from 'app/modules/store/storeConfig';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import Box from '@mui/material/Box';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import { Theme, useTheme } from '@mui/material';
+import { IForecastingForm } from 'app/shared/model/forecasting.model';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -22,34 +21,24 @@ const MenuProps = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250
-    }
-  }
+      width: 250,
+    },
+  },
 };
-
-const names = [
-  "Oliver Hansen",
-  "Van Henry",
-  "April Tucker",
-  "Ralph Hubbard",
-  "Omar Alexander",
-  "Carlos Abbott",
-  "Miriam Wagner",
-  "Bradley Wilkerson",
-  "Virginia Andrews",
-  "Kelly Snyder"
-];
 
 function getStyles(name: string, personName: readonly string[], theme: Theme) {
   return {
-    fontWeight:
-      personName.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium
+    fontWeight: personName.indexOf(name) === -1 ? theme.typography.fontWeightRegular : theme.typography.fontWeightMedium,
   };
 }
 
-const Features = () => {
+interface IFeatures {
+  forecastingForm: IForecastingForm;
+  setForecastingForm: Dispatch<SetStateAction<IForecastingForm>>;
+}
+
+const Features = (props: IFeatures) => {
+  const { forecastingForm, setForecastingForm } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const { selectedMeasures, dataset } = useAppSelector(state => state.visualizer);
   const open = Boolean(anchorEl);
@@ -57,18 +46,35 @@ const Features = () => {
   const theme = useTheme();
   const [personName, setPersonName] = React.useState<string[]>([]);
 
-  const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+  const handleChange = mez => event => {
+    // dataset.header[mez]
     const {
-      target: { value }
+      target: { value },
     } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
+    setForecastingForm(state => ({
+      ...state,
+      features: {
+        ...state.features,
+        columnFeatures: state.features.columnFeatures.reduce((acc, curval) => {
+          if (curval.columnName === dataset.header[mez]) {
+            return [
+              ...acc,
+              {
+                columnName: curval.columnName,
+                features: event.target.value,
+              },
+            ];
+          } else {
+            return [...acc, curval];
+          }
+        }, []),
+      },
+    }));
   };
 
   return (
     <Grid sx={{ display: 'flex', flexDirection: 'column', rowGap: 2, width: '70%', textAlign: 'center', m: 'auto' }}>
+      {console.log(forecastingForm)}
       {selectedMeasures.map(mez => (
         <Grid key={`${mez}-selectedMes-pill`} sx={{ display: 'flex', alignItems: 'center', columnGap: 2 }}>
           <Grid
@@ -85,31 +91,42 @@ const Features = () => {
               {`${dataset.header[mez]}`}
             </Typography>
           </Grid>
-          <Grid sx={{width: "80%"}}>
-            <FormControl sx={{width: "100%"}}>
-              {personName.length === 0 ? <InputLabel id="demo-multiple-chip-label">Select Features</InputLabel> : null}
-              <Select
-                labelId="demo-multiple-chip-label"
-                id="demo-multiple-chip"
-                multiple
-                displayEmpty
-                value={personName}
-                onChange={handleChange}
-                renderValue={selected => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map(value => (
-                      <Chip key={value} label={value} />
-                    ))}
-                  </Box>
-                )}
-                MenuProps={MenuProps}
-              >
-                {names.map(name => (
-                  <MenuItem key={name} value={name} style={getStyles(name, personName, theme)}>
-                    {name}
-                  </MenuItem>
-                ))}
-              </Select>
+          <Grid sx={{ width: '80%' }}>
+            <FormControl sx={{ width: '100%' }}>
+              {forecastingForm.features.columnFeatures.findIndex(cf => cf.columnName === dataset.header[mez]) !== -1 &&
+              forecastingForm.features.columnFeatures[
+                forecastingForm.features.columnFeatures.findIndex(cf => cf.columnName === dataset.header[mez])
+              ].features.length === 0 ? (
+                <InputLabel id="demo-multiple-chip-label">Select Features</InputLabel>
+              ) : null}
+              {forecastingForm.features.columnFeatures.findIndex(cf => cf.columnName === dataset.header[mez]) !== -1 && (
+                <Select
+                  labelId="demo-multiple-chip-label"
+                  id="demo-multiple-chip"
+                  multiple
+                  displayEmpty
+                  value={
+                    forecastingForm.features.columnFeatures[
+                      forecastingForm.features.columnFeatures.findIndex(cf => cf.columnName === dataset.header[mez])
+                    ].features
+                  }
+                  onChange={handleChange(mez)}
+                  renderValue={selected => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map(value => (
+                        <Chip key={value} label={value} />
+                      ))}
+                    </Box>
+                  )}
+                  MenuProps={MenuProps}
+                >
+                  {dataset.header.map(name => (
+                    <MenuItem key={name} value={name} style={getStyles(name, personName, theme)}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
             </FormControl>
           </Grid>
         </Grid>
