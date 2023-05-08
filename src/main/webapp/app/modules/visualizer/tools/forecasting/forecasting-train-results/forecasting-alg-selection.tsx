@@ -1,25 +1,14 @@
 import Grid from '@mui/material/Grid';
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import { useAppSelector } from 'app/modules/store/storeConfig';
 import { IForecastingForm } from 'app/shared/model/forecasting.model';
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import Menu from '@mui/material/Menu';
-import Chip from '@mui/material/Chip';
-import { grey } from '@mui/material/colors';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
-import Collapse from '@mui/material/Collapse';
-import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import LinearProgress from '@mui/material/LinearProgress';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import ForecastingAlgModal from './forecasting-alg-selection-modal';
@@ -30,7 +19,8 @@ interface IForecastingTrain {
   setForecastingForm: Dispatch<SetStateAction<IForecastingForm>>;
 }
 
-const ForecastingTrain = (props: IForecastingTrain) => {
+const ForecastingAlgSelection = (props: IForecastingTrain) => {
+  const {forecastingForm, setForecastingForm} = props;
   const [open, setOpen] = useState(false);
 
   const handleClick = event => {
@@ -90,4 +80,4 @@ const ForecastingTrain = (props: IForecastingTrain) => {
   );
 };
 
-export default ForecastingTrain;
+export default ForecastingAlgSelection;

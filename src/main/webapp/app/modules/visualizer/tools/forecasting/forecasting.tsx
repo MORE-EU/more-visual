@@ -9,7 +9,7 @@ import { IForecastingForm, IForecastingDefault } from 'app/shared/model/forecast
 import { useAppSelector } from 'app/modules/store/storeConfig';
 import ForecastingDataPrep from './forecasting-data-preparation/forecasting-dataPrep';
 import ForecastingFeatureExtr from './forecasting-feature-extraction/forecasting-feature-extraction';
-import ForecastingTrain from './forecasting-train-results/forecasting-train';
+import ForecastingAlgSelection from './forecasting-train-results/forecasting-alg-selection';
 import ForecastingResults from './forecasting-results/forecasting-results';
 
 const steps = ['Data Selection', 'Feature Selection', 'Algorithm Selection'];
@@ -102,7 +102,7 @@ const Forecasting = () => {
         ) : activeStep === 1 ? (
           <ForecastingFeatureExtr forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
         ) : activeStep === 2 ? (
-          <ForecastingTrain forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
+          <ForecastingAlgSelection forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
         ) : (
           <ForecastingResults />
         )}

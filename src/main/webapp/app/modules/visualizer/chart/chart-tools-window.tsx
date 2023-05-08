@@ -1,5 +1,5 @@
 import React from 'react';
-import { grey } from '@mui/material/colors';
+import { grey, red } from '@mui/material/colors';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -32,7 +32,7 @@ const ChartToolsWindow = () => {
           </Typography>
           <Box sx={{flex: 1}}/>
           <IconButton onClick={handleClose}>
-            <CloseIcon />
+            <CloseIcon sx={{"&:hover": {color: red[400]}}}/>
           </IconButton>
         </Grid>
         <Grid sx={{ height: '90%' }}>
