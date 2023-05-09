@@ -91,6 +91,18 @@ export const IXGBoostDefault: Readonly<IXGBoost> = {
   n_estimators: 100,
 };
 
+export const IXGBoostDefaultFT: Readonly<IXGBoost> = {
+  booster: 'gbtree',
+  learning_rate: [0.01, 0.5, 0.01],
+  max_depth: [1, 25, 1],
+  min_child_weight: [1, 10, 1],
+  gamma: [0.01, 0.5, 0.05],
+  lambda: [0.01, 0.5, 0.05],
+  alpha: [0.01, 0.5, 0.05],
+  colsample_bytree: [0.1, 1, 0.1],
+  n_estimators: [100, 2000, 100],
+};
+
 export const ILGBMDefault: Readonly<ILGBM> = {
   boosting_type: 'gbdt',
   learning_rate: 0.1,
@@ -103,12 +115,25 @@ export const ILGBMDefault: Readonly<ILGBM> = {
   n_estimators: 100,
 };
 
+export const ILGBMDefaultFT: Readonly<ILGBM> = {
+  boosting_type: 'gbdt',
+  learning_rate: [0.01, 0.5, 0.01],
+  max_depth: [1, 25, 1],
+  num_leaves: [1, 100, 1],
+  min_child_weight: [0.001, 0.1, 0.001],
+  reg_alpha: [0.01, 0.5, 0.05],
+  reg_lambda: [0.01, 0.5, 0.05],
+  colsample_bytree: [0.1, 1, 0.1],
+  n_estimators: [100, 2000, 100],
+};
+
 export const ILinearRegressionDefault: Readonly<ILinearRegression> = {
   fit_intercept: true,
   positive: false,
 };
 
 export const IXGBoostIntervals = {
+  booster: ['gbtree', 'gblinear', 'dart'],
   learning_rate: { min: 0, max: 1 },
   max_depth: { min: 0, max: null }, //>0
   min_child_weight: { min: 0, max: null }, //>0
@@ -120,6 +145,7 @@ export const IXGBoostIntervals = {
 };
 
 export const ILGBMIntervals = {
+  boosting_type: ['gbdt', 'dart', 'goss'],
   learning_rate: { min: 0, max: 1 },
   max_depth: { min: 1, max: null }, //>=1
   num_leaves: { min: 2, max: null }, //>=2
@@ -128,5 +154,12 @@ export const ILGBMIntervals = {
   reg_lambda: { min: 0, max: 1 }, //>=0
   colsample_bytree: { min: 0, max: 1 },
   n_estimators: { min: 0, max: 1 }, //>0
+};
+
+export const IStringParameters = {
+  booster: ['gbtree', 'gblinear', 'dart'],
+  boosting_type: ['gbdt', 'dart', 'goss'],
+  fit_intercept: [true, false],
+  positive: [true, false],
 };
 /*  *************  */

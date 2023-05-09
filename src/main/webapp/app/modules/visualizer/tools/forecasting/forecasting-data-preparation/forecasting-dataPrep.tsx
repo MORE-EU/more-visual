@@ -189,11 +189,11 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
                 marks={[
                   { label: `train ${forecastingForm.dataSplit[0]}%`, value: forecastingForm.dataSplit[0] / 2 },
                   {
-                    label: forecastingForm.dataSplit[1] > 0 ? `test ${forecastingForm.dataSplit[1]}%` : null,
+                    label: forecastingForm.dataSplit[1] > 0 ? `validation  ${forecastingForm.dataSplit[1]}%` : null,
                     value: forecastingForm.dataSplit[0] + forecastingForm.dataSplit[1] / 2,
                   },
                   {
-                    label: forecastingForm.dataSplit[2] > 0 ? `validation` : null,
+                    label: forecastingForm.dataSplit[2] > 0 ? `test ${forecastingForm.dataSplit[2]}%` : null,
                     value: forecastingForm.dataSplit[0] + forecastingForm.dataSplit[1] + forecastingForm.dataSplit[2] / 2,
                   }
                 ]}

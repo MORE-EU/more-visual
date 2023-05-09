@@ -74,7 +74,6 @@ const Features = (props: IFeatures) => {
 
   return (
     <Grid sx={{ display: 'flex', flexDirection: 'column', rowGap: 2, width: '70%', textAlign: 'center', m: 'auto' }}>
-      {console.log(forecastingForm)}
       {selectedMeasures.map(mez => (
         <Grid key={`${mez}-selectedMes-pill`} sx={{ display: 'flex', alignItems: 'center', columnGap: 2 }}>
           <Grid
@@ -85,6 +84,7 @@ const Features = (props: IFeatures) => {
               alignItems: 'center',
               borderRadius: 2,
               height: 'auto',
+              justifyContent: "center"
             }}
           >
             <Typography variant="subtitle1" fontSize={20} sx={{ p: 1 }}>

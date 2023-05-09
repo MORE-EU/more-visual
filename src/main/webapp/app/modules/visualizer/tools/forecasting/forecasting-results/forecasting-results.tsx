@@ -25,13 +25,13 @@ function createData(measureName, progress, estimatedTime, actions) {
       actions,
       history: [
         {
-          modelName: 'LSTM',
+          modelName: 'XGBoost',
           accuracy: 0.8,
           precision: 0.2,
           recall: 0.5,
         },
         {
-          modelName: 'Prophet',
+          modelName: 'LinearRegression',
           accuracy: 0.6,
           precision: 0.4,
           recall: 0.3,

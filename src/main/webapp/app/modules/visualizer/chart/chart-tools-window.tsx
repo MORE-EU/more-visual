@@ -31,8 +31,8 @@ const ChartToolsWindow = () => {
             {activeTool}
           </Typography>
           <Box sx={{flex: 1}}/>
-          <IconButton onClick={handleClose}>
-            <CloseIcon sx={{"&:hover": {color: red[400]}}}/>
+          <IconButton onClick={handleClose} sx={{borderRadius: 0, "&:hover": {color: red[400]}}}>
+            <CloseIcon />
           </IconButton>
         </Grid>
         <Grid sx={{ height: '90%' }}>

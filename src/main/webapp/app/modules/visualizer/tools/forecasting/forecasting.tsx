@@ -86,7 +86,6 @@ const Forecasting = () => {
 
   return (
     <Grid sx={{ width: '100%', height: '100%' }}>
-      {console.log(forecastingForm)}
       <Grid sx={{ width: '100%', height: '15%' }}>
         <Stepper activeStep={activeStep} sx={{ pl: 3, pr: 3, pt: 2 }}>
           {steps.map((label, index) => (
@@ -96,7 +95,7 @@ const Forecasting = () => {
           ))}
         </Stepper>
       </Grid>
-      <Grid sx={{ width: '100%', height: '70%', overflowY: 'auto' }}>
+      <Grid sx={{ width: '100%', height: '70%', overflowY: 'auto', display: "flex" }}>
         {activeStep === 0 ? (
           <ForecastingDataPrep forecastingForm={forecastingForm} setForecastingForm={setForecastingForm} />
         ) : activeStep === 1 ? (
@@ -118,11 +117,6 @@ const Forecasting = () => {
             Back
           </Button>
           <Grid sx={{ flex: '1 1 auto' }} />
-          {/* {isStepOptional(activeStep) && (
-            <Button size='small' color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-              Skip
-            </Button>
-          )} */}
           <Button size="small" sx={{ fontSize: 12, height: '90%' }} onClick={handleNext}>
             {activeStep === steps.length - 1 ? 'Train' : 'Next'}
           </Button>
