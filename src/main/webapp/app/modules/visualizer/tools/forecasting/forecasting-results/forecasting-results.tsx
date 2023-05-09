@@ -150,7 +150,6 @@ const ForecastingResults = () => {
             display: 'flex',
             alignItems: 'center',
             border: '1px solid rgba(0,0,0,0.3)',
-            borderRadius: 4,
             columnGap: 2,
             width: '70%',
             m: 'auto',

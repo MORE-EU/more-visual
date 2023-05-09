@@ -7,7 +7,6 @@ export interface IForecastingForm {
   cleanData: boolean;
   dataSplit: number[];
   features: IFeatures;
-  predictions: number;
   algorithms: IAlgorigths;
 }
 
@@ -76,7 +75,6 @@ export const IForecastingDefault: Readonly<IForecastingForm> = {
   algorithms: {},
   dataSplit: [60, 20, 20],
   features: { columnFeatures: [], optionalFeatures: {} },
-  predictions: 0,
 };
 
 export const IXGBoostDefault: Readonly<IXGBoost> = {

@@ -1,4 +1,4 @@
-import { IconButton, TextField } from '@mui/material';
+import { FormControl, IconButton, InputLabel, MenuItem, OutlinedInput, Select, TextField } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Modal from '@mui/material/Modal';
@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import { blue, grey, red } from '@mui/material/colors';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import ClearIcon from '@mui/icons-material/Clear';
-import { IForecastingForm, ILGBMIntervals, IXGBoostIntervals } from 'app/shared/model/forecasting.model';
+import { IForecastingForm, ILGBMIntervals, IStringParameters, IXGBoostIntervals } from 'app/shared/model/forecasting.model';
 
 const style = {
   position: 'absolute',
@@ -62,12 +62,27 @@ const ForecastingAlgModal = (props: IForecastingAlgModal) => {
     );
   };
 
+  const handleFTNumericBoxChange = (parameter, idx) => e => {
+    const arrayCopy = forecastingForm.algorithms[selectedAlgo][parameter]
+    arrayCopy[idx] = parseFloat(e.target.value)
+    setForecastingForm(state => ({...state, algorithms: {...state.algorithms, [selectedAlgo]: {...state.algorithms[selectedAlgo], [parameter]: arrayCopy}}}))
+  }
+
+  const handleNumericBoxChange = parameter => e => {
+    setForecastingForm(state => ({...state, algorithms: {...state.algorithms, [selectedAlgo]: {...state.algorithms[selectedAlgo], [parameter]: parseFloat(e.target.value)}}}))
+  }
+
+  const handleStringBoxChange = parameter => e => {
+    setForecastingForm(state => ({...state, algorithms: {...state.algorithms, [selectedAlgo]: {...state.algorithms[selectedAlgo], [parameter]: e.target.value}}}))
+  }
+
   const handleClose = () => {
     setOpen(!open);
   };
 
   return (
     <>
+    {console.log(forecastingForm)}
       <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description" hideBackdrop>
         <Grid sx={style}>
           <Grid sx={{ height: '6%', width: '100%', backgroundColor: grey[300], display: 'flex', alignItems: 'center' }}>
@@ -92,49 +107,77 @@ const ForecastingAlgModal = (props: IForecastingAlgModal) => {
                 flexDirection: 'column',
                 rowGap: 1,
                 borderRight: '1px solid rgba(0,0,0,0.4)',
+                pr: 1, pl: 1
               }}
             >
               {Object.keys(forecastingForm.algorithms).includes(selectedAlgo) &&
                 Object.keys(forecastingForm.algorithms[selectedAlgo]).map(par => (
-                  <Grid key={`algoParameter-${par}`}>
-                    <Grid>
-                      <Typography id="modal-modal-description" sx={{ mt: 2, fontWeight: 500 }}>
+                  <Grid key={`algoParameter-${par}`} sx={{display: "flex", flexDirection: "column"}}>
+                    <Grid >
+                      <Typography id="modal-modal-description" sx={{ mt: 2, fontWeight: 500, bgcolor: grey[300], pl: 1, color: grey[800] }}>
                         {par}
                       </Typography>
                     </Grid>
-                    <Grid sx={{ width: 'inherit', display: 'flex', columnGap: 1 }}>
-                      {fineTuneSelection.includes(selectedAlgo) ? (
-                        <>
+                    <Grid sx={{ width: 'inherit', display: 'flex', columnGap: 1, padding: "10px", bgcolor: grey[100] }}>
+                      {typeof forecastingForm.algorithms[selectedAlgo][par] !== 'string' ? (
+                        fineTuneSelection.includes(selectedAlgo) ? (
+                          <>
+                            <TextField
+                              id="outlined-number"
+                              label="Min"
+                              size="small"
+                              type="number"
+                              value={forecastingForm.algorithms[selectedAlgo][par][0]}
+                              onChange={handleFTNumericBoxChange(par, 0)}
+                              sx={{ width: '20%' }}
+                            />
+                            <TextField
+                              id="outlined-number"
+                              label="Max"
+                              size="small"
+                              type="number"
+                              value={forecastingForm.algorithms[selectedAlgo][par][1]}
+                              onChange={handleFTNumericBoxChange(par, 1)}
+                              sx={{ width: '20%' }}
+                            />
+                            <TextField
+                              id="outlined-number"
+                              label="Step"
+                              size="small"
+                              type="number"
+                              value={forecastingForm.algorithms[selectedAlgo][par][2]}
+                              onChange={handleFTNumericBoxChange(par, 2)}
+                              sx={{ width: '20%' }}
+                            />
+                          </>
+                        ) : (
                           <TextField
                             id="outlined-number"
-                            label="Min"
+                            label="value"
                             type="number"
-                            defaultValue={forecastingForm.algorithms[selectedAlgo][par][0]}
+                            size="small"
+                            onChange={handleNumericBoxChange(par)}
+                            value={forecastingForm.algorithms[selectedAlgo][par]}
                             sx={{ width: '20%' }}
                           />
-                          <TextField
-                            id="outlined-number"
-                            label="Max"
-                            type="number"
-                            defaultValue={forecastingForm.algorithms[selectedAlgo][par][1]}
-                            sx={{ width: '20%' }}
-                          />
-                          <TextField
-                            id="outlined-number"
-                            label="Step"
-                            type="number"
-                            defaultValue={forecastingForm.algorithms[selectedAlgo][par][2]}
-                            sx={{ width: '20%' }}
-                          />
-                        </>
+                        )
                       ) : (
-                        <TextField
-                          id="outlined-number"
-                          label="value"
-                          type="number"
-                          defaultValue={forecastingForm.algorithms[selectedAlgo][par]}
-                          sx={{ width: '20%' }}
-                        />
+                          <Select
+                          displayEmpty
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            size="small"
+                            value={forecastingForm.algorithms[selectedAlgo][par]}
+                            label="Age"
+                            onChange={handleStringBoxChange(par)}
+                            input={<OutlinedInput />}
+                          >
+                            {
+                              IStringParameters[par].map(val => (
+                                <MenuItem value={val}>{val}</MenuItem>
+                              ))
+                            }
+                          </Select>
                       )}
                     </Grid>
                   </Grid>
@@ -154,7 +197,7 @@ const ForecastingAlgModal = (props: IForecastingAlgModal) => {
               <Typography id="modal-modal-description" sx={{ mt: 2, color: grey[600], fontWeight: 800, fontSize: 24 }}>
                 {`${selectedAlgo} parameters`}
               </Typography>
-              <pre style={{ marginTop: 2, color: blue[500], fontWeight: 600, fontSize: 20, lineHeight: 1.4 }}>
+              <pre style={{ marginTop: 2, color: blue[500], fontWeight: 400, fontSize: 20, lineHeight: 1.4 }}>
                 {forecastingForm.algorithms[selectedAlgo] && prettyPrintJSON(forecastingForm.algorithms[selectedAlgo])}
               </pre>
             </Grid>

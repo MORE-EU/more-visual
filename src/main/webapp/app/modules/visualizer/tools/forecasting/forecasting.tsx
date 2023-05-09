@@ -107,13 +107,13 @@ const Forecasting = () => {
         )}
       </Grid>
       {activeStep === 3 ? (
-        <Grid sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+        <Grid sx={{ display: 'flex', flexDirection: 'row', height: '15%', pr: 3, pl: 3 }}>
           <Box sx={{ flex: '1 1 auto' }} />
-          <Button onClick={handleReset}>Reset</Button>
+          <Button size="small" color="inherit" sx={{ fontSize: 12, height: '90%' }} onClick={handleReset}>Reset</Button>
         </Grid>
       ) : (
         <Grid sx={{ display: 'flex', flexDirection: 'row', height: '15%', pr: 3, pl: 3 }}>
-          <Button size="small" color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1, fontSize: 12, height: '90%' }}>
+          <Button size="small" color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ fontSize: 12, height: '90%' }}>
             Back
           </Button>
           <Grid sx={{ flex: '1 1 auto' }} />
