@@ -88,6 +88,7 @@ const ForecastingAlgSelection = (props: IForecastingTrain) => {
         setForecastingForm={setForecastingForm}
         selectedAlgo={selectedAlgo}
         fineTuneSelection={fineTuneSelection}
+        setFileTuneSelection={setFileTuneSelection}
       />
       <Grid
         className={'Future-predictive-window'}
@@ -110,7 +111,7 @@ const ForecastingAlgSelection = (props: IForecastingTrain) => {
               <TableHead>
                 <TableRow>
                   <TableCell>Algorithm</TableCell>
-                  <TableCell align="center">Fine tune</TableCell>
+                  {/* <TableCell align="center">Fine tune</TableCell> */}
                   <TableCell align="center">Parameters</TableCell>
                 </TableRow>
               </TableHead>
@@ -121,14 +122,14 @@ const ForecastingAlgSelection = (props: IForecastingTrain) => {
                       <Checkbox onChange={handleAlgorithmSelection(row)} />
                       {row}
                     </TableCell>
-                    <TableCell align="center">
+                    {/* <TableCell align="center">
                       {row !== 'LinearRegression' && (
                         <Checkbox
                           onChange={handleFineTuneCheckbox(row)}
                           disabled={!Object.keys(forecastingForm.algorithms).includes(row)}
                         />
                       )}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell align="center">
                       <Button variant="outlined" disabled={!Object.keys(forecastingForm.algorithms).includes(row)} onClick={handleConfigClick(row)}>
                         Configure
