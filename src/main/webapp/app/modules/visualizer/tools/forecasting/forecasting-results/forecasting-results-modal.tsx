@@ -1,8 +1,23 @@
 import React from 'react';
 import Modal from '@mui/material/Modal';
-import Highcharts from 'highcharts';
+import Highcharts from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
+import HighchartsMore from 'highcharts/highcharts-more';
 import { useAppSelector } from 'app/modules/store/storeConfig';
+import Grid from '@mui/material/Grid';
+
+HighchartsMore(Highcharts);
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '60%',
+  height: 'max-content',
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+};
 
 const ModalWithChart = (props) => {
   const {chartRef} = useAppSelector(state => state.visualizer)
@@ -53,22 +68,32 @@ const ModalWithChart = (props) => {
     const startingPoint = chartRef.series[0].userOptions.data.findIndex(item => item === findArrayWithClosestNumber(chartRef.series[0].zones[2].value, chartRef.series[0].userOptions.data))
     const endingPoint = chartRef.series[0].userOptions.data.findIndex(item => item === findArrayWithClosestNumber(chartRef.series[0].zones[3].value, chartRef.series[0].userOptions.data))
     const target_timeseries = chartRef.series[0].userOptions.data.slice(startingPoint, endingPoint);
-    console.log(startingPoint, endingPoint)
     return target_timeseries;
   }
 
   const generateCharts = () => {
     const initialTimeseries = getInitialTimeseries();
     const generatedSeries1 = generateSimilarTimeSeries(initialTimeseries);
-    // console.log(initialTimeseries, generatedSeries1);
     return [
       {
         name: 'Initial Series',
         data: initialTimeseries,
+        opposite: false,
+        title: {
+          anabled: true,
+          text: "Initial Series"
+        },
+        offset: 0
       },
       {
         name: 'Predicted Series',
         data: generatedSeries1,
+        opposite: false,
+        title: {
+          anabled: true,
+          text: "Initial Series"
+        },
+        offset: 0
       },
     ];
   };
@@ -78,14 +103,23 @@ const ModalWithChart = (props) => {
       text: 'Initial vs. Predicted Time Series',
     },
     series: generateCharts(),
+    xAxis: {
+      ordinal: false,
+      type: 'datetime',
+    },
+    rangeSelector: {
+      enabled: false,
+    },
+    credits: {
+      enabled: false,
+    },
   };
 
   return (
       <Modal open={resultsModal} onClose={handleClose}>
-        <div style={{ margin: 'auto', width: 600, height: 400, padding: 20 }}>
-          {console.log(chartRef)}
-          <HighchartsReact highcharts={Highcharts} options={options} />
-        </div>
+        <Grid sx={style}>
+          <HighchartsReact highcharts={Highcharts} constructorType={'stockChart'} options={options} />
+        </Grid>
       </Modal>
   );
 };
