@@ -22,6 +22,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { green, orange } from '@mui/material/colors';
 import ModalWithChart from './forecasting-results-modal';
 import Tooltip from '@mui/material/Tooltip';
+import Popper from '@mui/material/Popper';
 
 function createData(measureName, progress, estimatedTime, actions) {
   return {
@@ -66,7 +67,7 @@ const rows = [
 ];
 
 const Row = props => {
-  const { row, setResultsModal } = props;
+  const { row, setResultsModal,handleClick } = props;
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -120,10 +121,7 @@ const Row = props => {
                       <TableCell align="center">{historyRow.recall}</TableCell>
                       <TableCell align="center">
                         <IconButton
-                          disabled={row.progress !== 100}
-                          onClick={() => {
-                            console.log(row.action);
-                          }}
+                          onClick={handleClick}
                         >
                           <SaveIcon />
                         </IconButton>
@@ -151,8 +149,18 @@ const Row = props => {
 
 const ForecastingResults = () => {
   const [resultsModal, setResultsModal] = useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+  
   return (
     <>
+      <Popper id="save-popper" open={open} anchorEl={anchorEl} placement="top">
+        <Box sx={{ border: 1, p: 1, bgcolor: 'background.paper' }}>The content of the Popper.</Box>
+      </Popper>
       <ModalWithChart resultsModal={resultsModal} setResultsModal={setResultsModal} />
       <Grid
         className={'Future-predictive-window'}
@@ -186,7 +194,7 @@ const ForecastingResults = () => {
               </TableHead>
               <TableBody>
                 {rows.map(row => (
-                  <Row key={row.measureName} row={row} setResultsModal={setResultsModal} />
+                  <Row key={row.measureName} row={row} setResultsModal={setResultsModal} handleClick={handleClick} />
                 ))}
               </TableBody>
             </Table>

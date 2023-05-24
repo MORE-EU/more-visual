@@ -49,6 +49,30 @@ const ForecastingTrainStepper = () => {
     const isStepSkipped = step => {
       return skipped.has(step);
     };
+
+    const handleNextButton = () => {
+      if(activeStep === 0){
+       if(forecastingForm.startDate !== null && forecastingForm.endDate !== null){
+        return false;
+       }else{
+        return true;
+       }
+      }
+      else if(activeStep === 1){
+        if(forecastingForm.features.columnFeatures[0].features.length !== 0){
+          return false;
+        }else{
+          return true;
+        }
+      }else if(activeStep === 2){
+        if(Object.keys(forecastingForm.algorithms).length !== 0){
+          return false;
+        }else {
+          return true;
+        }
+      }
+      return false;
+    }
   
     const handleNext = () => {
       let newSkipped = skipped;
@@ -120,7 +144,7 @@ const ForecastingTrainStepper = () => {
             Back
           </Button>
           <Grid sx={{ flex: '1 1 auto' }} />
-          <Button size="small" sx={{ fontSize: 12, height: '90%' }} onClick={handleNext}>
+          <Button size="small" sx={{ fontSize: 12, height: '90%' }} onClick={handleNext} disabled={handleNextButton()}>
             {activeStep === steps.length - 1 ? 'Train' : 'Next'}
           </Button>
         </Grid>
