@@ -31,7 +31,7 @@ const ForecastingModelSelection = props => {
           Saved Models
         </Typography>
       </Grid>
-      <Grid sx={{ width: '60%', textAlign: 'center', m: 'auto', rowGap: 1, display: 'flex', flexDirection: 'column', overflowY: "auto", pb: 4 }}>
+      <Grid sx={{ width: '100%', textAlign: 'center', m: 'auto', rowGap: 1, display: 'flex', flexDirection: 'column', pb: 4, pr: "20%", pl: "20%", overflowY:"auto" }}>
         {/* {savedModels.map((modelName) => (
           <Grid key={modelName} sx={{ width: '100%', display: 'flex', bgcolor: grey[200], borderRadius: 10, alignItems: 'center' }}>
             <Typography variant="subtitle1" fontSize={16} sx={{ pl: 3 }}>
@@ -56,8 +56,8 @@ const ForecastingModelSelection = props => {
             Train a new model
           </Typography>
         </Button> */}
-        <TableContainer component={Paper}>
-          <Table aria-label="caption table" size="small">
+        <TableContainer sx={{maxheight: "80%"}} component={Paper}>
+          <Table stickyHeader aria-label="caption table" size="small">
             <caption style={{padding: 0}}>
               <Button
                 variant="text"

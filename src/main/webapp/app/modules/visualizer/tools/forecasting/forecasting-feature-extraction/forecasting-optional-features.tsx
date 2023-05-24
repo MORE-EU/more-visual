@@ -21,6 +21,16 @@ import { useAppSelector } from 'app/modules/store/storeConfig';
 const CollapseTemporal = props => {
   const { open, handleTemporalCheckboxes, forecastingForm } = props;
   const temporalSelection = ['Minute', 'Month', 'Is Working Hour', 'Hour', 'WeekDay', 'Is Weekend', 'Day', 'Week of Year'];
+  const temporalSelectionMap = {
+    'Minute':"minute",
+    'Month': "month", 
+    'Is Working Hour': "is_working_hour", 
+    'Hour': "hour", 
+    'WeekDay': "weekday", 
+    'Is Weekend': "is_weekend", 
+    'Day': "day", 
+    'Week of Year': "week_of_year"
+  }
   return (
     Object.hasOwn(forecastingForm.features.optionalFeatures, 'temporal') && (
       <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -45,7 +55,7 @@ const CollapseTemporal = props => {
                     <TableCell key={`${text}-temp-body-column`} align="center">
                       <Checkbox
                         value={forecastingForm.features.optionalFeatures['temporal'].includes(text)}
-                        onChange={handleTemporalCheckboxes(text)}
+                        onChange={handleTemporalCheckboxes(temporalSelectionMap[text])}
                       />
                     </TableCell>
                   ))}
@@ -63,6 +73,12 @@ const CollapsePastMetr = props => {
   const { open, handlePastMetricsCheckboxes, forecastingForm } = props;
   const pastMetrCategories = ['Previous Hour', 'Previous Day', 'Previous Week', 'Previous Month'];
   const pastMetrSelection = ['Actual Load', 'Average Load', 'Min Load', 'Max Load'];
+  const pastMetrSelectionMap = {
+    'Actual Load': "actual", 
+    'Average Load': "average", 
+    'Min Load': "min", 
+    'Max Load': "max"
+  }
   return (
     Object.hasOwn(forecastingForm.features.optionalFeatures, 'pastMetrics') && (
       <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -90,7 +106,7 @@ const CollapsePastMetr = props => {
                       <TableCell key={`${textMetric}-pastMetr-body-column`} align="center">
                         <Checkbox
                           value={forecastingForm.features.optionalFeatures['pastMetrics'][map[text]].includes(textMetric)}
-                          onChange={handlePastMetricsCheckboxes(text, textMetric)}
+                          onChange={handlePastMetricsCheckboxes(text, pastMetrSelectionMap[textMetric])}
                         />
                       </TableCell>
                     ))}
