@@ -11,6 +11,7 @@ import eu.more2020.visual.repository.ToolsRepository;
 import eu.more2020.visual.service.CsvDataService;
 import eu.more2020.visual.service.IndexedModelarDataService;
 import eu.more2020.visual.service.ModelarDataService;
+import eu.more2020.visual.service.grpc.MyServerImpl;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -48,6 +49,7 @@ public class DatasetResource {
     private final IndexedModelarDataService indexedModelarDataService;
     private final AlertRepository alertRepository;
     private final FileHandlingRepository fileHandlingRepository;
+    private final MyServerImpl myServerImpl;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -59,7 +61,7 @@ public class DatasetResource {
                            ToolsRepository toolsRepository,
                            CsvDataService csvDataService, ModelarDataService modelarDataService, 
                            IndexedModelarDataService indexedModelarDataService, AlertRepository alertRepository,
-                           FileHandlingRepository fileHandlingRepository) {
+                           FileHandlingRepository fileHandlingRepository, MyServerImpl myServerImpl) {
         this.datasetRepository = datasetRepository;
         this.toolsRepository = toolsRepository;
         this.csvDataService = csvDataService;
@@ -67,6 +69,7 @@ public class DatasetResource {
         this.indexedModelarDataService = indexedModelarDataService;
         this.alertRepository = alertRepository;
         this.fileHandlingRepository = fileHandlingRepository;
+        this.myServerImpl = myServerImpl;
     }
 
     /**

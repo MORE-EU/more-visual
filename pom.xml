@@ -77,6 +77,9 @@
         <jacoco.itReportFile>${jacoco.itReportFolder}/integrationTest.exec</jacoco.itReportFile>
         <junit.utReportFolder>${project.testresult.directory}/test</junit.utReportFolder>
         <junit.itReportFolder>${project.testresult.directory}/integrationTest</junit.itReportFolder>
+        <grpc.version>1.42.1</grpc.version>
+        <protobuf-plugin.version>0.6.1</protobuf-plugin.version>
+        <protobuf.version>3.19.1</protobuf.version>
         <!-- jhipster-needle-maven-property -->
     </properties>
 
@@ -92,6 +95,17 @@
             &lt;!&ndash; jhipster-needle-maven-add-dependency-management &ndash;&gt;
         </dependencies>
     </dependencyManagement>-->
+    <dependencyManagement>
+    <dependencies>
+    <dependency>
+    <groupId>io.grpc</groupId>
+    <artifactId>grpc-bom</artifactId>
+    <version>${grpc.version}</version>
+    <type>pom</type>
+    <scope>import</scope>
+    </dependency>
+    </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -277,6 +291,22 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <version>2.0.1.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.more2020.grpc</groupId>
+            <artifactId>grpc-files</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.devh</groupId>
+            <artifactId>grpc-server-spring-boot-starter</artifactId>
+            <version>2.13.1.RELEASE</version>
+            <!-- <exclusions>
+            <exclusion>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-netty-shaded</artifactId>
+            </exclusion>
+        </exclusions> -->
         </dependency>
     </dependencies>
     <build>
@@ -740,13 +770,6 @@
                 <!-- jhipster-needle-maven-add-plugin-management -->
             </plugins>
         </pluginManagement>
-        <extensions>
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
-                <version>1.5.0.Final</version>
-            </extension>
-        </extensions>
     </build>
     <profiles>
         <profile>
