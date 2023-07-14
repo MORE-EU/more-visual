@@ -84,7 +84,7 @@ const Features = (props: IFeatures) => {
               alignItems: 'center',
               borderRadius: 2,
               height: 'auto',
-              justifyContent: "center"
+              justifyContent: 'center',
             }}
           >
             <Typography variant="subtitle1" fontSize={20} sx={{ p: 1 }}>
@@ -120,11 +120,13 @@ const Features = (props: IFeatures) => {
                   )}
                   MenuProps={MenuProps}
                 >
-                  {dataset.header.map(name => (
-                    <MenuItem key={name} value={name} style={getStyles(name, personName, theme)}>
-                      {name}
-                    </MenuItem>
-                  ))}
+                  {dataset.header
+                    .filter(h => dataset.header[mez] !== h && dataset.header[dataset.timeCol] !== h)
+                    .map(name => (
+                      <MenuItem key={name} value={name} style={getStyles(name, personName, theme)}>
+                        {name}
+                      </MenuItem>
+                    ))}
                 </Select>
               )}
             </FormControl>
