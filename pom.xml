@@ -298,6 +298,11 @@
             <version>1.0</version>
         </dependency>
         <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java-util</artifactId>
+            <version>3.21.5</version>
+        </dependency>
+        <dependency>
             <groupId>net.devh</groupId>
             <artifactId>grpc-server-spring-boot-starter</artifactId>
             <version>2.13.1.RELEASE</version>

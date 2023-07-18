@@ -4,30 +4,26 @@
 package eu.more2020.visual.grpc;
 
 /**
- * <pre>
- * The response message containing the greetings
- * </pre>
- *
- * Protobuf type {@code eu.more2020.visual.grpc.HelloReply}
+ * Protobuf type {@code eu.more2020.visual.grpc.Inference}
  */
-public final class HelloReply extends
+public final class Inference extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:eu.more2020.visual.grpc.HelloReply)
-    HelloReplyOrBuilder {
+    // @@protoc_insertion_point(message_implements:eu.more2020.visual.grpc.Inference)
+    InferenceOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use HelloReply.newBuilder() to construct.
-  private HelloReply(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use Inference.newBuilder() to construct.
+  private Inference(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private HelloReply() {
-    message_ = "";
+  private Inference() {
+    predictions_ = com.google.protobuf.ByteString.EMPTY;
   }
 
   @java.lang.Override
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
       UnusedPrivateParameter unused) {
-    return new HelloReply();
+    return new Inference();
   }
 
   @java.lang.Override
@@ -35,7 +31,7 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-  private HelloReply(
+  private Inference(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -54,9 +50,8 @@ private static final long serialVersionUID = 0L;
             done = true;
             break;
           case 10: {
-            java.lang.String s = input.readStringRequireUtf8();
 
-            message_ = s;
+            predictions_ = input.readBytes();
             break;
           }
           default: {
@@ -80,53 +75,26 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return eu.more2020.visual.grpc.HelloWorldProto.internal_static_eu_more2020_visual_grpc_HelloReply_descriptor;
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Inference_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return eu.more2020.visual.grpc.HelloWorldProto.internal_static_eu_more2020_visual_grpc_HelloReply_fieldAccessorTable
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Inference_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            eu.more2020.visual.grpc.HelloReply.class, eu.more2020.visual.grpc.HelloReply.Builder.class);
+            eu.more2020.visual.grpc.Inference.class, eu.more2020.visual.grpc.Inference.Builder.class);
   }
 
-  public static final int MESSAGE_FIELD_NUMBER = 1;
-  private volatile java.lang.Object message_;
+  public static final int PREDICTIONS_FIELD_NUMBER = 1;
+  private com.google.protobuf.ByteString predictions_;
   /**
-   * <code>string message = 1;</code>
-   * @return The message.
+   * <code>bytes predictions = 1;</code>
+   * @return The predictions.
    */
   @java.lang.Override
-  public java.lang.String getMessage() {
-    java.lang.Object ref = message_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      message_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string message = 1;</code>
-   * @return The bytes for message.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getMessageBytes() {
-    java.lang.Object ref = message_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      message_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public com.google.protobuf.ByteString getPredictions() {
+    return predictions_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -143,8 +111,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(message_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, message_);
+    if (!predictions_.isEmpty()) {
+      output.writeBytes(1, predictions_);
     }
     unknownFields.writeTo(output);
   }
@@ -155,8 +123,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(message_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, message_);
+    if (!predictions_.isEmpty()) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBytesSize(1, predictions_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -168,13 +137,13 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof eu.more2020.visual.grpc.HelloReply)) {
+    if (!(obj instanceof eu.more2020.visual.grpc.Inference)) {
       return super.equals(obj);
     }
-    eu.more2020.visual.grpc.HelloReply other = (eu.more2020.visual.grpc.HelloReply) obj;
+    eu.more2020.visual.grpc.Inference other = (eu.more2020.visual.grpc.Inference) obj;
 
-    if (!getMessage()
-        .equals(other.getMessage())) return false;
+    if (!getPredictions()
+        .equals(other.getPredictions())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -186,76 +155,76 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
-    hash = (53 * hash) + getMessage().hashCode();
+    hash = (37 * hash) + PREDICTIONS_FIELD_NUMBER;
+    hash = (53 * hash) + getPredictions().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
   }
 
-  public static eu.more2020.visual.grpc.HelloReply parseFrom(
+  public static eu.more2020.visual.grpc.Inference parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static eu.more2020.visual.grpc.HelloReply parseFrom(
+  public static eu.more2020.visual.grpc.Inference parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static eu.more2020.visual.grpc.HelloReply parseFrom(
+  public static eu.more2020.visual.grpc.Inference parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static eu.more2020.visual.grpc.HelloReply parseFrom(
+  public static eu.more2020.visual.grpc.Inference parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static eu.more2020.visual.grpc.HelloReply parseFrom(byte[] data)
+  public static eu.more2020.visual.grpc.Inference parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static eu.more2020.visual.grpc.HelloReply parseFrom(
+  public static eu.more2020.visual.grpc.Inference parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static eu.more2020.visual.grpc.HelloReply parseFrom(java.io.InputStream input)
+  public static eu.more2020.visual.grpc.Inference parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static eu.more2020.visual.grpc.HelloReply parseFrom(
+  public static eu.more2020.visual.grpc.Inference parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
-  public static eu.more2020.visual.grpc.HelloReply parseDelimitedFrom(java.io.InputStream input)
+  public static eu.more2020.visual.grpc.Inference parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
-  public static eu.more2020.visual.grpc.HelloReply parseDelimitedFrom(
+  public static eu.more2020.visual.grpc.Inference parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static eu.more2020.visual.grpc.HelloReply parseFrom(
+  public static eu.more2020.visual.grpc.Inference parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static eu.more2020.visual.grpc.HelloReply parseFrom(
+  public static eu.more2020.visual.grpc.Inference parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -268,7 +237,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(eu.more2020.visual.grpc.HelloReply prototype) {
+  public static Builder newBuilder(eu.more2020.visual.grpc.Inference prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -284,30 +253,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * <pre>
-   * The response message containing the greetings
-   * </pre>
-   *
-   * Protobuf type {@code eu.more2020.visual.grpc.HelloReply}
+   * Protobuf type {@code eu.more2020.visual.grpc.Inference}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:eu.more2020.visual.grpc.HelloReply)
-      eu.more2020.visual.grpc.HelloReplyOrBuilder {
+      // @@protoc_insertion_point(builder_implements:eu.more2020.visual.grpc.Inference)
+      eu.more2020.visual.grpc.InferenceOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return eu.more2020.visual.grpc.HelloWorldProto.internal_static_eu_more2020_visual_grpc_HelloReply_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Inference_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return eu.more2020.visual.grpc.HelloWorldProto.internal_static_eu_more2020_visual_grpc_HelloReply_fieldAccessorTable
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Inference_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              eu.more2020.visual.grpc.HelloReply.class, eu.more2020.visual.grpc.HelloReply.Builder.class);
+              eu.more2020.visual.grpc.Inference.class, eu.more2020.visual.grpc.Inference.Builder.class);
     }
 
-    // Construct using eu.more2020.visual.grpc.HelloReply.newBuilder()
+    // Construct using eu.more2020.visual.grpc.Inference.newBuilder()
     private Builder() {
       maybeForceBuilderInitialization();
     }
@@ -325,7 +290,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      message_ = "";
+      predictions_ = com.google.protobuf.ByteString.EMPTY;
 
       return this;
     }
@@ -333,17 +298,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return eu.more2020.visual.grpc.HelloWorldProto.internal_static_eu_more2020_visual_grpc_HelloReply_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Inference_descriptor;
     }
 
     @java.lang.Override
-    public eu.more2020.visual.grpc.HelloReply getDefaultInstanceForType() {
-      return eu.more2020.visual.grpc.HelloReply.getDefaultInstance();
+    public eu.more2020.visual.grpc.Inference getDefaultInstanceForType() {
+      return eu.more2020.visual.grpc.Inference.getDefaultInstance();
     }
 
     @java.lang.Override
-    public eu.more2020.visual.grpc.HelloReply build() {
-      eu.more2020.visual.grpc.HelloReply result = buildPartial();
+    public eu.more2020.visual.grpc.Inference build() {
+      eu.more2020.visual.grpc.Inference result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -351,9 +316,9 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public eu.more2020.visual.grpc.HelloReply buildPartial() {
-      eu.more2020.visual.grpc.HelloReply result = new eu.more2020.visual.grpc.HelloReply(this);
-      result.message_ = message_;
+    public eu.more2020.visual.grpc.Inference buildPartial() {
+      eu.more2020.visual.grpc.Inference result = new eu.more2020.visual.grpc.Inference(this);
+      result.predictions_ = predictions_;
       onBuilt();
       return result;
     }
@@ -392,19 +357,18 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof eu.more2020.visual.grpc.HelloReply) {
-        return mergeFrom((eu.more2020.visual.grpc.HelloReply)other);
+      if (other instanceof eu.more2020.visual.grpc.Inference) {
+        return mergeFrom((eu.more2020.visual.grpc.Inference)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(eu.more2020.visual.grpc.HelloReply other) {
-      if (other == eu.more2020.visual.grpc.HelloReply.getDefaultInstance()) return this;
-      if (!other.getMessage().isEmpty()) {
-        message_ = other.message_;
-        onChanged();
+    public Builder mergeFrom(eu.more2020.visual.grpc.Inference other) {
+      if (other == eu.more2020.visual.grpc.Inference.getDefaultInstance()) return this;
+      if (other.getPredictions() != com.google.protobuf.ByteString.EMPTY) {
+        setPredictions(other.getPredictions());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -421,11 +385,11 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      eu.more2020.visual.grpc.HelloReply parsedMessage = null;
+      eu.more2020.visual.grpc.Inference parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (eu.more2020.visual.grpc.HelloReply) e.getUnfinishedMessage();
+        parsedMessage = (eu.more2020.visual.grpc.Inference) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
         if (parsedMessage != null) {
@@ -435,78 +399,36 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private java.lang.Object message_ = "";
+    private com.google.protobuf.ByteString predictions_ = com.google.protobuf.ByteString.EMPTY;
     /**
-     * <code>string message = 1;</code>
-     * @return The message.
+     * <code>bytes predictions = 1;</code>
+     * @return The predictions.
      */
-    public java.lang.String getMessage() {
-      java.lang.Object ref = message_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        message_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
+    @java.lang.Override
+    public com.google.protobuf.ByteString getPredictions() {
+      return predictions_;
     }
     /**
-     * <code>string message = 1;</code>
-     * @return The bytes for message.
-     */
-    public com.google.protobuf.ByteString
-        getMessageBytes() {
-      java.lang.Object ref = message_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        message_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string message = 1;</code>
-     * @param value The message to set.
+     * <code>bytes predictions = 1;</code>
+     * @param value The predictions to set.
      * @return This builder for chaining.
      */
-    public Builder setMessage(
-        java.lang.String value) {
+    public Builder setPredictions(com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
   
-      message_ = value;
+      predictions_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>string message = 1;</code>
+     * <code>bytes predictions = 1;</code>
      * @return This builder for chaining.
      */
-    public Builder clearMessage() {
+    public Builder clearPredictions() {
       
-      message_ = getDefaultInstance().getMessage();
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string message = 1;</code>
-     * @param value The bytes for message to set.
-     * @return This builder for chaining.
-     */
-    public Builder setMessageBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
-      message_ = value;
+      predictions_ = getDefaultInstance().getPredictions();
       onChanged();
       return this;
     }
@@ -523,41 +445,41 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:eu.more2020.visual.grpc.HelloReply)
+    // @@protoc_insertion_point(builder_scope:eu.more2020.visual.grpc.Inference)
   }
 
-  // @@protoc_insertion_point(class_scope:eu.more2020.visual.grpc.HelloReply)
-  private static final eu.more2020.visual.grpc.HelloReply DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:eu.more2020.visual.grpc.Inference)
+  private static final eu.more2020.visual.grpc.Inference DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new eu.more2020.visual.grpc.HelloReply();
+    DEFAULT_INSTANCE = new eu.more2020.visual.grpc.Inference();
   }
 
-  public static eu.more2020.visual.grpc.HelloReply getDefaultInstance() {
+  public static eu.more2020.visual.grpc.Inference getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<HelloReply>
-      PARSER = new com.google.protobuf.AbstractParser<HelloReply>() {
+  private static final com.google.protobuf.Parser<Inference>
+      PARSER = new com.google.protobuf.AbstractParser<Inference>() {
     @java.lang.Override
-    public HelloReply parsePartialFrom(
+    public Inference parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new HelloReply(input, extensionRegistry);
+      return new Inference(input, extensionRegistry);
     }
   };
 
-  public static com.google.protobuf.Parser<HelloReply> parser() {
+  public static com.google.protobuf.Parser<Inference> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<HelloReply> getParserForType() {
+  public com.google.protobuf.Parser<Inference> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public eu.more2020.visual.grpc.HelloReply getDefaultInstanceForType() {
+  public eu.more2020.visual.grpc.Inference getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

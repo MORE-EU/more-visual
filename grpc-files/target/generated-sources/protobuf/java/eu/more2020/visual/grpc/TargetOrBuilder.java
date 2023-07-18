@@ -3,8 +3,8 @@
 
 package eu.more2020.visual.grpc;
 
-public interface HelloRequestOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:eu.more2020.visual.grpc.HelloRequest)
+public interface TargetOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:eu.more2020.visual.grpc.Target)
     com.google.protobuf.MessageOrBuilder {
 
   /**
@@ -18,4 +18,16 @@ public interface HelloRequestOrBuilder extends
    */
   com.google.protobuf.ByteString
       getNameBytes();
+
+  /**
+   * <code>string id = 2;</code>
+   * @return The id.
+   */
+  java.lang.String getId();
+  /**
+   * <code>string id = 2;</code>
+   * @return The bytes for id.
+   */
+  com.google.protobuf.ByteString
+      getIdBytes();
 }

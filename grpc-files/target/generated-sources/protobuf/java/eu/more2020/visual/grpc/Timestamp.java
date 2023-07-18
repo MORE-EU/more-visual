@@ -4,30 +4,26 @@
 package eu.more2020.visual.grpc;
 
 /**
- * <pre>
- * The request message containing the user's name.
- * </pre>
- *
- * Protobuf type {@code eu.more2020.visual.grpc.HelloRequest}
+ * Protobuf type {@code eu.more2020.visual.grpc.Timestamp}
  */
-public final class HelloRequest extends
+public final class Timestamp extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:eu.more2020.visual.grpc.HelloRequest)
-    HelloRequestOrBuilder {
+    // @@protoc_insertion_point(message_implements:eu.more2020.visual.grpc.Timestamp)
+    TimestampOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use HelloRequest.newBuilder() to construct.
-  private HelloRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use Timestamp.newBuilder() to construct.
+  private Timestamp(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private HelloRequest() {
-    name_ = "";
+  private Timestamp() {
+    modelName_ = "";
   }
 
   @java.lang.Override
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
       UnusedPrivateParameter unused) {
-    return new HelloRequest();
+    return new Timestamp();
   }
 
   @java.lang.Override
@@ -35,7 +31,7 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-  private HelloRequest(
+  private Timestamp(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -53,10 +49,15 @@ private static final long serialVersionUID = 0L;
           case 0:
             done = true;
             break;
-          case 10: {
+          case 8: {
+
+            timestamp_ = input.readInt64();
+            break;
+          }
+          case 18: {
             java.lang.String s = input.readStringRequireUtf8();
 
-            name_ = s;
+            modelName_ = s;
             break;
           }
           default: {
@@ -80,49 +81,60 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return eu.more2020.visual.grpc.HelloWorldProto.internal_static_eu_more2020_visual_grpc_HelloRequest_descriptor;
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Timestamp_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return eu.more2020.visual.grpc.HelloWorldProto.internal_static_eu_more2020_visual_grpc_HelloRequest_fieldAccessorTable
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Timestamp_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            eu.more2020.visual.grpc.HelloRequest.class, eu.more2020.visual.grpc.HelloRequest.Builder.class);
+            eu.more2020.visual.grpc.Timestamp.class, eu.more2020.visual.grpc.Timestamp.Builder.class);
   }
 
-  public static final int NAME_FIELD_NUMBER = 1;
-  private volatile java.lang.Object name_;
+  public static final int TIMESTAMP_FIELD_NUMBER = 1;
+  private long timestamp_;
   /**
-   * <code>string name = 1;</code>
-   * @return The name.
+   * <code>int64 timestamp = 1;</code>
+   * @return The timestamp.
    */
   @java.lang.Override
-  public java.lang.String getName() {
-    java.lang.Object ref = name_;
+  public long getTimestamp() {
+    return timestamp_;
+  }
+
+  public static final int MODEL_NAME_FIELD_NUMBER = 2;
+  private volatile java.lang.Object modelName_;
+  /**
+   * <code>string model_name = 2;</code>
+   * @return The modelName.
+   */
+  @java.lang.Override
+  public java.lang.String getModelName() {
+    java.lang.Object ref = modelName_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      name_ = s;
+      modelName_ = s;
       return s;
     }
   }
   /**
-   * <code>string name = 1;</code>
-   * @return The bytes for name.
+   * <code>string model_name = 2;</code>
+   * @return The bytes for modelName.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getNameBytes() {
-    java.lang.Object ref = name_;
+      getModelNameBytes() {
+    java.lang.Object ref = modelName_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      name_ = b;
+      modelName_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
@@ -143,8 +155,11 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
+    if (timestamp_ != 0L) {
+      output.writeInt64(1, timestamp_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(modelName_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, modelName_);
     }
     unknownFields.writeTo(output);
   }
@@ -155,8 +170,12 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
+    if (timestamp_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt64Size(1, timestamp_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(modelName_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, modelName_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -168,13 +187,15 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof eu.more2020.visual.grpc.HelloRequest)) {
+    if (!(obj instanceof eu.more2020.visual.grpc.Timestamp)) {
       return super.equals(obj);
     }
-    eu.more2020.visual.grpc.HelloRequest other = (eu.more2020.visual.grpc.HelloRequest) obj;
+    eu.more2020.visual.grpc.Timestamp other = (eu.more2020.visual.grpc.Timestamp) obj;
 
-    if (!getName()
-        .equals(other.getName())) return false;
+    if (getTimestamp()
+        != other.getTimestamp()) return false;
+    if (!getModelName()
+        .equals(other.getModelName())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -186,76 +207,79 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + NAME_FIELD_NUMBER;
-    hash = (53 * hash) + getName().hashCode();
+    hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getTimestamp());
+    hash = (37 * hash) + MODEL_NAME_FIELD_NUMBER;
+    hash = (53 * hash) + getModelName().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
   }
 
-  public static eu.more2020.visual.grpc.HelloRequest parseFrom(
+  public static eu.more2020.visual.grpc.Timestamp parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static eu.more2020.visual.grpc.HelloRequest parseFrom(
+  public static eu.more2020.visual.grpc.Timestamp parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static eu.more2020.visual.grpc.HelloRequest parseFrom(
+  public static eu.more2020.visual.grpc.Timestamp parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static eu.more2020.visual.grpc.HelloRequest parseFrom(
+  public static eu.more2020.visual.grpc.Timestamp parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static eu.more2020.visual.grpc.HelloRequest parseFrom(byte[] data)
+  public static eu.more2020.visual.grpc.Timestamp parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static eu.more2020.visual.grpc.HelloRequest parseFrom(
+  public static eu.more2020.visual.grpc.Timestamp parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static eu.more2020.visual.grpc.HelloRequest parseFrom(java.io.InputStream input)
+  public static eu.more2020.visual.grpc.Timestamp parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static eu.more2020.visual.grpc.HelloRequest parseFrom(
+  public static eu.more2020.visual.grpc.Timestamp parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
-  public static eu.more2020.visual.grpc.HelloRequest parseDelimitedFrom(java.io.InputStream input)
+  public static eu.more2020.visual.grpc.Timestamp parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
-  public static eu.more2020.visual.grpc.HelloRequest parseDelimitedFrom(
+  public static eu.more2020.visual.grpc.Timestamp parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static eu.more2020.visual.grpc.HelloRequest parseFrom(
+  public static eu.more2020.visual.grpc.Timestamp parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static eu.more2020.visual.grpc.HelloRequest parseFrom(
+  public static eu.more2020.visual.grpc.Timestamp parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -268,7 +292,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(eu.more2020.visual.grpc.HelloRequest prototype) {
+  public static Builder newBuilder(eu.more2020.visual.grpc.Timestamp prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -284,30 +308,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * <pre>
-   * The request message containing the user's name.
-   * </pre>
-   *
-   * Protobuf type {@code eu.more2020.visual.grpc.HelloRequest}
+   * Protobuf type {@code eu.more2020.visual.grpc.Timestamp}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:eu.more2020.visual.grpc.HelloRequest)
-      eu.more2020.visual.grpc.HelloRequestOrBuilder {
+      // @@protoc_insertion_point(builder_implements:eu.more2020.visual.grpc.Timestamp)
+      eu.more2020.visual.grpc.TimestampOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return eu.more2020.visual.grpc.HelloWorldProto.internal_static_eu_more2020_visual_grpc_HelloRequest_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Timestamp_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return eu.more2020.visual.grpc.HelloWorldProto.internal_static_eu_more2020_visual_grpc_HelloRequest_fieldAccessorTable
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Timestamp_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              eu.more2020.visual.grpc.HelloRequest.class, eu.more2020.visual.grpc.HelloRequest.Builder.class);
+              eu.more2020.visual.grpc.Timestamp.class, eu.more2020.visual.grpc.Timestamp.Builder.class);
     }
 
-    // Construct using eu.more2020.visual.grpc.HelloRequest.newBuilder()
+    // Construct using eu.more2020.visual.grpc.Timestamp.newBuilder()
     private Builder() {
       maybeForceBuilderInitialization();
     }
@@ -325,7 +345,9 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      name_ = "";
+      timestamp_ = 0L;
+
+      modelName_ = "";
 
       return this;
     }
@@ -333,17 +355,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return eu.more2020.visual.grpc.HelloWorldProto.internal_static_eu_more2020_visual_grpc_HelloRequest_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Timestamp_descriptor;
     }
 
     @java.lang.Override
-    public eu.more2020.visual.grpc.HelloRequest getDefaultInstanceForType() {
-      return eu.more2020.visual.grpc.HelloRequest.getDefaultInstance();
+    public eu.more2020.visual.grpc.Timestamp getDefaultInstanceForType() {
+      return eu.more2020.visual.grpc.Timestamp.getDefaultInstance();
     }
 
     @java.lang.Override
-    public eu.more2020.visual.grpc.HelloRequest build() {
-      eu.more2020.visual.grpc.HelloRequest result = buildPartial();
+    public eu.more2020.visual.grpc.Timestamp build() {
+      eu.more2020.visual.grpc.Timestamp result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -351,9 +373,10 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public eu.more2020.visual.grpc.HelloRequest buildPartial() {
-      eu.more2020.visual.grpc.HelloRequest result = new eu.more2020.visual.grpc.HelloRequest(this);
-      result.name_ = name_;
+    public eu.more2020.visual.grpc.Timestamp buildPartial() {
+      eu.more2020.visual.grpc.Timestamp result = new eu.more2020.visual.grpc.Timestamp(this);
+      result.timestamp_ = timestamp_;
+      result.modelName_ = modelName_;
       onBuilt();
       return result;
     }
@@ -392,18 +415,21 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof eu.more2020.visual.grpc.HelloRequest) {
-        return mergeFrom((eu.more2020.visual.grpc.HelloRequest)other);
+      if (other instanceof eu.more2020.visual.grpc.Timestamp) {
+        return mergeFrom((eu.more2020.visual.grpc.Timestamp)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(eu.more2020.visual.grpc.HelloRequest other) {
-      if (other == eu.more2020.visual.grpc.HelloRequest.getDefaultInstance()) return this;
-      if (!other.getName().isEmpty()) {
-        name_ = other.name_;
+    public Builder mergeFrom(eu.more2020.visual.grpc.Timestamp other) {
+      if (other == eu.more2020.visual.grpc.Timestamp.getDefaultInstance()) return this;
+      if (other.getTimestamp() != 0L) {
+        setTimestamp(other.getTimestamp());
+      }
+      if (!other.getModelName().isEmpty()) {
+        modelName_ = other.modelName_;
         onChanged();
       }
       this.mergeUnknownFields(other.unknownFields);
@@ -421,11 +447,11 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      eu.more2020.visual.grpc.HelloRequest parsedMessage = null;
+      eu.more2020.visual.grpc.Timestamp parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (eu.more2020.visual.grpc.HelloRequest) e.getUnfinishedMessage();
+        parsedMessage = (eu.more2020.visual.grpc.Timestamp) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
         if (parsedMessage != null) {
@@ -435,78 +461,109 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private java.lang.Object name_ = "";
+    private long timestamp_ ;
     /**
-     * <code>string name = 1;</code>
-     * @return The name.
+     * <code>int64 timestamp = 1;</code>
+     * @return The timestamp.
      */
-    public java.lang.String getName() {
-      java.lang.Object ref = name_;
+    @java.lang.Override
+    public long getTimestamp() {
+      return timestamp_;
+    }
+    /**
+     * <code>int64 timestamp = 1;</code>
+     * @param value The timestamp to set.
+     * @return This builder for chaining.
+     */
+    public Builder setTimestamp(long value) {
+      
+      timestamp_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int64 timestamp = 1;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearTimestamp() {
+      
+      timestamp_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object modelName_ = "";
+    /**
+     * <code>string model_name = 2;</code>
+     * @return The modelName.
+     */
+    public java.lang.String getModelName() {
+      java.lang.Object ref = modelName_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        name_ = s;
+        modelName_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>string name = 1;</code>
-     * @return The bytes for name.
+     * <code>string model_name = 2;</code>
+     * @return The bytes for modelName.
      */
     public com.google.protobuf.ByteString
-        getNameBytes() {
-      java.lang.Object ref = name_;
+        getModelNameBytes() {
+      java.lang.Object ref = modelName_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        name_ = b;
+        modelName_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>string name = 1;</code>
-     * @param value The name to set.
+     * <code>string model_name = 2;</code>
+     * @param value The modelName to set.
      * @return This builder for chaining.
      */
-    public Builder setName(
+    public Builder setModelName(
         java.lang.String value) {
       if (value == null) {
     throw new NullPointerException();
   }
   
-      name_ = value;
+      modelName_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>string name = 1;</code>
+     * <code>string model_name = 2;</code>
      * @return This builder for chaining.
      */
-    public Builder clearName() {
+    public Builder clearModelName() {
       
-      name_ = getDefaultInstance().getName();
+      modelName_ = getDefaultInstance().getModelName();
       onChanged();
       return this;
     }
     /**
-     * <code>string name = 1;</code>
-     * @param value The bytes for name to set.
+     * <code>string model_name = 2;</code>
+     * @param value The bytes for modelName to set.
      * @return This builder for chaining.
      */
-    public Builder setNameBytes(
+    public Builder setModelNameBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
       
-      name_ = value;
+      modelName_ = value;
       onChanged();
       return this;
     }
@@ -523,41 +580,41 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:eu.more2020.visual.grpc.HelloRequest)
+    // @@protoc_insertion_point(builder_scope:eu.more2020.visual.grpc.Timestamp)
   }
 
-  // @@protoc_insertion_point(class_scope:eu.more2020.visual.grpc.HelloRequest)
-  private static final eu.more2020.visual.grpc.HelloRequest DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:eu.more2020.visual.grpc.Timestamp)
+  private static final eu.more2020.visual.grpc.Timestamp DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new eu.more2020.visual.grpc.HelloRequest();
+    DEFAULT_INSTANCE = new eu.more2020.visual.grpc.Timestamp();
   }
 
-  public static eu.more2020.visual.grpc.HelloRequest getDefaultInstance() {
+  public static eu.more2020.visual.grpc.Timestamp getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<HelloRequest>
-      PARSER = new com.google.protobuf.AbstractParser<HelloRequest>() {
+  private static final com.google.protobuf.Parser<Timestamp>
+      PARSER = new com.google.protobuf.AbstractParser<Timestamp>() {
     @java.lang.Override
-    public HelloRequest parsePartialFrom(
+    public Timestamp parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new HelloRequest(input, extensionRegistry);
+      return new Timestamp(input, extensionRegistry);
     }
   };
 
-  public static com.google.protobuf.Parser<HelloRequest> parser() {
+  public static com.google.protobuf.Parser<Timestamp> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<HelloRequest> getParserForType() {
+  public com.google.protobuf.Parser<Timestamp> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public eu.more2020.visual.grpc.HelloRequest getDefaultInstanceForType() {
+  public eu.more2020.visual.grpc.Timestamp getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 
