@@ -1,8 +1,9 @@
 package eu.more2020.visual.domain.Grpc;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class PredictionsRes {
+public class PredictionsRes implements Serializable {
     private Map<String, Float> predictions;
     private Map<String, Float> evaluation;
 

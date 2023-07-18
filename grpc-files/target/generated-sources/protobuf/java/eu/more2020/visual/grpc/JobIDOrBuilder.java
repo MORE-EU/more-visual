@@ -4,7 +4,7 @@
 package eu.more2020.visual.grpc;
 
 public interface JobIDOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:eu.more2020.visual.grpc.JobID)
+    // @@protoc_insertion_point(interface_extends:JobID)
     com.google.protobuf.MessageOrBuilder {
 
   /**

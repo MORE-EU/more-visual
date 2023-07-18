@@ -1,6 +1,8 @@
 package eu.more2020.visual.domain.Grpc;
 
-public class AllResultsRes {
+import java.io.Serializable;
+
+public class AllResultsRes implements Serializable {
     private ResultsRes[] results;
 
     public ResultsRes[] getResults() {
@@ -13,6 +15,9 @@ public class AllResultsRes {
 
     public AllResultsRes(ResultsRes[] results) {
         this.results = results;
+    }
+
+    public AllResultsRes() {
     }
 
 }

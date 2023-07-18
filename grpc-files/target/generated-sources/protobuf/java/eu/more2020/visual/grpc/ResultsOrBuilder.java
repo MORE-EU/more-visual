@@ -4,7 +4,7 @@
 package eu.more2020.visual.grpc;
 
 public interface ResultsOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:eu.more2020.visual.grpc.Results)
+    // @@protoc_insertion_point(interface_extends:Results)
     com.google.protobuf.MessageOrBuilder {
 
   /**
@@ -24,7 +24,7 @@ public interface ResultsOrBuilder extends
    * string = model name
    * </pre>
    *
-   * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+   * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
    */
   int getMetricsCount();
   /**
@@ -32,7 +32,7 @@ public interface ResultsOrBuilder extends
    * string = model name
    * </pre>
    *
-   * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+   * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
    */
   boolean containsMetrics(
       java.lang.String key);
@@ -47,7 +47,7 @@ public interface ResultsOrBuilder extends
    * string = model name
    * </pre>
    *
-   * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+   * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
    */
   java.util.Map<java.lang.String, eu.more2020.visual.grpc.Predictions>
   getMetricsMap();
@@ -56,7 +56,7 @@ public interface ResultsOrBuilder extends
    * string = model name
    * </pre>
    *
-   * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+   * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
    */
 
   eu.more2020.visual.grpc.Predictions getMetricsOrDefault(
@@ -67,7 +67,7 @@ public interface ResultsOrBuilder extends
    * string = model name
    * </pre>
    *
-   * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+   * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
    */
 
   eu.more2020.visual.grpc.Predictions getMetricsOrThrow(

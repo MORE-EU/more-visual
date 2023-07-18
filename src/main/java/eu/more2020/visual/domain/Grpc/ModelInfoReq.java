@@ -1,6 +1,8 @@
 package eu.more2020.visual.domain.Grpc;
 
-public class ModelInfoReq {
+import java.io.Serializable;
+
+public class ModelInfoReq implements Serializable {
     private String model_type;
     private String model_name;
     private String target;
@@ -33,6 +35,9 @@ public class ModelInfoReq {
         this.model_type = model_type;
         this.model_name = model_name;
         this.target = target;
+    }
+
+    public ModelInfoReq() {
     }
 
 }

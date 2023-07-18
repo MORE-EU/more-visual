@@ -1,6 +1,8 @@
 package eu.more2020.visual.domain.Grpc;
 
-public class InferenceRes {
+import java.io.Serializable;
+
+public class InferenceRes implements Serializable {
     private byte[] predictions;
 
     public byte[] getPredictions() {
@@ -13,6 +15,9 @@ public class InferenceRes {
 
     public InferenceRes(byte[] predictions) {
         this.predictions = predictions;
+    }
+
+    public InferenceRes() {
     }
 
 }

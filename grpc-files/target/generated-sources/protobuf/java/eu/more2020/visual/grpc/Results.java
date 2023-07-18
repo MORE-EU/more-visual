@@ -4,11 +4,11 @@
 package eu.more2020.visual.grpc;
 
 /**
- * Protobuf type {@code eu.more2020.visual.grpc.Results}
+ * Protobuf type {@code Results}
  */
 public final class Results extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:eu.more2020.visual.grpc.Results)
+    // @@protoc_insertion_point(message_implements:Results)
     ResultsOrBuilder {
 private static final long serialVersionUID = 0L;
   // Use Results.newBuilder() to construct.
@@ -90,7 +90,7 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Results_descriptor;
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_Results_descriptor;
   }
 
   @SuppressWarnings({"rawtypes"})
@@ -108,7 +108,7 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Results_fieldAccessorTable
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_Results_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             eu.more2020.visual.grpc.Results.class, eu.more2020.visual.grpc.Results.Builder.class);
   }
@@ -157,7 +157,7 @@ private static final long serialVersionUID = 0L;
         java.lang.String, eu.more2020.visual.grpc.Predictions> defaultEntry =
             com.google.protobuf.MapEntry
             .<java.lang.String, eu.more2020.visual.grpc.Predictions>newDefaultInstance(
-                eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Results_MetricsEntry_descriptor, 
+                eu.more2020.visual.grpc.GrpcProto.internal_static_Results_MetricsEntry_descriptor, 
                 com.google.protobuf.WireFormat.FieldType.STRING,
                 "",
                 com.google.protobuf.WireFormat.FieldType.MESSAGE,
@@ -182,7 +182,7 @@ private static final long serialVersionUID = 0L;
    * string = model name
    * </pre>
    *
-   * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+   * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
    */
 
   @java.lang.Override
@@ -204,7 +204,7 @@ private static final long serialVersionUID = 0L;
    * string = model name
    * </pre>
    *
-   * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+   * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
    */
   @java.lang.Override
 
@@ -216,7 +216,7 @@ private static final long serialVersionUID = 0L;
    * string = model name
    * </pre>
    *
-   * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+   * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
    */
   @java.lang.Override
 
@@ -233,7 +233,7 @@ private static final long serialVersionUID = 0L;
    * string = model name
    * </pre>
    *
-   * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+   * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
    */
   @java.lang.Override
 
@@ -425,15 +425,15 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code eu.more2020.visual.grpc.Results}
+   * Protobuf type {@code Results}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:eu.more2020.visual.grpc.Results)
+      // @@protoc_insertion_point(builder_implements:Results)
       eu.more2020.visual.grpc.ResultsOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Results_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Results_descriptor;
     }
 
     @SuppressWarnings({"rawtypes"})
@@ -461,7 +461,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Results_fieldAccessorTable
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Results_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               eu.more2020.visual.grpc.Results.class, eu.more2020.visual.grpc.Results.Builder.class);
     }
@@ -493,7 +493,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Results_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Results_descriptor;
     }
 
     @java.lang.Override
@@ -708,7 +708,7 @@ private static final long serialVersionUID = 0L;
      * string = model name
      * </pre>
      *
-     * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+     * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
      */
 
     @java.lang.Override
@@ -730,7 +730,7 @@ private static final long serialVersionUID = 0L;
      * string = model name
      * </pre>
      *
-     * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+     * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
      */
     @java.lang.Override
 
@@ -742,7 +742,7 @@ private static final long serialVersionUID = 0L;
      * string = model name
      * </pre>
      *
-     * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+     * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
      */
     @java.lang.Override
 
@@ -759,7 +759,7 @@ private static final long serialVersionUID = 0L;
      * string = model name
      * </pre>
      *
-     * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+     * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
      */
     @java.lang.Override
 
@@ -784,7 +784,7 @@ private static final long serialVersionUID = 0L;
      * string = model name
      * </pre>
      *
-     * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+     * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
      */
 
     public Builder removeMetrics(
@@ -807,7 +807,7 @@ private static final long serialVersionUID = 0L;
      * string = model name
      * </pre>
      *
-     * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+     * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
      */
     public Builder putMetrics(
         java.lang.String key,
@@ -826,7 +826,7 @@ private static final long serialVersionUID = 0L;
      * string = model name
      * </pre>
      *
-     * <code>map&lt;string, .eu.more2020.visual.grpc.Predictions&gt; metrics = 2;</code>
+     * <code>map&lt;string, .Predictions&gt; metrics = 2;</code>
      */
 
     public Builder putAllMetrics(
@@ -848,10 +848,10 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:eu.more2020.visual.grpc.Results)
+    // @@protoc_insertion_point(builder_scope:Results)
   }
 
-  // @@protoc_insertion_point(class_scope:eu.more2020.visual.grpc.Results)
+  // @@protoc_insertion_point(class_scope:Results)
   private static final eu.more2020.visual.grpc.Results DEFAULT_INSTANCE;
   static {
     DEFAULT_INSTANCE = new eu.more2020.visual.grpc.Results();

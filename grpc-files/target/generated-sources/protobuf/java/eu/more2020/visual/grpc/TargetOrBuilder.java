@@ -4,7 +4,7 @@
 package eu.more2020.visual.grpc;
 
 public interface TargetOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:eu.more2020.visual.grpc.Target)
+    // @@protoc_insertion_point(interface_extends:Target)
     com.google.protobuf.MessageOrBuilder {
 
   /**

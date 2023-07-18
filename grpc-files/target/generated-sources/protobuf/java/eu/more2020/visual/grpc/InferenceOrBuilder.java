@@ -4,7 +4,7 @@
 package eu.more2020.visual.grpc;
 
 public interface InferenceOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:eu.more2020.visual.grpc.Inference)
+    // @@protoc_insertion_point(interface_extends:Inference)
     com.google.protobuf.MessageOrBuilder {
 
   /**

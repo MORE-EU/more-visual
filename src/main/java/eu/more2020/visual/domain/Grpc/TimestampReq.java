@@ -1,6 +1,8 @@
 package eu.more2020.visual.domain.Grpc;
 
-public class TimestampReq {
+import java.io.Serializable;
+
+public class TimestampReq implements Serializable {
     private Integer timestamp;
     private String model_name;
 
@@ -23,6 +25,9 @@ public class TimestampReq {
     public TimestampReq(Integer timestamp, String model_name) {
         this.timestamp = timestamp;
         this.model_name = model_name;
+    }
+
+    public TimestampReq() {
     }
 
 }

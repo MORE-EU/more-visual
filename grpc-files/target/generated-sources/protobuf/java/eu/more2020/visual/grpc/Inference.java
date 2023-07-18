@@ -4,11 +4,11 @@
 package eu.more2020.visual.grpc;
 
 /**
- * Protobuf type {@code eu.more2020.visual.grpc.Inference}
+ * Protobuf type {@code Inference}
  */
 public final class Inference extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:eu.more2020.visual.grpc.Inference)
+    // @@protoc_insertion_point(message_implements:Inference)
     InferenceOrBuilder {
 private static final long serialVersionUID = 0L;
   // Use Inference.newBuilder() to construct.
@@ -75,13 +75,13 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Inference_descriptor;
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_Inference_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Inference_fieldAccessorTable
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_Inference_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             eu.more2020.visual.grpc.Inference.class, eu.more2020.visual.grpc.Inference.Builder.class);
   }
@@ -253,21 +253,21 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code eu.more2020.visual.grpc.Inference}
+   * Protobuf type {@code Inference}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:eu.more2020.visual.grpc.Inference)
+      // @@protoc_insertion_point(builder_implements:Inference)
       eu.more2020.visual.grpc.InferenceOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Inference_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Inference_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Inference_fieldAccessorTable
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Inference_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               eu.more2020.visual.grpc.Inference.class, eu.more2020.visual.grpc.Inference.Builder.class);
     }
@@ -298,7 +298,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Inference_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Inference_descriptor;
     }
 
     @java.lang.Override
@@ -445,10 +445,10 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:eu.more2020.visual.grpc.Inference)
+    // @@protoc_insertion_point(builder_scope:Inference)
   }
 
-  // @@protoc_insertion_point(class_scope:eu.more2020.visual.grpc.Inference)
+  // @@protoc_insertion_point(class_scope:Inference)
   private static final eu.more2020.visual.grpc.Inference DEFAULT_INSTANCE;
   static {
     DEFAULT_INSTANCE = new eu.more2020.visual.grpc.Inference();

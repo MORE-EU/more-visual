@@ -41,7 +41,7 @@ public class AutoMLCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
                 .usePlaintext()
                 .build();
 
@@ -72,7 +72,7 @@ public class AutoMLCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
                 .usePlaintext()
                 .build();
 
@@ -104,7 +104,7 @@ public class AutoMLCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
                 .usePlaintext()
                 .build();
 
@@ -135,7 +135,7 @@ public class AutoMLCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
                 .usePlaintext()
                 .build();
 
@@ -167,7 +167,7 @@ public class AutoMLCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
                 .usePlaintext()
                 .build();
 
@@ -200,7 +200,7 @@ public class AutoMLCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
                 .usePlaintext()
                 .build();
 

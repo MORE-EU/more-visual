@@ -4,7 +4,7 @@
 package eu.more2020.visual.grpc;
 
 public interface PredictionsOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:eu.more2020.visual.grpc.Predictions)
+    // @@protoc_insertion_point(interface_extends:Predictions)
     com.google.protobuf.MessageOrBuilder {
 
   /**

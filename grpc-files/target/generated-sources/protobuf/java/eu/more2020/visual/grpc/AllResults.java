@@ -4,11 +4,11 @@
 package eu.more2020.visual.grpc;
 
 /**
- * Protobuf type {@code eu.more2020.visual.grpc.AllResults}
+ * Protobuf type {@code AllResults}
  */
 public final class AllResults extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:eu.more2020.visual.grpc.AllResults)
+    // @@protoc_insertion_point(message_implements:AllResults)
     AllResultsOrBuilder {
 private static final long serialVersionUID = 0L;
   // Use AllResults.newBuilder() to construct.
@@ -83,13 +83,13 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_AllResults_descriptor;
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_AllResults_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_AllResults_fieldAccessorTable
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_AllResults_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             eu.more2020.visual.grpc.AllResults.class, eu.more2020.visual.grpc.AllResults.Builder.class);
   }
@@ -97,14 +97,14 @@ private static final long serialVersionUID = 0L;
   public static final int RESULTS_FIELD_NUMBER = 1;
   private java.util.List<eu.more2020.visual.grpc.Results> results_;
   /**
-   * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+   * <code>repeated .Results results = 1;</code>
    */
   @java.lang.Override
   public java.util.List<eu.more2020.visual.grpc.Results> getResultsList() {
     return results_;
   }
   /**
-   * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+   * <code>repeated .Results results = 1;</code>
    */
   @java.lang.Override
   public java.util.List<? extends eu.more2020.visual.grpc.ResultsOrBuilder> 
@@ -112,21 +112,21 @@ private static final long serialVersionUID = 0L;
     return results_;
   }
   /**
-   * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+   * <code>repeated .Results results = 1;</code>
    */
   @java.lang.Override
   public int getResultsCount() {
     return results_.size();
   }
   /**
-   * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+   * <code>repeated .Results results = 1;</code>
    */
   @java.lang.Override
   public eu.more2020.visual.grpc.Results getResults(int index) {
     return results_.get(index);
   }
   /**
-   * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+   * <code>repeated .Results results = 1;</code>
    */
   @java.lang.Override
   public eu.more2020.visual.grpc.ResultsOrBuilder getResultsOrBuilder(
@@ -292,21 +292,21 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code eu.more2020.visual.grpc.AllResults}
+   * Protobuf type {@code AllResults}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:eu.more2020.visual.grpc.AllResults)
+      // @@protoc_insertion_point(builder_implements:AllResults)
       eu.more2020.visual.grpc.AllResultsOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_AllResults_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_AllResults_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_AllResults_fieldAccessorTable
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_AllResults_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               eu.more2020.visual.grpc.AllResults.class, eu.more2020.visual.grpc.AllResults.Builder.class);
     }
@@ -342,7 +342,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_AllResults_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_AllResults_descriptor;
     }
 
     @java.lang.Override
@@ -489,7 +489,7 @@ private static final long serialVersionUID = 0L;
         eu.more2020.visual.grpc.Results, eu.more2020.visual.grpc.Results.Builder, eu.more2020.visual.grpc.ResultsOrBuilder> resultsBuilder_;
 
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public java.util.List<eu.more2020.visual.grpc.Results> getResultsList() {
       if (resultsBuilder_ == null) {
@@ -499,7 +499,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public int getResultsCount() {
       if (resultsBuilder_ == null) {
@@ -509,7 +509,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public eu.more2020.visual.grpc.Results getResults(int index) {
       if (resultsBuilder_ == null) {
@@ -519,7 +519,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public Builder setResults(
         int index, eu.more2020.visual.grpc.Results value) {
@@ -536,7 +536,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public Builder setResults(
         int index, eu.more2020.visual.grpc.Results.Builder builderForValue) {
@@ -550,7 +550,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public Builder addResults(eu.more2020.visual.grpc.Results value) {
       if (resultsBuilder_ == null) {
@@ -566,7 +566,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public Builder addResults(
         int index, eu.more2020.visual.grpc.Results value) {
@@ -583,7 +583,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public Builder addResults(
         eu.more2020.visual.grpc.Results.Builder builderForValue) {
@@ -597,7 +597,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public Builder addResults(
         int index, eu.more2020.visual.grpc.Results.Builder builderForValue) {
@@ -611,7 +611,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public Builder addAllResults(
         java.lang.Iterable<? extends eu.more2020.visual.grpc.Results> values) {
@@ -626,7 +626,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public Builder clearResults() {
       if (resultsBuilder_ == null) {
@@ -639,7 +639,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public Builder removeResults(int index) {
       if (resultsBuilder_ == null) {
@@ -652,14 +652,14 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public eu.more2020.visual.grpc.Results.Builder getResultsBuilder(
         int index) {
       return getResultsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public eu.more2020.visual.grpc.ResultsOrBuilder getResultsOrBuilder(
         int index) {
@@ -669,7 +669,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public java.util.List<? extends eu.more2020.visual.grpc.ResultsOrBuilder> 
          getResultsOrBuilderList() {
@@ -680,14 +680,14 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public eu.more2020.visual.grpc.Results.Builder addResultsBuilder() {
       return getResultsFieldBuilder().addBuilder(
           eu.more2020.visual.grpc.Results.getDefaultInstance());
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public eu.more2020.visual.grpc.Results.Builder addResultsBuilder(
         int index) {
@@ -695,7 +695,7 @@ private static final long serialVersionUID = 0L;
           index, eu.more2020.visual.grpc.Results.getDefaultInstance());
     }
     /**
-     * <code>repeated .eu.more2020.visual.grpc.Results results = 1;</code>
+     * <code>repeated .Results results = 1;</code>
      */
     public java.util.List<eu.more2020.visual.grpc.Results.Builder> 
          getResultsBuilderList() {
@@ -728,10 +728,10 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:eu.more2020.visual.grpc.AllResults)
+    // @@protoc_insertion_point(builder_scope:AllResults)
   }
 
-  // @@protoc_insertion_point(class_scope:eu.more2020.visual.grpc.AllResults)
+  // @@protoc_insertion_point(class_scope:AllResults)
   private static final eu.more2020.visual.grpc.AllResults DEFAULT_INSTANCE;
   static {
     DEFAULT_INSTANCE = new eu.more2020.visual.grpc.AllResults();

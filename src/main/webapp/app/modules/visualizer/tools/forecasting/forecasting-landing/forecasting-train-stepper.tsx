@@ -2,7 +2,7 @@ import Grid from '@mui/material/Grid';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
-import { useAppSelector } from 'app/modules/store/storeConfig';
+import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { IForecastingDefault, IForecastingForm } from 'app/shared/model/forecasting.model';
 import React, { useEffect, useState } from 'react';
 import ForecastingDataPrep from '../forecasting-data-preparation/forecasting-dataPrep';
@@ -11,6 +11,7 @@ import Button from '@mui/material/Button';
 import ForecastingFeatureExtr from '../forecasting-feature-extraction/forecasting-feature-extraction';
 import ForecastingAlgSelection from '../forecasting-train-results/forecasting-alg-selection';
 import ForecastingResults from '../forecasting-results/forecasting-results';
+import { startTraining } from 'app/modules/store/forecastingSlice';
 
 const steps = ['Data Selection', 'Feature Selection', 'Algorithm Selection'];
 
@@ -19,6 +20,12 @@ const ForecastingTrainStepper = () => {
     const [activeStep, setActiveStep] = useState(0);
     const [skipped, setSkipped] = useState(new Set());
     const [forecastingForm, setForecastingForm] = useState<IForecastingForm>(IForecastingDefault);
+    const dispatch = useAppDispatch();
+
+    const handleTrain = e => {
+      dispatch(startTraining(forecastingForm));
+      setActiveStep(prevActiveStep => prevActiveStep + 1)
+    }
   
     useEffect(() => {
       const columnFeat = forecastingForm.features.columnFeatures.map(num => num.columnName);
@@ -144,7 +151,7 @@ const ForecastingTrainStepper = () => {
             Back
           </Button>
           <Grid sx={{ flex: '1 1 auto' }} />
-          <Button size="small" sx={{ fontSize: 12, height: '90%' }} onClick={handleNext} disabled={handleNextButton()}>
+          <Button size="small" sx={{ fontSize: 12, height: '90%' }} onClick={activeStep === steps.length - 1 ? handleTrain : handleNext} disabled={handleNextButton()}>
             {activeStep === steps.length - 1 ? 'Train' : 'Next'}
           </Button>
         </Grid>

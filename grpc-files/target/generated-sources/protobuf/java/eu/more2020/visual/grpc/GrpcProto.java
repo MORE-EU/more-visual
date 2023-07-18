@@ -15,80 +15,80 @@ public final class GrpcProto {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_TrainingInfo_descriptor;
+    internal_static_TrainingInfo_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_TrainingInfo_fieldAccessorTable;
+      internal_static_TrainingInfo_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_Target_descriptor;
+    internal_static_Target_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_Target_fieldAccessorTable;
+      internal_static_Target_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_Status_descriptor;
+    internal_static_Status_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_Status_fieldAccessorTable;
+      internal_static_Status_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_JobID_descriptor;
+    internal_static_JobID_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_JobID_fieldAccessorTable;
+      internal_static_JobID_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_Timestamp_descriptor;
+    internal_static_Timestamp_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_Timestamp_fieldAccessorTable;
+      internal_static_Timestamp_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_Progress_descriptor;
+    internal_static_Progress_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_Progress_fieldAccessorTable;
+      internal_static_Progress_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_Progress_DataEntry_descriptor;
+    internal_static_Progress_DataEntry_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_Progress_DataEntry_fieldAccessorTable;
+      internal_static_Progress_DataEntry_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_Predictions_descriptor;
+    internal_static_Predictions_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_Predictions_fieldAccessorTable;
+      internal_static_Predictions_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_Predictions_PredictionsEntry_descriptor;
+    internal_static_Predictions_PredictionsEntry_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_Predictions_PredictionsEntry_fieldAccessorTable;
+      internal_static_Predictions_PredictionsEntry_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_Predictions_EvaluationEntry_descriptor;
+    internal_static_Predictions_EvaluationEntry_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_Predictions_EvaluationEntry_fieldAccessorTable;
+      internal_static_Predictions_EvaluationEntry_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_Results_descriptor;
+    internal_static_Results_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_Results_fieldAccessorTable;
+      internal_static_Results_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_Results_MetricsEntry_descriptor;
+    internal_static_Results_MetricsEntry_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_Results_MetricsEntry_fieldAccessorTable;
+      internal_static_Results_MetricsEntry_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_AllResults_descriptor;
+    internal_static_AllResults_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_AllResults_fieldAccessorTable;
+      internal_static_AllResults_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_Inference_descriptor;
+    internal_static_Inference_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_Inference_fieldAccessorTable;
+      internal_static_Inference_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eu_more2020_visual_grpc_ModelInfo_descriptor;
+    internal_static_ModelInfo_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eu_more2020_visual_grpc_ModelInfo_fieldAccessorTable;
+      internal_static_ModelInfo_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -98,140 +98,129 @@ public final class GrpcProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020helloworld.proto\022\027eu.more2020.visual.g" +
-      "rpc\"*\n\014TrainingInfo\022\n\n\002id\030\001 \001(\t\022\016\n\006confi" +
-      "g\030\002 \001(\t\"\"\n\006Target\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 " +
-      "\001(\t\"$\n\006Status\022\n\n\002id\030\001 \001(\t\022\016\n\006status\030\002 \001(" +
-      "\t\"\023\n\005JobID\022\n\n\002id\030\001 \001(\t\"2\n\tTimestamp\022\021\n\tt" +
-      "imestamp\030\001 \001(\003\022\022\n\nmodel_name\030\002 \001(\t\"~\n\010Pr" +
-      "ogress\022\n\n\002id\030\001 \001(\t\0229\n\004data\030\002 \003(\0132+.eu.mo" +
-      "re2020.visual.grpc.Progress.DataEntry\032+\n" +
-      "\tDataEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\002" +
-      "8\001\"\212\002\n\013Predictions\022J\n\013predictions\030\001 \003(\0132" +
-      "5.eu.more2020.visual.grpc.Predictions.Pr" +
-      "edictionsEntry\022H\n\nevaluation\030\002 \003(\01324.eu." +
-      "more2020.visual.grpc.Predictions.Evaluat" +
-      "ionEntry\0322\n\020PredictionsEntry\022\013\n\003key\030\001 \001(" +
-      "\t\022\r\n\005value\030\002 \001(\002:\0028\001\0321\n\017EvaluationEntry\022" +
-      "\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\002:\0028\001\"\257\001\n\007Resu" +
-      "lts\022\016\n\006target\030\001 \001(\t\022>\n\007metrics\030\002 \003(\0132-.e" +
-      "u.more2020.visual.grpc.Results.MetricsEn" +
-      "try\032T\n\014MetricsEntry\022\013\n\003key\030\001 \001(\t\0223\n\005valu" +
-      "e\030\002 \001(\0132$.eu.more2020.visual.grpc.Predic" +
-      "tions:\0028\001\"?\n\nAllResults\0221\n\007results\030\001 \003(\013" +
-      "2 .eu.more2020.visual.grpc.Results\" \n\tIn" +
-      "ference\022\023\n\013predictions\030\001 \001(\014\"C\n\tModelInf" +
-      "o\022\022\n\nmodel_type\030\001 \001(\t\022\022\n\nmodel_name\030\002 \001(" +
-      "\t\022\016\n\006target\030\003 \001(\t2\251\004\n\nRouteGuide\022Y\n\rStar" +
-      "tTraining\022%.eu.more2020.visual.grpc.Trai" +
-      "ningInfo\032\037.eu.more2020.visual.grpc.Statu" +
-      "s\"\000\022R\n\013GetProgress\022\036.eu.more2020.visual." +
-      "grpc.JobID\032!.eu.more2020.visual.grpc.Pro" +
-      "gress\"\000\022_\n\030GetSpecificTargetResults\022\037.eu" +
-      ".more2020.visual.grpc.Target\032 .eu.more20" +
-      "20.visual.grpc.Results\"\000\022]\n\024GetAllTarget" +
-      "sResults\022\036.eu.more2020.visual.grpc.JobID" +
-      "\032#.eu.more2020.visual.grpc.AllResults\"\000\022" +
-      "X\n\014GetInference\022\".eu.more2020.visual.grp" +
-      "c.Timestamp\032\".eu.more2020.visual.grpc.In" +
-      "ference\"\000\022R\n\tSaveModel\022\".eu.more2020.vis" +
-      "ual.grpc.ModelInfo\032\037.eu.more2020.visual." +
-      "grpc.Status\"\000B&\n\027eu.more2020.visual.grpc" +
-      "B\tGrpcProtoP\001b\006proto3"
+      "\n\020helloworld.proto\"*\n\014TrainingInfo\022\n\n\002id" +
+      "\030\001 \001(\t\022\016\n\006config\030\002 \001(\t\"\"\n\006Target\022\014\n\004name" +
+      "\030\001 \001(\t\022\n\n\002id\030\002 \001(\t\"$\n\006Status\022\n\n\002id\030\001 \001(\t" +
+      "\022\016\n\006status\030\002 \001(\t\"\023\n\005JobID\022\n\n\002id\030\001 \001(\t\"2\n" +
+      "\tTimestamp\022\021\n\ttimestamp\030\001 \001(\003\022\022\n\nmodel_n" +
+      "ame\030\002 \001(\t\"f\n\010Progress\022\n\n\002id\030\001 \001(\t\022!\n\004dat" +
+      "a\030\002 \003(\0132\023.Progress.DataEntry\032+\n\tDataEntr" +
+      "y\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\332\001\n\013Pr" +
+      "edictions\0222\n\013predictions\030\001 \003(\0132\035.Predict" +
+      "ions.PredictionsEntry\0220\n\nevaluation\030\002 \003(" +
+      "\0132\034.Predictions.EvaluationEntry\0322\n\020Predi" +
+      "ctionsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\002:" +
+      "\0028\001\0321\n\017EvaluationEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005v" +
+      "alue\030\002 \001(\002:\0028\001\"\177\n\007Results\022\016\n\006target\030\001 \001(" +
+      "\t\022&\n\007metrics\030\002 \003(\0132\025.Results.MetricsEntr" +
+      "y\032<\n\014MetricsEntry\022\013\n\003key\030\001 \001(\t\022\033\n\005value\030" +
+      "\002 \001(\0132\014.Predictions:\0028\001\"\'\n\nAllResults\022\031\n" +
+      "\007results\030\001 \003(\0132\010.Results\" \n\tInference\022\023\n" +
+      "\013predictions\030\001 \001(\014\"C\n\tModelInfo\022\022\n\nmodel" +
+      "_type\030\001 \001(\t\022\022\n\nmodel_name\030\002 \001(\t\022\016\n\006targe" +
+      "t\030\003 \001(\t2\211\002\n\nRouteGuide\022)\n\rStartTraining\022" +
+      "\r.TrainingInfo\032\007.Status\"\000\022\"\n\013GetProgress" +
+      "\022\006.JobID\032\t.Progress\"\000\022/\n\030GetSpecificTarg" +
+      "etResults\022\007.Target\032\010.Results\"\000\022-\n\024GetAll" +
+      "TargetsResults\022\006.JobID\032\013.AllResults\"\000\022(\n" +
+      "\014GetInference\022\n.Timestamp\032\n.Inference\"\000\022" +
+      "\"\n\tSaveModel\022\n.ModelInfo\032\007.Status\"\000B&\n\027e" +
+      "u.more2020.visual.grpcB\tGrpcProtoP\001b\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         });
-    internal_static_eu_more2020_visual_grpc_TrainingInfo_descriptor =
+    internal_static_TrainingInfo_descriptor =
       getDescriptor().getMessageTypes().get(0);
-    internal_static_eu_more2020_visual_grpc_TrainingInfo_fieldAccessorTable = new
+    internal_static_TrainingInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_TrainingInfo_descriptor,
+        internal_static_TrainingInfo_descriptor,
         new java.lang.String[] { "Id", "Config", });
-    internal_static_eu_more2020_visual_grpc_Target_descriptor =
+    internal_static_Target_descriptor =
       getDescriptor().getMessageTypes().get(1);
-    internal_static_eu_more2020_visual_grpc_Target_fieldAccessorTable = new
+    internal_static_Target_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_Target_descriptor,
+        internal_static_Target_descriptor,
         new java.lang.String[] { "Name", "Id", });
-    internal_static_eu_more2020_visual_grpc_Status_descriptor =
+    internal_static_Status_descriptor =
       getDescriptor().getMessageTypes().get(2);
-    internal_static_eu_more2020_visual_grpc_Status_fieldAccessorTable = new
+    internal_static_Status_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_Status_descriptor,
+        internal_static_Status_descriptor,
         new java.lang.String[] { "Id", "Status", });
-    internal_static_eu_more2020_visual_grpc_JobID_descriptor =
+    internal_static_JobID_descriptor =
       getDescriptor().getMessageTypes().get(3);
-    internal_static_eu_more2020_visual_grpc_JobID_fieldAccessorTable = new
+    internal_static_JobID_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_JobID_descriptor,
+        internal_static_JobID_descriptor,
         new java.lang.String[] { "Id", });
-    internal_static_eu_more2020_visual_grpc_Timestamp_descriptor =
+    internal_static_Timestamp_descriptor =
       getDescriptor().getMessageTypes().get(4);
-    internal_static_eu_more2020_visual_grpc_Timestamp_fieldAccessorTable = new
+    internal_static_Timestamp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_Timestamp_descriptor,
+        internal_static_Timestamp_descriptor,
         new java.lang.String[] { "Timestamp", "ModelName", });
-    internal_static_eu_more2020_visual_grpc_Progress_descriptor =
+    internal_static_Progress_descriptor =
       getDescriptor().getMessageTypes().get(5);
-    internal_static_eu_more2020_visual_grpc_Progress_fieldAccessorTable = new
+    internal_static_Progress_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_Progress_descriptor,
+        internal_static_Progress_descriptor,
         new java.lang.String[] { "Id", "Data", });
-    internal_static_eu_more2020_visual_grpc_Progress_DataEntry_descriptor =
-      internal_static_eu_more2020_visual_grpc_Progress_descriptor.getNestedTypes().get(0);
-    internal_static_eu_more2020_visual_grpc_Progress_DataEntry_fieldAccessorTable = new
+    internal_static_Progress_DataEntry_descriptor =
+      internal_static_Progress_descriptor.getNestedTypes().get(0);
+    internal_static_Progress_DataEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_Progress_DataEntry_descriptor,
+        internal_static_Progress_DataEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_eu_more2020_visual_grpc_Predictions_descriptor =
+    internal_static_Predictions_descriptor =
       getDescriptor().getMessageTypes().get(6);
-    internal_static_eu_more2020_visual_grpc_Predictions_fieldAccessorTable = new
+    internal_static_Predictions_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_Predictions_descriptor,
+        internal_static_Predictions_descriptor,
         new java.lang.String[] { "Predictions", "Evaluation", });
-    internal_static_eu_more2020_visual_grpc_Predictions_PredictionsEntry_descriptor =
-      internal_static_eu_more2020_visual_grpc_Predictions_descriptor.getNestedTypes().get(0);
-    internal_static_eu_more2020_visual_grpc_Predictions_PredictionsEntry_fieldAccessorTable = new
+    internal_static_Predictions_PredictionsEntry_descriptor =
+      internal_static_Predictions_descriptor.getNestedTypes().get(0);
+    internal_static_Predictions_PredictionsEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_Predictions_PredictionsEntry_descriptor,
+        internal_static_Predictions_PredictionsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_eu_more2020_visual_grpc_Predictions_EvaluationEntry_descriptor =
-      internal_static_eu_more2020_visual_grpc_Predictions_descriptor.getNestedTypes().get(1);
-    internal_static_eu_more2020_visual_grpc_Predictions_EvaluationEntry_fieldAccessorTable = new
+    internal_static_Predictions_EvaluationEntry_descriptor =
+      internal_static_Predictions_descriptor.getNestedTypes().get(1);
+    internal_static_Predictions_EvaluationEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_Predictions_EvaluationEntry_descriptor,
+        internal_static_Predictions_EvaluationEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_eu_more2020_visual_grpc_Results_descriptor =
+    internal_static_Results_descriptor =
       getDescriptor().getMessageTypes().get(7);
-    internal_static_eu_more2020_visual_grpc_Results_fieldAccessorTable = new
+    internal_static_Results_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_Results_descriptor,
+        internal_static_Results_descriptor,
         new java.lang.String[] { "Target", "Metrics", });
-    internal_static_eu_more2020_visual_grpc_Results_MetricsEntry_descriptor =
-      internal_static_eu_more2020_visual_grpc_Results_descriptor.getNestedTypes().get(0);
-    internal_static_eu_more2020_visual_grpc_Results_MetricsEntry_fieldAccessorTable = new
+    internal_static_Results_MetricsEntry_descriptor =
+      internal_static_Results_descriptor.getNestedTypes().get(0);
+    internal_static_Results_MetricsEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_Results_MetricsEntry_descriptor,
+        internal_static_Results_MetricsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_eu_more2020_visual_grpc_AllResults_descriptor =
+    internal_static_AllResults_descriptor =
       getDescriptor().getMessageTypes().get(8);
-    internal_static_eu_more2020_visual_grpc_AllResults_fieldAccessorTable = new
+    internal_static_AllResults_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_AllResults_descriptor,
+        internal_static_AllResults_descriptor,
         new java.lang.String[] { "Results", });
-    internal_static_eu_more2020_visual_grpc_Inference_descriptor =
+    internal_static_Inference_descriptor =
       getDescriptor().getMessageTypes().get(9);
-    internal_static_eu_more2020_visual_grpc_Inference_fieldAccessorTable = new
+    internal_static_Inference_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_Inference_descriptor,
+        internal_static_Inference_descriptor,
         new java.lang.String[] { "Predictions", });
-    internal_static_eu_more2020_visual_grpc_ModelInfo_descriptor =
+    internal_static_ModelInfo_descriptor =
       getDescriptor().getMessageTypes().get(10);
-    internal_static_eu_more2020_visual_grpc_ModelInfo_fieldAccessorTable = new
+    internal_static_ModelInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eu_more2020_visual_grpc_ModelInfo_descriptor,
+        internal_static_ModelInfo_descriptor,
         new java.lang.String[] { "ModelType", "ModelName", "Target", });
   }
 

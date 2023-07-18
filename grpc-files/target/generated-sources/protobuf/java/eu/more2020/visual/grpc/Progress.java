@@ -4,11 +4,11 @@
 package eu.more2020.visual.grpc;
 
 /**
- * Protobuf type {@code eu.more2020.visual.grpc.Progress}
+ * Protobuf type {@code Progress}
  */
 public final class Progress extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:eu.more2020.visual.grpc.Progress)
+    // @@protoc_insertion_point(message_implements:Progress)
     ProgressOrBuilder {
 private static final long serialVersionUID = 0L;
   // Use Progress.newBuilder() to construct.
@@ -90,7 +90,7 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Progress_descriptor;
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_Progress_descriptor;
   }
 
   @SuppressWarnings({"rawtypes"})
@@ -108,7 +108,7 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Progress_fieldAccessorTable
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_Progress_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             eu.more2020.visual.grpc.Progress.class, eu.more2020.visual.grpc.Progress.Builder.class);
   }
@@ -157,7 +157,7 @@ private static final long serialVersionUID = 0L;
         java.lang.String, java.lang.String> defaultEntry =
             com.google.protobuf.MapEntry
             .<java.lang.String, java.lang.String>newDefaultInstance(
-                eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Progress_DataEntry_descriptor, 
+                eu.more2020.visual.grpc.GrpcProto.internal_static_Progress_DataEntry_descriptor, 
                 com.google.protobuf.WireFormat.FieldType.STRING,
                 "",
                 com.google.protobuf.WireFormat.FieldType.STRING,
@@ -409,15 +409,15 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code eu.more2020.visual.grpc.Progress}
+   * Protobuf type {@code Progress}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:eu.more2020.visual.grpc.Progress)
+      // @@protoc_insertion_point(builder_implements:Progress)
       eu.more2020.visual.grpc.ProgressOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Progress_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Progress_descriptor;
     }
 
     @SuppressWarnings({"rawtypes"})
@@ -445,7 +445,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Progress_fieldAccessorTable
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Progress_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               eu.more2020.visual.grpc.Progress.class, eu.more2020.visual.grpc.Progress.Builder.class);
     }
@@ -477,7 +477,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Progress_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Progress_descriptor;
     }
 
     @java.lang.Override
@@ -804,10 +804,10 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:eu.more2020.visual.grpc.Progress)
+    // @@protoc_insertion_point(builder_scope:Progress)
   }
 
-  // @@protoc_insertion_point(class_scope:eu.more2020.visual.grpc.Progress)
+  // @@protoc_insertion_point(class_scope:Progress)
   private static final eu.more2020.visual.grpc.Progress DEFAULT_INSTANCE;
   static {
     DEFAULT_INSTANCE = new eu.more2020.visual.grpc.Progress();

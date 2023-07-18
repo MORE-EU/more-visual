@@ -1,7 +1,14 @@
 import Grid from '@mui/material/Grid';
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import Typography from '@mui/material/Typography';
-import { IForecastingForm, ILGBMDefault, ILGBMDefaultFT, ILinearRegressionDefault, IXGBoostDefault, IXGBoostDefaultFT } from 'app/shared/model/forecasting.model';
+import {
+  IForecastingForm,
+  ILGBMDefault,
+  ILGBMDefaultFT,
+  ILinearRegressionDefault,
+  IXGBoostDefault,
+  IXGBoostDefaultFT,
+} from 'app/shared/model/forecasting.model';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
@@ -12,6 +19,7 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import ForecastingAlgModal from './forecasting-alg-selection-modal';
+import Slider from '@mui/material/Slider';
 
 interface IForecastingTrain {
   forecastingForm: IForecastingForm;
@@ -28,6 +36,10 @@ const ForecastingAlgSelection = (props: IForecastingTrain) => {
     setSelectedAlgo(algName);
     setOpen(!open);
   };
+
+  const handleSliderChange = (e,val) => {
+    setForecastingForm(state => ({...state, future_predictions: val}))
+  }
 
   const handleFineTuneCheckbox = algName => e => {
     const tempForm = forecastingForm;
@@ -108,6 +120,14 @@ const ForecastingAlgSelection = (props: IForecastingTrain) => {
         <Grid sx={{ width: '60%', m: 'auto' }}>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table" size="small">
+              <caption style={{width: "90%"}}>
+                <div style={{width: "90%", display: "flex", columnGap: 15, alignItems: "center"}}>
+                <Typography variant="subtitle1" fontSize={14}>
+                Future Predictions:
+              </Typography>
+              <Slider sx={{width: "60%"}} disabled={false} marks={false} max={30} min={1} value={forecastingForm.future_predictions} size="small" valueLabelDisplay="auto" onChange={handleSliderChange} />
+                </div>
+              </caption>
               <TableHead>
                 <TableRow>
                   <TableCell>Algorithm</TableCell>
@@ -131,7 +151,11 @@ const ForecastingAlgSelection = (props: IForecastingTrain) => {
                       )}
                     </TableCell> */}
                     <TableCell align="center">
-                      <Button variant="outlined" disabled={!Object.keys(forecastingForm.algorithms).includes(row)} onClick={handleConfigClick(row)}>
+                      <Button
+                        variant="outlined"
+                        disabled={!Object.keys(forecastingForm.algorithms).includes(row)}
+                        onClick={handleConfigClick(row)}
+                      >
                         Configure
                       </Button>
                     </TableCell>

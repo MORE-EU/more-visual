@@ -11,7 +11,7 @@ import loggerMiddleware from 'app/config/logger-middleware';
 import home from "./homeSlice";
 import fileManagement from "./fileManagementSlice"
 import uploadFarm from "./uploadFarmSlice";
-import autoML from "./autoMLSlice";
+import forecasting from "./forecastingSlice";
 
 enableMapSet();
 
@@ -23,7 +23,7 @@ export const store = configureStore({
         home,
         fileManagement,
         uploadFarm,
-        autoML
+        forecasting
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false

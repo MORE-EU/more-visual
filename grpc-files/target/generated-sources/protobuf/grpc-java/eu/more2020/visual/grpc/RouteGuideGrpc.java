@@ -12,7 +12,7 @@ public final class RouteGuideGrpc {
 
   private RouteGuideGrpc() {}
 
-  public static final String SERVICE_NAME = "eu.more2020.visual.grpc.RouteGuide";
+  public static final String SERVICE_NAME = "RouteGuide";
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<eu.more2020.visual.grpc.TrainingInfo,

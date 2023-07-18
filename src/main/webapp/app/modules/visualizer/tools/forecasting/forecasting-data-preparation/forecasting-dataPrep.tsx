@@ -53,6 +53,10 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
   }
   };
 
+  const handleTimeInterval = (e) => {
+    setForecastingForm(state => ({...state, time_interval: e.target.value}));
+  }
+
   const handleDataSplitCommit = (e, value) => {
     dispatch(setForecastingDataSplit(forecastingForm.dataSplit));
   };
@@ -173,6 +177,28 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
             </Typography>
             <Checkbox value={forecastingForm.cleanData} onChange={handleCleanData} />
           </Grid> */}
+          <Grid sx={{display: 'flex', gap: 1, alignItems: 'center', width: '70%', m: 'auto'}}>
+          <Grid sx={{ width: '30%', alignSelf: "flex-start" }}>
+              <Typography variant="subtitle1" fontSize={18}>
+                Time interval:
+              </Typography>
+            </Grid>
+            <Grid sx={{ width: '70%' }}>
+            <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            size='small'
+            value={forecastingForm.time_interval}
+            label=""
+            onChange={handleTimeInterval}
+            >
+            <MenuItem value={"15m"}>15m</MenuItem>
+            <MenuItem value={"30m"}>30m</MenuItem>
+            <MenuItem value={"1h"}>1h</MenuItem>
+            <MenuItem value={"6h"}>6h</MenuItem>
+          </Select>
+            </Grid>
+          </Grid>
           <Grid sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '70%', m: 'auto' }}>
             <Grid sx={{ width: '30%', alignSelf: "flex-start" }}>
               <Typography variant="subtitle1" fontSize={18}>

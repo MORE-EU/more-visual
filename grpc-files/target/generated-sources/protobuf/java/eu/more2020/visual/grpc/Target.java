@@ -4,11 +4,11 @@
 package eu.more2020.visual.grpc;
 
 /**
- * Protobuf type {@code eu.more2020.visual.grpc.Target}
+ * Protobuf type {@code Target}
  */
 public final class Target extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:eu.more2020.visual.grpc.Target)
+    // @@protoc_insertion_point(message_implements:Target)
     TargetOrBuilder {
 private static final long serialVersionUID = 0L;
   // Use Target.newBuilder() to construct.
@@ -83,13 +83,13 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Target_descriptor;
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_Target_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Target_fieldAccessorTable
+    return eu.more2020.visual.grpc.GrpcProto.internal_static_Target_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             eu.more2020.visual.grpc.Target.class, eu.more2020.visual.grpc.Target.Builder.class);
   }
@@ -335,21 +335,21 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code eu.more2020.visual.grpc.Target}
+   * Protobuf type {@code Target}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:eu.more2020.visual.grpc.Target)
+      // @@protoc_insertion_point(builder_implements:Target)
       eu.more2020.visual.grpc.TargetOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Target_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Target_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Target_fieldAccessorTable
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Target_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               eu.more2020.visual.grpc.Target.class, eu.more2020.visual.grpc.Target.Builder.class);
     }
@@ -382,7 +382,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return eu.more2020.visual.grpc.GrpcProto.internal_static_eu_more2020_visual_grpc_Target_descriptor;
+      return eu.more2020.visual.grpc.GrpcProto.internal_static_Target_descriptor;
     }
 
     @java.lang.Override
@@ -653,10 +653,10 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:eu.more2020.visual.grpc.Target)
+    // @@protoc_insertion_point(builder_scope:Target)
   }
 
-  // @@protoc_insertion_point(class_scope:eu.more2020.visual.grpc.Target)
+  // @@protoc_insertion_point(class_scope:Target)
   private static final eu.more2020.visual.grpc.Target DEFAULT_INSTANCE;
   static {
     DEFAULT_INSTANCE = new eu.more2020.visual.grpc.Target();

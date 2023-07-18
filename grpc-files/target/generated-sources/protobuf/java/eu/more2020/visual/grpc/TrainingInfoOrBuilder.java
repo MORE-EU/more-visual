@@ -4,7 +4,7 @@
 package eu.more2020.visual.grpc;
 
 public interface TrainingInfoOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:eu.more2020.visual.grpc.TrainingInfo)
+    // @@protoc_insertion_point(interface_extends:TrainingInfo)
     com.google.protobuf.MessageOrBuilder {
 
   /**

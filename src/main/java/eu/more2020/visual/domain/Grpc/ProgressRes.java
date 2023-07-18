@@ -1,33 +1,34 @@
 package eu.more2020.visual.domain.Grpc;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class ProgressRes {
-    private String target;
-    private Map<String, String> metrics;
+public class ProgressRes implements Serializable {
+    private String id;
+    private Map<String, String> data;
 
-    public String getTarget() {
-        return target;
+    public String getId() {
+        return id;
     }
 
-    public void setTarget(String target) {
-        this.target = target;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public Map<String, String> getMetrics() {
-        return metrics;
+    public Map<String, String> getData() {
+        return data;
     }
 
-    public void setMetrics(Map<String, String> metrics) {
-        this.metrics = metrics;
+    public void setData(Map<String, String> data) {
+        this.data = data;
     }
 
     public ProgressRes() {
     }
 
-    public ProgressRes(String target, Map<String, String> metrics) {
-        this.target = target;
-        this.metrics = metrics;
+    public ProgressRes(String id, Map<String, String> data) {
+        this.id = id;
+        this.data = data;
     }
 
 }

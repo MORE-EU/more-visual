@@ -4,7 +4,7 @@
 package eu.more2020.visual.grpc;
 
 public interface ModelInfoOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:eu.more2020.visual.grpc.ModelInfo)
+    // @@protoc_insertion_point(interface_extends:ModelInfo)
     com.google.protobuf.MessageOrBuilder {
 
   /**

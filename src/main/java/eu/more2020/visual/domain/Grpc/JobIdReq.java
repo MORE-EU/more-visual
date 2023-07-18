@@ -12,5 +12,12 @@ public class JobIdReq implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
-    
+
+    public JobIdReq() {
+    }
+
+    public JobIdReq(String id) {
+        this.id = id;
+    }
+
 }

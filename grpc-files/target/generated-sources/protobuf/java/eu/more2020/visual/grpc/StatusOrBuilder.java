@@ -4,7 +4,7 @@
 package eu.more2020.visual.grpc;
 
 public interface StatusOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:eu.more2020.visual.grpc.Status)
+    // @@protoc_insertion_point(interface_extends:Status)
     com.google.protobuf.MessageOrBuilder {
 
   /**

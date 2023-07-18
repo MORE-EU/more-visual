@@ -4,7 +4,7 @@
 package eu.more2020.visual.grpc;
 
 public interface TimestampOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:eu.more2020.visual.grpc.Timestamp)
+    // @@protoc_insertion_point(interface_extends:Timestamp)
     com.google.protobuf.MessageOrBuilder {
 
   /**

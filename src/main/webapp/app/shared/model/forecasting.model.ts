@@ -3,6 +3,8 @@
 export interface IForecastingForm {
   startDate: number | null;
   endDate: number | null;
+  time_interval: string;
+  future_predictions: number;
   targetColumn: string[] | null;
   cleanData: boolean;
   dataSplit: number[];
@@ -70,6 +72,8 @@ interface IAlgorigths {
 export const IForecastingDefault: Readonly<IForecastingForm> = {
   startDate: null,
   endDate: null,
+  time_interval: '15m',
+  future_predictions: 10,
   targetColumn: null,
   cleanData: true,
   algorithms: {},
