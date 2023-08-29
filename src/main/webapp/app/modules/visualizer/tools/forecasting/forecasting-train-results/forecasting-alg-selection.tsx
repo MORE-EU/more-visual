@@ -139,7 +139,7 @@ const ForecastingAlgSelection = (props: IForecastingTrain) => {
                 {['XGBoost', 'LGBM', 'LinearRegression'].map(row => (
                   <TableRow key={row} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                     <TableCell component="th" scope="row">
-                      <Checkbox onChange={handleAlgorithmSelection(row)} />
+                      <Checkbox checked={Object.hasOwn(forecastingForm.algorithms, row)} onChange={handleAlgorithmSelection(row)} />
                       {row}
                     </TableCell>
                     {/* <TableCell align="center">

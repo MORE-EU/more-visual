@@ -117,7 +117,6 @@
             <groupId>io.github.jhipster</groupId>
             <artifactId>jhipster-framework</artifactId>
             <version>3.9.1</version>
-
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -313,8 +312,25 @@
             </exclusion>
         </exclusions> -->
         </dependency>
+        <dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-data-mongodb</artifactId>
+            <version>2.2.7.RELEASE</version>
+		</dependency>
+        <dependency>
+  			<groupId>com.influxdb</groupId>
+  			<artifactId>influxdb-client-java</artifactId>
+  			<version>6.6.0</version>
+		</dependency>
     </dependencies>
     <build>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.6.2</version>
+            </extension>
+        </extensions>
         <defaultGoal>spring-boot:run</defaultGoal>
         <plugins>
             <plugin>

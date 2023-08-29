@@ -131,7 +131,6 @@ const ForecastingAlgModal = (props: IForecastingAlgModal) => {
 
   return (
     <>
-      {console.log(forecastingForm)}
       <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description" hideBackdrop>
         <Grid sx={style}>
           <Grid sx={{ height: '6%', width: '100%', backgroundColor: grey[300], display: 'flex', alignItems: 'center' }}>

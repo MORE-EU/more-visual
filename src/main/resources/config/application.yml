@@ -42,6 +42,8 @@ spring:
   jmx:
     enabled: false
   data:
+    mongodb:
+      uri: mongodb://user:password@localhost:27017/more
   messages:
     basename: i18n/messages
   main:
@@ -107,7 +109,7 @@ jhipster:
 
 application:
   name: 'More2020'
-  workspacePath: /opt/more-workspace
+  workspacePath: /data/1/more-workspace
   timeFormat: 'yyyy-MM-dd[ HH:mm:ss]'
   delimiter: ','
   toolApi: http://localhost:8889/

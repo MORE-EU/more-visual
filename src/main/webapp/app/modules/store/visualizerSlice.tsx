@@ -7,7 +7,7 @@ import { IQueryResults } from 'app/shared/model/query-results.model';
 import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import axios from 'axios';
-import moment, { Moment } from "moment";
+import moment, { Moment } from 'moment';
 
 const seedrandom = require('seedrandom');
 const lvl = 64;
@@ -20,29 +20,28 @@ const generateColor = () => {
   if (hex.length < 6) {
     hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
   }
-  var rgb = "#",
-    c, i;
+  var rgb = '#',
+    c,
+    i;
   for (i = 0; i < 3; i++) {
     c = parseInt(hex.substr(i * 2, 2), 16);
-    c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
-    rgb += ("00" + c).substr(c.length);
+    c = Math.round(Math.min(Math.max(0, c + c * lum), 255)).toString(16);
+    rgb += ('00' + c).substr(c.length);
   }
   return rgb;
-}
+};
 
 const calculateFreqFromDiff = (timeRange: any) => {
   const diff = moment.duration(moment(timeRange.to).diff(moment(timeRange.from))).humanize();
-  if (diff.includes("month") || diff.includes("day")){
-    return "hour";
+  if (diff.includes('month') || diff.includes('day')) {
+    return 'hour';
+  } else if (diff.includes('hour')) {
+    return 'minute';
+  } else if (diff.includes('minute') || diff.includes('second')) {
+    return 'second';
   }
-  else if(diff.includes("hour")){
-    return "minute";
-  }
-  else if(diff.includes("minute") || diff.includes("second")){
-    return "second";
-  }
-  return "hour";
-}
+  return 'hour';
+};
 
 const initPatterns = (data, length, frequency) => {
   let pattern1 = { start: new Date(data[500].timestamp), end: new Date(data[500 + length].timestamp) };
@@ -73,14 +72,14 @@ const initPatterns = (data, length, frequency) => {
 const forecastingInitialState = {
   forecastingStartDate: null,
   forecastingEndDate: null,
-  forecastingDataSplit: [60, 20, 20]
-}
+  forecastingDataSplit: [60, 20, 20],
+};
 
 const initialState = {
   loading: true,
   errorMessage: null,
   dataset: null,
-  chartType: "line",
+  chartType: 'line',
   queryResults: null as IQueryResults,
   data: null as any,
   compareData: null,
@@ -107,7 +106,7 @@ const initialState = {
   showDatePick: false,
   showChangepointFunction: false,
   comparePopover: false,
-  singleDateValue: {start: null, end: null},
+  singleDateValue: { start: null, end: null },
   dateValues: [],
   fixedWidth: 0,
   expand: false,
@@ -130,7 +129,7 @@ const initialState = {
   alertingPreview: false,
   alertResults: {},
   alertingPlotMode: false,
-  ...forecastingInitialState
+  ...forecastingInitialState,
 };
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
@@ -176,45 +175,15 @@ export const deleteAlert = createAsyncThunk('deleteAlert', async (alertName: Str
 
 export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
-  async (data: { folder: string; id: string[];
-    from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter?: Map<number, number[]>}) => {
-    const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
-    let query;
-    from !== null && to !== null
-    ? (query = {
-      range: { from, to } as ITimeRange,
-      frequency: resampleFreq.toUpperCase(),
-      measures: selectedMeasures,
-      filter: filter ? Object.fromEntries(filter) : null,
-    } as IQuery)
-    : (query = { range: null, frequency: resampleFreq.toUpperCase() });
-    const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
-    return response.data;
-  }
-);
-
-export const liveDataImplementation = createAsyncThunk(
-  'liveDataImplementation',
-  async (data: { folder: string; id: string[];
-    from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter?: Map<number, number[]>}) => {
-    const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
-    let query;
-    from !== null && to !== null
-    ? (query = {
-      range: { from, to } as ITimeRange,
-      frequency: resampleFreq.toUpperCase(),
-      measures: selectedMeasures,
-      filter: filter ? Object.fromEntries(filter) : null,
-    } as IQuery)
-    : (query = { range: null, frequency: resampleFreq.toUpperCase() });
-    const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
-    return response.data;
-  }
-);
-
-export const updateCompareQueryResults = createAsyncThunk(
-  'updateCompareQueryResults',
-  async (data: { folder: string; id: string[]; from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter: {}; }) => {
+  async (data: {
+    folder: string;
+    id: string[];
+    from: number;
+    to: number;
+    resampleFreq: string;
+    selectedMeasures: any[];
+    filter?: Map<number, number[]>;
+  }) => {
     const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
     let query;
     from !== null && to !== null
@@ -222,7 +191,51 @@ export const updateCompareQueryResults = createAsyncThunk(
           range: { from, to } as ITimeRange,
           frequency: resampleFreq.toUpperCase(),
           measures: selectedMeasures,
-          filter
+          filter: filter ? Object.fromEntries(filter) : null,
+        } as IQuery)
+      : (query = { range: null, frequency: resampleFreq.toUpperCase() });
+    const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
+    return response.data;
+  }
+);
+
+export const liveDataImplementation = createAsyncThunk(
+  'liveDataImplementation',
+  async (data: {
+    folder: string;
+    id: string[];
+    from: number;
+    to: number;
+    resampleFreq: string;
+    selectedMeasures: any[];
+    filter?: Map<number, number[]>;
+  }) => {
+    const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
+    let query;
+    from !== null && to !== null
+      ? (query = {
+          range: { from, to } as ITimeRange,
+          frequency: resampleFreq.toUpperCase(),
+          measures: selectedMeasures,
+          filter: filter ? Object.fromEntries(filter) : null,
+        } as IQuery)
+      : (query = { range: null, frequency: resampleFreq.toUpperCase() });
+    const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
+    return response.data;
+  }
+);
+
+export const updateCompareQueryResults = createAsyncThunk(
+  'updateCompareQueryResults',
+  async (data: { folder: string; id: string[]; from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter: {} }) => {
+    const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
+    let query;
+    from !== null && to !== null
+      ? (query = {
+          range: { from, to } as ITimeRange,
+          frequency: resampleFreq.toUpperCase(),
+          measures: selectedMeasures,
+          filter,
         } as IQuery)
       : (query = { range: null, frequency: resampleFreq.toUpperCase() });
     const response = Promise.all(
@@ -236,8 +249,8 @@ export const updateCompareQueryResults = createAsyncThunk(
 
 export const applyChangepointDetection = createAsyncThunk(
   'applyChangepointDetection',
-  async (data: { id: string; from: number; to: number;}) => {
-    const { id, from, to} = data;
+  async (data: { id: string; from: number; to: number }) => {
+    const { id, from, to } = data;
     const response = await axios
       .post(`api/tools/changepoint_detection`, {
         id,
@@ -248,20 +261,18 @@ export const applyChangepointDetection = createAsyncThunk(
   }
 );
 
-export const applyForecasting = createAsyncThunk(
-  'applyForecasting',
-  async(id: string) => {
-    const requestUrl = `api/tools/forecasting/${id}`;
-    const response = await axios.post(requestUrl);
-    return response.data;
-  });
+export const applyForecasting = createAsyncThunk('applyForecasting', async (id: string) => {
+  const requestUrl = `api/tools/forecasting/${id}`;
+  const response = await axios.post(requestUrl);
+  return response.data;
+});
 
 export const applyDeviationDetection = createAsyncThunk(
   'applyDeviationDetection',
-  async (data: {id: string, from : number, to : number, weeks : number, changepoints : IChangepointDate[]}) => {
+  async (data: { id: string; from: number; to: number; weeks: number; changepoints: IChangepointDate[] }) => {
     const requestUrl = `api/tools/soiling`;
     const id = data.id;
-    const range = {from: data.from, to: data.to} as unknown as ITimeRange;
+    const range = ({ from: data.from, to: data.to } as unknown) as ITimeRange;
     const changepoints = data.changepoints;
     const weeks = data.weeks;
     const response = await axios.post(requestUrl, {
@@ -271,29 +282,28 @@ export const applyDeviationDetection = createAsyncThunk(
       weeks,
     });
     return response.data;
-  });
+  }
+);
 
 export const applyYawMisalignmentDetection = createAsyncThunk(
   'applyYawMisalignmentDetection',
-  async(data: {id: string, from: number, to: number}) => {
+  async (data: { id: string; from: number; to: number }) => {
     const requestUrl = `api/tools/yaw_misalignment`;
     const id = data.id;
-    const range = {from: data.from, to: data.to} as unknown as ITimeRange;
+    const range = ({ from: data.from, to: data.to } as unknown) as ITimeRange;
     const response = await axios.post(requestUrl, {
       id,
       range,
     });
     return response.data;
   }
-)
+);
 
-export const getManualChangepoints = createAsyncThunk(
-  'getManualChangepoints',
-  async (id: string) => {
-    const requestUrl = `api/tools/changepoint_detection/washes/${id}`;
-    const response = await axios.get(requestUrl);
-    return response.data;
-  });
+export const getManualChangepoints = createAsyncThunk('getManualChangepoints', async (id: string) => {
+  const requestUrl = `api/tools/changepoint_detection/washes/${id}`;
+  const response = await axios.get(requestUrl);
+  return response.data;
+});
 
 // Then, handle actions in your reducers:
 const visualizer = createSlice({
@@ -315,7 +325,7 @@ const visualizer = createSlice({
     updateResampleFreq(state, action) {
       state.resampleFreq = action.payload;
     },
-    updateFilters(state, action: {payload: {measureCol: any, range: any}, type: string}) {
+    updateFilters(state, action: { payload: { measureCol: any; range: any }; type: string }) {
       state.filter = state.filter.set(action.payload.measureCol, action.payload.range);
     },
     resetFilters(state) {
@@ -331,7 +341,7 @@ const visualizer = createSlice({
       state.datasetChoice = action.payload;
     },
     updateDatasetMeasures(state, action) {
-      state.dataset.measures = action.payload
+      state.dataset.measures = action.payload;
     },
     updatePatternNav(state, action) {
       state.patternNav = action.payload;
@@ -360,12 +370,12 @@ const visualizer = createSlice({
       state.anchorEl = action.payload;
     },
     updateSoilingWeeks(state, action) {
-      state.soilingWeeks = action.payload
+      state.soilingWeeks = action.payload;
     },
     updateAlertResults(state, action) {
-      state.alertResults = {...action.payload}
+      state.alertResults = { ...action.payload };
     },
-    getPatterns(state, action: {payload: {data: IDataPoint[], val: number, resampleFreq: string}, type: string}) {
+    getPatterns(state, action: { payload: { data: IDataPoint[]; val: number; resampleFreq: string }; type: string }) {
       state.patterns = initPatterns(action.payload.data, action.payload.val, action.payload.resampleFreq);
     },
     setShowDatePick(state, action) {
@@ -419,27 +429,27 @@ const visualizer = createSlice({
     toggleChangepointDetection(state, action) {
       state.changepointDetectionEnabled = action.payload;
     },
-    toggleSoilingDetection(state, action){
+    toggleSoilingDetection(state, action) {
       state.soilingEnabled = action.payload;
       state.secondaryData = state.soilingEnabled ? state.secondaryData : null;
     },
-    toggleYawMisalignmentDetection(state, action){
+    toggleYawMisalignmentDetection(state, action) {
       state.yawMisalignmentEnabled = action.payload;
     },
-    toggleForecasting(state, action){
+    toggleForecasting(state, action) {
       state.forecasting = action.payload;
     },
-    toggleManualChangepoints(state, action){
+    toggleManualChangepoints(state, action) {
       state.manualChangepointsEnabled = action.payload;
     },
-    toggleCustomChangepoints(state, action){
+    toggleCustomChangepoints(state, action) {
       state.customChangepointsEnabled = action.payload;
     },
     resetForecastingState(state) {
       // remove plotlines from chart when you disable forecasting
-      state.chartRef.xAxis[0].removePlotLine("start")
-      state.chartRef.xAxis[0].removePlotLine("end")
-     return{...state, ...forecastingInitialState}
+      state.chartRef.xAxis[0].removePlotLine('start');
+      state.chartRef.xAxis[0].removePlotLine('end');
+      return { ...state, ...forecastingInitialState };
     },
     resetChartValues(state) {
       state.queryResultsLoading = initialState.queryResultsLoading;
@@ -456,9 +466,9 @@ const visualizer = createSlice({
     builder.addCase(getDataset.fulfilled, (state, action) => {
       state.loading = false;
       state.dataset = action.payload.data;
-      state.measureColors = [...state.dataset.header.map(() => generateColor())]
+      state.measureColors = [...state.dataset.header.map(() => generateColor())];
       state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
-      state.selectedMeasures = [action.payload.data.measures[0]]
+      state.selectedMeasures = [action.payload.data.measures[0]];
     });
     builder.addCase(getFarmMeta.fulfilled, (state, action) => {
       state.loading = false;
@@ -498,12 +508,12 @@ const visualizer = createSlice({
     builder.addCase(updateCompareQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;
       state.compareData = action.payload;
-    })
+    });
     builder.addCase(liveDataImplementation.fulfilled, (state, action) => {
       state.liveDataImplLoading = false;
       state.queryResultsLoading = false;
       state.data = action.payload.data.length !== 0 ? [...state.data, ...action.payload.data.slice(0)] : state.data;
-    })
+    });
     builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending), state => {
       state.errorMessage = null;
       state.loading = true;
@@ -518,7 +528,8 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(saveAlert.pending, deleteAlert.pending, getAlerts.pending, editAlert.pending), state => {
       state.alertsLoading = true;
     });
-    builder.addMatcher(isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected),
+    builder.addMatcher(
+      isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.payload;
@@ -547,12 +558,12 @@ const visualizer = createSlice({
 });
 
 export const {
-  resetChartValues, resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq, updateFilters,
-  updatePatterns, updateChangeChart,updateDatasetChoice, updateDatasetMeasures, updatePatternNav, updateChartRef,
-  updateManualChangepoints, updateSecondaryData, updateActiveTool, updateCompare, updateAnchorEl,
-  updateData, updateSoilingWeeks, toggleForecasting, toggleSoilingDetection, toggleChangepointDetection, setForecastingDataSplit,
-  toggleYawMisalignmentDetection, toggleManualChangepoints,  toggleCustomChangepoints, setAutoMLStartDate, setAutoMLEndDate,
-  setShowDatePick,setShowChangepointFunction, setComparePopover, setSingleDateValue,setDateValues,setFixedWidth, setAlertingPlotMode, resetForecastingState,
-  setDetectedChangepointFilter, setExpand, setOpenToolkit, setFolder, resetFilters, getPatterns, setChartType, setAlertingPreview, updateAlertResults
+  resetChartValues,resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilters,
+  updatePatterns,updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updatePatternNav,updateChartRef,
+  updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks,
+  toggleForecasting,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
+  toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
+  setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
+  setExpand,setOpenToolkit,setFolder,resetFilters,getPatterns,setChartType,setAlertingPreview,updateAlertResults,
 } = visualizer.actions;
 export default visualizer.reducer;

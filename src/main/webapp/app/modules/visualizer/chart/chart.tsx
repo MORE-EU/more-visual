@@ -546,8 +546,8 @@ export const Chart = () => {
   return (
     <Grid
       sx={{ border: '1px solid rgba(0, 0, 0, .1)', height: activeTool ? '40%' : '70%', position: 'relative' }}
-      onMouseOver={() => handleMouseOverChart()}
-      onMouseLeave={() => handleMouseLeaveChart()}
+      onMouseOver={() => data ? handleMouseOverChart() : null}
+      onMouseLeave={() => data ? handleMouseLeaveChart() : null}
     >
       {!data ? <LinearProgress /> : <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />}
       {data && (

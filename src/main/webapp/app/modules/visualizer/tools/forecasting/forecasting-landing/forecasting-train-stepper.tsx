@@ -117,7 +117,6 @@ const ForecastingTrainStepper = () => {
 
   return (
     <>
-    {console.log(forecastingForm)}
       <Grid sx={{ width: '100%', height: '15%' }}>
         <Stepper activeStep={activeStep} sx={{ pl: 3, pr: 3, pt: 2 }}>
           {steps.map((label, index) => (

@@ -180,7 +180,7 @@ const Row = props => {
   const [open, setOpen] = React.useState(false);
 
   const hadleOptionalFeatureCheckBoxes = value => e => {
-    if (Object.hasOwn(forecastingForm.features.optionalFeatures, value)) {
+    if (Object.hasOwn(forecastingForm.features.optionalFeatures, value) && value !== "temporal") {
       const feat = forecastingForm.features.optionalFeatures;
       delete feat[value];
       setForecastingForm(state => ({ ...state, features: { ...state.features, optionalFeatures: feat } }));
@@ -285,7 +285,7 @@ const Row = props => {
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>
           <Checkbox
-            value={Object.hasOwn(forecastingForm.features.optionalFeatures, mapFeaturesNames[row.name])}
+            checked={Object.hasOwn(forecastingForm.features.optionalFeatures, mapFeaturesNames[row.name])}
             onChange={hadleOptionalFeatureCheckBoxes(mapFeaturesNames[row.name])}
           />
         </TableCell>

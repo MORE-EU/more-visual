@@ -28,12 +28,15 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
   const { forecastingForm, setForecastingForm } = props;
 
   const handleDates = e => value => {
+    const userTimezoneOffset = value.getTimezoneOffset() * 60000;
+    const date = new Date(value).getTime();
+    console.log(new Date(value + userTimezoneOffset).getTime())
     e === 'start' &&
-      (setForecastingForm(state => ({ ...state, startDate: new Date(value).getTime() })),
-      dispatch(setAutoMLStartDate(new Date(value).getTime())));
+      (setForecastingForm(state => ({ ...state, startDate: date + userTimezoneOffset})),
+      dispatch(setAutoMLStartDate(new Date(date + userTimezoneOffset).getTime())));
     e === 'end' &&
-      (setForecastingForm(state => ({ ...state, endDate: new Date(value).getTime() })),
-      dispatch(setAutoMLEndDate(new Date(value).getTime())));
+      (setForecastingForm(state => ({ ...state, endDate: date + userTimezoneOffset})),
+      dispatch(setAutoMLEndDate(new Date(date + userTimezoneOffset).getTime())));
   };
 
   const handleTargetColumn = e => {
@@ -60,6 +63,10 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
   const handleDataSplitCommit = (e, value) => {
     dispatch(setForecastingDataSplit(forecastingForm.dataSplit));
   };
+
+  const getDateValue = (date) => {
+    return date === null ? date : date - new Date(date).getTimezoneOffset() * 60000
+  }
 
   const sliderSx = { 
     '& .MuiSlider-thumb': {
@@ -88,6 +95,7 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
 
   return (
     <>
+    {console.log(forecastingForm)}
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Grid
           className={'basic-values'}
@@ -138,7 +146,7 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
               minDateTime={dataset.timeRange.from}
               maxDateTime={forecastingForm.endDate ? forecastingForm.endDate : dataset.timeRange.to}
               renderInput={props => <TextField size="small" {...props} />}
-              value={forecastingForm.startDate}
+              value={getDateValue(forecastingForm.startDate)}
               onChange={e => {}}
               onAccept={handleDates('start')}
               inputFormat="dd/MM/yyyy hh:mm a"
@@ -151,7 +159,7 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
               minDateTime={forecastingForm.startDate ? forecastingForm.startDate : dataset.timeRange.from}
               maxDateTime={dataset.timeRange.to}
               renderInput={props => <TextField size="small" {...props} />}
-              value={forecastingForm.endDate}
+              value={getDateValue(forecastingForm.endDate)}
               onChange={e => {}}
               onAccept={handleDates('end')}
               inputFormat="dd/MM/yyyy hh:mm a"

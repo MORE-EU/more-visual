@@ -4,10 +4,6 @@ import eu.more2020.visual.domain.*;
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
-import eu.more2020.visual.domain.Grpc.JobIdReq;
-import eu.more2020.visual.domain.Grpc.ProgressRes;
-import eu.more2020.visual.domain.Grpc.StatusRes;
-import eu.more2020.visual.domain.Grpc.TrainingInfoReq;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.FileHandlingRepository;
@@ -15,7 +11,6 @@ import eu.more2020.visual.repository.ToolsRepository;
 import eu.more2020.visual.service.CsvDataService;
 import eu.more2020.visual.service.IndexedModelarDataService;
 import eu.more2020.visual.service.ModelarDataService;
-import eu.more2020.visual.service.grpc.AutoMLCallsImpl;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -53,7 +48,6 @@ public class DatasetResource {
     private final IndexedModelarDataService indexedModelarDataService;
     private final AlertRepository alertRepository;
     private final FileHandlingRepository fileHandlingRepository;
-    private final AutoMLCallsImpl autoMLCallsImpl;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -65,7 +59,7 @@ public class DatasetResource {
                            ToolsRepository toolsRepository,
                            CsvDataService csvDataService, ModelarDataService modelarDataService, 
                            IndexedModelarDataService indexedModelarDataService, AlertRepository alertRepository,
-                           FileHandlingRepository fileHandlingRepository, AutoMLCallsImpl autoMLCallsImpl) {
+                           FileHandlingRepository fileHandlingRepository) {
         this.datasetRepository = datasetRepository;
         this.toolsRepository = toolsRepository;
         this.csvDataService = csvDataService;
@@ -73,7 +67,6 @@ public class DatasetResource {
         this.indexedModelarDataService = indexedModelarDataService;
         this.alertRepository = alertRepository;
         this.fileHandlingRepository = fileHandlingRepository;
-        this.autoMLCallsImpl = autoMLCallsImpl;
     }
 
     /**
