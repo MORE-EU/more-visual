@@ -149,3 +149,8 @@ Desktop.ini
 package-lock.json
 package-lock.json
 *.zip
+
+######################
+# GRPC-FORECASTING
+######################
+/grpc-files/target
