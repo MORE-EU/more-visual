@@ -41,9 +41,6 @@ spring:
     active: #spring.profiles.active#
   jmx:
     enabled: false
-  data:
-    mongodb:
-      uri: mongodb://user:password@localhost:27017/more
   messages:
     basename: i18n/messages
   main:
@@ -68,6 +65,8 @@ spring:
     multipart:
       max-file-size: 10485760000
       max-request-size: 10485760000
+  config:
+    import: optional:classpath:mongodb.properties
 
 server:
   servlet:
@@ -110,6 +109,7 @@ jhipster:
 application:
   name: 'More2020'
   workspacePath: /opt/more-workspace
+  dbSettings: src/main/resources/config/databsases.cfg
   timeFormat: 'yyyy-MM-dd[ HH:mm:ss]'
   delimiter: ','
   toolApi: http://localhost:8889/
