@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataBasesConfig {
 
+    private String influx_url;
+
     private String token;
 
     private String bucket;
@@ -19,8 +21,9 @@ public class DataBasesConfig {
 
     private String mongo_user_password;
 
-    public DataBasesConfig(String token, String bucket, String org, String mongo_uri, String mongo_db_name,
+    public DataBasesConfig(String influx_url, String token, String bucket, String org, String mongo_uri, String mongo_db_name,
             String mongo_user_name, String mongo_user_password) {
+        this.influx_url = influx_url;
         this.token = token;
         this.bucket = bucket;
         this.org = org;
@@ -31,6 +34,14 @@ public class DataBasesConfig {
     }
 
     public DataBasesConfig() {
+    }
+    
+    public String getInflux_url() {
+        return influx_url;
+    }
+
+    public void setInflux_url(String influx_url) {
+        this.influx_url = influx_url;
     }
 
     public String getToken() {

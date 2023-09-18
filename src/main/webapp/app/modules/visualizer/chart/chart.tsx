@@ -609,7 +609,7 @@ export const Chart = () => {
                 maxPointWidth: 80,
                 turboThreshold: 100000, // TODO: REMOVE THIS IS ONLY FOR ALEX YAW
                 marker: {
-                  enabled: filter.size != 0 ? true : false,
+                  enabled: Object.keys(filter).length !== 0 ? true : false,
                 },
               },
             },

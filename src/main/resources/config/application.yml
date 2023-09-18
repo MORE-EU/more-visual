@@ -39,6 +39,9 @@ spring:
     # Otherwise, it will be filled in by maven when building the JAR file
     # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
     active: #spring.profiles.active#
+  data:
+    mongodb:
+      uri: mongodb://user:F8]E4(6}ke}|&V&2nq4Z@83.212.75.52:27017/more
   jmx:
     enabled: false
   messages:
@@ -65,8 +68,6 @@ spring:
     multipart:
       max-file-size: 10485760000
       max-request-size: 10485760000
-  config:
-    import: optional:classpath:mongodb.properties
 
 server:
   servlet:
@@ -109,7 +110,7 @@ jhipster:
 application:
   name: 'More2020'
   workspacePath: /opt/more-workspace
-  dbSettings: src/main/resources/config/databsases.cfg
+  dbSettings: /opt/more-workspace/config/settings.cfg
   timeFormat: 'yyyy-MM-dd[ HH:mm:ss]'
   delimiter: ','
   toolApi: http://localhost:8889/

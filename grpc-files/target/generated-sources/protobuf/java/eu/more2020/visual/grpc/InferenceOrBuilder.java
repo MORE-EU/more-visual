@@ -8,8 +8,36 @@ public interface InferenceOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>bytes predictions = 1;</code>
-   * @return The predictions.
+   * <code>map&lt;string, float&gt; predictions = 1;</code>
    */
-  com.google.protobuf.ByteString getPredictions();
+  int getPredictionsCount();
+  /**
+   * <code>map&lt;string, float&gt; predictions = 1;</code>
+   */
+  boolean containsPredictions(
+      java.lang.String key);
+  /**
+   * Use {@link #getPredictionsMap()} instead.
+   */
+  @java.lang.Deprecated
+  java.util.Map<java.lang.String, java.lang.Float>
+  getPredictions();
+  /**
+   * <code>map&lt;string, float&gt; predictions = 1;</code>
+   */
+  java.util.Map<java.lang.String, java.lang.Float>
+  getPredictionsMap();
+  /**
+   * <code>map&lt;string, float&gt; predictions = 1;</code>
+   */
+
+  float getPredictionsOrDefault(
+      java.lang.String key,
+      float defaultValue);
+  /**
+   * <code>map&lt;string, float&gt; predictions = 1;</code>
+   */
+
+  float getPredictionsOrThrow(
+      java.lang.String key);
 }

@@ -85,6 +85,11 @@ public final class GrpcProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_Inference_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_Inference_PredictionsEntry_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_Inference_PredictionsEntry_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ModelInfo_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -115,18 +120,20 @@ public final class GrpcProto {
       "\t\022&\n\007metrics\030\002 \003(\0132\025.Results.MetricsEntr" +
       "y\032<\n\014MetricsEntry\022\013\n\003key\030\001 \001(\t\022\033\n\005value\030" +
       "\002 \001(\0132\014.Predictions:\0028\001\"\'\n\nAllResults\022\031\n" +
-      "\007results\030\001 \003(\0132\010.Results\" \n\tInference\022\023\n" +
-      "\013predictions\030\001 \001(\014\"C\n\tModelInfo\022\022\n\nmodel" +
-      "_type\030\001 \001(\t\022\022\n\nmodel_name\030\002 \001(\t\022\016\n\006targe" +
-      "t\030\003 \001(\t2\211\002\n\nRouteGuide\022)\n\rStartTraining\022" +
-      "\r.TrainingInfo\032\007.Status\"\000\022\"\n\013GetProgress" +
-      "\022\006.JobID\032\t.Progress\"\000\022/\n\030GetSpecificTarg" +
-      "etResults\022\007.Target\032\010.Results\"\000\022-\n\024GetAll" +
-      "TargetsResults\022\006.JobID\032\013.AllResults\"\000\022(\n" +
-      "\014GetInference\022\n.Timestamp\032\n.Inference\"\000\022" +
-      "\"\n\tSaveModel\022\n.ModelInfo\032\007.Status\"\000B&\n\027e" +
-      "u.more2020.visual.grpcB\tGrpcProtoP\001b\006pro" +
-      "to3"
+      "\007results\030\001 \003(\0132\010.Results\"q\n\tInference\0220\n" +
+      "\013predictions\030\001 \003(\0132\033.Inference.Predictio" +
+      "nsEntry\0322\n\020PredictionsEntry\022\013\n\003key\030\001 \001(\t" +
+      "\022\r\n\005value\030\002 \001(\002:\0028\001\"C\n\tModelInfo\022\022\n\nmode" +
+      "l_type\030\001 \001(\t\022\022\n\nmodel_name\030\002 \001(\t\022\016\n\006targ" +
+      "et\030\003 \001(\t2\211\002\n\nRouteGuide\022)\n\rStartTraining" +
+      "\022\r.TrainingInfo\032\007.Status\"\000\022\"\n\013GetProgres" +
+      "s\022\006.JobID\032\t.Progress\"\000\022/\n\030GetSpecificTar" +
+      "getResults\022\007.Target\032\010.Results\"\000\022-\n\024GetAl" +
+      "lTargetsResults\022\006.JobID\032\013.AllResults\"\000\022(" +
+      "\n\014GetInference\022\n.Timestamp\032\n.Inference\"\000" +
+      "\022\"\n\tSaveModel\022\n.ModelInfo\032\007.Status\"\000B&\n\027" +
+      "eu.more2020.visual.grpcB\tGrpcProtoP\001b\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -216,6 +223,12 @@ public final class GrpcProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Inference_descriptor,
         new java.lang.String[] { "Predictions", });
+    internal_static_Inference_PredictionsEntry_descriptor =
+      internal_static_Inference_descriptor.getNestedTypes().get(0);
+    internal_static_Inference_PredictionsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_Inference_PredictionsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
     internal_static_ModelInfo_descriptor =
       getDescriptor().getMessageTypes().get(10);
     internal_static_ModelInfo_fieldAccessorTable = new

@@ -116,6 +116,7 @@ public class ForecastingUtils {
             dbConfig.setMongo_db_name(properties.getProperty("mongo_db_name"));
             dbConfig.setMongo_user_name(properties.getProperty("mongo_user_name"));
             dbConfig.setMongo_user_password(properties.getProperty("mongo_user_password"));
+            dbConfig.setInflux_url(properties.getProperty("influx_url"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -174,10 +175,9 @@ public class ForecastingUtils {
     }
 
     public void influxInit(DataBasesConfig dbCon) {
-
         InfluxDBClientOptions options = InfluxDBClientOptions
                 .builder()
-                .url("http://localhost:8086")
+                .url(dbCon.getInflux_url())
                 .org(dbCon.getOrg())
                 .bucket(dbCon.getBucket())
                 .authenticateToken(dbCon.getToken().toCharArray())

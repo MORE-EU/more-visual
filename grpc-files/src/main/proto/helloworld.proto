@@ -76,7 +76,7 @@ message AllResults {
 }
 
 message Inference {
-  bytes predictions = 1;
+  map<string, float> predictions = 1;
 }
 
 message ModelInfo {

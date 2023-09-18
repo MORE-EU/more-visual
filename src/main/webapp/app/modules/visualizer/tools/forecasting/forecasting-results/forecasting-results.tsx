@@ -26,6 +26,8 @@ import Popper from '@mui/material/Popper';
 import { getProgress, saveModel } from 'app/modules/store/forecastingSlice';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import TextField from '@mui/material/TextField';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const Row = props => {
   const { name, status, setResultsModal, handleClick } = props;
@@ -126,6 +128,19 @@ const ForecastingResults = () => {
   const { forecastingData, savedModels } = useAppSelector(state => state.forecasting);
   const [intervalID, setIntervalID] = useState(null);
   const [modelInfo, setmodelInfo] = useState({ model_name: '', model_type: '', target: '' });
+  const [openSnack, setOpenSnack] = useState(false);
+
+  const handleSnackOpen = () => {
+    setOpenSnack(true);
+  };
+
+  const handleSnackClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSnack(false);
+  };
 
   const handleClick = (type, target) => event => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -139,6 +154,7 @@ const ForecastingResults = () => {
   const handleSubmit = e => {
     dispatch(saveModel(modelInfo));
     setAnchorEl(null);
+    handleSnackOpen();
   };
 
   useEffect(() => {
@@ -162,6 +178,11 @@ const ForecastingResults = () => {
 
   return (
     <>
+      <Snackbar open={openSnack} autoHideDuration={3000} onClose={handleSnackClose}>
+        <Alert onClose={handleSnackClose} severity="success" sx={{ width: '100%' }}>
+          Model has been saved
+        </Alert>
+      </Snackbar>
       <Popper id="save-popper" open={open} anchorEl={anchorEl} placement="top">
         <Box sx={{ border: 1, p: 1, bgcolor: 'background.paper', display: 'flex' }}>
           <TextField id="outlined-required" size="small" label={null} onChange={handleTextChange} />

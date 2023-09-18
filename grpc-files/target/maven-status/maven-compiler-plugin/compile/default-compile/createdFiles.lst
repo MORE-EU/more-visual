@@ -52,6 +52,7 @@ eu\more2020\visual\grpc\Predictions$Builder.class
 eu\more2020\visual\grpc\Status.class
 eu\more2020\visual\grpc\PredictionsOrBuilder.class
 eu\more2020\visual\grpc\Predictions$EvaluationDefaultEntryHolder.class
+eu\more2020\visual\grpc\Inference$PredictionsDefaultEntryHolder.class
 eu\more2020\visual\grpc\Results$MetricsDefaultEntryHolder.class
 eu\more2020\visual\grpc\AllResultsOrBuilder.class
 eu\more2020\visual\grpc\Timestamp.class

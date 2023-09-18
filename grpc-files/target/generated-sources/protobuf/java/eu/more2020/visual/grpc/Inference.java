@@ -16,7 +16,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private Inference() {
-    predictions_ = com.google.protobuf.ByteString.EMPTY;
   }
 
   @java.lang.Override
@@ -39,6 +38,7 @@ private static final long serialVersionUID = 0L;
     if (extensionRegistry == null) {
       throw new java.lang.NullPointerException();
     }
+    int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
     try {
@@ -50,8 +50,16 @@ private static final long serialVersionUID = 0L;
             done = true;
             break;
           case 10: {
-
-            predictions_ = input.readBytes();
+            if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+              predictions_ = com.google.protobuf.MapField.newMapField(
+                  PredictionsDefaultEntryHolder.defaultEntry);
+              mutable_bitField0_ |= 0x00000001;
+            }
+            com.google.protobuf.MapEntry<java.lang.String, java.lang.Float>
+            predictions__ = input.readMessage(
+                PredictionsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+            predictions_.getMutableMap().put(
+                predictions__.getKey(), predictions__.getValue());
             break;
           }
           default: {
@@ -78,6 +86,18 @@ private static final long serialVersionUID = 0L;
     return eu.more2020.visual.grpc.GrpcProto.internal_static_Inference_descriptor;
   }
 
+  @SuppressWarnings({"rawtypes"})
+  @java.lang.Override
+  protected com.google.protobuf.MapField internalGetMapField(
+      int number) {
+    switch (number) {
+      case 1:
+        return internalGetPredictions();
+      default:
+        throw new RuntimeException(
+            "Invalid map field number: " + number);
+    }
+  }
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
@@ -87,14 +107,84 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int PREDICTIONS_FIELD_NUMBER = 1;
-  private com.google.protobuf.ByteString predictions_;
+  private static final class PredictionsDefaultEntryHolder {
+    static final com.google.protobuf.MapEntry<
+        java.lang.String, java.lang.Float> defaultEntry =
+            com.google.protobuf.MapEntry
+            .<java.lang.String, java.lang.Float>newDefaultInstance(
+                eu.more2020.visual.grpc.GrpcProto.internal_static_Inference_PredictionsEntry_descriptor, 
+                com.google.protobuf.WireFormat.FieldType.STRING,
+                "",
+                com.google.protobuf.WireFormat.FieldType.FLOAT,
+                0F);
+  }
+  private com.google.protobuf.MapField<
+      java.lang.String, java.lang.Float> predictions_;
+  private com.google.protobuf.MapField<java.lang.String, java.lang.Float>
+  internalGetPredictions() {
+    if (predictions_ == null) {
+      return com.google.protobuf.MapField.emptyMapField(
+          PredictionsDefaultEntryHolder.defaultEntry);
+    }
+    return predictions_;
+  }
+
+  public int getPredictionsCount() {
+    return internalGetPredictions().getMap().size();
+  }
   /**
-   * <code>bytes predictions = 1;</code>
-   * @return The predictions.
+   * <code>map&lt;string, float&gt; predictions = 1;</code>
+   */
+
+  @java.lang.Override
+  public boolean containsPredictions(
+      java.lang.String key) {
+    if (key == null) { throw new NullPointerException("map key"); }
+    return internalGetPredictions().getMap().containsKey(key);
+  }
+  /**
+   * Use {@link #getPredictionsMap()} instead.
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString getPredictions() {
-    return predictions_;
+  @java.lang.Deprecated
+  public java.util.Map<java.lang.String, java.lang.Float> getPredictions() {
+    return getPredictionsMap();
+  }
+  /**
+   * <code>map&lt;string, float&gt; predictions = 1;</code>
+   */
+  @java.lang.Override
+
+  public java.util.Map<java.lang.String, java.lang.Float> getPredictionsMap() {
+    return internalGetPredictions().getMap();
+  }
+  /**
+   * <code>map&lt;string, float&gt; predictions = 1;</code>
+   */
+  @java.lang.Override
+
+  public float getPredictionsOrDefault(
+      java.lang.String key,
+      float defaultValue) {
+    if (key == null) { throw new NullPointerException("map key"); }
+    java.util.Map<java.lang.String, java.lang.Float> map =
+        internalGetPredictions().getMap();
+    return map.containsKey(key) ? map.get(key) : defaultValue;
+  }
+  /**
+   * <code>map&lt;string, float&gt; predictions = 1;</code>
+   */
+  @java.lang.Override
+
+  public float getPredictionsOrThrow(
+      java.lang.String key) {
+    if (key == null) { throw new NullPointerException("map key"); }
+    java.util.Map<java.lang.String, java.lang.Float> map =
+        internalGetPredictions().getMap();
+    if (!map.containsKey(key)) {
+      throw new java.lang.IllegalArgumentException();
+    }
+    return map.get(key);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -111,9 +201,12 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!predictions_.isEmpty()) {
-      output.writeBytes(1, predictions_);
-    }
+    com.google.protobuf.GeneratedMessageV3
+      .serializeStringMapTo(
+        output,
+        internalGetPredictions(),
+        PredictionsDefaultEntryHolder.defaultEntry,
+        1);
     unknownFields.writeTo(output);
   }
 
@@ -123,9 +216,15 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!predictions_.isEmpty()) {
+    for (java.util.Map.Entry<java.lang.String, java.lang.Float> entry
+         : internalGetPredictions().getMap().entrySet()) {
+      com.google.protobuf.MapEntry<java.lang.String, java.lang.Float>
+      predictions__ = PredictionsDefaultEntryHolder.defaultEntry.newBuilderForType()
+          .setKey(entry.getKey())
+          .setValue(entry.getValue())
+          .build();
       size += com.google.protobuf.CodedOutputStream
-        .computeBytesSize(1, predictions_);
+          .computeMessageSize(1, predictions__);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -142,8 +241,8 @@ private static final long serialVersionUID = 0L;
     }
     eu.more2020.visual.grpc.Inference other = (eu.more2020.visual.grpc.Inference) obj;
 
-    if (!getPredictions()
-        .equals(other.getPredictions())) return false;
+    if (!internalGetPredictions().equals(
+        other.internalGetPredictions())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -155,8 +254,10 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + PREDICTIONS_FIELD_NUMBER;
-    hash = (53 * hash) + getPredictions().hashCode();
+    if (!internalGetPredictions().getMap().isEmpty()) {
+      hash = (37 * hash) + PREDICTIONS_FIELD_NUMBER;
+      hash = (53 * hash) + internalGetPredictions().hashCode();
+    }
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -264,6 +365,28 @@ private static final long serialVersionUID = 0L;
       return eu.more2020.visual.grpc.GrpcProto.internal_static_Inference_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 1:
+          return internalGetPredictions();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
+    @SuppressWarnings({"rawtypes"})
+    protected com.google.protobuf.MapField internalGetMutableMapField(
+        int number) {
+      switch (number) {
+        case 1:
+          return internalGetMutablePredictions();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -290,8 +413,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      predictions_ = com.google.protobuf.ByteString.EMPTY;
-
+      internalGetMutablePredictions().clear();
       return this;
     }
 
@@ -318,7 +440,9 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public eu.more2020.visual.grpc.Inference buildPartial() {
       eu.more2020.visual.grpc.Inference result = new eu.more2020.visual.grpc.Inference(this);
-      result.predictions_ = predictions_;
+      int from_bitField0_ = bitField0_;
+      result.predictions_ = internalGetPredictions();
+      result.predictions_.makeImmutable();
       onBuilt();
       return result;
     }
@@ -367,9 +491,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(eu.more2020.visual.grpc.Inference other) {
       if (other == eu.more2020.visual.grpc.Inference.getDefaultInstance()) return this;
-      if (other.getPredictions() != com.google.protobuf.ByteString.EMPTY) {
-        setPredictions(other.getPredictions());
-      }
+      internalGetMutablePredictions().mergeFrom(
+          other.internalGetPredictions());
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
       return this;
@@ -398,38 +521,133 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
+    private int bitField0_;
 
-    private com.google.protobuf.ByteString predictions_ = com.google.protobuf.ByteString.EMPTY;
-    /**
-     * <code>bytes predictions = 1;</code>
-     * @return The predictions.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString getPredictions() {
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.Float> predictions_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.Float>
+    internalGetPredictions() {
+      if (predictions_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            PredictionsDefaultEntryHolder.defaultEntry);
+      }
       return predictions_;
     }
+    private com.google.protobuf.MapField<java.lang.String, java.lang.Float>
+    internalGetMutablePredictions() {
+      onChanged();;
+      if (predictions_ == null) {
+        predictions_ = com.google.protobuf.MapField.newMapField(
+            PredictionsDefaultEntryHolder.defaultEntry);
+      }
+      if (!predictions_.isMutable()) {
+        predictions_ = predictions_.copy();
+      }
+      return predictions_;
+    }
+
+    public int getPredictionsCount() {
+      return internalGetPredictions().getMap().size();
+    }
     /**
-     * <code>bytes predictions = 1;</code>
-     * @param value The predictions to set.
-     * @return This builder for chaining.
+     * <code>map&lt;string, float&gt; predictions = 1;</code>
      */
-    public Builder setPredictions(com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      predictions_ = value;
-      onChanged();
+
+    @java.lang.Override
+    public boolean containsPredictions(
+        java.lang.String key) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      return internalGetPredictions().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getPredictionsMap()} instead.
+     */
+    @java.lang.Override
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.Float> getPredictions() {
+      return getPredictionsMap();
+    }
+    /**
+     * <code>map&lt;string, float&gt; predictions = 1;</code>
+     */
+    @java.lang.Override
+
+    public java.util.Map<java.lang.String, java.lang.Float> getPredictionsMap() {
+      return internalGetPredictions().getMap();
+    }
+    /**
+     * <code>map&lt;string, float&gt; predictions = 1;</code>
+     */
+    @java.lang.Override
+
+    public float getPredictionsOrDefault(
+        java.lang.String key,
+        float defaultValue) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      java.util.Map<java.lang.String, java.lang.Float> map =
+          internalGetPredictions().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <code>map&lt;string, float&gt; predictions = 1;</code>
+     */
+    @java.lang.Override
+
+    public float getPredictionsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      java.util.Map<java.lang.String, java.lang.Float> map =
+          internalGetPredictions().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
+    public Builder clearPredictions() {
+      internalGetMutablePredictions().getMutableMap()
+          .clear();
       return this;
     }
     /**
-     * <code>bytes predictions = 1;</code>
-     * @return This builder for chaining.
+     * <code>map&lt;string, float&gt; predictions = 1;</code>
      */
-    public Builder clearPredictions() {
+
+    public Builder removePredictions(
+        java.lang.String key) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      internalGetMutablePredictions().getMutableMap()
+          .remove(key);
+      return this;
+    }
+    /**
+     * Use alternate mutation accessors instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.Float>
+    getMutablePredictions() {
+      return internalGetMutablePredictions().getMutableMap();
+    }
+    /**
+     * <code>map&lt;string, float&gt; predictions = 1;</code>
+     */
+    public Builder putPredictions(
+        java.lang.String key,
+        float value) {
+      if (key == null) { throw new NullPointerException("map key"); }
       
-      predictions_ = getDefaultInstance().getPredictions();
-      onChanged();
+      internalGetMutablePredictions().getMutableMap()
+          .put(key, value);
+      return this;
+    }
+    /**
+     * <code>map&lt;string, float&gt; predictions = 1;</code>
+     */
+
+    public Builder putAllPredictions(
+        java.util.Map<java.lang.String, java.lang.Float> values) {
+      internalGetMutablePredictions().getMutableMap()
+          .putAll(values);
       return this;
     }
     @java.lang.Override
