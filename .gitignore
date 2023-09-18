@@ -4,9 +4,6 @@
 /src/main/webapp/content/css/main.css
 /target/classes/static/**
 /src/test/javascript/coverage/
-/src/main/resources/config/databsases.cfg
-/src/main/resources/config/mongodb.properties
-docker-init.yml
 
 ######################
 # Node
@@ -79,6 +76,7 @@ out/
 ######################
 /log/
 /target/
+/grpc-files/target
 
 ######################
 # Gradle
