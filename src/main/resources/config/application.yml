@@ -41,7 +41,7 @@ spring:
     active: #spring.profiles.active#
   data:
     mongodb:
-      uri: mongodb://user:F8]E4(6}ke}|&V&2nq4Z@83.212.75.52:27017/more
+      uri:
   jmx:
     enabled: false
   messages:
