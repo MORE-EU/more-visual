@@ -1,111 +1,205 @@
-import React, { useState } from 'react';
-import { Box, Button, Checkbox, Divider, Slider, Stack, Typography } from '@mui/material';
-import List from '@mui/material/List';
+import React, { useEffect, useRef, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { resetFilters, updateFilters, updateQueryResults } from 'app/modules/store/visualizerSlice';
+import { resetFilters, updateFilter, updateQueryResults } from 'app/modules/store/visualizerSlice';
+import { grey } from '@mui/material/colors';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import Slider from '@mui/material/Slider';
 
 export const Filter = () => {
-  const { queryResults, filter, folder, dataset, from, to, resampleFreq, selectedMeasures } = useAppSelector(state => state.visualizer);
+  const { queryResults, filter, folder, dataset, from, to, resampleFreq, selectedMeasures, chartRef, queryResultsLoading } = useAppSelector(
+    state => state.visualizer
+  );
   const dispatch = useAppDispatch();
+  const [windowFilters, updateWindowFilters] = useState({});
+  const [textError, setTextError] = useState({min: false, max: false});
+  const debounceTimer = useRef(null);
+
+  const getFirstFilters = () => {
+    return selectedMeasures.reduce((acc, cur) => {
+      const stats = queryResults.measureStats[cur];
+      return { ...acc, [cur]: [stats.min, stats.max] };
+    }, {});
+  };
+
+  useEffect(() => {
+    if (Object.keys(filter).length === 0) {
+      updateWindowFilters(getFirstFilters());
+    } else {
+      updateWindowFilters(filter);
+    }
+  }, []);
+
+  useEffect(() => {
+    queryResultsLoading && chartRef.showLoading();
+    !queryResultsLoading && chartRef.hideLoading();
+  }, [queryResultsLoading]);
 
   const filterReset = () => {
     dispatch(resetFilters());
+    updateWindowFilters(getFirstFilters());
     dispatch(updateQueryResults({ folder, id: dataset.id, from, to, resampleFreq, selectedMeasures }));
   };
 
-  const handleFilterSlider = (newRange, col) => {
-    const newFilter = new Map(filter);
-    newFilter.set(col, newRange);
+  const onSliderChange = measureCol => (e, range) => {
+    updateWindowFilters(state => ({ ...state, [measureCol]: range }));
+  };
+
+  const handleFilterSlider = colName => (e, newRange) => {
+    const newFilter = { ...windowFilters, [colName]: newRange };
+    dispatch(updateFilter(newFilter));
     dispatch(updateQueryResults({ folder, id: dataset.id, from, to, resampleFreq, selectedMeasures, filter: newFilter }));
   };
 
-  const countDecimals = value => {
-    if (Math.floor(value) === value) return 0;
-    return value.toString().split('.')[1].length || 0;
+  const getParsedValue = val => {
+    return parseFloat(parseFloat(val).toFixed(2));
   };
 
-  const handleTextFields = (e, col, stats, type) => {
-    if (!isNaN(parseFloat(e.target.value))) {
-      if (countDecimals(parseFloat(e.target.value)) <= 2) {
-        const newFilter = new Map(filter);
-        if (type === 'min') {
-          newFilter.set(col, [parseFloat(e.target.value), filter.has(col) ? filter.get(col)[1] : parseFloat(stats.max).toFixed(2)]);
-          dispatch(
-            updateFilters({
-              measureCol: col,
-              range: [parseFloat(e.target.value), filter.has(col) ? filter.get(col)[1] : parseFloat(stats.max).toFixed(2)],
-            })
-          ),
-            dispatch(updateQueryResults({ folder, id: dataset.id, from, to, resampleFreq, selectedMeasures, filter: newFilter }));
-        } else {
-          newFilter.set(col, [filter.has(col) ? filter.get(col)[0] : parseFloat(stats.min).toFixed(2), parseFloat(e.target.value)]);
-          dispatch(
-            updateFilters({
-              measureCol: col,
-              range: [filter.has(col) ? filter.get(col)[0] : parseFloat(stats.min).toFixed(2), parseFloat(e.target.value)],
-            })
-          ),
-            dispatch(updateQueryResults({ folder, id: dataset.id, from, to, resampleFreq, selectedMeasures, filter: newFilter }));
-        }
+  const handleTextFields = (col, choice) => e => {
+    const value = parseFloat(e.target.value);
+    const stats = queryResults.measureStats[col];
+    console.log(windowFilters[col]);
+    if (choice === 'min') {
+      if (value > windowFilters[col][1] || value < stats.min) {
+        setTextError(state => ({...state, min: true}))
+        setTimeout(() => {
+          setTextError(state => ({...state, min: false}))
+        }, 800);
+        return;
+      } else {
+        updateWindowFilters(state => ({ ...state, [col]: [value, windowFilters[col][1]] }));
+        const newFilter = { ...windowFilters, [col]: [value, windowFilters[col][1]] };
+        clearTimeout(debounceTimer.current);
+        debounceTimer.current = setTimeout(() => {
+          dispatch(updateQueryResults({ folder, id: dataset.id, from, to, resampleFreq, selectedMeasures, filter: newFilter }));
+        }, 1000);
+      }
+    } else {
+      if (value < windowFilters[col][0] || value > stats.max) {
+        setTextError(state => ({...state, max: true}))
+        setTimeout(() => {
+          setTextError(state => ({...state, max: false}))
+        }, 800);
+        return;
+      } else {
+        updateWindowFilters(state => ({ ...state, [col]: [windowFilters[col][0], value] }));
+        const newFilter = { ...windowFilters, [col]: [windowFilters[col][0], value] };
+        clearTimeout(debounceTimer.current);
+        debounceTimer.current = setTimeout(() => {
+          dispatch(updateQueryResults({ folder, id: dataset.id, from, to, resampleFreq, selectedMeasures, filter: newFilter }));
+        }, 1000);
       }
     }
   };
 
   return (
-    <Box sx={{ pl: 2, pr: 2 }}>
-      <Box>
-        <Button variant="contained" onClick={filterReset}>
-          Reset Filters
-        </Button>
-      </Box>
-      <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+    <>
+      <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', rowGap: 2, pt: 2 }}>
+        <Box
+          sx={{
+            width: '60%',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            borderBottom: `2px solid ${grey[600]}`,
+            display: 'flex',
+            columnGap: 1,
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, display: 'block', width: '100%', color: grey[800] }}>
+            Available Filters
+          </Typography>
+          <Tooltip title="Reset Filters" placement="right">
+            <IconButton onClick={filterReset}>
+              <RestartAltIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
         {queryResults &&
           selectedMeasures.map((col, idx) => {
             const stats = queryResults.measureStats[col];
             return (
-              <Box key={col} sx={{ width: '80%', mt: idx > 0 ? 1 : 0 }}>
-                <Typography gutterBottom variant="overline" sx={{ textAlign: 'center', fontWeight: 900, display: 'block' }}>
-                  {dataset.header[col]}
-                </Typography>
-                <Slider
-                  value={!filter.has(col) ? [stats.min, stats.max] : [parseFloat(filter.get(col)[0]), parseFloat(filter.get(col)[1])]}
-                  min={stats.min}
-                  max={stats.max}
-                  onChange={(e, newRange) => {
-                    dispatch(updateFilters({ measureCol: col, range: newRange }));
+              <Box
+                key={col}
+                sx={{
+                  width: '80%',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  display: 'flex',
+                  // border: `2px solid ${grey[700]}`,
+                  // borderRadius: 3,
+                  p: 1,
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  // backgroundColor: grey[100],
+                }}
+              >
+                <Box
+                  key={`${col}-filter-name`}
+                  sx={{
+                    border: `2px solid ${grey[600]}`,
+                    alignItems: 'end',
+                    display: 'flex',
+                    width: '20%',
+                    textAlign: 'center',
+                    borderTopRightRadius: 18,
+                    borderBottomRightRadius: 18,
+                    p: 1
                   }}
-                  onChangeCommitted={(e, newRange) => handleFilterSlider(newRange, col)}
-                  valueLabelDisplay="auto"
-                />
-                <Stack direction="row" spacing={2}>
+                >
+                  <Typography variant="subtitle1" sx={{ fontWeight: 900, display: 'block', width: '100%' }}>
+                    {`${dataset.header[col]}`}
+                  </Typography>
+                </Box>
+                <Box key={`${col}-slider`} sx={{ width: '30%', display: 'flex' }}>
+                  <Slider
+                    value={!Object.hasOwn(windowFilters, col) ? [stats.min, stats.max] : windowFilters[col]}
+                    min={parseFloat(parseFloat(stats.min).toFixed(2))}
+                    max={parseFloat(parseFloat(stats.max).toFixed(2))}
+                    onChange={onSliderChange(col)}
+                    onChangeCommitted={handleFilterSlider(col)}
+                    valueLabelDisplay="auto"
+                    sx={{
+                      '& .MuiSlider-thumb': { backgroundColor: grey[700] },
+                      '& .MuiSlider-track': { backgroundColor: grey[500], borderColor: grey[500] },
+                      '& .MuiSlider-rail': { backgroundColor: grey[500] },
+                    }}
+                  />
+                </Box>
+                <Box sx={{ width: '30%', display: 'flex', columnGap: 1 }}>
                   <TextField
                     id="outlined-basic"
                     label="Min-Value"
                     variant="outlined"
                     type="number"
                     size="small"
-                    value={filter.has(col) ? filter.get(col)[0] : parseFloat(parseFloat(stats.min).toFixed(2))}
-                    onChange={e => handleTextFields(e, col, stats, 'min')}
+                    value={!Object.hasOwn(windowFilters, col) ? getParsedValue(stats.min) : getParsedValue(windowFilters[col][0])}
+                    onChange={handleTextFields(col, 'min')}
+                    error={textError.min}
                   />
+                  <Typography gutterBottom variant="subtitle1" sx={{ fontWeight: 900, display: 'block', alignSelf: 'end' }}>
+                    -
+                  </Typography>
                   <TextField
                     id="outlined-basic"
                     label="Max-Value"
                     variant="outlined"
                     type="number"
                     size="small"
-                    value={filter.has(col) ? filter.get(col)[1] : parseFloat(parseFloat(stats.max).toFixed(2))}
-                    onChange={e => {
-                      handleTextFields(e, col, stats, 'max');
-                    }}
+                    value={!Object.hasOwn(windowFilters, col) ? getParsedValue(stats.max) : getParsedValue(windowFilters[col][1])}
+                    onChange={handleTextFields(col, 'max')}
+                    error={textError.max}
                   />
-                </Stack>
-                <Divider sx={{ mt: 2 }} />
+                </Box>
               </Box>
             );
           })}
-      </List>
-    </Box>
+      </Box>
+    </>
   );
 };
 

@@ -10,6 +10,9 @@ const initialState = {
   forecastingError: null,
   forecastingInitialSeries: null,
   savedModels: null,
+  forecastingInference: null,
+  predModalOpen: false,
+  selectedModel: null,
 };
 
 const resultsMaker = (state, payload: IForecastingResults) => {
@@ -71,6 +74,11 @@ export const deleteModelByName = createAsyncThunk('deleteModelByName', async (mo
   return response;
 });
 
+export const getInference = createAsyncThunk('getInference', async (info: { timestamp: number; model_name: string }) => {
+  const response = await axios.post(`api/forecasting/inference`, info).then(res => res.data);
+  return response;
+});
+
 export const getInitialSeries = createAsyncThunk(
   'getInitialSeries',
   async (data: { from; to; folder; id; measure }, { getState, dispatch }) => {
@@ -97,8 +105,21 @@ const forecasting = createSlice({
     setForecastingInitialSeries(state, action) {
       state.forecastingInitialSeries = action.payload;
     },
+    setPredModalOpen(state, action) {
+      state.predModalOpen = action.payload;
+    },
+    setSelectedModel(state, action) {
+      state.selectedModel = action.payload;
+    },
+    setForecastingInference(state, action) {
+      state.forecastingInference = action.payload;
+    },
   },
   extraReducers(builder) {
+    builder.addCase(getInference.fulfilled, (state, action) => {
+      state.forecastingLoading = false;
+      state.forecastingInference = action.payload.predictions;
+    });
     builder.addCase(startTraining.fulfilled, (state, action) => {
       state.forecastingLoading = false;
     });
@@ -125,7 +146,8 @@ const forecasting = createSlice({
         getProgress.pending,
         getTarget.pending,
         getInitialSeries.pending,
-        saveModel.pending
+        saveModel.pending,
+        getInference.pending
       ),
       state => {
         state.forecastingLoading = true;
@@ -138,7 +160,8 @@ const forecasting = createSlice({
         getProgress.rejected,
         getTarget.rejected,
         getInitialSeries.rejected,
-        saveModel.rejected
+        saveModel.rejected,
+        getInference.rejected
       ),
       (state, action) => {
         state.forecastingError = action.payload;
@@ -148,5 +171,11 @@ const forecasting = createSlice({
   },
 });
 
-export const { setForecastingData, setForecastingInitialSeries } = forecasting.actions;
+export const {
+  setForecastingData,
+  setForecastingInitialSeries,
+  setPredModalOpen,
+  setSelectedModel,
+  setForecastingInference,
+} = forecasting.actions;
 export default forecasting.reducer;

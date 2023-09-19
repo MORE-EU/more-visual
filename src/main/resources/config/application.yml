@@ -39,11 +39,11 @@ spring:
     # Otherwise, it will be filled in by maven when building the JAR file
     # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
     active: #spring.profiles.active#
-  jmx:
-    enabled: false
   data:
     mongodb:
-      uri: mongodb://user:password@localhost:27017/more
+      uri:
+  jmx:
+    enabled: false
   messages:
     basename: i18n/messages
   main:
@@ -110,6 +110,7 @@ jhipster:
 application:
   name: 'More2020'
   workspacePath: /opt/more-workspace
+  dbSettings: /opt/more-workspace/config/settings.cfg
   timeFormat: 'yyyy-MM-dd[ HH:mm:ss]'
   delimiter: ','
   toolApi: http://localhost:8889/

@@ -19,7 +19,7 @@ const Forecasting = () => {
   return (
     <Grid sx={{ width: '100%', height: '100%' }}>
       {!newTrain && savedModels && <ForecastingModelSelection savedModels={savedModels} setNewTrain={setNewTrain} />}
-      {newTrain && <ForecastingTrainStepper/>}
+      {newTrain && <ForecastingTrainStepper setNewTrain={setNewTrain} />}
     </Grid>
   );
 };

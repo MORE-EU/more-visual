@@ -18,7 +18,7 @@ import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useAppDispatch } from 'app/modules/store/storeConfig';
-import { deleteModelByName } from 'app/modules/store/forecastingSlice';
+import { deleteModelByName, setPredModalOpen, setSelectedModel } from 'app/modules/store/forecastingSlice';
 import ForecastingPredModal from '../forecasting-prediction/forecasting-prediction-modal';
 
 const ForecastingModelSelection = props => {
@@ -31,6 +31,11 @@ const ForecastingModelSelection = props => {
 
   const handleDelete = modelName => e => {
     dispatch(deleteModelByName(modelName));
+  };
+
+  const handleInference = modelName => e => {
+    dispatch(setPredModalOpen(true));
+    dispatch(setSelectedModel(modelName));
   };
 
   return (
@@ -88,7 +93,7 @@ const ForecastingModelSelection = props => {
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Predict">
-                      <IconButton>
+                      <IconButton onClick={handleInference(model.model_name)}>
                         <QueryStatsIcon />
                       </IconButton>
                     </Tooltip>

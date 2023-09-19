@@ -95,7 +95,6 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
 
   return (
     <>
-    {console.log(forecastingForm)}
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Grid
           className={'basic-values'}

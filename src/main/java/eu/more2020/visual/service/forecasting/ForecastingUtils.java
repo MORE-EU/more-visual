@@ -2,7 +2,10 @@ package eu.more2020.visual.service.forecasting;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,8 +27,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -44,9 +47,8 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoClient;
 
 import eu.more2020.visual.domain.Forecasting.DBs.Bebeze;
-import eu.more2020.visual.domain.Forecasting.DBs.InfluxDBConfig;
+import eu.more2020.visual.domain.Forecasting.DBs.DataBasesConfig;
 import eu.more2020.visual.domain.Forecasting.DBs.Meta;
-import eu.more2020.visual.domain.Forecasting.DBs.MongoDBConfig;
 import eu.more2020.visual.repository.MetaRepository;
 import io.reactivex.rxjava3.core.BackpressureOverflowStrategy;
 
@@ -57,13 +59,19 @@ public class ForecastingUtils {
 
     @Autowired
     private MetaRepository metaRepository;
-    private InfluxDBConfig influxDBConfig = new InfluxDBConfig();
-    private MongoDBConfig mongoDBConfig;
-    private MongoTemplate mongoTemplate;
+    private DataBasesConfig dbConfig = new DataBasesConfig();
+    private Properties properties = new Properties();
 
-    public ForecastingUtils(MetaRepository metaRepository, InfluxDBConfig influxDBConfig) {
+    @Value("${application.workspacePath}")
+    private String workspacePath;
+
+    @Value("${application.dbSettings}")
+    private String dbSettings;
+
+    public ForecastingUtils(MetaRepository metaRepository, Properties properties, DataBasesConfig dbConfig) {
         this.metaRepository = metaRepository;
-        this.influxDBConfig = influxDBConfig;
+        this.dbConfig = dbConfig;
+        this.properties = properties;
     }
 
     public ResponseEntity<List<Meta>> deleteForecastingModel(String modelName) {
@@ -98,16 +106,31 @@ public class ForecastingUtils {
     }
 
     public String dbsInitialization () {
+        try {
+            FileInputStream inputStream = new FileInputStream(dbSettings);
+            properties.load(inputStream);
+            dbConfig.setBucket(properties.getProperty("bucket"));
+            dbConfig.setOrg(properties.getProperty("org"));
+            dbConfig.setToken(properties.getProperty("token"));
+            dbConfig.setMongo_uri(properties.getProperty("mongo_uri"));
+            dbConfig.setMongo_db_name(properties.getProperty("mongo_db_name"));
+            dbConfig.setMongo_user_name(properties.getProperty("mongo_user_name"));
+            dbConfig.setMongo_user_password(properties.getProperty("mongo_user_password"));
+            dbConfig.setInflux_url(properties.getProperty("influx_url"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        executorService.submit(() -> mongoInit());
-        executorService.submit(() -> influxInit());
+        executorService.submit(() -> mongoInit(dbConfig));
+        executorService.submit(() -> influxInit(dbConfig));
         return "done";
     }
 
     public List<Point> getPoints() {
         log.debug("Parsing CSV file...");
         long startTime = System.currentTimeMillis();
-        Path pathInput = Paths.get("/home/bstam/ForecastingController/csv/bbz1big.csv");
+        Path pathInput = Paths.get(workspacePath + "/bbz/bbz1big.csv");
         List<Point> list = List.of(); // Default to empty list.
         try {
             int initialCapacity = (int) Files.lines(pathInput).count();
@@ -151,14 +174,13 @@ public class ForecastingUtils {
         return list;
     }
 
-    public void influxInit() {
-
+    public void influxInit(DataBasesConfig dbCon) {
         InfluxDBClientOptions options = InfluxDBClientOptions
                 .builder()
-                .url("http://localhost:8086")
-                .org(influxDBConfig.getOrg())
-                .bucket(influxDBConfig.getBucket())
-                .authenticateToken(influxDBConfig.getToken().toCharArray())
+                .url(dbCon.getInflux_url())
+                .org(dbCon.getOrg())
+                .bucket(dbCon.getBucket())
+                .authenticateToken(dbCon.getToken().toCharArray())
                 .build();
 
         InfluxDBClient client = InfluxDBClientFactory.create(options);
@@ -166,7 +188,7 @@ public class ForecastingUtils {
 
         String query = String.format(
                 "from(bucket:\"%s\") |> range(start: 0) |> filter(fn: (r) => r._measurement == \"%s\") |> limit(n: 1)",
-                influxDBConfig.getBucket(), "bebeze");
+                dbCon.getBucket(), "bebeze");
 
         List<FluxTable> tables = queryApi.query(query);
         if (tables.isEmpty()) {
@@ -184,20 +206,19 @@ public class ForecastingUtils {
         long endTime = System.currentTimeMillis();
         double elapsedTimeSeconds = (endTime - startTime) / 1000.0;
         log.debug("Influx data injection took: " + elapsedTimeSeconds + " seconds");
-        log.debug("completed initialization");
+        log.debug("Influx: completed initialization");
         } catch (InfluxException e) {
         e.printStackTrace();
         }
         } else {
-            log.debug("Initialization has already been completed");
+            log.debug("Influx: Initialization has already been completed");
         }
         client.close();
     }
 
-    public void mongoInit() {
+    public void mongoInit(DataBasesConfig dbCon) {
         // Create connection string
-        ConnectionString connString = new ConnectionString(mongoDBConfig.getConnectionString());
-
+        ConnectionString connString = new ConnectionString(dbCon.getMongo_uri());
         // Create MongoClientSettings
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connString)
@@ -210,52 +231,52 @@ public class ForecastingUtils {
 
             // Check if the database exists
             boolean databaseExists = mongoClient.listDatabaseNames().into(new ArrayList<>())
-                    .contains(mongoDBConfig.getDatabaseName());
+                    .contains(dbCon.getMongo_db_name());
             if (!databaseExists) {
-                initializeMongoDatabase(mongoClient);
+                initializeMongoDatabase(mongoClient, dbCon);
             }
 
             // Check if the user exists
-            Document userFilter = new Document("user", mongoDBConfig.getUserName());
+            Document userFilter = new Document("user", dbCon.getMongo_user_name());
             boolean userExists = adminDatabase.getCollection("system.users").countDocuments(userFilter) > 0;
             if (!userExists) {
-                initializeMongoUser(mongoClient);
+                initializeMongoUser(mongoClient, dbCon);
             }
             mongoClient.close();
         }
     }
 
-    public void initializeMongoUser(MongoClient mongoClient) {
+    public void initializeMongoUser(MongoClient mongoClient, DataBasesConfig dbCon) {
 
-        MongoDatabase targetDatabase = mongoClient.getDatabase(mongoDBConfig.getDatabaseName());
+        MongoDatabase targetDatabase = mongoClient.getDatabase(dbCon.getMongo_db_name());
         // Create the user
-        Document createUserCommand = new Document("createUser", mongoDBConfig.getUserName())
-                .append("pwd", mongoDBConfig.getPassword())
+        Document createUserCommand = new Document("createUser", dbCon.getMongo_user_name())
+                .append("pwd", dbCon.getMongo_user_password())
                 .append("roles", Arrays.asList(
-                        new Document("role", "readWrite").append("db", mongoDBConfig.getDatabaseName()),
-                        new Document("role", "dbAdmin").append("db", mongoDBConfig.getDatabaseName())));
+                        new Document("role", "readWrite").append("db", dbCon.getMongo_db_name()),
+                        new Document("role", "dbAdmin").append("db", dbCon.getMongo_db_name())));
 
         Document createUserResult = targetDatabase.runCommand(createUserCommand);
         if (createUserResult.getDouble("ok") == 1.0) {
-            log.debug("User created successfully.");
+            log.debug("Mongo: User created successfully.");
         } else {
-            log.debug("Failed to create user.");
+            log.debug("Mongo: Failed to create user.");
         }
     }
 
-    public void initializeMongoDatabase(MongoClient mongoClient) {
+    public void initializeMongoDatabase(MongoClient mongoClient, DataBasesConfig dbCon) {
 
-        MongoDatabase targetDatabase = mongoClient.getDatabase(mongoDBConfig.getDatabaseName());
+        MongoDatabase targetDatabase = mongoClient.getDatabase(dbCon.getMongo_db_name());
 
-        Document createDatabaseCommand = new Document("create", mongoDBConfig.getDatabaseName());
+        Document createDatabaseCommand = new Document("create", dbCon.getMongo_db_name());
         Document databaseCreation = targetDatabase.runCommand(createDatabaseCommand);
         targetDatabase.createCollection("meta");
         targetDatabase.getCollection("more").drop();
 
         if (databaseCreation.getDouble("ok") == 1.0) {
-            log.debug("Database created successfully.");
+            log.debug("Mongo: Database created successfully.");
         } else {
-            log.debug("Failed to create Database.");
+            log.debug("Mongo: Failed to create Database.");
         }
     }
 

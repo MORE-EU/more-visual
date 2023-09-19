@@ -78,7 +78,7 @@ export const IForecastingDefault: Readonly<IForecastingForm> = {
   cleanData: true,
   algorithms: {},
   dataSplit: [60, 20, 20],
-  features: { columnFeatures: [], optionalFeatures: { temporal: [] } },
+  features: { columnFeatures: [], optionalFeatures: {} },
 };
 
 export const IXGBoostDefault: Readonly<IXGBoost> = {

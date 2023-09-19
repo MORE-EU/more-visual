@@ -3,14 +3,14 @@ package eu.more2020.visual.domain.Forecasting.Grpc;
 import java.io.Serializable;
 
 public class TimestampReq implements Serializable {
-    private Integer timestamp;
+    private Long timestamp;
     private String model_name;
 
-    public Integer getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Integer timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -22,7 +22,7 @@ public class TimestampReq implements Serializable {
         this.model_name = model_name;
     }
 
-    public TimestampReq(Integer timestamp, String model_name) {
+    public TimestampReq(Long timestamp, String model_name) {
         this.timestamp = timestamp;
         this.model_name = model_name;
     }

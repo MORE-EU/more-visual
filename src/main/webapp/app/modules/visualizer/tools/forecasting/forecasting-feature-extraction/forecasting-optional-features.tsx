@@ -180,7 +180,7 @@ const Row = props => {
   const [open, setOpen] = React.useState(false);
 
   const hadleOptionalFeatureCheckBoxes = value => e => {
-    if (Object.hasOwn(forecastingForm.features.optionalFeatures, value) && value !== "temporal") {
+    if (Object.hasOwn(forecastingForm.features.optionalFeatures, value)) {
       const feat = forecastingForm.features.optionalFeatures;
       delete feat[value];
       setForecastingForm(state => ({ ...state, features: { ...state.features, optionalFeatures: feat } }));
