@@ -9,9 +9,23 @@ import { useScrollBlock } from 'app/shared/util/useScrollBlock';
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import moment from 'moment';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import {updateChartRef,updateCompareQueryResults,updateFrom,updateQueryResults,updateResampleFreq,updateTo,
-  applyChangepointDetection,toggleCustomChangepoints,applyDeviationDetection,liveDataImplementation,applyYawMisalignmentDetection,
-  updateAlertResults,setAlertingPreview,setAlertingPlotMode} from 'app/modules/store/visualizerSlice';
+import {
+  updateChartRef,
+  updateCompareQueryResults,
+  updateFrom,
+  updateQueryResults,
+  updateResampleFreq,
+  updateTo,
+  applyChangepointDetection,
+  toggleCustomChangepoints,
+  applyDeviationDetection,
+  liveDataImplementation,
+  applyYawMisalignmentDetection,
+  updateAlertResults,
+  setAlertingPreview,
+  setAlertingPlotMode,
+  updateCustomChangepoints
+} from 'app/modules/store/visualizerSlice';
 import { ChartPlotBands } from 'app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands';
 import chartAlertingChecker, { alertingPlotBandsCreator } from './chart-alerting/chart-alerting-functions';
 
@@ -22,8 +36,8 @@ HighchartsMore(Highcharts);
 annotationsAdvanced(Highcharts);
 
 export const Chart = () => {
-  const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,measureColors,queryResultsLoading,filter,
-    queryResults,changeChart,compare,changepointDetectionEnabled,detectedChangepointFilter,customChangepointsEnabled,patterns,data,compareData,
+  const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,measureColors,queryResultsLoading,filter, customChangepoints,
+    queryResults,changeChart,compare,changepointDetectionEnabled,detectedChangepointFilter,customChangepointsEnabled,data,compareData,
     forecastData,soilingEnabled,alertingPlotMode,alertResults,forecastingDataSplit,soilingWeeks,yawMisalignmentEnabled,secondaryData,chartType,
     liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate} = useAppSelector(state => state.visualizer);
 
@@ -56,22 +70,22 @@ export const Chart = () => {
   const isChangepointDetectionEnabled = useRef(changepointDetectionEnabled);
 
   // Color Zones For Patterns
-  useEffect(() => {
-    const newZones =
-      patterns !== null &&
-      []
-        .concat(
-          ...patterns.patternGroups.map(patternGroup => {
-            return [].concat(
-              ...patternGroup.patterns.map(pattern => {
-                return [{ value: pattern.start }, { value: pattern.end, color: patternGroup.color }];
-              })
-            );
-          })
-        )
-        .sort((a, b) => a.value.getTime() - b.value.getTime());
-    setZones(newZones);
-  }, [patterns]);
+  // useEffect(() => {
+  //   const newZones =
+  //     patterns !== null &&
+  //     []
+  //       .concat(
+  //         ...patterns.patternGroups.map(patternGroup => {
+  //           return [].concat(
+  //             ...patternGroup.patterns.map(pattern => {
+  //               return [{ value: pattern.start }, { value: pattern.end, color: patternGroup.color }];
+  //             })
+  //           );
+  //         })
+  //       )
+  //       .sort((a, b) => a.value.getTime() - b.value.getTime());
+  //   setZones(newZones);
+  // }, [patterns]);
 
   //change zones if forecasting is activated and both start & end date is set
   const getZones = color => {
@@ -208,19 +222,43 @@ export const Chart = () => {
     }
   };
 
+  const getChangepointData = (start, end, series) => {
+    console.log(series);
+    return series.map((s, idx) => {
+      const newCustomChangepoint = {
+          range: { from: start, to: end } as ITimeRange,
+          measure: dataset.header.indexOf(s.userOptions.name),
+          measureChartId: s.userOptions.index,
+          id: latestCustomChangepoints.current.reduce((max, obj) => obj.id > max ? obj.id : max, 0) + 1,
+          custom: true,
+        };
+      return newCustomChangepoint;
+    })
+    // const newCustomChangepoint = {
+    //   range: { from: start, to: end } as ITimeRange,
+    //   id: latestCustomChangepoints.current.length,
+    //   custom: true,
+    // };
+  }
+
   const customChangepointSelection = event => {
     event.preventDefault();
-    const newCustomChangepoint = {
-      range: { from: event.xAxis[0].min, to: event.xAxis[0].max } as ITimeRange,
-      id: latestCustomChangepoints.current.length,
-      custom: true,
-    };
-    latestCustomChangepoints.current.push(newCustomChangepoint);
+    const newCustomChangepoints = getChangepointData(event.xAxis[0].min, event.xAxis[0].max, event.target.series);
+    // const newCustomChangepoint = {
+    //   range: { from: event.xAxis[0].min, to: event.xAxis[0].max } as ITimeRange,
+    //   id: latestCustomChangepoints.current.length,
+    //   custom: true,
+    // };
+    // latestCustomChangepoints.current = [...latestCustomChangepoints.current, newCustomChangepoint];
+    latestCustomChangepoints.current = [...latestCustomChangepoints.current, ...newCustomChangepoints];
+    dispatch(updateCustomChangepoints(latestCustomChangepoints.current));
     dispatch(toggleCustomChangepoints(false));
   };
 
   const setCustomChangepoints = newCustomChangepoints => {
     latestCustomChangepoints.current = newCustomChangepoints;
+    dispatch(updateCustomChangepoints(latestCustomChangepoints.current));
+
   };
 
   const chartFunctions = (e: { target: any }) => {

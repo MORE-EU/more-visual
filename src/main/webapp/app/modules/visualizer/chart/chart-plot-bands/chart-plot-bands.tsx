@@ -19,7 +19,7 @@ export interface IChartPlotBandsProps {
 }
 
 
-export const ChartPlotBands = (props:IChartPlotBandsProps) => {
+export const ChartPlotBands = (props: IChartPlotBandsProps) => {
 
   const {manualChangepoints, manualChangepointsEnabled,
     detectedChangepoints, changepointDetectionEnabled,

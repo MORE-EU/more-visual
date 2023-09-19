@@ -1,5 +1,7 @@
 package eu.more2020.visual.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.protobuf.InvalidProtocolBufferException;
 import eu.more2020.visual.domain.*;
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
@@ -14,7 +16,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface ToolsRepository {
 
-    List<Changepoint> getManualChangepoints(String id);
+    List<Changepoint> getManualChangepoints(String id) throws InvalidProtocolBufferException, JsonProcessingException;
 
     List<DataPoint> forecasting(String id);
 

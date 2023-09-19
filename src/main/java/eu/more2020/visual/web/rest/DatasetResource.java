@@ -42,11 +42,10 @@ public class DatasetResource {
     private static final String ENTITY_NAME = "dataset";
     private final Logger log = LoggerFactory.getLogger(DatasetResource.class);
     private final DatasetRepository datasetRepository;
-    private final ToolsRepository toolsRepository;
     private final CsvDataService csvDataService;
     private final ModelarDataService modelarDataService;
     private final IndexedModelarDataService indexedModelarDataService;
-    private final AlertRepository alertRepository;
+
     private final FileHandlingRepository fileHandlingRepository;
 
     @Value("${jhipster.clientApp.name}")
@@ -56,16 +55,13 @@ public class DatasetResource {
     private String workspacePath;
 
     public DatasetResource(DatasetRepository datasetRepository,
-                           ToolsRepository toolsRepository,
-                           CsvDataService csvDataService, ModelarDataService modelarDataService, 
+                           CsvDataService csvDataService, ModelarDataService modelarDataService,
                            IndexedModelarDataService indexedModelarDataService, AlertRepository alertRepository,
                            FileHandlingRepository fileHandlingRepository) {
         this.datasetRepository = datasetRepository;
-        this.toolsRepository = toolsRepository;
         this.csvDataService = csvDataService;
         this.modelarDataService = modelarDataService;
         this.indexedModelarDataService = indexedModelarDataService;
-        this.alertRepository = alertRepository;
         this.fileHandlingRepository = fileHandlingRepository;
     }
 
@@ -187,61 +183,7 @@ public class DatasetResource {
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 
-    @PostMapping("/tools/changepoint_detection")
-    public ResponseEntity<List<Changepoint>> changepointDetection(@Valid @RequestBody ChangepointDetection changepoints) throws IOException {
-        log.debug("CP for {}", changepoints);
-        List<Changepoint> detectedChangepoints = toolsRepository.changepointDetection(changepoints);
-        log.debug("Detected CP for {}", detectedChangepoints);
 
-        return new ResponseEntity<>(detectedChangepoints, HttpStatus.OK);
-    }
-
-    @GetMapping("/tools/changepoint_detection/washes/{id}")
-    public List<Changepoint> getManualChangepoints(@PathVariable String id) throws IOException {
-        log.debug("REST request to get manual changepoints ");
-        return toolsRepository.getManualChangepoints(id);
-    }
-
-    @PostMapping("/tools/forecasting/{id}")
-    public List<DataPoint> forecast(@PathVariable String id) throws IOException {
-        log.debug("REST request to get Forecast");
-        return toolsRepository.forecasting(id);
-    }
-
-    @PostMapping("/tools/soiling")
-    public List<DataPoint> soilingDetection(@Valid @RequestBody DeviationDetection deviationDetection) {
-        return toolsRepository.soilingDetection(deviationDetection);
-    }
-
-
-    @PostMapping("/tools/yaw_misalignment")
-    public List<DataPoint> yawMisalignmentDetection(@Valid @RequestBody RangeDetection yawMisalignmentDetection) {
-        return toolsRepository.yawMisalignmentDetection(yawMisalignmentDetection);
-    }
-
-    @GetMapping("/alerts/{datasetId}")
-    public List<Alert> getAlerts(@PathVariable String datasetId) throws IOException {
-        log.debug("REST request to find alerts for {} dataset", datasetId);
-        return alertRepository.getAlerts(datasetId);
-    }
-
-    @PostMapping("/alerts/add")
-    public List<Alert> saveAlert(@Valid @RequestBody Alert alertInfo) throws IOException {
-        log.debug("REST request to add alert with name: {}", alertInfo.getName());
-        return alertRepository.saveAlert(alertInfo);
-    }
-
-    @PostMapping("/alerts/remove/{alertName}")
-    public List<Alert> deleteAlert(@PathVariable String alertName) throws IOException {
-        log.debug("REST request to remove alert with name: {}", alertName);
-        return alertRepository.deleteAlert(alertName);
-    }
-    
-    @PostMapping("/alerts/edit")
-    public List<Alert> editAlert(@Valid @RequestBody Alert editedAlert) throws IOException {
-        log.debug("REST request to edit alert with name: {}", editedAlert.getName());
-        return alertRepository.editAlert(editedAlert);
-    }
 
     @PostMapping("/files/upload/{farmName}")
     public ResponseEntity<FarmMeta> saveUploadedFile (@PathVariable String farmName, @RequestParam("files") MultipartFile[] files) throws URISyntaxException, IOException {
@@ -259,7 +201,7 @@ public class DatasetResource {
       return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
     }
-    
+
     @PostMapping("/files/upload/farm")
     public ResponseEntity<FarmMeta> createNewFarm (@RequestParam("meta") String metaInfo, @RequestParam("files") MultipartFile[] files) throws URISyntaxException, IOException {
     ObjectMapper ob = new ObjectMapper();

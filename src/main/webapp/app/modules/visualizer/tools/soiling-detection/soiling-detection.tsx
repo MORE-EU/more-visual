@@ -64,9 +64,6 @@ export const SoilingDetection = () => {
   return (
     <Box sx={{pl: 2, pr: 2}}>
       <Box>
-        <Typography variant="h6" gutterBottom>
-          Soiling Detection
-        </Typography>
         <Divider orientation="horizontal" flexItem>
         </Divider>
       </Box>
@@ -121,7 +118,7 @@ export const SoilingDetection = () => {
           flexDirection: 'row',
           justifyContent: 'space-between',
         }}>
-          <Box sx={{pt: 1}}>Enable</Box>
+          <Box sx={{pt: 1}}><Typography variant="body1">Enable</Typography></Box>
           <Switch
             checked={soilingEnabled}
             disabled={!changepointDetectionEnabled}
