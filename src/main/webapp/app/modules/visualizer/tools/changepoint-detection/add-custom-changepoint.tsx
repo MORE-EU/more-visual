@@ -1,17 +1,20 @@
+import {Box, Button, Typography} from "@mui/material";
 import React from "react";
 import {toggleCustomChangepoints} from "app/modules/store/visualizerSlice";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-export const AddCustomChangepoint = () => {
-  const {customChangepointsEnabled, anchorEl} = useAppSelector(state => state.visualizer);
-  const dispatch = useAppDispatch();
 
-  const handleCustomChangepointsChange = () => {
-    dispatch(toggleCustomChangepoints(!customChangepointsEnabled));
-  }
+export interface AddCustomChangepointProps {
+  check: boolean,
+  name: string,
+  handleFunction: any,
+}
+export const AddCustomChangepoint = (props:AddCustomChangepointProps) => {
+  const {anchorEl} = useAppSelector(state => state.visualizer);
+  const dispatch = useAppDispatch();
+  const {check, name, handleFunction} = props;
+
 
   return (
     <Box sx={{
@@ -19,13 +22,13 @@ export const AddCustomChangepoint = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
     }}>
-      <Box sx={{pt: 1}}>Add New
-
+      <Box sx={{pt: 1}}>
+        <Typography variant="body1">{name}</Typography>
       </Box>
       <Button
-        onClick={() => handleCustomChangepointsChange()}
+        onClick={() => handleFunction()}
       >
-        {(customChangepointsEnabled && anchorEl === null)
+        {(check && anchorEl === null)
           ?  <HighlightOffIcon /> : <AddCircleOutlineIcon color={"primary"}/>
         }
       </Button>

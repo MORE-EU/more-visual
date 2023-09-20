@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {
   getManualChangepoints, updateSelectedMeasures,
   toggleChangepointDetection, applyChangepointDetection,
-  toggleManualChangepoints, toggleSoilingDetection, setDetectedChangepointFilter,
+  toggleManualChangepoints, toggleSoilingDetection, setDetectedChangepointFilter, toggleCustomChangepoints,
 } from "app/modules/store/visualizerSlice";
 import {AddCustomChangepoint} from "./add-custom-changepoint";
 import Box from "@mui/material/Box";
@@ -28,6 +28,7 @@ export const filterChangepoints = (changepoints, filter) => {
 export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   const { dataset, from, to,
     changepointDetectionEnabled, manualChangepoints,
+    customChangepointsEnabled,
     manualChangepointsEnabled, detectedChangepointFilter,
   } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
@@ -43,6 +44,10 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
     const action = !manualChangepointsEnabled;
     dispatch(toggleManualChangepoints(action));
     dispatch(updateSelectedMeasures(shownMeasures));
+  }
+
+  const handleCustomChangepointsChange = () => {
+    dispatch(toggleCustomChangepoints(!customChangepointsEnabled));
   }
 
   const handleChangepointDetection = () => {
@@ -80,7 +85,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
         flexDirection: 'row',
         justifyContent: 'space-between',
       }}>
-        <Box sx={{pt: 1}}>{manualChangepointsName}</Box>
+        <Box sx={{pt: 1}}> <Typography variant="body1">{manualChangepointsName}</Typography></Box>
         <Tooltip describeChild title={manualChangepoints ? "Show " + manualChangepointsName : "No Data Found"}>
           <Switch
             checked={manualChangepointsEnabled}
@@ -96,7 +101,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
         alignItems: 'center',
         justifyContent: 'space-between',
       }}>
-        <Box sx={{pt: 1}}>{potentialChangepointsName}</Box>
+        <Box sx={{pt: 1}}><Typography variant="body1">{potentialChangepointsName}</Typography></Box>
         <Switch
           checked={changepointDetectionEnabled}
           onChange={() => handleChangepointDetection()}
@@ -104,7 +109,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
         />
 
       </Box>
-      <AddCustomChangepoint/>
+      <AddCustomChangepoint name="Add New" check={customChangepointsEnabled} handleFunction={handleCustomChangepointsChange}/>
       <Box>
         <Typography variant="body1" gutterBottom sx={{fontWeight:600}}>
           Filter (%)

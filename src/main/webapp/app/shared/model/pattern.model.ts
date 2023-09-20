@@ -1,6 +1,8 @@
+import { ITimeRange } from 'app/shared/model/time-range.model';
+
 export interface IPattern {
-  start: Date;
-  end: Date;
+  id: number;
+  range: ITimeRange;
 }
 
-export const defaultValue: Readonly<IPattern> = { start: null, end: null };
+export const defaultValue: Readonly<IPattern> = { id: null, range: null as ITimeRange };

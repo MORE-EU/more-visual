@@ -6,7 +6,7 @@ import static io.grpc.MethodDescriptor.generateFullMethodName;
  */
 @javax.annotation.Generated(
     value = "by gRPC proto compiler (version 1.42.1)",
-    comments = "Source: helloworld.proto")
+    comments = "Source: forecasting.proto")
 @io.grpc.stub.annotations.GrpcGenerated
 public final class RouteGuideGrpc {
 

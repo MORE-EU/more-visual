@@ -1,13 +1,23 @@
 package eu.more2020.visual.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.*;
 
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
+import eu.more2020.visual.domain.Forecasting.Grpc.StatusRes;
+import eu.more2020.visual.grpc.RouteGuideGrpc;
+import eu.more2020.visual.grpc.Status;
+import eu.more2020.visual.grpc.TrainingInfo;
+import eu.more2020.visual.grpc.tools.*;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -25,7 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class ToolsRepositoryImpl implements ToolsRepository {
+public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase implements ToolsRepository {
 
     private final ApplicationProperties applicationProperties;
 
@@ -55,61 +65,46 @@ public class ToolsRepositoryImpl implements ToolsRepository {
 
     @Override
     public List<Changepoint> getManualChangepoints(String id) {
+        List<Changepoint> gtChangepoints = new ArrayList<>();
         try {
-            URL dataURL = new URL(applicationProperties.getToolApi() + "washes/" + id);
-            HttpURLConnection con = (HttpURLConnection) dataURL.openConnection();
-            con.setRequestMethod("POST");
+            WashesRequest request = WashesRequest.newBuilder()
+                .setDatasetId(id)
+                .build();
+
+            // Create a channel to connect to the target gRPC server
+            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+                .usePlaintext()
+                .build();
+
+            // Create a stub using the generated code and the channel
+            DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
+
+            // Invoke the remote method on the target server
+            WashesResponse response = stub.checkWashes(request);
+
+            // Convert the response to JSON string
+            String json = JsonFormat.printer().print(response);
+
+            // Create an ObjectMapper
             ObjectMapper objectMapper = new ObjectMapper();
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer content = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
-            con.disconnect();
-            JsonNode responseObject = objectMapper.readTree(content.toString());
+
+            // Deserialize the JSON string into a Response object
+            JsonNode responseObject = objectMapper.readTree(json.toString());
             JsonNode starts = responseObject.get("Starting date");
             JsonNode ends = responseObject.get("Ending date");
             Integer noOfIntervals = starts.size();
-            List<Changepoint> gtChangepoints = new ArrayList<>();
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
                 gtChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
                     LocalDateTime.parse(ends.get(ii).asText(), formatter)), 0.0));
             }
-            return gtChangepoints;
-        } catch (Exception e) {
+            // Shutdown the channel
+            channel.shutdown();
+        }
+        catch(Exception e){
             e.printStackTrace();
-            return new ArrayList<>();
         }
-    }
-
-    public JsonNode getRains(String id, Map<String, Object> params) throws IOException {
-        URL dataURL = new URL(applicationProperties.getToolApi() + "rains/" + id);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(params);
-        HttpURLConnection conn = (HttpURLConnection) dataURL.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setRequestProperty("Accept", "application/json");
-        conn.setDoOutput(true);
-        try (OutputStream os = conn.getOutputStream()) {
-            byte[] input = json.getBytes("utf-8");
-            os.write(input, 0, input.length);
-        }
-        BufferedReader in = new BufferedReader(
-            new InputStreamReader(conn.getInputStream()));
-        String inputLine;
-        StringBuffer content = new StringBuffer();
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
-        }
-        JsonNode responseObject = objectMapper.readTree(content.toString());
-
-        in.close();
-        return responseObject;
+        return gtChangepoints;
     }
 
     @Override
@@ -151,43 +146,37 @@ public class ToolsRepositoryImpl implements ToolsRepository {
     public List<Changepoint> changepointDetection(ChangepointDetection changepointDetection) {
         List<Changepoint> detectedChangepoints = new ArrayList<>();
         try {
-            URL dataURL = new URL(applicationProperties.getToolApi() + "cp_detection/" + changepointDetection.getId());
-            Map<String, Object> params = new LinkedHashMap<>();
-            params.put("start_date", changepointDetection.getRange().getFrom().format(formatter));
-            params.put("end_date", changepointDetection.getRange().getTo().format(formatter));
-            if (changepointDetection.getChangepoints() != null) {
-                params.put("c_starts", changepointDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getFrom().format(formatter)).collect(Collectors.toList()));
-                params.put("c_ends", changepointDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getTo().format(formatter)).collect(Collectors.toList()));
-            }
-            ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(params);
-            HttpURLConnection conn = (HttpURLConnection) dataURL.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Accept", "application/json");
-            conn.setDoOutput(true);
-            try (OutputStream os = conn.getOutputStream()) {
-                byte[] input = json.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()));
-            String inputLine;
-            StringBuffer content = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
+            ExtractRainsRequest request = ExtractRainsRequest.newBuilder()
+                .setDatasetId(changepointDetection.getId())
+                .setStartDate(changepointDetection.getRange().getFrom().format(formatter))
+                .setEndDate(changepointDetection.getRange().getTo().format(formatter))
+                .build();
 
-            JsonNode responseObject = objectMapper.readTree(content.toString());
-            JsonNode scores = responseObject.get("Score");
-            JsonNode starts = responseObject.get("Starting date");
-            JsonNode ends = responseObject.get("Ending date");
+            // Create a channel to connect to the target gRPC server
+            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+                .usePlaintext()
+                .build();
+
+            // Create a stub using the generated code and the channel
+            DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
+
+            // Invoke the remote method on the target server
+            ExtractRainsResponse response = stub.extractRains(request);
+
+            // Convert the response to JSON string
+            String json = response.getResult();
+            // Create an ObjectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            JsonNode responseObject = objectMapper.readTree(json);
+            log.info("READ JSON: {}", responseObject);
+            JsonNode starts = responseObject.get("start");
+            JsonNode ends = responseObject.get("stop");
             Integer noOfIntervals = starts.size();
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
                 detectedChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
-                    LocalDateTime.parse(ends.get(ii).asText(), formatter)), scores.get(ii).asDouble()));
+                    LocalDateTime.parse(ends.get(ii).asText(), formatter)),0));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -199,44 +188,43 @@ public class ToolsRepositoryImpl implements ToolsRepository {
     public List<DataPoint> soilingDetection(DeviationDetection deviationDetection) {
         List<DataPoint> dataPoints = new ArrayList<>();
         try {
-            URL dataURL = new URL(applicationProperties.getToolApi() + "power_index/" + deviationDetection.getId());
-            Map<String, Object> params = new LinkedHashMap<>();
-            params.put("start_date", deviationDetection.getRange().getFrom().format(formatter));
-            params.put("end_date", deviationDetection.getRange().getTo().format(formatter));
+            List<String> cpStarts = new ArrayList<>();
+            List<String> cpEnds = new ArrayList<>();
             if (deviationDetection.getChangepoints() != null) {
-                params.put("cp_starts", deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getFrom().format(formatter)).collect(Collectors.toList()));
-                params.put("cp_ends", deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getTo().format(formatter)).collect(Collectors.toList()));
+                cpStarts = deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getFrom().format(formatter)).collect(Collectors.toList());
+                cpEnds = deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getTo().format(formatter)).collect(Collectors.toList());
             }
-            params.put("weeks_train", deviationDetection.getWeeks());
-            log.debug("DV for: " + params);
+            CalculatePowerIndexRequest request = CalculatePowerIndexRequest.newBuilder()
+                .setDatasetId(deviationDetection.getId())
+                .setStartDate(deviationDetection.getRange().getFrom().format(formatter))
+                .setEndDate(deviationDetection.getRange().getTo().format(formatter))
+                .setWeeksTrain(deviationDetection.getWeeks())
+                .addAllCpStarts(cpStarts)
+                .addAllCpEnds(cpEnds)
+                .build();
+
+
+            // Create a channel to connect to the target gRPC server
+            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+                .usePlaintext()
+                .build();
+
+            // Create a stub using the generated code and the channel
+            DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
+
+            // Invoke the remote method on the target server
+            CalculatePowerIndexResponse response = stub.calculatePowerIndex(request);
+
+            // Convert the response to JSON string
+            String json = response.getFilename();
+            // Create an ObjectMapper
             ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(params);
-            HttpURLConnection conn = (HttpURLConnection) dataURL.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Accept", "application/json");
-            conn.setDoOutput(true);
-            try (OutputStream os = conn.getOutputStream()) {
-                byte[] input = json.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()));
-            String inputLine;
-            StringBuffer content = new StringBuffer();
 
-            // Write CSV to local file
-            String[] header = in.readLine().split(","); // read header
+            JsonNode responseObject = objectMapper.readTree(json);
+            log.info("READ JSON: {}", responseObject);
 
-            while ((inputLine = in.readLine()) != null) {
-                String[] splitted = inputLine.split(",");
-                DataPoint dataPoint = new DataPoint(LocalDateTime.parse(splitted[0], formatter),
-                    Arrays.stream(splitted).skip(1).mapToDouble(Double::parseDouble).toArray());
-                dataPoints.add(dataPoint);
-            }
-            in.close();
-        }
-        catch (Exception e){
+            // Create an ObjectMapper
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return dataPoints;

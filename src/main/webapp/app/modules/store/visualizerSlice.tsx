@@ -8,6 +8,9 @@ import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.mod
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import axios from 'axios';
 import moment, { Moment } from 'moment';
+import {IPatterns} from "app/shared/model/patterns.model";
+import {IPatternGroup} from "app/shared/model/pattern-group.model";
+import {IPattern} from "app/shared/model/pattern.model";
 
 const seedrandom = require('seedrandom');
 const lvl = 64;
@@ -43,31 +46,6 @@ const calculateFreqFromDiff = (timeRange: any) => {
   return 'hour';
 };
 
-const initPatterns = (data, length, frequency) => {
-  let pattern1 = { start: new Date(data[500].timestamp), end: new Date(data[500 + length].timestamp) };
-  let pattern2 = { start: new Date(data[4000].timestamp), end: new Date(data[4000 + length].timestamp) };
-  let randomColor = Math.floor(Math.random() * 16777215).toString(16);
-
-  let patternGroup = { patterns: [], color: '#' + randomColor };
-  patternGroup.patterns.push(pattern1);
-  patternGroup.patterns.push(pattern2);
-  const patternGroups = [];
-  patternGroups.push(patternGroup);
-
-  pattern1 = { start: new Date(data[2000].timestamp), end: new Date(data[2000 + length].timestamp) };
-  pattern2 = { start: new Date(data[3000].timestamp), end: new Date(data[3000 + length].timestamp) };
-
-  randomColor = Math.floor(Math.random() * 16777215).toString(16);
-
-  patternGroup = { patterns: [], color: '#' + randomColor };
-  patternGroup.patterns.push(pattern1);
-  patternGroup.patterns.push(pattern2);
-
-  patternGroups.push(patternGroup);
-  const knee = [1, 1, 1, 1, 7, 8, 9];
-  const corrected = { knee: null, annotationVector: null };
-  return { frequency, length, patternGroups, knee, corrected };
-};
 
 const forecastingInitialState = {
   forecastingStartDate: null,
@@ -113,6 +91,7 @@ const initialState = {
   openToolkit: false,
   forecastData: null as IDataPoint[],
   secondaryData: null as IDataPoint[],
+  customChangepoints: [] as IChangepointDate[],
   manualChangepoints: [] as IChangepointDate[],
   detectedChangepoints: [] as IChangepointDate[],
   soilingWeeks: 1,
@@ -305,6 +284,31 @@ export const getManualChangepoints = createAsyncThunk('getManualChangepoints', a
   return response.data;
 });
 
+export const applySearchPatterns = createAsyncThunk(
+  'applySearchPatterns',
+  async (data: { searchPatterns: IPattern[]}) => {
+    const { searchPatterns } = data;
+    // Fetch data (replace this with your actual API call)
+    // For now, let's mock some search results
+    return  { patternGroups: searchPatterns.map((s) => {
+      return {
+        id: s.id,
+        color: 1,
+        searchPattern: s,
+        similarPatterns: [
+          {
+            range: {
+              from: s.range.from + 1000000000,
+              to: s.range.to + 300000000,
+            },
+          },
+        ],
+      } as IPatternGroup;
+    })
+   }
+  }
+);
+
 // Then, handle actions in your reducers:
 const visualizer = createSlice({
   name: 'VisualizerState',
@@ -331,9 +335,6 @@ const visualizer = createSlice({
     resetFilters(state) {
       state.filter = {};
     },
-    updatePatterns(state, action) {
-      state.patterns = action.payload;
-    },
     updateChangeChart(state, action) {
       state.changeChart = action.payload;
     },
@@ -343,14 +344,14 @@ const visualizer = createSlice({
     updateDatasetMeasures(state, action) {
       state.dataset.measures = action.payload;
     },
-    updatePatternNav(state, action) {
-      state.patternNav = action.payload;
-    },
     updateChartRef(state, action) {
       state.chartRef = action.payload;
     },
     updateManualChangepoints(state, action) {
       state.manualChangepoints = action.payload;
+    },
+    updateCustomChangepoints(state, action) {
+      state.customChangepoints = action.payload;
     },
     updateActiveTool(state, action) {
       state.activeTool = action.payload;
@@ -374,9 +375,6 @@ const visualizer = createSlice({
     },
     updateAlertResults(state, action) {
       state.alertResults = { ...action.payload };
-    },
-    getPatterns(state, action: { payload: { data: IDataPoint[]; val: number; resampleFreq: string }; type: string }) {
-      state.patterns = initPatterns(action.payload.data, action.payload.val, action.payload.resampleFreq);
     },
     setShowDatePick(state, action) {
       state.showDatePick = action.payload;
@@ -462,7 +460,7 @@ const visualizer = createSlice({
       state.chartRef = initialState.chartRef;
     },
   },
-  extraReducers(builder) {
+  extraReducers: function (builder) {
     builder.addCase(getDataset.fulfilled, (state, action) => {
       state.loading = false;
       state.dataset = action.payload.data;
@@ -548,6 +546,7 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(applyChangepointDetection.fulfilled), (state, action) => {
       state.detectedChangepoints = action.payload.length === 0 ? null : action.payload;
     });
+
     builder.addMatcher(isAnyOf(getManualChangepoints.fulfilled), (state, action) => {
       state.manualChangepoints = action.payload.length === 0 ? null : action.payload;
     });
@@ -559,11 +558,11 @@ const visualizer = createSlice({
 
 export const {
   resetChartValues,resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
-  updatePatterns,updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updatePatternNav,updateChartRef,
+  updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef,
   updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks,
   toggleForecasting,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
   setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
-  setExpand,setOpenToolkit,setFolder,resetFilters,getPatterns,setChartType,setAlertingPreview,updateAlertResults,
+  setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,
 } = visualizer.actions;
 export default visualizer.reducer;
