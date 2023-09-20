@@ -1,6 +1,5 @@
 import Highcharts from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
-import HighchartsMore from 'highcharts/highcharts-more';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Modal from '@mui/material/Modal';
@@ -11,8 +10,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { getInference, setForecastingInference, setPredModalOpen, setSelectedModel } from 'app/modules/store/forecastingSlice';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import React, { useState } from 'react';
-import { grey } from '@mui/material/colors';
 import { Typography } from '@mui/material';
+import grey from '@mui/material/colors/grey';
 
 const style = {
   position: 'absolute',

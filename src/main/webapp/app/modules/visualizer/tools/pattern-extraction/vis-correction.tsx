@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import {Box, Button, Typography} from '@mui/material';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
 import Modal from '@material-ui/core/Modal';
@@ -9,6 +8,9 @@ import {KneePlot} from "app/modules/visualizer/tools/pattern-extraction/knee-plo
 import {AnnotationVector} from "app/modules/visualizer/tools/pattern-extraction/annotation-vector";
 import ModalStyles from "app/shared/layout/ModalStyle";
 import { useAppSelector } from 'app/modules/store/storeConfig';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 export const VisCorrection = () => {
 

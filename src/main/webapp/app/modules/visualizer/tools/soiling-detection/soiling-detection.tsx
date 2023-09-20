@@ -1,16 +1,4 @@
-import React, {useEffect, useState} from 'react';
-import {
-  Box,
-  Button,
-  Divider,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Switch,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import React, {useEffect} from 'react';
 import ChangepointDetection from "../changepoint-detection/changepoint-detection";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import HelpIcon from "@mui/icons-material/Help";
@@ -21,6 +9,15 @@ import {
   updateSecondaryData, updateSoilingWeeks,
 } from "app/modules/store/visualizerSlice";
 import {filterChangepoints} from "../changepoint-detection/changepoint-detection";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
+import Switch from '@mui/material/Switch';
 
 export const SoilingDetection = () => {
   const {dataset, from, to,

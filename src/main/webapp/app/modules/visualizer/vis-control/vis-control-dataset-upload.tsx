@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import { blue, grey, red } from '@mui/material/colors';
 import Grid from '@mui/material/Grid';
 import Modal from '@mui/material/Modal';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
@@ -16,15 +15,16 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import Input from '@mui/material/Input';
-import InputAdornment from '@mui/material/InputAdornment';
 import Checkbox from '@mui/material/Checkbox';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { setLoadingButton, uploadDataset } from 'app/modules/store/fileManagementSlice';
-import LinearProgress from '@mui/material/LinearProgress';
 import { CircularProgressWithLabel } from 'app/modules/home/home-left-menu';
+import grey from '@mui/material/colors/grey';
+import blue from '@mui/material/colors/blue';
+import red from '@mui/material/colors/red';
 
 const style = {
   position: 'absolute',

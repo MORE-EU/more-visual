@@ -1,10 +1,15 @@
 import React, { useEffect } from 'react';
-import { Grid, FormControl, MenuItem, Paper, Select, Typography } from '@mui/material';
 import Highcharts from 'highcharts';
 import Heatmap from 'highcharts/modules/heatmap.js';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import { setStatCateg, setStatSelect } from '../store/homeSlice';
-import { grey } from '@mui/material/colors';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import grey from '@mui/material/colors/grey';
 Heatmap(Highcharts);
 
 export const HomeRightStatsPanel = () => {

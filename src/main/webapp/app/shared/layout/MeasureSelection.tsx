@@ -1,6 +1,10 @@
 import React, {useState} from "react";
-import {Box, FormControl, InputLabel, MenuItem, Select} from "@mui/material";
 import {useAppSelector} from "app/modules/store/storeConfig";
+import Box from "@mui/material/Box";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 
 export interface IMeasureSeletionProps {

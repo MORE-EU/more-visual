@@ -1,29 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Avatar,
-  Divider,
-  FormControl,
-  Grid,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Paper,
-  Select,
-  Typography,
-  IconButton,
-  Box,
-  CircularProgress,
-  Button,
-} from '@mui/material';
+import React from 'react';
 import WindPowerIcon from '@mui/icons-material/WindPower';
-import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import EditIcon from '@mui/icons-material/Edit';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
-import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
 import { HomeFilters } from './home-filters';
 import { LatLng } from 'leaflet';
 import CloseIcon from '@mui/icons-material/Close';
@@ -34,7 +12,20 @@ import SimpleBar from 'simplebar-react';
 import { Link } from 'react-router-dom';
 import DoneIcon from '@mui/icons-material/Done';
 import { setLoadingButton, uploadFile } from '../store/fileManagementSlice';
-import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
 
 export const CircularProgressWithLabel = props => (
   <Box sx={{ position: 'relative', display: 'inline-flex' }}>
@@ -138,28 +129,6 @@ export const HomeLeftMenu = () => {
             borderBottomColor: grey[700],
           }}
         >
-          {/* <Typography variant="subtitle1" fontSize={20} fontWeight={450} sx={{ padding: 1 }}>
-            Farm
-          </Typography>
-          <FormControl sx={{ width: 100, flex: 1, mr: 1 }} size="small">
-            <Select
-              value={selectedDir}
-              onChange={e => {
-                dispatch(setSelectedDir(e.target.value));
-              }}
-              sx={{ height: '2rem', bgcolor: grey[400] }}
-            >
-              {directories.map(dir => (
-                <MenuItem key={`${dir}-key`} value={dir}>
-                  {dir}
-                </MenuItem>
-              ))}
-              <Divider />
-              <MenuItem key={'upload-new-farm'} component={Link} to={'/upload'}>
-                Create new farm
-              </MenuItem>
-            </Select>
-          </FormControl> */}
           <Button variant="outlined" sx={menuButtonStyle} component={Link} to={'/dashboard/2'}>
             <DashboardRoundedIcon fontSize="medium" sx={{ color: grey[800], mr: 1 }} />
             Dashboard
@@ -168,42 +137,10 @@ export const HomeLeftMenu = () => {
             <EditIcon fontSize="medium" sx={{ color: grey[800], mr: 1 }} />
             Edit
           </Button>
-          {/* <IconButton size="medium" component={Link} to={'/dashboard/2'}>
-            <DashboardRoundedIcon fontSize="medium" sx={{ color: grey[800] }} />
-          </IconButton> */}
-          {/* {!loadingButton ? (
-            <Button size="medium" component="label" sx={menuButtonStyle}>
-              <input hidden multiple type="file" accept=".csv" onChange={handleUploadChange} />
-              <FileUploadRoundedIcon fontSize="medium" sx={{ color: grey[800] }} />
-              Add
-            </Button>
-          ) : (
-            <CircularProgressWithLabel value={uploadState} />
-          )} */}
         </Grid>
         <Grid>
           <List sx={{ width: '100%', overflow: 'hiden', height: 280 }} dense>
             <SimpleBar key="simpleBar-dataset" style={{ height: '280px' }}>
-              {/* {items.map((item, idx) => {
-                return (
-                  <>
-                    <ListItemButton
-                      key={`${item}-${idx}`}
-                      onClick={() => {
-                        dispatch(setFly(new LatLng(item.fly[0], item.fly[1])));
-                      }}
-                    >
-                      <ListItemAvatar>
-                        <Avatar variant="rounded" sx={{ width: 30, height: 30, bgcolor: grey[800] }}>
-                          <WindPowerIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText primary={item.name} sx={{ mr: 2, textAlign: 'center' }} />
-                    </ListItemButton>
-                    <Divider light />
-                  </>
-                );
-              })} */}
               {directories.map((dir, idx) => (
                 <>
                   <ListItemButton key={`${dir}-${idx}`} onClick={haldeListButtonCLick(dir, idx)} selected={dir === selectedDir}>

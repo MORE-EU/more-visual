@@ -1,8 +1,13 @@
 import React, {useState} from "react";
-import {Button, FormControl, Grid, InputLabel, MenuItem, Select} from "@mui/material";
 import ModalStyles from "app/shared/layout/ModalStyle";
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
 import { setOpenToolkit } from "app/modules/store/visualizerSlice";
+import Grid from "@mui/material/Grid";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Button from "@mui/material/Button";
 
 export const AnnotationVector = () => {
 

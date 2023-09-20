@@ -1,6 +1,5 @@
-import {Box, Button, Slider, Switch, Tooltip, Typography} from "@mui/material";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {
   getManualChangepoints, updateSelectedMeasures,
@@ -8,7 +7,11 @@ import {
   toggleManualChangepoints, toggleSoilingDetection, setDetectedChangepointFilter,
 } from "app/modules/store/visualizerSlice";
 import {AddCustomChangepoint} from "./add-custom-changepoint";
-import {IChangepointDate} from "app/shared/model/changepoint-date.model";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
+import Switch from "@mui/material/Switch";
+import Slider from "@mui/material/Slider";
 
 
 

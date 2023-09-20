@@ -8,7 +8,6 @@ import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import { getDirectories, getSampleFile, getFarmMeta } from '../store/visualizerSlice';
 import { setAllFilters, setFilSamples, setItems, setSelectedDir } from '../store/homeSlice';
 import 'simplebar-react/dist/simplebar.min.css';
-import EditFarmModal from './home-edit-modal';
 import HomeEditFarmModal from './home-edit-modal';
 
 export const Home = () => {

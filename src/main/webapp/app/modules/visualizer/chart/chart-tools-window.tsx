@@ -1,5 +1,4 @@
 import React from 'react';
-import { grey, red } from '@mui/material/colors';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -13,6 +12,8 @@ import Box from '@mui/material/Box';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { resetForecastingState, updateActiveTool } from 'app/modules/store/visualizerSlice';
+import grey from '@mui/material/colors/grey';
+import red from '@mui/material/colors/red';
 
 const ChartToolsWindow = () => {
   const { activeTool } = useAppSelector(state => state.visualizer);

@@ -1,6 +1,6 @@
 import React from 'react';
-import {Box} from "@mui/material";
 import VisCorrection from "app/modules/visualizer/tools/pattern-extraction/vis-correction";
+import Box from '@mui/material/Box';
 
 export const PatternResults = (props) => {
   return (

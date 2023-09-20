@@ -3,15 +3,12 @@ import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import React, { Dispatch, SetStateAction, useEffect } from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import Checkbox from '@mui/material/Checkbox';
 import Slider from '@mui/material/Slider';
 import Typography from '@mui/material/Typography';
-import HelpIcon from '@mui/icons-material/Help';
-import styled from '@mui/system/styled';
 import { IForecastingForm } from 'app/shared/model/forecasting.model';
 import { setAutoMLEndDate, setAutoMLStartDate, setForecastingDataSplit } from 'app/modules/store/visualizerSlice';
 import { grey } from '@mui/material/colors';
@@ -37,14 +34,6 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
     e === 'end' &&
       (setForecastingForm(state => ({ ...state, endDate: date + userTimezoneOffset})),
       dispatch(setAutoMLEndDate(new Date(date + userTimezoneOffset).getTime())));
-  };
-
-  const handleTargetColumn = e => {
-    setForecastingForm(state => ({ ...state, TargetColumn: e.target.value }));
-  };
-
-  const handleCleanData = e => {
-    setForecastingForm(state => ({ ...state, cleanData: !forecastingForm.cleanData }));
   };
 
   const handleDataSplit = e => {
@@ -106,36 +95,6 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
             textAlign: 'center',
           }}
         >
-          {/* <Grid sx={{ display: 'flex', gap: 1, justifyContent: 'space-evenly', alignItems: 'center', width: '50%', m: 'auto' }}>
-            <Typography variant="subtitle1" fontSize={15}>
-              Start Date:
-            </Typography>
-            <DateTimePicker
-              label={forecastingForm.startDate ? null : 'pick a date'}
-              minDateTime={dataset.timeRange.from}
-              maxDateTime={forecastingForm.endDate ? forecastingForm.endDate : dataset.timeRange.to}
-              renderInput={props => <TextField size="small" {...props} />}
-              value={forecastingForm.startDate}
-              onChange={e => {}}
-              onAccept={handleDates('start')}
-              inputFormat="dd/MM/yyyy hh:mm a"
-            />
-          </Grid>
-          <Grid sx={{ display: 'flex', gap: 1, justifyContent: 'space-evenly', alignItems: 'center', width: '50%', m: 'auto' }}>
-            <Typography variant="subtitle1" fontSize={15}>
-              End Date:
-            </Typography>
-            <DateTimePicker
-              label={forecastingForm.endDate ? null : 'pick a date'}
-              minDateTime={forecastingForm.startDate ? forecastingForm.startDate : dataset.timeRange.from}
-              maxDateTime={dataset.timeRange.to}
-              renderInput={props => <TextField size="small" {...props} />}
-              value={forecastingForm.endDate}
-              onChange={e => {}}
-              onAccept={handleDates('end')}
-              inputFormat="dd/MM/yyyy hh:mm a"
-            />
-          </Grid> */}
           <Grid sx={{ display: 'flex', gap: 1, justifyContent: 'space-evenly', alignItems: 'center', width: '70%', m: 'auto' }}>
           <Typography variant="subtitle1" fontSize={18}>
               Data Range Selection:
@@ -164,26 +123,6 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
               inputFormat="dd/MM/yyyy hh:mm a"
             />
           </Grid>
-          {/* <Grid sx={{ display: 'flex', gap: 1, justifyContent: 'space-evenly', alignItems: 'center', width: '50%', m: 'auto' }}>
-            <Typography variant="subtitle1" fontSize={15}>
-              Target Column:
-            </Typography>
-            {forecastingForm.TargetColumn && (
-              <Select size="small" value={forecastingForm.TargetColumn} onChange={handleTargetColumn}>
-                {dataset.header.map(measure => (
-                  <MenuItem key={`${measure}-item`} value={measure}>
-                    {measure}
-                  </MenuItem>
-                ))}
-              </Select>
-            )}
-          </Grid>
-          <Grid sx={{ display: 'flex', gap: 1, justifyContent: 'space-evenly', alignItems: 'center', width: '50%', m: 'auto' }}>
-            <Typography variant="subtitle1" fontSize={15}>
-              Clean - Prepare Data
-            </Typography>
-            <Checkbox value={forecastingForm.cleanData} onChange={handleCleanData} />
-          </Grid> */}
           <Grid sx={{display: 'flex', gap: 1, alignItems: 'center', width: '70%', m: 'auto'}}>
           <Grid sx={{ width: '30%', alignSelf: "flex-start" }}>
               <Typography variant="subtitle1" fontSize={18}>

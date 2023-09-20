@@ -1,5 +1,3 @@
-import { Box, Button, Grid, LinearProgress, Step, StepLabel, Stepper, Typography } from '@mui/material';
-import { grey } from '@mui/material/colors';
 import './upload-farm.scss';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
@@ -10,6 +8,14 @@ import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import { setCsvSample, setFiles } from '../store/uploadFarmSlice';
 import { setMetaData } from '../store/uploadFarmSlice';
 import { setLoadingFarmUpload, uploadFarm } from '../store/fileManagementSlice';
+import Grid from '@mui/material/Grid';
+import grey from '@mui/material/colors/grey';
+import Typography from '@mui/material/Typography';
+import LinearProgress from '@mui/material/LinearProgress';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import Button from '@mui/material/Button';
 
 const steps = ['Upload farm files', 'Fill out farm info', 'Finish Farm Creation'];
 const formDataInitialState = { name: null, type: 0, latitude: '', longitude: '' };

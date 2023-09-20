@@ -1,4 +1,3 @@
-import {Button, FormControl, Grid, InputLabel, MenuItem, Select} from "@mui/material";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts/highstock";
 import React, {useState} from "react";
@@ -6,6 +5,12 @@ import ModalStyles from "app/shared/layout/ModalStyle";
 import DimensionSelector from "app/shared/layout/DimensionSelector";
 import { useAppSelector, useAppDispatch } from 'app/modules/store/storeConfig';
 import { setOpenToolkit, updateSelectedMeasures } from "app/modules/store/visualizerSlice";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 export const KneePlot = () => {
 

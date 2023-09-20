@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import Highcharts from 'highcharts/highstock';
-import {Box, Button, TextField} from '@mui/material';
 import DimensionSelector from "app/shared/layout/DimensionSelector";
 import PatternResults from "app/modules/visualizer/tools/pattern-extraction/pattern-results";
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { getPatterns, updatePatterns, updateSelectedMeasures } from 'app/modules/store/visualizerSlice';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 Highcharts.setOptions({
   time: {

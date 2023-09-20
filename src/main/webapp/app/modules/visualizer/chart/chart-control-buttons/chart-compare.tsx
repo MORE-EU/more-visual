@@ -1,10 +1,16 @@
 import React from 'react';
-import { Box, IconButton, ListItemText, MenuItem, Popover, Tooltip, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { setComparePopover, updateCompare } from 'app/modules/store/visualizerSlice';
 import AddchartIcon from '@mui/icons-material/Addchart';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import Popover from '@mui/material/Popover';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
 
 export const ChartCompare = () => {
   const dispatch = useAppDispatch();

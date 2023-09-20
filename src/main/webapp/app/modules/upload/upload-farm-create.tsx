@@ -1,9 +1,9 @@
-import { grey } from '@mui/material/colors';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import SimpleBar from 'simplebar-react';
 import { useAppSelector } from '../store/storeConfig';
+import grey from '@mui/material/colors/grey';
 
 const UploadFarmCreate = () => {
     const {metaData} = useAppSelector(state => state.uploadFarm);

@@ -1,7 +1,11 @@
 import React from 'react';
-import {Box, Button, Grid, Modal, Typography} from '@mui/material';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { setOpenToolkit, setShowChangepointFunction, updateActiveTool } from 'app/modules/store/visualizerSlice';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 
 export const ChartChangepointFunctions = () => {
 

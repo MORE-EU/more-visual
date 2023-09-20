@@ -1,11 +1,11 @@
 import React, {useEffect, useRef, useState} from "react";
 import PlotBandLabels, {PlotBandPopover} from "app/modules/visualizer/chart/chart-plot-bands/plot-band-popover";
-import {Popover} from "@mui/material";
 import Highcharts from "highcharts/highstock";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {IChangepointDate} from "app/shared/model/changepoint-date.model";
 import {toggleCustomChangepoints, updateAnchorEl} from "app/modules/store/visualizerSlice";
 import {filterChangepoints} from "app/modules/visualizer/tools/changepoint-detection/changepoint-detection";
+import Popover from "@mui/material/Popover";
 
 export interface IChartPlotBandsProps {
   customPlotBands: any,

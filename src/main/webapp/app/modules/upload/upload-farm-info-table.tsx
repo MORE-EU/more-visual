@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
-import { blue, grey, red } from '@mui/material/colors';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
@@ -19,6 +18,9 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import SimpleBar from 'simplebar-react';
 import { useAppSelector } from '../store/storeConfig';
 import UploadFarmModal from './upload-farm-info-modal';
+import grey from '@mui/material/colors/grey';
+import blue from '@mui/material/colors/blue';
+import red from '@mui/material/colors/red';
 
 const inputSx = {
   color: grey[700],

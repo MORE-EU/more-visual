@@ -1,8 +1,14 @@
 import React from 'react';
 import Highcharts from 'highcharts/highstock';
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import {Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField} from '@mui/material';
 import { updatePatterns } from 'app/modules/store/visualizerSlice';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Button from '@mui/material/Button';
+import Select from '@mui/material/Select';
 
 Highcharts.setOptions({
   time: {
