@@ -284,30 +284,6 @@ export const getManualChangepoints = createAsyncThunk('getManualChangepoints', a
   return response.data;
 });
 
-export const applySearchPatterns = createAsyncThunk(
-  'applySearchPatterns',
-  async (data: { searchPatterns: IPattern[]}) => {
-    const { searchPatterns } = data;
-    // Fetch data (replace this with your actual API call)
-    // For now, let's mock some search results
-    return  { patternGroups: searchPatterns.map((s) => {
-      return {
-        id: s.id,
-        color: 1,
-        searchPattern: s,
-        similarPatterns: [
-          {
-            range: {
-              from: s.range.from + 1000000000,
-              to: s.range.to + 300000000,
-            },
-          },
-        ],
-      } as IPatternGroup;
-    })
-   }
-  }
-);
 
 // Then, handle actions in your reducers:
 const visualizer = createSlice({

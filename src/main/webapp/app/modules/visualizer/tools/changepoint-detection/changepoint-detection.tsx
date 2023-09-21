@@ -103,7 +103,8 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
         />
 
       </Box>
-      <AddCustomChangepoint name="Add New" check={customChangepointsEnabled} handleFunction={handleCustomChangepointsChange}/>
+      <AddCustomChangepoint name="Add New" check={customChangepointsEnabled}
+                            handleFunction={handleCustomChangepointsChange}/>
       <Box>
         <Typography variant="body1" gutterBottom sx={{fontWeight:600}}>
           Filter (%)

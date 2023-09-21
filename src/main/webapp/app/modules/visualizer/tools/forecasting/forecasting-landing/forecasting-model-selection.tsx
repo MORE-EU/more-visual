@@ -41,28 +41,29 @@ const ForecastingModelSelection = props => {
   return (
     <>
     <ForecastingPredModal />
-    <Grid sx={{ height: '100%', width: '100%', scroll: 'auto', display: 'flex', flexDirection: 'column', rowGap: 2 }}>
-      <Grid sx={{ width: '80%', borderBottom: '1px solid rgba(0,0,0,0.3)', textAlign: 'center', m: 'auto' }}>
-        <Typography variant="subtitle1" fontSize={20}>
+    <Grid sx={{ height: '100%', width: '100%', scroll: 'auto', display: 'flex', flexDirection: 'column', rowGap: 2, fontSize:'2em'}}>
+      <Grid sx={{ width: '80%', height: '20%', borderBottom: '1px solid rgba(0,0,0,0.3)', display:'flex', alignItems:'end',textAlign: 'left', m: 'auto' }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, display: 'block', width: '100%', color: grey[800], alignSelf:'end' }}>
           Saved Models
         </Typography>
       </Grid>
       <Grid
         sx={{
-          width: '100%',
+          width: '80%',
+          height: '80%',
           textAlign: 'center',
           m: 'auto',
           rowGap: 1,
           display: 'flex',
           flexDirection: 'column',
           pb: 4,
-          pr: '20%',
-          pl: '20%',
+          pr: 1,
+          pl : 1,
           overflowY: 'auto',
         }}
       >
         <TableContainer sx={{ maxheight: '80%' }} component={Paper}>
-          <Table stickyHeader aria-label="caption table" size="small">
+          <Table stickyHeader aria-label="caption table" >
             <caption style={{ padding: 0 }}>
               <Button
                 variant="text"

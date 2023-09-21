@@ -62,16 +62,11 @@ export const SoilingDetection = () => {
   }
 
   return (
-    <Box sx={{pl: 2, pr: 2}}>
-      <Box>
-        <Divider orientation="horizontal" flexItem>
-        </Divider>
-      </Box>
+    <Box sx={{display: 'flex', flexDirection: 'column', height: '90%', fontSize:'2em'}}>
       <ChangepointDetection
         changepointsName={"Washing Events"} manualChangepointsName={"Manual Washes"} potentialChangepointsName={"Rains"}
         shownMeasures={[dataset.header.indexOf("power"), dataset.header.indexOf("precipitation")]} />
       <Box>
-        <Divider sx={{paddingBottom:2}}/>
         <Box
           sx={{
             display: 'flex',

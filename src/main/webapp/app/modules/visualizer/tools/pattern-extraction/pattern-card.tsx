@@ -9,6 +9,8 @@ import IconButton from "@mui/material/IconButton"; // Import your CSS file for s
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import SubPatternCard from "app/modules/visualizer/tools/pattern-extraction/sub-pattern-card";
+import RefreshIcon from '@mui/icons-material/Refresh';
+import SaveIcon from '@mui/icons-material/Save';
 
 export interface IPatternCardProps {
   value: number,
@@ -65,6 +67,14 @@ const PatternCard = (props: IPatternCardProps) => {
 
   }
 
+  const handleResetSearchPattern = () => {
+
+  }
+
+  const handleSavePattern = () => {
+
+  }
+
   const handleExpandClick = () => {
     setIsExpanded(!isExpanded);
   };
@@ -87,7 +97,26 @@ const PatternCard = (props: IPatternCardProps) => {
         </TableCell>
         <TableCell align="center"></TableCell>
         <TableCell align="left">
-          <Checkbox checked={isChecked} onChange={onCheckboxChange} />
+          <Checkbox checked={isChecked}
+                    disabled={checkForPatterns()}
+                    onChange={onCheckboxChange} />
+          {checkForPatterns()  &&
+            <>
+              <IconButton
+                sx={{ width: '20%' }}
+                onClick={() => handleResetSearchPattern()}
+                disabled={!checkForPatterns()} // Disable when search is not applied for this pattern
+              >
+              <RefreshIcon />
+            </IconButton>
+            <IconButton
+              sx={{ width: '20%' }}
+              onClick={() => handleSavePattern()}
+              disabled={!checkForPatterns()} // Disable when search is not applied for this pattern
+            >
+              <SaveIcon />
+            </IconButton>
+            </>}
         </TableCell>
         <TableCell>
           <IconButton disabled={!checkForPatterns()} onClick={handleExpandClick} size="small">

@@ -4,7 +4,6 @@ import {Box, Button, Divider, List, ListItem, Paper, TableCell, TableContainer, 
 import DimensionSelector from "app/shared/layout/DimensionSelector";
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import {
-  applySearchPatterns,
   toggleCustomChangepoints,
 } from 'app/modules/store/visualizerSlice';
 import PatternCard from "app/modules/visualizer/tools/pattern-extraction/pattern-card";
@@ -14,7 +13,7 @@ import {
 import Table from "@mui/material/Table";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import {removePattern} from "app/modules/store/patternExtractionSlice";
+import {applySearchPatterns, removePattern} from "app/modules/store/patternExtractionSlice";
 
 Highcharts.setOptions({
   time: {
@@ -77,7 +76,7 @@ export const VisPatterns = () => {
   }
 
   return (
-    <Box sx={{display: 'flex', flexDirection: 'column', height: '90%'}}>
+    <Box sx={{display: 'flex', flexDirection: 'column', height: '90%', fontSize:'2em'}}>
       <AddCustomChangepoint name="Highlight" handleFunction={handleNewPatternChange} check={customChangepointsEnabled}/>
       <Box sx={{width:"100%",textAlign:"right"}}>
         <Button
