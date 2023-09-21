@@ -1,21 +1,4 @@
 import React, { useEffect } from 'react';
-import {
-  Accordion,
-  AccordionDetails,
-  Button,
-  Checkbox,
-  Grid,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Paper,
-  Popper,
-  styled,
-  Typography,
-  useAutocomplete,
-} from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CircleIcon from '@mui/icons-material/Circle';
@@ -25,6 +8,21 @@ import { useAppSelector, useAppDispatch } from '../store/storeConfig';
 import { setAnchorEl, setInputValue, setSearch, setSearchResults, setSelected, setSelectedAcc } from '../store/homeSlice';
 import { grey } from '@mui/material/colors';
 import SimpleBar from 'simplebar-react';
+import useAutocomplete from '@mui/material/useAutocomplete';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import Popper from '@mui/material/Popper';
+import Paper from '@mui/material/Paper';
+import Accordion from '@mui/material/Accordion';
+import Typography from '@mui/material/Typography';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Checkbox from '@mui/material/Checkbox';
+import ListItemText from '@mui/material/ListItemText';
+import styled from '@mui/material/styles/styled';
 
 const AccordionSummary = styled(props => <MuiAccordionSummary expandIcon={<ArrowRightIcon sx={{ fontSize: '0.9rem' }} />} {...props} />)(
   ({ theme }) => ({

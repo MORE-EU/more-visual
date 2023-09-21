@@ -4,9 +4,10 @@ import MarkerClusterGroup from 'react-leaflet-markercluster';
 import {Link} from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import {Paper, Typography} from '@mui/material';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { setBounds } from 'app/modules/store/homeSlice';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 require('react-leaflet-markercluster/dist/styles.min.css');
 
 const FlyComponent = props => {
@@ -38,9 +39,6 @@ export const HomeMap = () => {
 
   const { fly, items, selected } = useAppSelector(state => state.home);
   const { farmMeta } = useAppSelector(state => state.visualizer);
-
-
-  // const history = useHistory();
 
   return (
     <div>
@@ -78,13 +76,7 @@ export const HomeMap = () => {
                       position={[info.lat, info.lng]}
                       icon={icon}
                       key={locIdx}
-                      // eventHandlers={{
-                      //   click() {
-                      //     history.push(`/visualize/bbz/bbz${rand}cut`);
-                      //   },
-                      // }}
                     >
-                      {/* <Tooltip direction="top"> */}
                       <Popup>
                         <Paper elevation={0} sx={{textAlign: "center"}}>
                           <Link to={`/visualize/bbz/${farmMeta.data[rand].id}`}>
@@ -101,7 +93,6 @@ export const HomeMap = () => {
                         </Typography>
 
                       </Popup>
-                      {/* </Tooltip> */}
                     </Marker>)
                 )
               })}

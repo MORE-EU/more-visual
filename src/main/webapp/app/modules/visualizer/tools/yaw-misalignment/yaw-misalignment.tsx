@@ -1,11 +1,13 @@
 import React from "react";
-import {Box, Divider, Switch, Typography} from "@mui/material";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {
   applyYawMisalignmentDetection,
   toggleYawMisalignmentDetection
 } from "app/modules/store/visualizerSlice";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Switch from "@mui/material/Switch";
 
 
 

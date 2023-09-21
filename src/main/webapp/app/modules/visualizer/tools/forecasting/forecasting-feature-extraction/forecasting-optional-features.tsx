@@ -16,7 +16,6 @@ import Checkbox from '@mui/material/Checkbox';
 import Tooltip from '@mui/material/Tooltip';
 import HelpIcon from '@mui/icons-material/Help';
 import { IForecastingForm } from 'app/shared/model/forecasting.model';
-import { useAppSelector } from 'app/modules/store/storeConfig';
 
 const CollapseTemporal = props => {
   const { open, handleTemporalCheckboxes, forecastingForm } = props;

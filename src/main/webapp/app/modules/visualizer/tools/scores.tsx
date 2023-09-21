@@ -1,11 +1,17 @@
 import React from 'react';
-import {Box, Button, Grid, List, ListItem, ListItemButton, ListItemText,} from "@mui/material";
 import ModalStyles from "app/shared/layout/ModalStyle";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts/highstock";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 
 
 const functions = ["R-SQUARED", "MAE", "ME", "MAPE", "MPE"];

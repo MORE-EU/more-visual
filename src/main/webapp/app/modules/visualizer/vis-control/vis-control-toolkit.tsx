@@ -19,83 +19,16 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 
-// const drawerWidth = "15%";
-
-
-// const openedMixin = (theme: Theme): CSSObject => ({
-//   width: drawerWidth,
-//   transition: theme.transitions.create('width', {
-//     easing: theme.transitions.easing.sharp,
-//     duration: theme.transitions.duration.enteringScreen,
-//   }),
-//   overflowX: 'hidden',
-// });
-
-// const closedMixin = (theme: Theme): CSSObject => ({
-//   transition: theme.transitions.create('width', {
-//     easing: theme.transitions.easing.sharp,
-//     duration: theme.transitions.duration.leavingScreen,
-//   }),
-//   overflowX: 'hidden',
-//   width: `calc(${theme.spacing(7)} + 1px)`,
-//   [theme.breakpoints.up('sm')]: {
-//     width: `calc(${theme.spacing(9)} + 1px)`,
-//   },
-// });
-
-// const DrawerHeader = styled('div')(({theme}) => ({
-//   display: 'flex',
-//   alignItems: 'center',
-//   justifyContent: 'flex-end',
-//   padding: theme.spacing(0, 1),
-//   // necessary for content to be below app bar
-//   ...theme.mixins.toolbar,
-// }));
-
-// const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})(
-//   ({theme, open}) => ({
-//     width: drawerWidth,
-//     flexShrink: 0,
-//     whiteSpace: 'nowrap',
-//     boxSizing: 'border-box',
-//     ...(open && {
-//       ...openedMixin(theme),
-//       '& .MuiDrawer-paper': openedMixin(theme),
-//     }),
-//     ...(!open && {
-//       ...closedMixin(theme),
-//       '& .MuiDrawer-paper': closedMixin(theme),
-//     }),
-//   }),
-// );
-
 const VisToolkit = () => {
 
   const {dataset, openToolkit, activeTool} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
-
-  // const handleDrawer = () => {
-  //   dispatch(setOpenToolkit(!openToolkit));
-  //   dispatch(updateActiveTool(null));
-  // };
 
   const handleToolClick = key => e => {
     dispatch(setOpenToolkit(true));
     dispatch(updateActiveTool(key));
   }
   return (
-    // <Box>
-    //   <CssBaseline/>
-    //   <Drawer variant="permanent" open={openToolkit} anchor="right">
-    //     <DrawerHeader>
-    //       {openToolkit && <Typography variant="subtitle1" fontSize={20} fontWeight={600}>
-    //       Tools
-    //       </Typography>}
-    //       <IconButton onClick={handleDrawer}>
-    //         {openToolkit ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
-    //       </IconButton>
-    //     </DrawerHeader>
-    //     {activeTool === -1 &&
         <Grid sx={{height: "100%", width: "100%"}}>
           <Typography variant="h6" gutterBottom>
           Tools
@@ -131,18 +64,8 @@ const VisToolkit = () => {
               </ListItemIcon>
               <ListItemText primary={"Filtering"}/>
             </ListItemButton>
-            {/* <ListItemButton key={5} onClick={handleToolClick("AutoML")}>
-              <ListItemIcon>
-                <AnalyticsIcon/>
-              </ListItemIcon>
-              <ListItemText primary={"AutoML"}/>
-            </ListItemButton> */}
           </List>     
         </Grid>
-    //     }
-    //     <ActiveTool />
-    //   </Drawer>
-    // </Box>
   );
 }
 

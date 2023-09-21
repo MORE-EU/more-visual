@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {Box, Button, FormControl, MenuItem, Paper, Select, ToggleButton, ToggleButtonGroup, Tooltip} from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import Heatmap from 'highcharts/modules/heatmap.js';
@@ -11,6 +10,14 @@ import { useAppSelector, useAppDispatch } from '../store/storeConfig';
 import { setChartCateg, setChartCategYaxis, setChartData, setChartType, setOption1, setOption2, setOption3, setOption4 } from '../store/homeSlice';
 import { grey } from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import Tooltip from '@mui/material/Tooltip';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 Heatmap(Highcharts);
 
@@ -87,8 +94,6 @@ export const HomeRightChartPanel = () => {
         xCateg[`${item}`] = xCateg[item].length;
       });
     }
-    // dispatch(setChartCateg([]));
-    // dispatch(setChartData([]));
     const chartCategValues = [];
     const chartDataValues = [];
     for (const [key, value] of Object.entries(xCateg)) {
@@ -197,46 +202,6 @@ export const HomeRightChartPanel = () => {
       </Tooltip>
       </ToggleButton>
     </ToggleButtonGroup>
-          {/* <Tooltip title="Bar Chart">
-            <Button
-              onClick={() => {
-                dispatch(setChartType('column'));
-                dispatch(setOption4(''));
-              }}
-            >
-              <BarChart/>
-            </Button>
-          </Tooltip>
-          <Tooltip title="Line Chart">
-            <Button
-              onClick={() => {
-                dispatch(setChartType('line'));
-                dispatch(setOption4(''));
-              }}
-            >
-              <ShowChart/>
-            </Button>
-          </Tooltip>
-          <Tooltip title="Area Chart">
-            <Button
-              onClick={() => {
-                dispatch(setChartType('area'));
-                dispatch(setOption4(''));
-              }}
-            >
-              <TableChart/>
-            </Button>
-          </Tooltip>
-          <Tooltip title="Heatmap">
-            <Button
-              onClick={() => {
-                dispatch(setChartType('heatmap'));
-                dispatch(setOption4('continent'));
-              }}
-            >
-              <GridViewIcon/>
-            </Button>
-          </Tooltip> */}
         </Box>
         <HighchartsReact highcharts={Highcharts} constructorType={'chart'} options={options}/>
         <Box

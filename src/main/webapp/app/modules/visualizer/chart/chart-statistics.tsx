@@ -1,7 +1,8 @@
-import React, {useRef} from 'react';
-import {Box, Button, Grid, IconButton, TextField, Tooltip, Typography} from '@mui/material';
+import React from 'react';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import {MeasureSelection} from "app/shared/layout/MeasureSelection";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 //TODO: unused
 export const ChartStatistics = () => {

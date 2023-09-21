@@ -10,7 +10,7 @@ import green from '@mui/material/colors/green';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import { setCsvSample, setFiles } from '../store/uploadFarmSlice';
-import { grey } from '@mui/material/colors';
+import grey from '@mui/material/colors/grey';
 
 const UploadFarmFiles = () => {
   const [fileNames, setFileNames] = useState([]);

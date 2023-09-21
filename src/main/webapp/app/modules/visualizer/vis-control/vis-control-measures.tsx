@@ -1,5 +1,5 @@
 import List from '@mui/material/List';
-import React, { useState } from 'react';
+import React from 'react';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { updateSelectedMeasures } from 'app/modules/store/visualizerSlice';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';

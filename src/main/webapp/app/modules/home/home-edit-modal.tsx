@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import { blue, grey, red } from '@mui/material/colors';
 import Button from '@mui/material/Button';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
-import { setLoadingButton, uploadFile } from '../store/fileManagementSlice';
 import CircularProgress from '@mui/material/CircularProgress';
 import DoneIcon from '@mui/icons-material/Done';
 import { setOpenHomeModal } from '../store/homeSlice';
@@ -20,6 +18,8 @@ import MenuItem from '@mui/material/MenuItem';
 import InputAdornment from '@mui/material/InputAdornment';
 import Checkbox from '@mui/material/Checkbox';
 import Chip from '@mui/material/Chip';
+import grey from '@mui/material/colors/grey';
+import red from '@mui/material/colors/red';
 
 const style = {
   position: 'absolute',

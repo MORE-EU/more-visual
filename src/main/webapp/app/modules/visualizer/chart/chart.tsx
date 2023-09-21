@@ -3,7 +3,6 @@ import '../visualizer.scss';
 import Highcharts from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsMore from 'highcharts/highcharts-more';
-import { Grid, LinearProgress } from '@mui/material';
 import annotationsAdvanced from 'highcharts/modules/annotations-advanced';
 import { useScrollBlock } from 'app/shared/util/useScrollBlock';
 import { ITimeRange } from 'app/shared/model/time-range.model';
@@ -28,9 +27,10 @@ import {
 } from 'app/modules/store/visualizerSlice';
 import { ChartPlotBands } from 'app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands';
 import chartAlertingChecker, { alertingPlotBandsCreator } from './chart-alerting/chart-alerting-functions';
-
 import { filterChangepoints } from 'app/modules/visualizer/tools/changepoint-detection/changepoint-detection';
-import { grey } from '@mui/material/colors';
+import grey from '@mui/material/colors/grey';
+import LinearProgress from '@mui/material/LinearProgress';
+import Grid from '@mui/material/Grid';
 
 HighchartsMore(Highcharts);
 annotationsAdvanced(Highcharts);

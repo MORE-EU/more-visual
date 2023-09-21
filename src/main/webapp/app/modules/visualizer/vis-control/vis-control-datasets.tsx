@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { getDataset, updateDatasetChoice } from 'app/modules/store/visualizerSlice';
 import React, { useState } from 'react';
-import VisUploadDataset from './vis-control-dataset-upload';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { Link } from 'react-router-dom';

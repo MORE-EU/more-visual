@@ -1,6 +1,6 @@
 import React from 'react';
-import {Box, Typography} from "@mui/material";
 import VisPatterns from "app/modules/visualizer/tools/pattern-extraction/vis-patterns";
+import Box from '@mui/material/Box';
 
 export const PatternExtraction = () => {
 

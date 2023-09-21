@@ -131,7 +131,6 @@ const ForecastingAlgSelection = (props: IForecastingTrain) => {
               <TableHead>
                 <TableRow>
                   <TableCell>Algorithm</TableCell>
-                  {/* <TableCell align="center">Fine tune</TableCell> */}
                   <TableCell align="center">Parameters</TableCell>
                 </TableRow>
               </TableHead>
@@ -142,14 +141,6 @@ const ForecastingAlgSelection = (props: IForecastingTrain) => {
                       <Checkbox checked={Object.hasOwn(forecastingForm.algorithms, row)} onChange={handleAlgorithmSelection(row)} />
                       {row}
                     </TableCell>
-                    {/* <TableCell align="center">
-                      {row !== 'LinearRegression' && (
-                        <Checkbox
-                          onChange={handleFineTuneCheckbox(row)}
-                          disabled={!Object.keys(forecastingForm.algorithms).includes(row)}
-                        />
-                      )}
-                    </TableCell> */}
                     <TableCell align="center">
                       <Button
                         variant="outlined"
