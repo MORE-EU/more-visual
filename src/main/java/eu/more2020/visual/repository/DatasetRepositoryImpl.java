@@ -230,7 +230,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
         for (String name : names) {
 
-            if (new File(applicationProperties.getWorkspacePath() + "/" + name).isDirectory()) {
+            if (new File(applicationProperties.getWorkspacePath() + "/" + name).isDirectory() && !name.equals("config")) {
                 log.debug(name);
                 dirs.add(name);
             }

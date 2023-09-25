@@ -113,7 +113,6 @@ const HomeEditFarmModal = () => {
   };
 
   const handleChipDelete = () => e => {
-    console.log(e);
   };
 
   const handleInputChanges = (fileName: string, property: string) => e => {
@@ -150,13 +149,11 @@ const HomeEditFarmModal = () => {
 
   return (
     <>
-      {console.log(selectedFiles)}
       <Modal
         open={openHomeModal}
         onClose={handleOnCloseModal}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
-        hideBackdrop
       >
         <Box sx={style}>
           <Grid xs={12} sx={{ height: '20%' }}>
@@ -189,11 +186,6 @@ const HomeEditFarmModal = () => {
               <Typography variant="subtitle1" fontWeight={800} fontSize={15} sx={{ color: grey[700], ml: 1, flex: 1 }}>
                 {'(*) required fields'}
               </Typography>
-              {/* {nextError && (
-              <Typography variant="subtitle1" fontWeight={800} fontSize={17} sx={{ color: red[600], mr: 2 }}>
-                {'Fill the required fields!'}
-              </Typography>
-            )} */}
             </Grid>
             {formData !== null && (
               <Grid key={'general-settings-grid'} className="general-settings-form" sx={{ height: '90%', overflow: 'hidden' }}>

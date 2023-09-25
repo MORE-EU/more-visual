@@ -94,7 +94,6 @@ const ModalWithChart = props => {
 
   return (
     <>
-    {console.log(dataset)}
       <Modal open={resultsModal !== null} onClose={handleClose}>
         <Grid sx={style}>
           <HighchartsReact highcharts={Highcharts} constructorType={'stockChart'} options={options} />

@@ -62,7 +62,6 @@ export const Filter = () => {
   const handleTextFields = (col, choice) => e => {
     const value = parseFloat(e.target.value);
     const stats = queryResults.measureStats[col];
-    console.log(windowFilters[col]);
     if (choice === 'min') {
       if (value > windowFilters[col][1] || value < stats.min) {
         setTextError(state => ({...state, min: true}))

@@ -223,7 +223,6 @@ export const Chart = () => {
   };
 
   const getChangepointData = (start, end, series) => {
-    console.log(series);
     return series.map((s, idx) => {
       const newCustomChangepoint = {
           range: { from: start, to: end } as ITimeRange,
