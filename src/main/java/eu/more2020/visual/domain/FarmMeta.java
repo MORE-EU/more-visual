@@ -6,7 +6,7 @@ import java.util.List;
 public class FarmMeta implements Serializable {
 
     private String name;
-    private Integer type;
+    private String type;
     private List<FarmInfo> data;
     private Float latitude;
     private Float longitude;
@@ -17,7 +17,7 @@ public class FarmMeta implements Serializable {
 
     }
 
-    public FarmMeta(String name, Integer type, List<FarmInfo> data, Float latitude, Float longitude) {
+    public FarmMeta(String name, String type, List<FarmInfo> data, Float latitude, Float longitude) {
         this.name = name;
         this.type = type;
         this.data = data;
@@ -33,11 +33,11 @@ public class FarmMeta implements Serializable {
         this.name = name;
     }
 
-    public Integer getType() {
+    public String getType() {
         return this.type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
 
