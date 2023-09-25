@@ -2,9 +2,15 @@ import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import React, {useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {
-  getManualChangepoints, updateSelectedMeasures,
-  toggleChangepointDetection, applyChangepointDetection,
-  toggleManualChangepoints, toggleSoilingDetection, setDetectedChangepointFilter, toggleCustomChangepoints,
+  getManualChangepoints,
+  updateSelectedMeasures,
+  toggleChangepointDetection,
+  applyChangepointDetection,
+  toggleManualChangepoints,
+  toggleSoilingDetection,
+  setDetectedChangepointFilter,
+  toggleCustomChangepoints,
+  applyDeviationDetection,
 } from "app/modules/store/visualizerSlice";
 import {AddCustomChangepoint} from "./add-custom-changepoint";
 import Box from "@mui/material/Box";
@@ -26,8 +32,9 @@ export const filterChangepoints = (changepoints, filter) => {
 }
 
 export const ChangepointDetection = (props: IChangepointDetectionProps) => {
-  const { dataset, from, to,
-    changepointDetectionEnabled, manualChangepoints,
+  const { dataset, from, to, soilingType, soilingWeeks,
+    manualChangepoints,
+    changepointDetectionEnabled,
     customChangepointsEnabled,
     manualChangepointsEnabled, detectedChangepointFilter,
   } = useAppSelector(state => state.visualizer);
@@ -54,14 +61,23 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
     const action = !changepointDetectionEnabled;
     dispatch(toggleChangepointDetection(action));
     dispatch(updateSelectedMeasures(shownMeasures));
-    if(action)
-      dispatch(applyChangepointDetection({id: dataset.id, from, to}));
+    dispatch(toggleSoilingDetection(true));
+    if(action) {
+      dispatch(applyChangepointDetection({id: dataset.id, from, to})).then(res => {
+        dispatch(applyDeviationDetection({id: dataset.id,
+          from, to,
+          weeks : soilingWeeks,
+          type : soilingType,
+          changepoints : filterChangepoints(res.payload, detectedChangepointFilter)
+        }));
+      });
+    }
     else{
       dispatch(toggleSoilingDetection(false));
     }
   }
 
-  const filterChangepoints = (e) => {
+  const handleChangepointsChange = (e) => {
     dispatch(setDetectedChangepointFilter(e.target.value));
   }
 
@@ -118,7 +134,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
         <Slider
           size="small"
           disabled={!changepointDetectionEnabled}
-          onChange= {(e) => filterChangepoints(e)}
+          onChange= {(e) => handleChangepointsChange(e)}
           defaultValue={detectedChangepointFilter}
           getAriaValueText = {(val) => ("Top" + val.toString() + "%")}
           aria-label="Small"

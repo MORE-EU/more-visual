@@ -38,7 +38,7 @@ annotationsAdvanced(Highcharts);
 export const Chart = () => {
   const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,measureColors,queryResultsLoading,filter, customChangepoints,
     queryResults,changeChart,compare,changepointDetectionEnabled,detectedChangepointFilter,customChangepointsEnabled,data,compareData,
-    forecastData,soilingEnabled,alertingPlotMode,alertResults,forecastingDataSplit,soilingWeeks,yawMisalignmentEnabled,secondaryData,chartType,
+    forecastData,soilingEnabled,soilingType,alertingPlotMode,alertResults,forecastingDataSplit,soilingWeeks,yawMisalignmentEnabled,secondaryData,chartType,
     liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate} = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
@@ -311,6 +311,7 @@ export const Chart = () => {
                 weeks: latestSoilingWeeks.current,
                 from: leftSide,
                 to: rightSide,
+                type: soilingType,
                 changepoints: filterChangepoints(res.payload, detectedChangepointFilter),
               })
             );
@@ -454,7 +455,16 @@ export const Chart = () => {
 
   const getSecondaryText = () => {
     if (isYawMisalignmentEnabled.current) return 'Yaw Angle';
-    if (isSoilingEnabled.current) return 'Soiling Ratio';
+    if (isSoilingEnabled.current) {
+      switch (soilingType){
+        case "soilingRatio":
+          return "Soiling Ratio"
+        case "powerLoss":
+          return "Power Loss"
+        default:
+          return "Soiling Ratio"
+      }
+    }
   };
 
   const computeChartData = () => {

@@ -95,6 +95,7 @@ const initialState = {
   manualChangepoints: [] as IChangepointDate[],
   detectedChangepoints: [] as IChangepointDate[],
   soilingWeeks: 1,
+  soilingType: 'soilingRatio',
   changepointDetectionEnabled: false,
   manualChangepointsEnabled: false,
   customChangepointsEnabled: false,
@@ -248,15 +249,17 @@ export const applyForecasting = createAsyncThunk('applyForecasting', async (id: 
 
 export const applyDeviationDetection = createAsyncThunk(
   'applyDeviationDetection',
-  async (data: { id: string; from: number; to: number; weeks: number; changepoints: IChangepointDate[] }) => {
+  async (data: { id: string; from: number; to: number; weeks: number; type: string; changepoints: IChangepointDate[] }) => {
     const requestUrl = `api/tools/soiling`;
     const id = data.id;
+    const type = data.type;
     const range = ({ from: data.from, to: data.to } as unknown) as ITimeRange;
     const changepoints = data.changepoints;
     const weeks = data.weeks;
     const response = await axios.post(requestUrl, {
       id,
       range,
+      type,
       changepoints,
       weeks,
     });
@@ -348,6 +351,9 @@ const visualizer = createSlice({
     },
     updateSoilingWeeks(state, action) {
       state.soilingWeeks = action.payload;
+    },
+    updateSoilingType(state, action) {
+      state.soilingType = action.payload;
     },
     updateAlertResults(state, action) {
       state.alertResults = { ...action.payload };
@@ -536,7 +542,7 @@ export const {
   resetChartValues,resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
   updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef,
   updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks,
-  toggleForecasting,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
+  updateSoilingType, toggleForecasting,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
   setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
   setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,

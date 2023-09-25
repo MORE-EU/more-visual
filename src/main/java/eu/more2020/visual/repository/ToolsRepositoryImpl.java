@@ -1,20 +1,14 @@
 package eu.more2020.visual.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.util.JsonFormat;
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.*;
 
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
-import eu.more2020.visual.domain.Forecasting.Grpc.StatusRes;
 import eu.more2020.visual.grpc.RouteGuideGrpc;
-import eu.more2020.visual.grpc.Status;
-import eu.more2020.visual.grpc.TrainingInfo;
 import eu.more2020.visual.grpc.tools.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -83,15 +77,15 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             WashesResponse response = stub.checkWashes(request);
 
             // Convert the response to JSON string
-            String json = JsonFormat.printer().print(response);
-
+            String json = response.getWashes();
             // Create an ObjectMapper
             ObjectMapper objectMapper = new ObjectMapper();
 
             // Deserialize the JSON string into a Response object
-            JsonNode responseObject = objectMapper.readTree(json.toString());
-            JsonNode starts = responseObject.get("Starting date");
-            JsonNode ends = responseObject.get("Ending date");
+            JsonNode responseObject = objectMapper.readTree(json);
+            log.info("READ JSON: {}", responseObject);
+            JsonNode starts = responseObject.get("Starting_date");
+            JsonNode ends = responseObject.get("Ending_date");
             Integer noOfIntervals = starts.size();
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
@@ -146,10 +140,14 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
     public List<Changepoint> changepointDetection(ChangepointDetection changepointDetection) {
         List<Changepoint> detectedChangepoints = new ArrayList<>();
         try {
-            ExtractRainsRequest request = ExtractRainsRequest.newBuilder()
+            CPDetectionRequest request = CPDetectionRequest.newBuilder()
                 .setDatasetId(changepointDetection.getId())
                 .setStartDate(changepointDetection.getRange().getFrom().format(formatter))
                 .setEndDate(changepointDetection.getRange().getTo().format(formatter))
+                .setThrsh(1)
+                .setWa1(10)
+                .setWa2(5)
+                .setWa3(10)
                 .build();
 
             // Create a channel to connect to the target gRPC server
@@ -161,7 +159,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
 
             // Invoke the remote method on the target server
-            ExtractRainsResponse response = stub.extractRains(request);
+            CPDetectionResponse response = stub.cPDetection(request);
 
             // Convert the response to JSON string
             String json = response.getResult();
@@ -170,8 +168,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
 
             JsonNode responseObject = objectMapper.readTree(json);
             log.info("READ JSON: {}", responseObject);
-            JsonNode starts = responseObject.get("start");
-            JsonNode ends = responseObject.get("stop");
+            JsonNode starts = responseObject.get("Starting date");
+            JsonNode ends = responseObject.get("Ending date");
             Integer noOfIntervals = starts.size();
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
@@ -186,6 +184,16 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
 
     @Override
     public List<DataPoint> soilingDetection(DeviationDetection deviationDetection) {
+        if(deviationDetection.getType().equals("soilingRatio")){
+            return getSoilingIndex(deviationDetection);
+        }
+        else if(deviationDetection.getType().equals("powerLoss")){
+            return getPowerLoss(deviationDetection);
+        }
+        else return getSoilingIndex(deviationDetection);
+    }
+
+    private List<DataPoint> getSoilingIndex(DeviationDetection deviationDetection){
         List<DataPoint> dataPoints = new ArrayList<>();
         try {
             List<String> cpStarts = new ArrayList<>();
@@ -216,13 +224,83 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             CalculatePowerIndexResponse response = stub.calculatePowerIndex(request);
 
             // Convert the response to JSON string
-            String json = response.getFilename();
+            String json = response.getResult();
             // Create an ObjectMapper
             ObjectMapper objectMapper = new ObjectMapper();
 
-            JsonNode responseObject = objectMapper.readTree(json);
-            log.info("READ JSON: {}", responseObject);
+            JsonNode responseObject = null;
 
+            responseObject = objectMapper.readTree(json);
+            log.info("READ JSON: {}", responseObject.get("power_index"));
+            JsonNode powerIndex = responseObject.get("power_index");
+            powerIndex.fields().forEachRemaining(entry -> {
+                long time = Long.parseLong(entry.getKey());
+                LocalDateTime localDateTime = LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(time),
+                    ZoneId.systemDefault()
+                );
+                String value = entry.getValue().asText();
+                DataPoint dataPoint = new DataPoint(localDateTime, new double[]{Double.parseDouble(value)});
+                dataPoints.add(dataPoint);
+            });
+            // Create an ObjectMapper
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dataPoints;
+    }
+
+
+    private List<DataPoint> getPowerLoss(DeviationDetection deviationDetection){
+        List<DataPoint> dataPoints = new ArrayList<>();
+        try {
+            List<String> cpStarts = new ArrayList<>();
+            List<String> cpEnds = new ArrayList<>();
+            if (deviationDetection.getChangepoints() != null) {
+                cpStarts = deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getFrom().format(formatter)).collect(Collectors.toList());
+                cpEnds = deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getTo().format(formatter)).collect(Collectors.toList());
+            }
+            CalculatePowerIndexRequest request = CalculatePowerIndexRequest.newBuilder()
+                .setDatasetId(deviationDetection.getId())
+                .setStartDate(deviationDetection.getRange().getFrom().format(formatter))
+                .setEndDate(deviationDetection.getRange().getTo().format(formatter))
+                .setWeeksTrain(deviationDetection.getWeeks())
+                .addAllCpStarts(cpStarts)
+                .addAllCpEnds(cpEnds)
+                .build();
+
+
+            // Create a channel to connect to the target gRPC server
+            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+                .usePlaintext()
+                .build();
+
+            // Create a stub using the generated code and the channel
+            DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
+
+            // Invoke the remote method on the target server
+            CalculatePowerIndexResponse response = stub.calculatePowerIndex(request);
+
+            // Convert the response to JSON string
+            String json = response.getResult();
+            // Create an ObjectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            JsonNode responseObject = null;
+
+            responseObject = objectMapper.readTree(json);
+            log.info("READ JSON: {}", responseObject.get("estimated_power_lost"));
+            JsonNode powerIndex = responseObject.get("estimated_power_lost");
+            powerIndex.fields().forEachRemaining(entry -> {
+                long time = Long.parseLong(entry.getKey());
+                LocalDateTime localDateTime = LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(time),
+                    ZoneId.systemDefault()
+                );
+                String value = entry.getValue().asText();
+                DataPoint dataPoint = new DataPoint(localDateTime, new double[]{Double.parseDouble(value)});
+                dataPoints.add(dataPoint);
+            });
             // Create an ObjectMapper
         } catch (Exception e) {
             e.printStackTrace();
@@ -239,37 +317,71 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             params.put("start_date", rangeDetection.getRange().getFrom().format(formatter));
             params.put("end_date", rangeDetection.getRange().getTo().format(formatter));
 
-            log.debug("YAW for: " + params);
-            ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(params);
-            HttpURLConnection conn = (HttpURLConnection) dataURL.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Accept", "application/json");
-            conn.setDoOutput(true);
-            try (OutputStream os = conn.getOutputStream()) {
-                byte[] input = json.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()));
-            String inputLine;
-            StringBuffer content = new StringBuffer();
+            EstimateYawMisalignmentRequest request = EstimateYawMisalignmentRequest.newBuilder()
+                .setDatasetId(rangeDetection.getId())
+                .setStartDate(rangeDetection.getRange().getFrom().format(formatter))
+                .setEndDate(rangeDetection.getRange().getTo().format(formatter))
+                .build();
 
-            // Write CSV to local file
-            String[] header = in.readLine().split(","); // read header
+            // Create a channel to connect to the target gRPC server
+            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+                .usePlaintext()
+                .build();
 
-            while ((inputLine = in.readLine()) != null) {
-                String[] splitted = inputLine.split(",");
-                DataPoint dataPoint = new DataPoint(LocalDateTime.parse(splitted[0], formatter),
-                    Arrays.stream(splitted).skip(1).mapToDouble(Double::parseDouble).toArray());
-                dataPoints.add(dataPoint);
-            }
-            in.close();
+            // Create a stub using the generated code and the channel
+//            DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
+//
+//            // Invoke the remote method on the target server
+//            EstimateYawMisalignmentResponse response = stub.estimateYawMisalignment(request);
+//
+//            // Convert the response to JSON string
+//            String json = response.getResult();
+//            // Create an ObjectMapper
+//            ObjectMapper objectMapper = new ObjectMapper();
+//
+//            JsonNode responseObject = null;
+//
+//            responseObject = objectMapper.readTree(json);
+//            log.info("READ JSON: {}", responseObject);
+//            JsonNode powerLost = responseObject.get("estimated_power_lost");
+//            powerLost.fields().forEachRemaining(entry -> {
+//                long time = Long.parseLong(entry.getKey());
+//                LocalDateTime localDateTime = LocalDateTime.ofInstant(
+//                    Instant.ofEpochMilli(time),
+//                    ZoneId.systemDefault()
+//                );
+//                String value = entry.getValue().asText();
+//                DataPoint dataPoint = new DataPoint(localDateTime, new double[]{Double.parseDouble(value)});
+//                dataPoints.add(dataPoint);
+//            });
+            dataPoints = generateSimulatedData(rangeDetection.getRange().getFrom(), rangeDetection.getRange().getTo());
+
         }
         catch (Exception e){
             e.printStackTrace();
         }
+        return dataPoints;
+    }
+
+    public static List<DataPoint> generateSimulatedData(LocalDateTime startDate, LocalDateTime endDate) {
+        List<DataPoint> dataPoints = new ArrayList<>();
+        Random random = new Random();
+
+        double yawAngle = 0; // Initialize yaw angle at 0 degrees
+        LocalDateTime currentTime = startDate;
+
+        while (currentTime.isBefore(endDate)) {
+            // Simulate slower yaw angle changes (e.g., from -4 to 4 degrees over a longer time)
+            yawAngle += (random.nextDouble() * 0.2 - 0.1) * 4; // Small random change (-0.4 to 0.4 degrees)
+            yawAngle = Math.min(4, Math.max(-4, yawAngle)); // Ensure angle stays within -4 to 4 degrees
+            DataPoint dataPoint = new DataPoint(currentTime, new double[]{yawAngle});
+            dataPoints.add(dataPoint);
+
+            // Add some randomness to the time intervals (change every long time)
+            int minutesToAdd = random.nextInt(60) + 30; // Random interval between 30 and 90 minutes
+            currentTime = currentTime.plusMinutes(minutesToAdd);
+        }
+
         return dataPoints;
     }
 

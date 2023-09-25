@@ -69,7 +69,7 @@ message CalculatePowerIndexRequest {
 }
 
 message CalculatePowerIndexResponse {
-    string filename = 1;
+    string result = 1;
 }
 
 message ForecastingRequest {
@@ -93,5 +93,5 @@ message EstimateYawMisalignmentRequest {
 }
 
 message EstimateYawMisalignmentResponse {
-    string filename = 1;
+    string result = 1;
 }
