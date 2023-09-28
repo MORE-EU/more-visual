@@ -13,7 +13,7 @@ import Header from './header/header';
 const mdTheme = createTheme();
 
 export const Visualizer = () => {
-  const { farmMeta, dataset, openToolkit, datasetChoice } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, datasetChoice, selectedConnection } = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
   const params: any = useParams();
@@ -24,9 +24,12 @@ export const Visualizer = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(setFolder(params.folder));
-    dispatch(getDataset({ folder: params.folder, id: params.id }));
-  }, [params.id !== undefined]);
+    if (params.id !== undefined) {
+      dispatch(setFolder(params.folder));
+      dispatch(getDataset({ folder: params.folder, id: params.id }));
+      farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
+    }
+  }, [params.id]);
 
   useEffect(() => {
     dataset && dispatch(getAlerts(dataset.id));
@@ -34,7 +37,6 @@ export const Visualizer = () => {
 
   useEffect(() => {
     params.id === undefined && farmMeta && history.push(`${params.folder}/${farmMeta.data[0].id}`);
-    farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
   }, [farmMeta]);
 
   useEffect(() => {
@@ -42,12 +44,12 @@ export const Visualizer = () => {
   }, [loadingButton]);
 
   return (
-    dataset !== null &&
+    dataset &&
     farmMeta && (
       <div>
         <ThemeProvider theme={mdTheme}>
           <Grid sx={{ height: '100%', width: '100%' }}>
-            <Header farmMeta={farmMeta} datasetChoice={datasetChoice}/>
+            <Header farmMeta={farmMeta} datasetChoice={datasetChoice} selectedConnection={selectedConnection} />
             <Divider />
             <Grid
               sx={{
@@ -69,7 +71,7 @@ export const Visualizer = () => {
                     p: 2,
                     display: 'flex',
                     flexDirection: 'column',
-                    height: "100%",
+                    height: '100%',
                   }}
                 >
                   <ChartContainer />

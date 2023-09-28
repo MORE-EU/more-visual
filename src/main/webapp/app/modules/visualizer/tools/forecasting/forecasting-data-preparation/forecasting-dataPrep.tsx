@@ -27,7 +27,6 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
   const handleDates = e => value => {
     const userTimezoneOffset = value.getTimezoneOffset() * 60000;
     const date = new Date(value).getTime();
-    console.log(new Date(value + userTimezoneOffset).getTime())
     e === 'start' &&
       (setForecastingForm(state => ({ ...state, startDate: date + userTimezoneOffset})),
       dispatch(setAutoMLStartDate(new Date(date + userTimezoneOffset).getTime())));

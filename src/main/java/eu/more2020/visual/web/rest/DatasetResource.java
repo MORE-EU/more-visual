@@ -1,13 +1,9 @@
 package eu.more2020.visual.web.rest;
 
 import eu.more2020.visual.domain.*;
-import eu.more2020.visual.domain.Detection.ChangepointDetection;
-import eu.more2020.visual.domain.Detection.DeviationDetection;
-import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.FileHandlingRepository;
-import eu.more2020.visual.repository.ToolsRepository;
 import eu.more2020.visual.service.CsvDataService;
 import eu.more2020.visual.service.IndexedModelarDataService;
 import eu.more2020.visual.service.ModelarDataService;
@@ -228,5 +224,11 @@ public class DatasetResource {
       log.debug("Fail to upload files! {}", e.getMessage());
       return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
+    }
+    
+    @PostMapping("/datasets/checkConnection")
+    public ResponseEntity<String> checkConnection (@RequestBody DbConfig dbConfig) throws URISyntaxException, IOException {
+    log.debug("Rest request to connect to DB with url {} and port {}", dbConfig.getUrl(), dbConfig.getPort());
+      return datasetRepository.checkConnection(dbConfig.getUrl(), dbConfig.getPort());
     }
 }

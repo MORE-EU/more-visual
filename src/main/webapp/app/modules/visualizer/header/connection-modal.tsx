@@ -75,7 +75,6 @@ const ConnectionModal = props => {
 
   return (
     <>
-    {console.log(dbConfig)}
     <Modal open={conModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
       <Box sx={style}>
         <Box>
@@ -85,9 +84,9 @@ const ConnectionModal = props => {
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: 2 }}>
           {Object.keys(dbConfig).map(key => (
-            <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 2, width: '100%' }}>
+            <Box key={`modal-key-${key}`} sx={{ display: 'flex', alignItems: 'center', columnGap: 2, width: '100%' }}>
               <Box sx={{width: "30%", textAlign: "center"}}>
-                <Typography id={`modal-key-${key}`} variant="subtitle1">
+                <Typography variant="subtitle1">
                   {`${key}:`}
                 </Typography>
               </Box>

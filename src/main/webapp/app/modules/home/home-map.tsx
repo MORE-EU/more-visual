@@ -79,7 +79,7 @@ export const HomeMap = () => {
                     >
                       <Popup>
                         <Paper elevation={0} sx={{textAlign: "center"}}>
-                          <Link to={`/visualize/bbz/${farmMeta.data[rand].id}`}>
+                          <Link to={`/visualize`}>
                             <Typography variant="overline" sx={{textDecoration: "none"}}>Detailed View
                             </Typography>
                           </Link> <br/>

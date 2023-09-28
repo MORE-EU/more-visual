@@ -123,16 +123,17 @@ export const HomeLeftMenu = () => {
             pb: 1,
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
+            // justifyContent: 'space-evenly',
+            // alignItems: 'center',
+            justifyContent: "center",
             borderBottom: '3px solid',
             borderBottomColor: grey[700],
           }}
         >
-          <Button variant="outlined" sx={menuButtonStyle} component={Link} to={'/dashboard/2'}>
+          {/* <Button variant="outlined" sx={menuButtonStyle} component={Link} to={'/dashboard/2'}>
             <DashboardRoundedIcon fontSize="medium" sx={{ color: grey[800], mr: 1 }} />
             Dashboard
-          </Button>
+          </Button> */}
           <Button sx={menuButtonStyle} variant="outlined" onClick={handleEditButton}>
             <EditIcon fontSize="medium" sx={{ color: grey[800], mr: 1 }} />
             Edit
