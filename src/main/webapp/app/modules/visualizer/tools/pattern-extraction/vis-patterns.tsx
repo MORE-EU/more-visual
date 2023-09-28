@@ -22,7 +22,8 @@ Highcharts.setOptions({
 });
 
 export const VisPatterns = () => {
-  const {customChangepointsEnabled, customChangepoints} = useAppSelector(state => state.visualizer);
+  const {folder, dataset,
+    customChangepointsEnabled, customChangepoints} = useAppSelector(state => state.visualizer);
   const {patterns} = useAppSelector(state => state.patternExtraction);
 
   const [searchPatterns, setSearchPatterns] = useState([]);
@@ -63,6 +64,7 @@ export const VisPatterns = () => {
   }
 
   const handleToggleSearchPatterns = () => {
+    const id = dataset.id;
     simulateLoading();
     searchPatterns.map((p, i) => {
       return {
@@ -72,7 +74,7 @@ export const VisPatterns = () => {
           to: customChangepoints[i].range.to
       }};
       });
-    dispatch(applySearchPatterns({searchPatterns}));
+    dispatch(applySearchPatterns({folder, id, searchPatterns}));
   }
 
   return (

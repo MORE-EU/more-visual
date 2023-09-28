@@ -1,20 +1,28 @@
 import {IPatterns} from "app/shared/model/patterns.model";
 import {createAsyncThunk, createSlice, isAnyOf} from "@reduxjs/toolkit";
 import {IPattern} from "app/shared/model/pattern.model";
+import axios from "axios";
 import {IPatternGroup} from "app/shared/model/pattern-group.model";
 
 const initialState = {
-  patterns: null as IPatterns,
+  patterns: null as IPatternGroup[],
 
 }
 
 export const applySearchPatterns = createAsyncThunk(
   'applySearchPatterns',
-  async (data: { searchPatterns: IPattern[]}) => {
-    const { searchPatterns } = data;
+  async (data: { folder: string; id: string[]; searchPatterns: IPattern[]}) => {
+    const { searchPatterns , folder, id} = data;
     // Fetch data (replace this with your actual API call)
     // For now, let's mock some search results
-    return  { patternGroups: searchPatterns.map((s) => {
+    const response = Promise.all(
+      searchPatterns.map(pattern => {
+        return axios.post(`api/tools/pattern`, pattern).then(res => res.data);
+      })
+    ).then(res => res.map(r => r.data));
+    // return response;
+    console.log(response);
+    return searchPatterns.map((s) => {
         return {
           id: s.id,
           color: 1,
@@ -35,7 +43,6 @@ export const applySearchPatterns = createAsyncThunk(
           ],
         } as IPatternGroup;
       })
-    }
   }
 );
 
@@ -47,7 +54,7 @@ const patternExtraction = createSlice({
       state.patterns = action.payload;
     },
     removePattern(state, action){
-      state.patterns.patternGroups = state.patterns.patternGroups.filter(item => item.id !== action.payload.id)
+      state.patterns = state.patterns.filter(item => item.id !== action.payload.id)
     }
   },
   extraReducers: function (builder) {

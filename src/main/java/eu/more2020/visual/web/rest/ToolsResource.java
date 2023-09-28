@@ -5,6 +5,7 @@ import eu.more2020.visual.domain.Changepoint;
 import eu.more2020.visual.domain.DataPoint;
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
+import eu.more2020.visual.domain.Detection.PatternDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.ToolsRepository;
@@ -55,6 +56,11 @@ public class ToolsResource {
     @PostMapping("/tools/soiling")
     public List<DataPoint> soilingDetection(@Valid @RequestBody DeviationDetection deviationDetection) {
         return toolsRepository.soilingDetection(deviationDetection);
+    }
+
+    @PostMapping("/tools/pattern")
+    public List<Changepoint> patternDetection(@Valid @RequestBody PatternDetection patternDetection) {
+        return toolsRepository.patternDetection(patternDetection);
     }
 
 

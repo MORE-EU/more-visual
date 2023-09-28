@@ -13,6 +13,7 @@ service DataService {
     rpc CalculatePowerIndex(CalculatePowerIndexRequest) returns (CalculatePowerIndexResponse);
     rpc Forecasting(ForecastingRequest) returns (ForecastingResponse);
     rpc EstimateYawMisalignment(EstimateYawMisalignmentRequest) returns (EstimateYawMisalignmentResponse);
+    rpc FrechetCalculator(FrechetCalculatorRequest) returns (FrechetCalculatorResponse);
 }
 
 message GetDatasetDataRequest {
@@ -93,5 +94,19 @@ message EstimateYawMisalignmentRequest {
 }
 
 message EstimateYawMisalignmentResponse {
+    string result = 1;
+}
+
+message FrechetCalculatorRequest {
+    string dataset_id = 1;
+    string start_date = 2;
+    string end_date = 3;
+    int32 R = 4;
+    int32 W = 5;
+    string column=6;
+
+}
+
+message FrechetCalculatorResponse {
     string result = 1;
 }

@@ -20,7 +20,7 @@ export interface IPatternCardProps {
 }
 
 const PatternCard = (props: IPatternCardProps) => {
-  const {data, dataset} = useAppSelector(state => state.visualizer);
+  const {data, dataset, farmMeta} = useAppSelector(state => state.visualizer);
   const {patterns} = useAppSelector(state => state.patternExtraction);
 
   const [showPatterns, setShowPatterns] = useState([]);
@@ -80,9 +80,10 @@ const PatternCard = (props: IPatternCardProps) => {
   };
 
   const checkForPatterns = () => {
-    return patterns && patterns.patternGroups ? patterns.patternGroups.find(patternGroup => patternGroup.id === value) : null;
+    return patterns ? patterns.find(patternGroup => patternGroup.id === value) : null;
   }
 
+  // @ts-ignore
   return (
     <>
       <TableRow>
@@ -98,7 +99,7 @@ const PatternCard = (props: IPatternCardProps) => {
         <TableCell align="center"></TableCell>
         <TableCell align="left">
           <Checkbox checked={isChecked}
-                    disabled={checkForPatterns() === null}
+                    disabled={checkForPatterns()}
                     onChange={onCheckboxChange} />
           {checkForPatterns()  &&
             <>
@@ -130,13 +131,16 @@ const PatternCard = (props: IPatternCardProps) => {
               <TableCell align="center"></TableCell>
               <TableCell align="center">FROM</TableCell>
               <TableCell align="center">TO</TableCell>
+              <TableCell align="center">{farmMeta.type == 0 ? "SOILING RATIO" : "YAW ANGLE   "}</TableCell>
               <TableCell align="center">SHOW</TableCell>
               <TableCell align="center"></TableCell>
-              <TableCell align="center"></TableCell>
         </TableRow>
-          {checkForPatterns() && patterns.patternGroups.find(patternGroup => patternGroup.id === value).similarPatterns.map((item, index) => (
-            <SubPatternCard pattern={item} isChecked={showPatterns.includes(item)} key={index}
-                            onCheckboxChange = {() => handleCheckboxClick(item)}/>
+          {checkForPatterns() && patterns.find(patternGroup => patternGroup.id === value).similarPatterns.map((item, index) => (
+            <SubPatternCard pattern={item}
+                            isChecked={showPatterns.includes(item)} key={index}
+                            onCheckboxChange = {() => handleCheckboxClick(item)}
+                            datasetType ={dataset.type}
+            />
           ))}
           </>
       )}

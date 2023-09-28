@@ -11,6 +11,7 @@
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/Results.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/Predictions.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/TrainingInfoOrBuilder.java
+/Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/FrechetCalculatorRequestOrBuilder.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/CalculatePowerIndexRequest.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/Status.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/WashesResponse.java
@@ -22,6 +23,7 @@
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/ProgressOrBuilder.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/EstimateYawMisalignmentRequestOrBuilder.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/CalculatePowerIndexResponse.java
+/Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/FrechetCalculatorRequest.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/CPDetectionRequestOrBuilder.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/TargetOrBuilder.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/DatasetDataResponseOrBuilder.java
@@ -40,6 +42,7 @@
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/WashesRequestOrBuilder.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/ModelInfo.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/JobID.java
+/Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/FrechetCalculatorResponse.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/CalculatePowerIndexResponseOrBuilder.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/Inference.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/GrpcProto.java
@@ -50,5 +53,6 @@
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/WashesResponseOrBuilder.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/ResultsOrBuilder.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/PredictionsOrBuilder.java
+/Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/FrechetCalculatorResponseOrBuilder.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/tools/ExtractRainsResponse.java
 /Users/vasilisstamatopoulos/Documents/Works/ATHENA/Projects/MORE/Code/more-visual/grpc-files/target/generated-sources/protobuf/java/eu/more2020/visual/grpc/ModelInfoOrBuilder.java

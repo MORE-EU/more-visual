@@ -5,6 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import eu.more2020.visual.domain.*;
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
+import eu.more2020.visual.domain.Detection.PatternDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
 
 import java.io.IOException;
@@ -25,5 +26,7 @@ public interface ToolsRepository {
     List<DataPoint> soilingDetection(DeviationDetection deviationDetection);
 
     List<DataPoint> yawMisalignmentDetection(RangeDetection rangeDetection);
+
+    List<Changepoint> patternDetection(PatternDetection patternDetection);
 
 }

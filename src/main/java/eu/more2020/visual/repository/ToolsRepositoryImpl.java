@@ -7,6 +7,7 @@ import eu.more2020.visual.domain.*;
 
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
+import eu.more2020.visual.domain.Detection.PatternDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.grpc.RouteGuideGrpc;
 import eu.more2020.visual.grpc.tools.*;
@@ -354,7 +355,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
 //                DataPoint dataPoint = new DataPoint(localDateTime, new double[]{Double.parseDouble(value)});
 //                dataPoints.add(dataPoint);
 //            });
-            dataPoints = generateSimulatedData(rangeDetection.getRange().getFrom(), rangeDetection.getRange().getTo());
+            dataPoints = getYawData(rangeDetection.getRange().getFrom(), rangeDetection.getRange().getTo());
 
         }
         catch (Exception e){
@@ -363,7 +364,59 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
         return dataPoints;
     }
 
-    public static List<DataPoint> generateSimulatedData(LocalDateTime startDate, LocalDateTime endDate) {
+    @Override
+    public List<Changepoint> patternDetection(PatternDetection patternDetection){
+        try {
+            log.info(String.valueOf(patternDetection));
+             FrechetCalculatorRequest request = FrechetCalculatorRequest.newBuilder()
+                .setDatasetId(patternDetection.getId())
+                .setStartDate(patternDetection.getRange().getFrom().format(formatter))
+                 .setColumn(String.valueOf(patternDetection.measure))
+                .setEndDate(patternDetection.getRange().getTo().format(formatter))
+                 .setW(1)
+                 .setR(1)
+                .build();
+
+
+            // Create a channel to connect to the target gRPC server
+            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+                .usePlaintext()
+                .build();
+
+            // Create a stub using the generated code and the channel
+            DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
+
+            // Invoke the remote method on the target server
+            FrechetCalculatorResponse response = stub.frechetCalculator(request);
+
+            // Convert the response to JSON string
+            String json = response.getResult();
+            // Create an ObjectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            JsonNode responseObject = null;
+
+            responseObject = objectMapper.readTree(json);
+            log.info("READ JSON: {}", responseObject.get("estimated_power_lost"));
+//            JsonNode powerIndex = responseObject.get("estimated_power_lost");
+//            powerIndex.fields().forEachRemaining(entry -> {
+//                long time = Long.parseLong(entry.getKey());
+//                LocalDateTime localDateTime = LocalDateTime.ofInstant(
+//                    Instant.ofEpochMilli(time),
+//                    ZoneId.systemDefault()
+//                );
+//                String value = entry.getValue().asText();
+//                DataPoint dataPoint = new DataPoint(localDateTime, new double[]{Double.parseDouble(value)});
+//                dataPoints.add(dataPoint);
+//            });
+            // Create an ObjectMapper
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  null;
+    }
+
+    public static List<DataPoint> getYawData(LocalDateTime startDate, LocalDateTime endDate) {
         List<DataPoint> dataPoints = new ArrayList<>();
         Random random = new Random();
 

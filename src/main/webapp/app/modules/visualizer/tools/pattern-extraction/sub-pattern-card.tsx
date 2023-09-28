@@ -1,31 +1,45 @@
 import React, { useState } from 'react';
 import ListItem from '@mui/material/ListItem';
 import {IChangepointDate} from "app/shared/model/changepoint-date.model";
-import {Checkbox, TableCell} from "@mui/material";
+import {Checkbox, TableCell, Typography} from "@mui/material";
 import TableRow from "@mui/material/TableRow";
-import {useAppSelector} from "app/modules/store/storeConfig";
-import SmallTimeSeriesChart from "app/modules/visualizer/sparklines/SmallTimeSeriesChart";
 import './patterns.scss';
-import IconButton from "@mui/material/IconButton"; // Import your CSS file for styling
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import {IPatterns} from "app/shared/model/patterns.model";
 import {IPattern} from "app/shared/model/pattern.model";
+import {makeStyles} from "@mui/styles";
 
 export interface IPatternCardProps {
   pattern: IPattern,
   isChecked: boolean,
   onCheckboxChange: () => any,
+  datasetType: string,
 }
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    display: 'flex',
+    alignItems: 'center',
+    margin: 'auto',
+  },
+  circle: {
+    width: '12px',
+    height: '12px',
+    borderRadius: '50%',
+    backgroundColor: 'green',
+    marginRight: theme.spacing(1), // Adjust spacing as needed
+  },
+}));
+
 
 const SubPatternCard = (props: IPatternCardProps) => {
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const {pattern, isChecked, onCheckboxChange} = props;
+  const {pattern, datasetType, isChecked, onCheckboxChange} = props;
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
+
+  const classes = useStyles();
 
   const getDateFormatted = (date) => {
     // Extract date components
@@ -52,9 +66,14 @@ const SubPatternCard = (props: IPatternCardProps) => {
         <TableCell align="center">{getDateFormatted(new Date(pattern.range.from))}</TableCell>
         <TableCell align="center">{getDateFormatted(new Date(pattern.range.to))}</TableCell>
         <TableCell align="center">
+          <div className={classes.container}>
+            <div className={classes.circle}></div>
+            <Typography>{0.96}</Typography>
+          </div>
+        </TableCell>
+        <TableCell align="center">
           <Checkbox checked={isChecked} onChange={onCheckboxChange} />
         </TableCell>
-        <TableCell align="center"></TableCell>
         <TableCell align="center"></TableCell>
       </TableRow>
     </>
