@@ -5,6 +5,7 @@ import eu.more2020.visual.domain.Farm;
 import eu.more2020.visual.domain.FarmMeta;
 import eu.more2020.visual.domain.Sample;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,6 +19,7 @@ public interface DatasetRepository {
 
     String DATASETS_CACHE = "datasets";
 
+    ResponseEntity<String> checkConnection(String url, String port) throws IOException;
 
     List<Dataset> findAll() throws IOException;
 

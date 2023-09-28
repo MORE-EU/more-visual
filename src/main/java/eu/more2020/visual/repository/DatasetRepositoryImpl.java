@@ -11,6 +11,8 @@ import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
@@ -231,11 +233,18 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         for (String name : names) {
 
             if (new File(applicationProperties.getWorkspacePath() + "/" + name).isDirectory() && !name.equals("config")) {
-                log.debug(name);
                 dirs.add(name);
             }
         }
         return dirs;
+    }
+
+    public ResponseEntity<String> checkConnection(String url, String port) throws IOException {
+        if (url.equalsIgnoreCase("83.212.75.52") && port.equalsIgnoreCase("31000")) {
+            return new ResponseEntity<>("Connected Successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Credentials Error", HttpStatus.BAD_REQUEST);
+        }
     }
 
 

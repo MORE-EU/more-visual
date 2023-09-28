@@ -98,7 +98,7 @@ const PatternCard = (props: IPatternCardProps) => {
         <TableCell align="center"></TableCell>
         <TableCell align="left">
           <Checkbox checked={isChecked}
-                    disabled={checkForPatterns() === null}
+                    disabled={checkForPatterns() !== null}
                     onChange={onCheckboxChange} />
           {checkForPatterns()  &&
             <>

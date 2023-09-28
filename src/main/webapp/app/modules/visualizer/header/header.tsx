@@ -12,7 +12,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 const Header = props => {
-  const { farmMeta, datasetChoice } = props;
+  const { farmMeta, datasetChoice, selectedConnection } = props;
   const [conModal, setConModal] = useState(false);
   const [menuChoice, setMenuChoice] = useState('CSV');
   const [keepChoice, setKeepChoice] = useState("CSV");
@@ -24,20 +24,20 @@ const Header = props => {
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
 
-  const onMenuClick = e => {
-    if(e.target.innerText === menuChoice) return;
-    setAnchorEl(null);
-    setKeepChoice(e.target.innerText);
-    if (e.target.innerText !== 'CSV') {
-      setConModal(true);
-    }else{
-      setMenuChoice("CSV")
-    }
-  };
+  // const onMenuClick = e => {
+  //   if(e.target.innerText === menuChoice) return;
+  //   setAnchorEl(null);
+  //   setKeepChoice(e.target.innerText);
+  //   if (e.target.innerText !== 'CSV') {
+  //     setConModal(true);
+  //   }else{
+  //     setMenuChoice("CSV")
+  //   }
+  // };
 
   return (
     <Grid
@@ -57,15 +57,17 @@ const Header = props => {
           <HomeIcon sx={{ mr: 0.5 }} fontSize='medium' />
           Home
         </Link>
-        <Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`/dashboard/${params.folder}`}>
+        <Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`/visualize`}>
           {farmMeta.name}
         </Link>
         <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
           {farmMeta.data[datasetChoice].name}
         </Typography>
       </Breadcrumbs>
-      <Chip label={menuChoice} color="primary" sx={{ width: '6rem' }} onClick={handleClick} />
-      <Menu
+      <Chip label={selectedConnection} color="primary" sx={{ width: '6rem' }} 
+      // onClick={handleClick} 
+      />
+      {/* <Menu
         id="basic-menu"
         anchorEl={anchorEl}
         open={menuOpen}
@@ -86,8 +88,8 @@ const Header = props => {
         <MenuItem onClick={onMenuClick} selected={menuChoice === 'ModelarDB'}>
           ModelarDB
         </MenuItem>
-      </Menu>
-      <ConnectionModal conModal={conModal} setConModal={setConModal} menuChoice={menuChoice} setMenuChoice={setMenuChoice} keepChoice={keepChoice} />
+      </Menu> */}
+      {/* <ConnectionModal conModal={conModal} setConModal={setConModal} menuChoice={menuChoice} setMenuChoice={setMenuChoice} keepChoice={keepChoice} /> */}
     </Grid>
   );
 };
