@@ -6,11 +6,11 @@ public class PatternDetection {
 
     private int id;
     private String datasetId;
-    private int measure;
+    private String measure;
     private TimeRange range;
 
     public PatternDetection(){}
-    public PatternDetection(int id, String datasetId, int measure, TimeRange range) {
+    public PatternDetection(int id, String datasetId, String measure, TimeRange range) {
         this.id = id;
         this.datasetId = datasetId;
         this.measure = measure;
@@ -25,7 +25,7 @@ public class PatternDetection {
         return datasetId;
     }
 
-    public int getMeasure() {
+    public String getMeasure() {
         return measure;
     }
 

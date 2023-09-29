@@ -370,7 +370,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
              FrechetCalculatorRequest request = FrechetCalculatorRequest.newBuilder()
                 .setDatasetId(patternDetection.getDatasetId())
                 .setStartDate(patternDetection.getRange().getFrom().format(formatter))
-                 .setColumn(String.valueOf(patternDetection.getMeasure()))
+                 .setColumn(patternDetection.getMeasure())
                 .setEndDate(patternDetection.getRange().getTo().format(formatter))
                  .setW(1)
                  .setR(1)

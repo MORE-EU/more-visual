@@ -69,7 +69,7 @@ export const VisPatterns = () => {
     searchPatterns.forEach((p, i) => {
       return {
         id: customChangepoints[i].id,
-        measure: customChangepoints[i].measure,
+        measure: dataset.header[customChangepoints[i].measure],
         range: {
           from: customChangepoints[i].range.from,
           to: customChangepoints[i].range.to
