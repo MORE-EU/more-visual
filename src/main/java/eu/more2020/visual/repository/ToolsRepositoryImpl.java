@@ -67,7 +67,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
                 .build();
 
             // Create a channel to connect to the target gRPC server
-            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+            ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
                 .usePlaintext()
                 .build();
 
@@ -152,7 +152,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
                 .build();
 
             // Create a channel to connect to the target gRPC server
-            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+            ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
                 .usePlaintext()
                 .build();
 
@@ -214,7 +214,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
 
 
             // Create a channel to connect to the target gRPC server
-            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+            ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
                 .usePlaintext()
                 .build();
 
@@ -272,7 +272,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
 
 
             // Create a channel to connect to the target gRPC server
-            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+            ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
                 .usePlaintext()
                 .build();
 
@@ -313,7 +313,6 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
     public List<DataPoint> yawMisalignmentDetection(RangeDetection rangeDetection) {
         List<DataPoint> dataPoints = new ArrayList<>();
         try {
-            URL dataURL = new URL(applicationProperties.getToolApi() + "yaw_misalignment/" + rangeDetection.getId());
             Map<String, Object> params = new LinkedHashMap<>();
             params.put("start_date", rangeDetection.getRange().getFrom().format(formatter));
             params.put("end_date", rangeDetection.getRange().getTo().format(formatter));
@@ -325,7 +324,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
                 .build();
 
             // Create a channel to connect to the target gRPC server
-            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+            ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
                 .usePlaintext()
                 .build();
 
@@ -379,7 +378,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
 
 
             // Create a channel to connect to the target gRPC server
-            ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+            ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
                 .usePlaintext()
                 .build();
 

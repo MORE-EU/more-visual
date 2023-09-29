@@ -113,7 +113,8 @@ application:
   dbSettings: /opt/more-workspace/config/settings.cfg
   timeFormat: 'yyyy-MM-dd[ HH:mm:ss]'
   delimiter: ','
-  toolApi: http://localhost:8889/
+  toolHost: 83.212.75.52
+  toolPort: 50052
   modelardb:
     url: leviathan.imsi.athenarc.gr
     port: 9999

@@ -12,7 +12,8 @@ public class ApplicationProperties {
     String workspacePath;
     String delimiter;
     String timeFormat;
-    String toolApi;
+    String toolHost;
+    int toolPort;
 
     public String getWorkspacePath() {
         return workspacePath;
@@ -38,11 +39,19 @@ public class ApplicationProperties {
         this.timeFormat = timeFormat;
     }
 
-    public String getToolApi() {
-        return toolApi;
+    public String getToolHost() {
+        return toolHost;
     }
 
-    public void setToolApi(String toolApi) {
-        this.toolApi = toolApi;
+    public int getToolPort() {
+        return toolPort;
+    }
+
+    public void setToolHost(String toolHost) {
+        this.toolHost = toolHost;
+    }
+
+    public void setToolPort(int toolPort) {
+        this.toolPort = toolPort;
     }
 }

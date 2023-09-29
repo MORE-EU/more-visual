@@ -62,29 +62,6 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         return datasets;
     }
 
-    public Boolean hasWashes(String id) {
-        try {
-            URL dataURL = new URL(applicationProperties.getToolApi() + "washes/" + id);
-            HttpURLConnection con = (HttpURLConnection) dataURL.openConnection();
-            con.setRequestMethod("POST");
-            int status = con.getResponseCode();
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer content = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
-            con.disconnect();
-            return Boolean.parseBoolean(String.valueOf(content));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
 
     @Override
     public Optional<FarmMeta> findFarm(String farmName) throws IOException {
