@@ -1,15 +1,45 @@
 package eu.more2020.visual.domain.Detection;
 
-public class PatternDetection extends AbstractDetection{
+import eu.more2020.visual.domain.TimeRange;
 
-    public int measure;
-    public PatternDetection() {}
+public class PatternDetection {
 
-    public PatternDetection(int measure) {
+    private int id;
+    private String datasetId;
+    private int measure;
+    private TimeRange range;
+
+    public PatternDetection(){}
+    public PatternDetection(int id, String datasetId, int measure, TimeRange range) {
+        this.id = id;
+        this.datasetId = datasetId;
         this.measure = measure;
+        this.range = range;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getDatasetId() {
+        return datasetId;
     }
 
     public int getMeasure() {
         return measure;
+    }
+
+    public TimeRange getRange() {
+        return range;
+    }
+
+    @Override
+    public String toString() {
+        return "PatternDetection{" +
+            "id=" + id +
+            ", datasetId='" + datasetId + '\'' +
+            ", measure=" + measure +
+            ", range=" + range +
+            '}';
     }
 }

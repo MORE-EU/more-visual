@@ -66,15 +66,16 @@ export const VisPatterns = () => {
   const handleToggleSearchPatterns = () => {
     const id = dataset.id;
     simulateLoading();
-    searchPatterns.map((p, i) => {
+    searchPatterns.forEach((p, i) => {
       return {
         id: customChangepoints[i].id,
+        measure: customChangepoints[i].measure,
         range: {
           from: customChangepoints[i].range.from,
           to: customChangepoints[i].range.to
       }};
       });
-    dispatch(applySearchPatterns({folder, id, searchPatterns}));
+    dispatch(applySearchPatterns({datasetId: id, searchPatterns}));
   }
 
   return (
