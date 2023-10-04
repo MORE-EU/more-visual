@@ -322,6 +322,11 @@
   			<artifactId>influxdb-client-java</artifactId>
   			<version>6.6.0</version>
 		</dependency>
+        <dependency>
+            <groupId>eu.more2020.visual.index</groupId>
+            <artifactId>more-vis-index</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <extensions>

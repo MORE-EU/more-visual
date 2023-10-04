@@ -3,7 +3,7 @@ package eu.more2020.visual.index.csv;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.domain.DataPoint;
-import eu.more2020.visual.domain.Dataset;
+import eu.more2020.visual.domain.VisualDataset;
 import eu.more2020.visual.domain.Query;
 import eu.more2020.visual.domain.QueryResults;
 import eu.more2020.visual.index.TimeSeriesIndexUtil;
@@ -26,7 +26,7 @@ public class CsvQueryProcessor {
     private static final Logger LOG = LogManager.getLogger(CsvQueryProcessor.class);
     private Query query;
     private QueryResults queryResults;
-    private Dataset dataset;
+    private VisualDataset dataset;
     private int freqLevel;
     private Stack<TreeNode> stack = new Stack<>();
     private FileInputStream fileInputStream;
@@ -37,7 +37,7 @@ public class CsvQueryProcessor {
     private Integer accumulatorCounter;
 
 
-    public CsvQueryProcessor(Query query, Dataset dataset, CsvTTI tti) {
+    public CsvQueryProcessor(Query query, VisualDataset dataset, CsvTTI tti) {
         this.query = query;
         this.filter = query.getFilter();
         this.measures = query.getMeasures() != null ? query.getMeasures() : dataset.getMeasures();
@@ -65,8 +65,8 @@ public class CsvQueryProcessor {
     public double[] nodeSelection(CsvTreeNode treeNode) throws IOException {
         List<Double> filteredVals = new ArrayList<Double>();
         if(filter != null){
-            Boolean filterCheck = filter.entrySet().stream().anyMatch(e -> 
-                treeNode.getStats().get(e.getKey()).getAverage() < e.getValue()[0] || 
+            Boolean filterCheck = filter.entrySet().stream().anyMatch(e ->
+                treeNode.getStats().get(e.getKey()).getAverage() < e.getValue()[0] ||
                 treeNode.getStats().get(e.getKey()).getAverage() > e.getValue()[1]);
         if(!filterCheck){
             measures.forEach(mez -> {
@@ -101,7 +101,7 @@ public class CsvQueryProcessor {
 
     public void processNode(CsvTreeNode treeNode) throws IOException {
         if (treeNode.getLevel() == freqLevel) {
-            queryResults.getData().add(new DataPoint(getCurrentNodeDateTime(), nodeSelection(treeNode))); 
+            queryResults.getData().add(new DataPoint(getCurrentNodeDateTime(), nodeSelection(treeNode)));
         } else {
             fileInputStream.getChannel().position(treeNode.getFileOffsetStart());
             String[] row;
@@ -155,7 +155,7 @@ public class CsvQueryProcessor {
         /* We filter in each level only in the first node and the last. If we are on the first node, we get everything that is from the start filter
          * and after. Else if we are in the last node we get everything before the end filter. Finally, if we re in intermediary nodes we get all children
          * that are below the filtered values of the current node.*/
-        
+
         if (isFirst)
             children = children.stream().filter(child -> child.getLabel() >= start).collect(Collectors.toList());
         if (isLast)

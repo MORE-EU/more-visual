@@ -23,11 +23,11 @@ public class ModelarTTI {
     protected TreeNode root;
     @Autowired
     private final ModelarDataService modelarDataService;
-    private Dataset dataset;
+    private VisualDataset dataset;
     private boolean isInitialized = false;
     private DateTimeFormatter formatter;
 
-    public ModelarTTI(ModelarDataService modelarDataService, Dataset dataset) {
+    public ModelarTTI(ModelarDataService modelarDataService, VisualDataset dataset) {
         this.modelarDataService = modelarDataService;
         this.dataset = dataset;
         this.formatter = DateTimeFormatter.ofPattern(dataset.getTimeFormat(), Locale.ENGLISH);

@@ -23,13 +23,13 @@ public class CsvTTI {
     private static final Logger LOG = LogManager.getLogger(CsvTTI.class);
     protected CsvTreeNode root;
     private Map<Integer, DoubleSummaryStatistics> measureStats;
-    private Dataset dataset;
+    private VisualDataset dataset;
     private String csv;
     private int objectsIndexed = 0;
     private boolean isInitialized = false;
     private DateTimeFormatter formatter;
 
-    public CsvTTI(String csv, Dataset dataset) {
+    public CsvTTI(String csv, VisualDataset dataset) {
         this.dataset = dataset;
         this.csv = csv;
         this.formatter =

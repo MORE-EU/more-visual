@@ -7,19 +7,21 @@ public class FarmMeta implements Serializable {
 
     private String name;
     private Integer type;
+    private String config;
     private List<FarmInfo> data;
     private Float latitude;
     private Float longitude;
-    
+
 
 
     public FarmMeta () {
 
     }
 
-    public FarmMeta(String name, Integer type, List<FarmInfo> data, Float latitude, Float longitude) {
+    public FarmMeta(String name, Integer type, String config, List<FarmInfo> data, Float latitude, Float longitude) {
         this.name = name;
         this.type = type;
+        this.config = config;
         this.data = data;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -65,6 +67,13 @@ public class FarmMeta implements Serializable {
         this.longitude = longitude;
     }
 
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
 
     @Override
     public String toString() {

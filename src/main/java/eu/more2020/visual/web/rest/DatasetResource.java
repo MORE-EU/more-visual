@@ -1,6 +1,13 @@
 package eu.more2020.visual.web.rest;
 
-import eu.more2020.visual.domain.*;
+import eu.more2020.visual.domain.DbConfig;
+import eu.more2020.visual.domain.FarmInfo;
+import eu.more2020.visual.domain.FarmMeta;
+import eu.more2020.visual.domain.Sample;
+import eu.more2020.visual.index.domain.*;
+import eu.more2020.visual.index.domain.Dataset.AbstractDataset;
+import eu.more2020.visual.index.domain.Query.Query;
+import eu.more2020.visual.index.index.TTI;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.FileHandlingRepository;
@@ -24,13 +31,15 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
- * REST controller for managing {@link Dataset}.
+ * REST controller for managing {@link AbstractDataset}.
  */
 @RestController
 @RequestMapping("/api")
@@ -69,12 +78,12 @@ public class DatasetResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/datasets")
-    public ResponseEntity<Dataset> createDataset(@Valid @RequestBody Dataset dataset) throws URISyntaxException, IOException {
+    public ResponseEntity<AbstractDataset> createDataset(@Valid @RequestBody AbstractDataset dataset) throws URISyntaxException, IOException {
         log.debug("REST request to save Dataset : {}", dataset);
         if (dataset.getId() != null) {
             throw new BadRequestAlertException("A new dataset cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Dataset result = datasetRepository.save(dataset);
+        AbstractDataset result = datasetRepository.save(dataset);
         return ResponseEntity.created(new URI("/api/datasets/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -90,12 +99,12 @@ public class DatasetResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/datasets")
-    public ResponseEntity<Dataset> updateDataset(@Valid @RequestBody Dataset dataset) throws URISyntaxException, IOException {
+    public ResponseEntity<AbstractDataset> updateDataset(@Valid @RequestBody AbstractDataset dataset) throws URISyntaxException, IOException {
         log.debug("REST request to update Dataset : {}", dataset);
         if (dataset.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        Dataset result = datasetRepository.save(dataset);
+        AbstractDataset result = datasetRepository.save(dataset);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, dataset.getId().toString()))
             .body(result);
@@ -107,7 +116,7 @@ public class DatasetResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of datasets in body.
      */
     @GetMapping("/datasets")
-    public List<Dataset> getAllDatasets() throws IOException {
+    public List<AbstractDataset> getAllDatasets() throws IOException {
         log.debug("REST request to get all Datasets");
         return datasetRepository.findAll();
     }
@@ -119,9 +128,9 @@ public class DatasetResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the dataset, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/datasets/{farmName}/{id}")
-    public ResponseEntity<Dataset> getDataset(@PathVariable String farmName, @PathVariable String id) throws IOException {
+    public ResponseEntity<AbstractDataset> getDataset(@PathVariable String farmName, @PathVariable String id) throws IOException, SQLException {
         log.debug("REST request to get Dataset : {}/{}", farmName, id);
-        Optional<Dataset> dataset = datasetRepository.findById(id, farmName);
+        Optional<AbstractDataset> dataset = datasetRepository.findById(id, farmName);
         log.debug(dataset.toString());
         return ResponseUtil.wrapOrNotFound(dataset);
     }
@@ -161,21 +170,15 @@ public class DatasetResource {
      * POST executeQuery
      */
     @PostMapping("/datasets/{farmName}/{id}/query")
-    public ResponseEntity<QueryResults> executeQuery(@PathVariable String farmName, @PathVariable String id, @Valid @RequestBody Query query) throws IOException {
+    public ResponseEntity<QueryResults> executeQuery(@PathVariable String farmName, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
         log.debug("REST request to execute Query: {}", query);
         Optional<QueryResults> queryResultsOptional;
-            queryResultsOptional = datasetRepository.findById(id, farmName).map(dataset -> {
-                if (dataset.getType().equals("modelar")) {
-                try {
-                    return modelarDataService.executeQuery(dataset, query);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                return csvDataService.executeQuery(dataset, query);
-            }
+        queryResultsOptional = datasetRepository.findById(id, farmName).map(dataset -> {
+            log.debug("Dataset {}", dataset);
+            TTI tti = new TTI(dataset, 0.95, 4, 1);
+            return tti.executeQueryMinMax(query);
         });
-        // queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
+//        queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 
@@ -225,7 +228,7 @@ public class DatasetResource {
       return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
     }
-    
+
     @PostMapping("/datasets/checkConnection")
     public ResponseEntity<String> checkConnection (@RequestBody DbConfig dbConfig) throws URISyntaxException, IOException {
     log.debug("Rest request to connect to DB with url {} and port {}", dbConfig.getUrl(), dbConfig.getPort());

@@ -1,10 +1,9 @@
 package eu.more2020.visual.service;
 
-import eu.more2020.visual.config.ApplicationProperties;
-import eu.more2020.visual.domain.Dataset;
 import eu.more2020.visual.domain.Query;
 import eu.more2020.visual.domain.QueryResults;
 import eu.more2020.visual.domain.TimeRange;
+import eu.more2020.visual.domain.VisualDataset;
 import eu.more2020.visual.index.csv.CsvTTI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
@@ -30,7 +28,7 @@ public class CsvDataService {
         indexes.remove(id, farmName);
     }
 
-    private synchronized List<CsvTTI> getIndexes(Dataset dataset, Query query) throws IOException {
+    private synchronized List<CsvTTI> getIndexes(VisualDataset dataset, Query query) throws IOException {
         List<CsvTTI> ttis = dataset.getFileInfoList().stream().filter(dataFileInfo -> dataFileInfo.getTimeRange().intersects(query.getRange()))
             .map(dataFileInfo -> {
                 CsvTTI tti = indexes.get(dataFileInfo.getFilePath());
@@ -43,7 +41,7 @@ public class CsvDataService {
         return ttis;
     }
 
-    public TimeRange getTimeRangeInit (TimeRange timeRange, Dataset dataset) {
+    public TimeRange getTimeRangeInit (TimeRange timeRange, VisualDataset dataset) {
         if(Duration.between(timeRange.getFrom(), timeRange.getTo()).toDays() >= 1){
             return new TimeRange(dataset.getTimeRange().getTo().minus(8, ChronoUnit.DAYS), dataset.getTimeRange().getTo().minus(1, ChronoUnit.DAYS));
         }else{
@@ -51,7 +49,7 @@ public class CsvDataService {
         }
     }
 
-    public QueryResults executeQuery(Dataset dataset, Query query) {
+    public QueryResults executeQuery(VisualDataset dataset, Query query) {
         log.debug(query.toString());
         if (query.getRange() == null) {
             query.setRange(getTimeRangeInit(dataset.getTimeRange(), dataset));

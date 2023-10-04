@@ -154,17 +154,19 @@ export const Chart = () => {
 
   useEffect(() => {
     if (compare.length !== 0) {
-      dispatch(updateCompareQueryResults({ folder, id: compare, from, to, resampleFreq, selectedMeasures, filter }));
+      dispatch(updateCompareQueryResults({ folder, id: compare, from, to, selectedMeasures, filter }));
     }
   }, [compare]);
 
   useEffect(() => {
     latestMeasures.current = selectedMeasures;
     dispatch(
-      updateQueryResults({ folder, id: dataset.id, from: from ? from : null, to: to ? to : null, resampleFreq, selectedMeasures, filter })
+      updateQueryResults({ folder, id: dataset.id,
+        from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
+        to: to ? to : dataset.timeRange.to, selectedMeasures, filter })
     );
     if (compare.length !== 0) {
-      dispatch(updateCompareQueryResults({ folder, id: compare, from, to, resampleFreq, selectedMeasures, filter }));
+      dispatch(updateCompareQueryResults({ folder, id: compare, from, to, selectedMeasures, filter }));
     }
     if (selectedMeasures.length === 6) toast('Maximum number of measures reached');
   }, [dataset, selectedMeasures]);
@@ -280,7 +282,6 @@ export const Chart = () => {
           id: latestDatasetId.current,
           from: leftSide,
           to: rightSide,
-          resampleFreq: latestFrequency.current,
           selectedMeasures: latestMeasures.current,
           filter: latestFilter.current,
         })
@@ -294,7 +295,6 @@ export const Chart = () => {
             id: latestCompare.current,
             from: leftSide,
             to: rightSide,
-            resampleFreq: latestFrequency.current,
             selectedMeasures: latestMeasures.current,
             filter: latestFilter.current,
           })
@@ -322,56 +322,43 @@ export const Chart = () => {
     const getSides = (max: number, min: number, p: number) => {
       const pad = max - min + (max - min) * p;
       const leftSide = Math.max(Math.min(min - pad, timeRange.current[0] + min - pad), timeRange.current[0]);
-      const rightSide = Math.min(max + pad, data[data.length - 1].timestamp);
+      const rightSide = Math.min(max + pad, data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp);
       return { leftSide, rightSide };
     };
 
-    const checkForData = (max: number, min: number) => {
-      const { leftSide, rightSide } = getSides(max, min, 0.25);
+    const checkForData = (min: number, max: number) => {
+      // const { leftSide, rightSide } = getSides(max, min, 0.25);
+      const leftSide = min;
+      const rightSide = max;
       latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
       latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
       if (leftSide !== latestLeftSide.current || rightSide !== latestRightSide.current) {
         fetchData(leftSide, rightSide);
       }
     };
+
     const checkForDataOnPan = () => {
       const { dataMax, dataMin, max, min } = chart.current.xAxis[0].getExtremes();
+      console.log(chart.current.xAxis[0].getExtremes());
       // Conditions for loading new data
-      if ((dataMax - max < 2 || min - dataMin < 2) && max < data[data.length - 1].timestamp) {
-        //dataMAx
-        checkForData(max, min);
-      }
-    };
-
-    const getDateDiff = (max: moment.Moment, min: moment.Moment) => {
-      return moment.duration(max.diff(min)).humanize();
-    };
-
-    const calculateFreqFromDiff = (diff: string) => {
-      if (diff.includes('month') || diff.includes('day')) {
-        return 'hour';
-      } else if (diff.includes('hour')) {
-        return 'minute';
-      } else if (diff.includes('minute') || diff.includes('second')) {
-        return 'second';
-      }
-      return 'hour';
+      // if ((dataMax - max < 2 || min - dataMin < 2) && max < data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp) {
+      //   checkForData(min, max);
+      // }
+      checkForData(min, max);
     };
 
     const checkForDataOnZoom = () => {
       const { dataMax, dataMin, max, min } = chart.current.xAxis[0].getExtremes();
-      const diff = getDateDiff(moment(max), moment(min));
-      const newFreq = calculateFreqFromDiff(diff);
-      if (
-        newFreq !== latestFrequency.current ||
-        (max > dataMax && max !== timeRange.current[1]) ||
-        (min < dataMin && min !== timeRange.current[0])
-      ) {
-        latestFrequency.current = newFreq;
-        dispatch(updateResampleFreq(newFreq));
-        checkForData(max, min);
-      }
+      console.log(chart.current.xAxis[0].getExtremes());
+      // if (
+      //   (max > dataMax && max !== timeRange.current[1]) ||
+      //   (min < dataMin && min !== timeRange.current[0])
+      // ) {
+      //   checkForData(min, max);
+      // }
+      checkForData(min, max);
     };
+
 
     // CHART: ZOOM FUNCTION
     Highcharts.addEvent(chart.current.container, 'wheel', (event: WheelEvent) => {
@@ -382,74 +369,61 @@ export const Chart = () => {
       if (!chart.current.loadingShown) {
         if (event.deltaY < 0 && max - min > 10000) {
           // in, 10000 is the max range on a zoom level
-          chart.current.xAxis[0].setExtremes(min + stepleft, max - stepright, true, false);
+          chart.current.xAxis[0].setExtremes(min + stepleft, max - stepright, true, true);
         } else if (event.deltaY > 0) {
           // out
+          console.log("Zoom out");
           chart.current.xAxis[0].setExtremes(
             Math.max(min - stepleft, timeRange.current[0]),
-            Math.min(max + stepright, data[data.length - 1].timestamp),
+            Math.min(max + stepright, data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp),
             true,
-            false
-          ); // timeRange.current[1]
+            true
+          );
         }
         checkForDataOnZoom();
       }
     });
 
+    // CHART: PAN FUNCTION
+    Highcharts.wrap(Highcharts.Chart.prototype, 'pan', function (proceed, ...args) {
+      if (!chart.current.loadingShown) {
+        proceed.apply(this, args);
+        checkForDataOnPan();
+      }
+    });
+
     const renderLabelForLiveData = () => {
       const { max } = chart.current.xAxis[0].getExtremes();
-      if (max >= data[data.length - 1].timestamp && latestFrequency.current === 'second') {
+      if (max >= data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp && latestFrequency.current === 'second') {
         toast('Live Data Mode');
       }
     };
 
-    // CHART: PAN FUNCTION
-    Highcharts.wrap(Highcharts.Chart.prototype, 'pan', function (proceed, ...args) {
-      if (!chart.current.loadingShown) {
-        latestPreview.current && (dispatch(setAlertingPreview(false)), dispatch(setAlertingPlotMode(false)), setAlertingPlotBands([]));
-        proceed.apply(this, args);
-        checkForDataOnPan();
-        renderLabelForLiveData();
-      }
-    });
-
-    const calculateStep = (freq, refreshVal) => {
-      const step = 1000 * refreshVal;
-      if (freq === 'hour') {
-        return step * Math.pow(60, 2);
-      } else if (freq === 'minute') {
-        return step * 60;
-      } else if (freq === 'second') {
-        return step;
-      }
-    };
-
     // LIVE DATA IMPLEMENTATION
-    setInterval(() => {
-      if (!latestPreview.current) {
-        const { max, min, dataMax } = chart.current.xAxis[0].getExtremes();
-        if (max >= data[data.length - 1].timestamp && latestFrequency.current === 'second') {
-          dispatch(
-            liveDataImplementation({
-              folder: latestFolder.current,
-              id: latestDatasetId.current,
-              from: dataMax,
-              to: dataMax + calculateStep(latestFrequency.current, 30),
-              resampleFreq: 'SECOND',
-              selectedMeasures: latestMeasures.current,
-              filter: latestFilter.current,
-            })
-          );
-          max === dataMax && chart.current.xAxis[0].setExtremes(min, dataMax + calculateStep(latestFrequency.current, 30), true, true);
-        }
-      }
-      // else{
-      //   chart.current.toast !== "Preview Mode" && toast('Preview Mode');
-      // }
-    }, 500);
+    // setInterval(() => {
+    //   if (!latestPreview.current) {
+    //     const { max, min, dataMax } = chart.current.xAxis[0].getExtremes();
+    //     if (max >= data[data.length - 1].timestamp && latestFrequency.current === 'second') {
+    //       dispatch(
+    //         liveDataImplementation({
+    //           folder: latestFolder.current,
+    //           id: latestDatasetId.current,
+    //           from: dataMax,
+    //           to: dataMax + calculateStep(latestFrequency.current, 30),
+    //           selectedMeasures: latestMeasures.current,
+    //           filter: latestFilter.current,
+    //         })
+    //       );
+    //       max === dataMax && chart.current.xAxis[0].setExtremes(min, dataMax + calculateStep(latestFrequency.current, 30), true, true);
+    //     }
+    //   }
+    //   // else{
+    //   //   chart.current.toast !== "Preview Mode" && toast('Preview Mode');
+    //   // }
+    // }, 500);
 
     // Set initial extremes
-    chart.current.xAxis[0].setExtremes(data[2].timestamp, data[data.length - 2].timestamp);
+    chart.current.xAxis[0].setExtremes(data[selectedMeasures[0]][2].timestamp, data[selectedMeasures[0]][data[selectedMeasures[0]].length - 2].timestamp);
   };
 
   const getSecondaryText = () => {
@@ -470,9 +444,13 @@ export const Chart = () => {
     let chartData =
       data !== null
         ? selectedMeasures.map((measure, index) => ({
-            data: data.map(d => {
-              const val = d.values[index];
-              return [d.timestamp, isNaN(val) ? null : val];
+            // data: data.map(d => {
+            //   const val = d.values[index];
+            //   return [d.timestamp, isNaN(val) ? null : val];
+            // }),
+            data: data[measure].map(d => {
+              const val = d.value;
+              return [d.timestamp, isNaN(val) ? null : val]
             }),
             name: dataset.header[measure],
             yAxis: changeChart ? index : 0,

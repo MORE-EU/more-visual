@@ -1,6 +1,6 @@
 package eu.more2020.visual.index.csv;
 
-import eu.more2020.visual.domain.Dataset;
+import eu.more2020.visual.domain.VisualDataset;
 import eu.more2020.visual.index.TreeNode;
 
 import java.util.DoubleSummaryStatistics;
@@ -30,7 +30,7 @@ public class CsvTreeNode extends TreeNode {
         this.dataPointCount = dataPointCount;
     }
 
-    public void adjustStats(String[] row, Dataset dataset) {
+    public void adjustStats(String[] row, VisualDataset dataset) {
         if (statisticsMap == null) {
             statisticsMap = new HashMap<>();
         }

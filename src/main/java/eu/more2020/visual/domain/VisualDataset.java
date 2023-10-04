@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * A Dataset.
  */
-public class Dataset implements Serializable {
+public class VisualDataset implements Serializable {
 
     private static final long serialVersionUID = 1L;
     public String samplingFreq;
@@ -170,10 +170,10 @@ public class Dataset implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Dataset)) {
+        if (!(o instanceof VisualDataset)) {
             return false;
         }
-        return id != null && id.equals(((Dataset) o).id);
+        return id != null && id.equals(((VisualDataset) o).id);
     }
 
     @Override

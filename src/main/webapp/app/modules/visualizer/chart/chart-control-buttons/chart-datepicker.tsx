@@ -15,10 +15,10 @@ const ChartDatePicker = () => {
   const handleOnAccept = (e, category) => {
     if (category === 'from') {
       chartRef.xAxis[0].setExtremes(e.getTime() + 200, to - 200);
-      dispatch(updateQueryResults({ folder, id: dataset.id, from: e.getTime(), to, resampleFreq, selectedMeasures, filter: null }));
+      dispatch(updateQueryResults({ folder, id: dataset.id, from: e.getTime(), to, selectedMeasures, filter: null }));
     } else {
       chartRef.xAxis[0].setExtremes(from + 200, e.getTime() - 200);
-      dispatch(updateQueryResults({ folder, id: dataset.id, from, to: e.getTime(), resampleFreq, selectedMeasures, filter: null }));
+      dispatch(updateQueryResults({ folder, id: dataset.id, from, to: e.getTime(), selectedMeasures, filter: null }));
     }
   };
 

@@ -79,6 +79,11 @@ const PatternCard = (props: IPatternCardProps) => {
     setIsExpanded(!isExpanded);
   };
 
+  const hasPatterns = () => {
+    const p =  patterns ? patterns.find(patternGroup => patternGroup.id === value) : null;
+    return p !== null;
+  }
+
   const checkForPatterns = () => {
     return patterns ? patterns.find(patternGroup => patternGroup.id === value) : null;
   }
@@ -99,7 +104,7 @@ const PatternCard = (props: IPatternCardProps) => {
         <TableCell align="center"></TableCell>
         <TableCell align="left">
           <Checkbox checked={isChecked}
-                    disabled={checkForPatterns()}
+                    disabled={hasPatterns()}
                     onChange={onCheckboxChange} />
           {checkForPatterns()  &&
             <>

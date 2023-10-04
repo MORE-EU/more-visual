@@ -390,25 +390,16 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
 
             // Convert the response to JSON string
             String json = response.getResult();
+            log.info("READ JSON: {}", json);
+
             // Create an ObjectMapper
             ObjectMapper objectMapper = new ObjectMapper();
 
             JsonNode responseObject = null;
 
             responseObject = objectMapper.readTree(json);
-            log.info("READ JSON: {}", responseObject.get("estimated_power_lost"));
-//            JsonNode powerIndex = responseObject.get("estimated_power_lost");
-//            powerIndex.fields().forEachRemaining(entry -> {
-//                long time = Long.parseLong(entry.getKey());
-//                LocalDateTime localDateTime = LocalDateTime.ofInstant(
-//                    Instant.ofEpochMilli(time),
-//                    ZoneId.systemDefault()
-//                );
-//                String value = entry.getValue().asText();
-//                DataPoint dataPoint = new DataPoint(localDateTime, new double[]{Double.parseDouble(value)});
-//                dataPoints.add(dataPoint);
-//            });
-            // Create an ObjectMapper
+            log.info("READ JSON: {}", responseObject);
+//
         } catch (Exception e) {
             e.printStackTrace();
         }

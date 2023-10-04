@@ -22,7 +22,7 @@ Highcharts.setOptions({
 });
 
 export const VisPatterns = () => {
-  const {folder, dataset,
+  const { dataset,
     customChangepointsEnabled, customChangepoints} = useAppSelector(state => state.visualizer);
   const {patterns} = useAppSelector(state => state.patternExtraction);
 
@@ -62,21 +62,20 @@ export const VisPatterns = () => {
   const handleNewPatternChange = () => {
     dispatch(toggleCustomChangepoints(!customChangepointsEnabled));
   }
+  const handleToggleSearchPatterns = async () => {
+    setLoading(true); // Set loading to true before dispatching
+    try {
+      const result = await dispatch(applySearchPatterns({ dataset, searchPatterns }));
+      // If the dispatch is successful, you can access the result here if needed
+      console.log('Dispatch successful:', result);
+    } catch (error) {
+      // Handle any errors that occur during dispatch here
+      console.error('Dispatch error:', error);
+    } finally {
+      setLoading(false); // Set loading to false whether dispatch succeeds or fails
+    }
+  };
 
-  const handleToggleSearchPatterns = () => {
-    const id = dataset.id;
-    simulateLoading();
-    searchPatterns.forEach((p, i) => {
-      return {
-        id: customChangepoints[i].id,
-        measure: dataset.header[customChangepoints[i].measure],
-        range: {
-          from: customChangepoints[i].range.from,
-          to: customChangepoints[i].range.to
-      }};
-      });
-    dispatch(applySearchPatterns({datasetId: id, searchPatterns}));
-  }
 
   return (
     <Box sx={{display: 'flex', flexDirection: 'column', height: '90%', fontSize:'2em'}}>

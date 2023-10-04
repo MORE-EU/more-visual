@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     height: '12px',
     borderRadius: '50%',
     backgroundColor: 'green',
-    marginRight: theme.spacing(1), // Adjust spacing as needed
+    // marginRight: theme.spacing(1), // Adjust spacing as needed
   },
 }));
 

@@ -2,12 +2,14 @@ package eu.more2020.visual.service;
 
 import eu.more2020.visual.domain.*;
 import eu.more2020.visual.index.TimeSeriesIndexUtil;
+import eu.more2020.visual.index.domain.Dataset.AbstractDataset;
 import org.apache.arrow.flight.FlightClient;
 import org.apache.arrow.flight.FlightStream;
 import org.apache.arrow.flight.Location;
 import org.apache.arrow.flight.Ticket;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.*;
+import org.apache.commons.math3.analysis.function.Abs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,10 +27,10 @@ public class ModelarDataService {
     private final Logger log = LoggerFactory.getLogger(ModelarDataService.class);
 
     @Value("${application.modelardb.url}")
-    private String modelarUrl = "leviathan.imsi.athenarc.gr";
+    private String modelarUrl = "83.212.75.52";
 
     @Value("${application.modelardb.port}")
-    private Integer modelarPort = 9999;
+    private Integer modelarPort = 31000;
 
     public String getSqlQuery(List<Integer> measures, String frequency, List<TimeRange> timeRanges) {
         String sql = "SELECT tid,  DATE_TRUNC('" + frequency + "', timestamp) AS ts, COUNT(1) AS count, MIN(value) min, MAX(value) max, SUM(value) sum FROM DataPoint "
@@ -46,7 +48,7 @@ public class ModelarDataService {
         return sql;
     }
 
-    public QueryResults executeQuery(Dataset dataset, Query query) throws Exception {
+    public QueryResults executeQuery(AbstractDataset dataset, Query query) throws Exception {
         log.debug(query.toString());
         Location location = Location.forGrpcInsecure(modelarUrl, modelarPort);
         List<Integer> measures = query.getMeasures() != null ? query.getMeasures() : dataset.getMeasures();
@@ -67,8 +69,6 @@ public class ModelarDataService {
         while (flightStream.next()) {
             VectorSchemaRoot vsr = flightStream.getRoot();
             int rowCount = vsr.getRowCount();
-            // System.out.println(rowCount);
-            // System.out.println(vsr);
 
             DataPoint dataPoint = null;
             LocalDateTime timeStamp = null;
@@ -88,14 +88,13 @@ public class ModelarDataService {
                 Double sum = ((Float8Vector) vsr.getVector("sum")).get(row);
                 Long count = ((BigIntVector) vsr.getVector("count")).get(row);
                 measureMap.put(tid, sum / count);
-                // System.out.println(tid + " | " + timeStamp + " | " + value);
             }
             flightStream.close();
         }
 
         queryResults.setData(dataPoints);
-        queryResults.setMeasureStats(dataset.getMeasureStats());
-        queryResults.setTimeRange(dataset.getTimeRange().toList());
+//        queryResults.setMeasureStats(dataset.getMeasureStats());
+//        queryResults.setTimeRange(dataset.getTimeRange().toList());
 
         return queryResults;
     }
@@ -111,7 +110,7 @@ public class ModelarDataService {
         return flightClient.getStream(ticket);
     }
 
-    public void fillDatasetStats(Dataset dataset) throws Exception {
+    public void fillDatasetStats(VisualDataset dataset) throws Exception {
         List<Integer> measures = dataset.getMeasures();
 
         String sql = "SELECT tid, MIN(value) as min_value, MAX(value) as max_value, SUM(value) as sum_value, COUNT(1) as count, MIN(timestamp) as min_timestamp, MAX(timestamp) as max_timestamp FROM DataPoint "

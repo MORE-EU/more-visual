@@ -26,14 +26,14 @@ public class ModelarQueryProcessor {
     private static final Logger LOG = LogManager.getLogger(ModelarQueryProcessor.class);
     private Query query;
     private QueryResults queryResults;
-    private Dataset dataset;
+    private VisualDataset dataset;
     private int freqLevel;
     private Stack<TreeNode> stack = new Stack<>();
     private ModelarTTI timeseriesTreeIndex;
     private List<Integer> measures;
     private ModelarDataService modelarDataService;
 
-    public ModelarQueryProcessor(Query query, Dataset dataset, ModelarTTI timeseriesTreeIndex, ModelarDataService modelarDataService) {
+    public ModelarQueryProcessor(Query query, VisualDataset dataset, ModelarTTI timeseriesTreeIndex, ModelarDataService modelarDataService) {
         this.query = query;
         this.measures = query.getMeasures() != null ? query.getMeasures() : dataset.getMeasures();
         this.queryResults = new QueryResults();

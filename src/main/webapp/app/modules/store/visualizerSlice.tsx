@@ -178,20 +178,22 @@ export const updateQueryResults = createAsyncThunk(
     id: string[];
     from: number;
     to: number;
-    resampleFreq: string;
     selectedMeasures: any[];
     filter?: {};
   }) => {
-    const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
+    const { folder, id, from, to, selectedMeasures, filter } = data;
     let query;
     from !== null && to !== null
       ? (query = {
-          range: { from, to } as ITimeRange,
-          frequency: resampleFreq.toUpperCase(),
+          from,
+          to,
+          viewPort: {width: 1000, height: 600},
           measures: selectedMeasures,
           filter: filter ? filter : null,
         } as IQuery)
-      : (query = { range: null, frequency: resampleFreq.toUpperCase() });
+      : (query = { range: null,
+        // frequency: resampleFreq.toUpperCase()
+      });
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
     return response.data;
   }
@@ -204,20 +206,20 @@ export const liveDataImplementation = createAsyncThunk(
     id: string[];
     from: number;
     to: number;
-    resampleFreq: string;
     selectedMeasures: any[];
     filter?: {};
   }) => {
-    const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
+    const { folder, id, from, to, selectedMeasures, filter } = data;
     let query;
-    from !== null && to !== null
+    (from !== null && to !== null)
       ? (query = {
-          range: { from, to } as ITimeRange,
-          frequency: resampleFreq.toUpperCase(),
+          from,
+          to,
+          viewPort: {width: 1000, height: 600},
           measures: selectedMeasures,
           filter: filter ? filter : null,
         } as IQuery)
-      : (query = { range: null, frequency: resampleFreq.toUpperCase() });
+      : (query = { from: null, to: null });
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
     return response.data;
   }
@@ -225,17 +227,20 @@ export const liveDataImplementation = createAsyncThunk(
 
 export const updateCompareQueryResults = createAsyncThunk(
   'updateCompareQueryResults',
-  async (data: { folder: string; id: string[]; from: number; to: number; resampleFreq: string; selectedMeasures: any[]; filter: {} }) => {
-    const { folder, id, from, to, resampleFreq, selectedMeasures, filter } = data;
+  async (data: { folder: string; id: string[]; from: number; to: number; selectedMeasures: any[]; filter: {} }) => {
+    const { folder, id, from, to, selectedMeasures, filter } = data;
     let query;
     from !== null && to !== null
       ? (query = {
-          range: { from, to } as ITimeRange,
-          frequency: resampleFreq.toUpperCase(),
+          from,
+          to,
+          viewPort: {width: 1000, height: 600},
           measures: selectedMeasures,
           filter,
         } as IQuery)
-      : (query = { range: null, frequency: resampleFreq.toUpperCase() });
+      : (query = { range: null,
+        // frequency: resampleFreq.toUpperCase()
+      });
     const response = Promise.all(
       id.map(name => {
         return axios.post(`api/datasets/${folder}/${name}/query`, query).then(res => res.data);
@@ -511,8 +516,8 @@ const visualizer = createSlice({
       state.queryResultsLoading = false;
       state.queryResults = action.payload;
       state.data = action.payload.data;
-      state.from = action.payload.data[0].timestamp;
-      state.to = action.payload.data[action.payload.data.length - 1].timestamp;
+      state.from = action.payload.data[state.selectedMeasures[0]][0].timestamp;
+      state.to = action.payload.data[state.selectedMeasures[0]][action.payload.data[state.selectedMeasures[0]].length - 1].timestamp;
     });
     builder.addCase(updateCompareQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;

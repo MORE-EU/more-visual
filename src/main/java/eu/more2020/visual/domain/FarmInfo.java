@@ -6,10 +6,14 @@ public class FarmInfo {
     private String id;
     private String path;
     private String type;
+    private String schema;
     private String name;
     private Boolean hasHeader;
     private List<Integer> measures;
-    private Integer timeCol;
+    private String timeCol;
+    private String valueCol;
+    private String idCol;
+
 
     public String getId() {
         return this.id;
@@ -47,14 +51,6 @@ public class FarmInfo {
         this.measures = measures;
     }
 
-    public Integer getTimeCol() {
-        return this.timeCol;
-    }
-
-    public void setTimeCol(Integer timeCol) {
-        this.timeCol = timeCol;
-    }
-
     public String getPath() {
         return path;
     }
@@ -69,6 +65,38 @@ public class FarmInfo {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getTimeCol() {
+        return timeCol;
+    }
+
+    public void setTimeCol(String timeCol) {
+        this.timeCol = timeCol;
+    }
+
+    public String getValueCol() {
+        return valueCol;
+    }
+
+    public void setValueCol(String valueCol) {
+        this.valueCol = valueCol;
+    }
+
+    public String getIdCol() {
+        return idCol;
+    }
+
+    public void setIdCol(String idCol) {
+        this.idCol = idCol;
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
 
     @Override

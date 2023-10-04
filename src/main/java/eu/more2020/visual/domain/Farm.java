@@ -1,5 +1,7 @@
 package eu.more2020.visual.domain;
 
+import eu.more2020.visual.index.domain.Dataset.AbstractDataset;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ public class Farm implements Serializable {
     private String id;
 
     private Float latitude;
-    
+
     private Float longitude;
 
     @NotNull
@@ -24,7 +26,7 @@ public class Farm implements Serializable {
     @NotNull
     private Integer type;
 
-    private ArrayList<Dataset> data;
+    private ArrayList<AbstractDataset> data;
 
     public Float getLatitude() {
         return this.latitude;
@@ -33,7 +35,7 @@ public class Farm implements Serializable {
     public Float getLongitude() {
         return this.longitude;
     }
-    
+
     public String getId() {
         return id;
     }
@@ -46,7 +48,7 @@ public class Farm implements Serializable {
         return type;
     }
 
-    public ArrayList<Dataset> getData() {
+    public ArrayList<AbstractDataset> getData() {
         return data;
     }
 

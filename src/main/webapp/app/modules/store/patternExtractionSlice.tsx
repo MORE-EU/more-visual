@@ -3,6 +3,7 @@ import {createAsyncThunk, createSlice, isAnyOf} from "@reduxjs/toolkit";
 import {IPattern} from "app/shared/model/pattern.model";
 import axios from "axios";
 import {IPatternGroup} from "app/shared/model/pattern-group.model";
+import {IDataset} from "app/shared/model/dataset.model";
 
 const initialState = {
   patterns: null as IPatternGroup[],
@@ -58,24 +59,23 @@ function fetchPatternGroups(searchPatterns) {
 
 export const applySearchPatterns = createAsyncThunk(
   'applySearchPatterns',
-  async (data: { datasetId: string, searchPatterns: IPattern[]}) => {
-    const { searchPatterns, datasetId} = data;
+  async (data: { dataset, searchPatterns: IPattern[]}) => {
+    const { dataset, searchPatterns} = data;
     // Fetch data (replace this with your actual API call)
     // For now, let's mock some search results
     const response = Promise.all(
       searchPatterns.map(p => {
         const pattern = {
           id: p.id,
-          datasetId: datasetId,
-          measure: p.measure,
+          datasetId: dataset.id,
+          measure: dataset.header[p.measure],
           range: p.range,
         }
         return axios.post(`api/tools/pattern`, pattern).then(res => res.data);
       })
     ).then(res => res.map(r => r.data));
-    // return response;
-    console.log(response);
-    return fetchPatternGroups(searchPatterns);
+    return response;
+    // return fetchPatternGroups(searchPatterns);
   }
 );
 

@@ -28,7 +28,7 @@ public class IndexedModelarDataService {
         indexes.remove(id);
     }
 
-    private synchronized ModelarTTI getIndex(Dataset dataset) {
+    private synchronized ModelarTTI getIndex(VisualDataset dataset) {
         ModelarTTI index = indexes.get(dataset.getId());
         if (index != null) {
             return index;
@@ -38,7 +38,7 @@ public class IndexedModelarDataService {
         return index;
     }
 
-    public QueryResults executeQuery(Dataset dataset, Query query) throws Exception {
+    public QueryResults executeQuery(VisualDataset dataset, Query query) throws Exception {
         log.debug(query.toString());
         try {
             ModelarTTI index = this.getIndex(dataset);
