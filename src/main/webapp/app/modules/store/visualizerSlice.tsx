@@ -191,9 +191,7 @@ export const updateQueryResults = createAsyncThunk(
           measures: selectedMeasures,
           filter: filter ? filter : null,
         } as IQuery)
-      : (query = { range: null,
-        // frequency: resampleFreq.toUpperCase()
-      });
+      : (query = {range: null});
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
     return response.data;
   }

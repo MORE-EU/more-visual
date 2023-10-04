@@ -109,7 +109,7 @@ jhipster:
 
 application:
   name: 'More2020'
-  workspacePath: /opt/more-workspace
+  workspacePath: /opt/more-new-workspace
   dbSettings: /opt/more-workspace/config/settings.cfg
   timeFormat: 'yyyy-MM-dd[ HH:mm:ss]'
   delimiter: ','

@@ -179,6 +179,7 @@ export const Chart = () => {
     latestSoilingWeeks.current = soilingWeeks;
   }, [soilingWeeks]);
 
+
   useEffect(() => {
     if (!changepointDetectionEnabled) setDetectedPlotBands([]);
     isChangepointDetectionEnabled.current = changepointDetectionEnabled;
@@ -235,22 +236,11 @@ export const Chart = () => {
         };
       return newCustomChangepoint;
     })
-    // const newCustomChangepoint = {
-    //   range: { from: start, to: end } as ITimeRange,
-    //   id: latestCustomChangepoints.current.length,
-    //   custom: true,
-    // };
   }
 
   const customChangepointSelection = event => {
     event.preventDefault();
     const newCustomChangepoints = getChangepointData(event.xAxis[0].min, event.xAxis[0].max, event.target.series);
-    // const newCustomChangepoint = {
-    //   range: { from: event.xAxis[0].min, to: event.xAxis[0].max } as ITimeRange,
-    //   id: latestCustomChangepoints.current.length,
-    //   custom: true,
-    // };
-    // latestCustomChangepoints.current = [...latestCustomChangepoints.current, newCustomChangepoint];
     latestCustomChangepoints.current = [...latestCustomChangepoints.current, ...newCustomChangepoints];
     dispatch(updateCustomChangepoints(latestCustomChangepoints.current));
     dispatch(toggleCustomChangepoints(false));
@@ -321,7 +311,7 @@ export const Chart = () => {
 
     const getSides = (max: number, min: number, p: number) => {
       const pad = max - min + (max - min) * p;
-      const leftSide = Math.max(Math.min(min - pad, timeRange.current[0] + min - pad), timeRange.current[0]);
+      const leftSide = Math.max(Math.min(min - pad, timeRange.current.from + min - pad), timeRange.current.from);
       const rightSide = Math.min(max + pad, data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp);
       return { leftSide, rightSide };
     };
@@ -339,23 +329,11 @@ export const Chart = () => {
 
     const checkForDataOnPan = () => {
       const { dataMax, dataMin, max, min } = chart.current.xAxis[0].getExtremes();
-      console.log(chart.current.xAxis[0].getExtremes());
-      // Conditions for loading new data
-      // if ((dataMax - max < 2 || min - dataMin < 2) && max < data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp) {
-      //   checkForData(min, max);
-      // }
       checkForData(min, max);
     };
 
     const checkForDataOnZoom = () => {
       const { dataMax, dataMin, max, min } = chart.current.xAxis[0].getExtremes();
-      console.log(chart.current.xAxis[0].getExtremes());
-      // if (
-      //   (max > dataMax && max !== timeRange.current[1]) ||
-      //   (min < dataMin && min !== timeRange.current[0])
-      // ) {
-      //   checkForData(min, max);
-      // }
       checkForData(min, max);
     };
 
@@ -372,10 +350,9 @@ export const Chart = () => {
           chart.current.xAxis[0].setExtremes(min + stepleft, max - stepright, true, true);
         } else if (event.deltaY > 0) {
           // out
-          console.log("Zoom out");
           chart.current.xAxis[0].setExtremes(
-            Math.max(min - stepleft, timeRange.current[0]),
-            Math.min(max + stepright, data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp),
+            Math.max(min - stepleft, dataset.timeRange.from),
+            Math.min(max + stepright, dataset.timeRange.to),
             true,
             true
           );
@@ -386,18 +363,20 @@ export const Chart = () => {
 
     // CHART: PAN FUNCTION
     Highcharts.wrap(Highcharts.Chart.prototype, 'pan', function (proceed, ...args) {
-      if (!chart.current.loadingShown) {
-        proceed.apply(this, args);
-        checkForDataOnPan();
-      }
-    });
-
-    const renderLabelForLiveData = () => {
-      const { max } = chart.current.xAxis[0].getExtremes();
-      if (max >= data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp && latestFrequency.current === 'second') {
-        toast('Live Data Mode');
-      }
-    };
+      const event = args[0];
+      const xAxis = chart.current.xAxis[0];
+      const axisRange = xAxis.max - xAxis.min;
+      const movementX = event.movementX;
+      const percent = (movementX / 2) * Math.min(60, Math.sqrt(movementX ** 2 + 1));
+      const deltaX = (axisRange) * percent / 100000;
+      xAxis.setExtremes(
+        Math.max(xAxis.min - deltaX, dataset.timeRange.from),
+        Math.min(xAxis.max - deltaX, dataset.timeRange.to),
+        true,
+        true
+      );
+      checkForDataOnPan();
+    })
 
     // LIVE DATA IMPLEMENTATION
     // setInterval(() => {
@@ -422,8 +401,10 @@ export const Chart = () => {
     //   // }
     // }, 500);
 
+
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(data[selectedMeasures[0]][2].timestamp, data[selectedMeasures[0]][data[selectedMeasures[0]].length - 2].timestamp);
+
   };
 
   const getSecondaryText = () => {
@@ -444,10 +425,6 @@ export const Chart = () => {
     let chartData =
       data !== null
         ? selectedMeasures.map((measure, index) => ({
-            // data: data.map(d => {
-            //   const val = d.values[index];
-            //   return [d.timestamp, isNaN(val) ? null : val];
-            // }),
             data: data[measure].map(d => {
               const val = d.value;
               return [d.timestamp, isNaN(val) ? null : val]
