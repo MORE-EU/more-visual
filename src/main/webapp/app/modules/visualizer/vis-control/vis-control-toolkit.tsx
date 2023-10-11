@@ -21,7 +21,7 @@ import Typography from '@mui/material/Typography';
 
 const VisToolkit = () => {
 
-  const {dataset, openToolkit, activeTool} = useAppSelector(state => state.visualizer);
+  const {farmMeta, openToolkit, activeTool} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const handleToolClick = key => e => {
@@ -40,13 +40,13 @@ const VisToolkit = () => {
               </ListItemIcon>
               <ListItemText primary={"Pattern Extraction"}/>
             </ListItemButton>
-            {dataset.resType === 0 && <><ListItemButton key={1} onClick={handleToolClick("Soiling Detection")}>
+            {farmMeta.resType === 0 && <><ListItemButton key={1} onClick={handleToolClick("Soiling Detection")}>
               <ListItemIcon>
                 <ManageSearchIcon/>
               </ListItemIcon>
               <ListItemText primary={"Soiling Detection"}/>
             </ListItemButton></>}
-            {dataset.resType === 1 && <><ListItemButton key={2} onClick={handleToolClick("Yaw Misalignment")}>
+            {farmMeta.resType === 1 && <><ListItemButton key={2} onClick={handleToolClick("Yaw Misalignment")}>
               <ListItemIcon>
                 <ManageSearchIcon/>
               </ListItemIcon>
@@ -64,7 +64,7 @@ const VisToolkit = () => {
               </ListItemIcon>
               <ListItemText primary={"Filtering"}/>
             </ListItemButton>
-          </List>     
+          </List>
         </Grid>
   );
 }

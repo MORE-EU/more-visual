@@ -110,13 +110,6 @@ export const SoilingDetection = () => {
             </Box>
             <Box sx={{
              width:"20%"}}>
-              {/*<Box sx={{pt: 1}}><Typography variant="body1">Enable</Typography></Box>*/}
-              {/*<Switch*/}
-              {/*  checked={soilingEnabled}*/}
-              {/*  disabled={!changepointDetectionEnabled}*/}
-              {/*  onChange={() => handleEnableSoiling()}*/}
-              {/*  inputProps={{'aria-label': 'controlled'}}*/}
-              {/*/>*/}
               <FormControl
                 disabled={!changepointDetectionEnabled}
               >

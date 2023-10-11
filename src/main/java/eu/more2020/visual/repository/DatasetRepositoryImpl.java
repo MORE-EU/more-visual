@@ -7,7 +7,6 @@ import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.index.datasource.QueryExecutor.ModelarDBQueryExecutor;
 import eu.more2020.visual.index.domain.Dataset.*;
 import eu.more2020.visual.index.domain.ModelarDB.ModelarDBConnection;
-import eu.more2020.visual.service.ModelarDataService;
 import eu.more2020.visual.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,18 +32,12 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
     private final Logger log = LoggerFactory.getLogger(DatasetRepositoryImpl.class);
 
-    private final ModelarDataService modelarDataService;
-
 
     @Value("${application.timeFormat}")
     private String timeFormat;
 
-    @Value("${application.delimiter}")
-    private String delimiter;
-
-    public DatasetRepositoryImpl(ApplicationProperties applicationProperties, ModelarDataService modelarDataService) {
+    public DatasetRepositoryImpl(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        this.modelarDataService = modelarDataService;
     }
 
     @Override
@@ -59,7 +52,6 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         }
         return datasets;
     }
-
 
     @Override
     public Optional<FarmMeta> findFarm(String farmName) throws IOException {
@@ -79,76 +71,29 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         Assert.notNull(id, "Id must not be null!");
         ObjectMapper mapper = new ObjectMapper();
         AbstractDataset dataset = null;
-        List<AbstractDataset> allDatasets = null;
-        Farm farm = new Farm();
         File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName, farmName + ".meta.json");
         ObjectMapper objectMapper = new ObjectMapper();
 
         if (metadataFile.exists()) {
             JsonNode jsonNode = objectMapper.readTree(metadataFile);
-            //farm = objectMapper.treeToValue(jsonNode, Farm.class);
+            FarmMeta farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
+
             String config = jsonNode.get("config").asText();
             for (JsonNode datasetNode : jsonNode.get("data")) {
                 // Extract data from JSON node and create the desired subclass of AbstractDataset
                 String datasetId = datasetNode.get("id").asText();
+                if(!datasetId.equals(id)) continue;
                 String path = datasetNode.get("path").asText();
-                String type = datasetNode.get("type").asText();
                 String schema = datasetNode.get("schema").asText();
 
                 String name = datasetNode.get("name").asText();
                 String timeCol = datasetNode.get("timeCol").asText();
                 String valueCol = datasetNode.get("valueCol").asText();
                 String idCol = datasetNode.get("idCol").asText();
-                dataset = createDataset(datasetId, path, type, schema, name, timeCol, valueCol, idCol, config);
+                dataset = createDataset(datasetId, path, farm.getType(), schema, name, timeCol, valueCol, idCol, config);
                 log.info(String.valueOf(dataset));
             }
         }
-        // Access data array and manually create AbstractDataset objects
-        List<AbstractDataset> datasets = new ArrayList<>();
-
-
-//        allDatasets = farm.getData();
-//            if (dataset != null) {
-//                switch (dataset.getType()) {
-//                    case "modelar":
-//                        try {
-//                            ModelarDBConnection modelarDBConnection = new ModelarDBConnection("83.212.75.52", 31000);
-//                            ModelarDBQueryExecutor modelarDBQueryExecutor = modelarDBConnection.getSqlQueryExecutor("", dataset.getName());
-//                            //dataset = new ModelarDBDataset(config, schema, table, timeFormat, timeCol, idCol, valueCol);
-//
-//                        } catch (Exception e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                        break;
-//                    default:
-//                    File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, id + ".csv");
-//                    if (!file.isDirectory()) {
-//                        DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
-//                        fillDataFileInfo(dataset, dataFileInfo);
-//                        dataset.getFileInfoList().add(dataFileInfo);
-//                    } else {
-//                        Dataset finalDataset = dataset;
-//                        List<DataFileInfo> fileInfoList = Arrays.stream(file.listFiles(f -> !f.isDirectory() && f.getName().endsWith(".csv"))).map(f -> {
-//                            DataFileInfo dataFileInfo = new DataFileInfo(f.getAbsolutePath());
-//                            try {
-//                                fillDataFileInfo(finalDataset, dataFileInfo);
-//                            } catch (IOException e) {
-//                                new RuntimeException(e);
-//                            }
-//                            return dataFileInfo;
-//                        }).collect(Collectors.toList());
-//                        // sort csv files by their time ranges ascending
-//                        fileInfoList.sort(Comparator.comparing(i -> i.getTimeRange().getFrom()));
-//                        dataset.setFileInfoList(fileInfoList);
-//                    }
-//                    if (dataset.getTimeRange() == null) {
-//                        dataset.setTimeRange(dataset.getFileInfoList().get(0).getTimeRange());
-//                    }
-//                    dataset.setTimeRange(dataset.getFileInfoList().stream().map(DataFileInfo::getTimeRange)
-//                        .reduce(dataset.getTimeRange(), (range1, range2) -> range1.span(range2)));
-//                        break;
-//                }
-//        }
         return Optional.ofNullable(dataset);
     }
 
@@ -179,9 +124,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         File file = new File(applicationProperties.getWorkspacePath());
         String[] names = file.list();
         List<String> dirs = new ArrayList<>();
-
         for (String name : names) {
-
             if (new File(applicationProperties.getWorkspacePath() + "/" + name).isDirectory() && !name.equals("config")) {
                 dirs.add(name);
             }
@@ -209,7 +152,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         AbstractDataset dataset = null;
         switch (type) {
             case "csv":
-               dataset = new CsvDataset(path, "0", "test", timeCol, true, timeFormat, delimiter);
+               dataset = new CsvDataset(path, "0", "test", timeCol, true, timeFormat, ",");
                break;
             case "parquet":
                 dataset = new ParquetDataset(path, "0", "test", timeCol, timeFormat);

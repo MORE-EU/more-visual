@@ -309,15 +309,7 @@ export const Chart = () => {
         dispatch(applyYawMisalignmentDetection({ id: latestDatasetId.current, from: leftSide, to: rightSide }));
     };
 
-    const getSides = (max: number, min: number, p: number) => {
-      const pad = max - min + (max - min) * p;
-      const leftSide = Math.max(Math.min(min - pad, timeRange.current.from + min - pad), timeRange.current.from);
-      const rightSide = Math.min(max + pad, data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp);
-      return { leftSide, rightSide };
-    };
-
     const checkForData = (min: number, max: number) => {
-      // const { leftSide, rightSide } = getSides(max, min, 0.25);
       const leftSide = min;
       const rightSide = max;
       latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
@@ -328,12 +320,12 @@ export const Chart = () => {
     };
 
     const checkForDataOnPan = () => {
-      const { dataMax, dataMin, max, min } = chart.current.xAxis[0].getExtremes();
+      const { max, min } = chart.current.xAxis[0].getExtremes();
       checkForData(min, max);
     };
 
     const checkForDataOnZoom = () => {
-      const { dataMax, dataMin, max, min } = chart.current.xAxis[0].getExtremes();
+      const { max, min } = chart.current.xAxis[0].getExtremes();
       checkForData(min, max);
     };
 
@@ -376,32 +368,28 @@ export const Chart = () => {
         true,
         true
       );
-      console.log(event);
       checkForDataOnPan();
     })
 
     // LIVE DATA IMPLEMENTATION
-    // setInterval(() => {
-    //   if (!latestPreview.current) {
-    //     const { max, min, dataMax } = chart.current.xAxis[0].getExtremes();
-    //     if (max >= data[data.length - 1].timestamp && latestFrequency.current === 'second') {
-    //       dispatch(
-    //         liveDataImplementation({
-    //           folder: latestFolder.current,
-    //           id: latestDatasetId.current,
-    //           from: dataMax,
-    //           to: dataMax + calculateStep(latestFrequency.current, 30),
-    //           selectedMeasures: latestMeasures.current,
-    //           filter: latestFilter.current,
-    //         })
-    //       );
-    //       max === dataMax && chart.current.xAxis[0].setExtremes(min, dataMax + calculateStep(latestFrequency.current, 30), true, true);
-    //     }
-    //   }
-    //   // else{
-    //   //   chart.current.toast !== "Preview Mode" && toast('Preview Mode');
-    //   // }
-    // }, 500);
+    setInterval(() => {
+      if (!latestPreview.current) {
+        const { max, min, dataMax } = chart.current.xAxis[0].getExtremes();
+        if (max >= data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp) {
+          dispatch(
+            liveDataImplementation({
+              folder: latestFolder.current,
+              id: latestDatasetId.current,
+              from: dataMax,
+              to: dataMax + 50000,
+              selectedMeasures: latestMeasures.current,
+              filter: latestFilter.current,
+            })
+          );
+          max === dataMax && chart.current.xAxis[0].setExtremes(min, dataMax + 50000, true, true);
+        }
+      }
+    }, 500);
 
 
     // Set initial extremes
@@ -602,7 +590,6 @@ export const Chart = () => {
                     const q50 = (arr: any) => quantile(arr, 0.5);
                     const q75 = (arr: any) => quantile(arr, 0.75);
                     const median = (arr: any) => q50(arr);
-
                     return [asc(groupData)[0], q25(groupData), q50(groupData), q75(groupData), asc(groupData)[groupData.length - 1]];
                   },
                 },
@@ -611,7 +598,6 @@ export const Chart = () => {
                 connectNulls: false,
                 connectorAllowed: false,
                 maxPointWidth: 80,
-                turboThreshold: 100000, // TODO: REMOVE THIS IS ONLY FOR ALEX YAW
                 marker: {
                   enabled: Object.keys(filter).length !== 0 ? true : false,
                 },

@@ -7,14 +7,10 @@ import eu.more2020.visual.domain.Sample;
 import eu.more2020.visual.index.domain.*;
 import eu.more2020.visual.index.domain.Dataset.AbstractDataset;
 import eu.more2020.visual.index.domain.Query.Query;
-import eu.more2020.visual.index.index.TTI;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.FileHandlingRepository;
-import eu.more2020.visual.service.CsvDataService;
 import eu.more2020.visual.service.DataService;
-import eu.more2020.visual.service.IndexedModelarDataService;
-import eu.more2020.visual.service.ModelarDataService;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -37,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * REST controller for managing {@link AbstractDataset}.
@@ -48,10 +43,8 @@ public class DatasetResource {
     private static final String ENTITY_NAME = "dataset";
     private final Logger log = LoggerFactory.getLogger(DatasetResource.class);
     private final DatasetRepository datasetRepository;
-    private final CsvDataService csvDataService;
-    private final ModelarDataService modelarDataService;
-    private final IndexedModelarDataService indexedModelarDataService;
-
+    private final DataService dataService;
+;
     private final FileHandlingRepository fileHandlingRepository;
 
     @Value("${jhipster.clientApp.name}")
@@ -61,13 +54,10 @@ public class DatasetResource {
     private String workspacePath;
 
     public DatasetResource(DatasetRepository datasetRepository,
-                           CsvDataService csvDataService, ModelarDataService modelarDataService,
-                           IndexedModelarDataService indexedModelarDataService, AlertRepository alertRepository,
-                           FileHandlingRepository fileHandlingRepository) {
+                           AlertRepository alertRepository,
+                           DataService dataService, FileHandlingRepository fileHandlingRepository) {
         this.datasetRepository = datasetRepository;
-        this.csvDataService = csvDataService;
-        this.modelarDataService = modelarDataService;
-        this.indexedModelarDataService = indexedModelarDataService;
+        this.dataService = dataService;
         this.fileHandlingRepository = fileHandlingRepository;
     }
 
@@ -176,8 +166,7 @@ public class DatasetResource {
         Optional<QueryResults> queryResultsOptional;
         queryResultsOptional = datasetRepository.findById(id, farmName).map(dataset -> {
             log.debug("Dataset {}", dataset);
-            return DataService
-            return tti.executeQueryMinMax(query);
+            return dataService.executeQuery(dataset, query);
         });
 //        queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);

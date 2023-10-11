@@ -7,6 +7,7 @@ import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
 import eu.more2020.visual.domain.Detection.PatternDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
+import eu.more2020.visual.index.domain.ImmutableDataPoint;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,13 +20,13 @@ public interface ToolsRepository {
 
     List<Changepoint> getManualChangepoints(String id) throws InvalidProtocolBufferException, JsonProcessingException;
 
-    List<DataPoint> forecasting(String id);
+    List<ImmutableDataPoint> forecasting(String id);
 
     List<Changepoint> changepointDetection(ChangepointDetection changepoints) throws IOException;
 
-    List<DataPoint> soilingDetection(DeviationDetection deviationDetection);
+    List<ImmutableDataPoint> soilingDetection(DeviationDetection deviationDetection);
 
-    List<DataPoint> yawMisalignmentDetection(RangeDetection rangeDetection);
+    List<ImmutableDataPoint> yawMisalignmentDetection(RangeDetection rangeDetection);
 
     List<Changepoint> patternDetection(PatternDetection patternDetection);
 

@@ -8,9 +8,7 @@ import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.mod
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import axios from 'axios';
 import moment, { Moment } from 'moment';
-import {IPatterns} from "app/shared/model/patterns.model";
-import {IPatternGroup} from "app/shared/model/pattern-group.model";
-import {IPattern} from "app/shared/model/pattern.model";
+
 
 const seedrandom = require('seedrandom');
 const lvl = 64;
@@ -237,7 +235,6 @@ export const updateCompareQueryResults = createAsyncThunk(
           filter,
         } as IQuery)
       : (query = { range: null,
-        // frequency: resampleFreq.toUpperCase()
       });
     const response = Promise.all(
       id.map(name => {
@@ -485,7 +482,7 @@ const visualizer = createSlice({
     builder.addCase(getFarmMeta.fulfilled, (state, action) => {
       state.loading = false;
       state.farmMeta = action.payload.data;
-    });
+    })
     builder.addCase(getDirectories.fulfilled, (state, action) => {
       state.loading = false;
       state.directories = action.payload.data;
@@ -521,10 +518,20 @@ const visualizer = createSlice({
       state.queryResultsLoading = false;
       state.compareData = action.payload;
     });
+    // builder.addCase(liveDataImplementation.fulfilled, (state, action) => {
+    //   state.liveDataImplLoading = false;
+    //   state.queryResultsLoading = false;
+    //   state.data = action.payload.data.length !== 0 ? [...state.data, ...action.payload.data.slice(0)] : state.data;
+    // });
     builder.addCase(liveDataImplementation.fulfilled, (state, action) => {
       state.liveDataImplLoading = false;
       state.queryResultsLoading = false;
-      state.data = action.payload.data.length !== 0 ? [...state.data, ...action.payload.data.slice(0)] : state.data;
+      state.data = action.payload.data[state.selectedMeasures[0]].length !== 0 ?
+        state.selectedMeasures.map(m => {
+          const d = action.payload.data[m];
+          return [...state.data[m], ...d.slice(0)];
+        })
+        : state.data;
     });
     builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending), state => {
       state.errorMessage = null;

@@ -6,21 +6,22 @@ import java.util.List;
 public class FarmMeta implements Serializable {
 
     private String name;
-    private Integer type;
+    private String type;
+    private Integer resType;
     private String config;
     private List<FarmInfo> data;
     private Float latitude;
     private Float longitude;
 
 
-
     public FarmMeta () {
 
     }
 
-    public FarmMeta(String name, Integer type, String config, List<FarmInfo> data, Float latitude, Float longitude) {
+    public FarmMeta(String name, String type, Integer resType, String config, List<FarmInfo> data, Float latitude, Float longitude) {
         this.name = name;
         this.type = type;
+        this.resType = resType;
         this.config = config;
         this.data = data;
         this.latitude = latitude;
@@ -33,14 +34,6 @@ public class FarmMeta implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Integer getType() {
-        return this.type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
     }
 
     public List<FarmInfo> getData() {
@@ -75,16 +68,32 @@ public class FarmMeta implements Serializable {
         this.config = config;
     }
 
-    @Override
-    public String toString() {
-        return "{" +
-            " name='" + getName() + "'" +
-            ", type='" + getType() + "'" +
-            ", data='" + getData() + "'" +
-            ", latitude='" + getLatitude() + "'" +
-            ", longitude='" + getLongitude() + "'" +
-            "}";
+    public String getType() {
+        return type;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
 
+    public Integer getResType() {
+        return resType;
+    }
+
+    public void setResType(Integer resType) {
+        this.resType = resType;
+    }
+
+    @Override
+    public String toString() {
+        return "FarmMeta{" +
+            "name='" + name + '\'' +
+            ", type='" + type + '\'' +
+            ", resType=" + resType +
+            ", config='" + config + '\'' +
+            ", data=" + data +
+            ", latitude=" + latitude +
+            ", longitude=" + longitude +
+            '}';
+    }
 }

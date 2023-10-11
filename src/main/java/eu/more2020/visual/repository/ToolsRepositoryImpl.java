@@ -11,6 +11,7 @@ import eu.more2020.visual.domain.Detection.PatternDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.grpc.RouteGuideGrpc;
 import eu.more2020.visual.grpc.tools.*;
+import eu.more2020.visual.index.domain.ImmutableDataPoint;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.slf4j.Logger;
@@ -18,11 +19,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -103,10 +102,10 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
     }
 
     @Override
-    public List<DataPoint> forecasting(String id){
+    public List<ImmutableDataPoint> forecasting(String id){
         String jsonName = applicationProperties.getWorkspacePath() + "/" + id + "_predict.json";
         File json = new File(jsonName);
-        List<DataPoint> forecastData = new ArrayList<>();
+        List<ImmutableDataPoint> forecastData = new ArrayList<>();
         if(json.exists()){
             // read json
             try {
@@ -124,8 +123,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
                     Map.Entry<String, JsonNode> datum = iter.next();
                     double[] vals = new double[1];
                     vals[0] = datum.getValue().asDouble();
-                    DataPoint dataPoint = new DataPoint(LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(datum.getKey())), ZoneId.systemDefault()),
-                        vals);
+                    ImmutableDataPoint dataPoint = new ImmutableDataPoint(Instant.ofEpochMilli(Long.parseLong(datum.getKey())).toEpochMilli(), vals);
                     forecastData.add(dataPoint);
                 }
             }
@@ -184,7 +182,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
     }
 
     @Override
-    public List<DataPoint> soilingDetection(DeviationDetection deviationDetection) {
+    public List<ImmutableDataPoint> soilingDetection(DeviationDetection deviationDetection) {
         if(deviationDetection.getType().equals("soilingRatio")){
             return getSoilingIndex(deviationDetection);
         }
@@ -194,8 +192,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
         else return getSoilingIndex(deviationDetection);
     }
 
-    private List<DataPoint> getSoilingIndex(DeviationDetection deviationDetection){
-        List<DataPoint> dataPoints = new ArrayList<>();
+    private List<ImmutableDataPoint> getSoilingIndex(DeviationDetection deviationDetection){
+        List<ImmutableDataPoint> dataPoints = new ArrayList<>();
         try {
             List<String> cpStarts = new ArrayList<>();
             List<String> cpEnds = new ArrayList<>();
@@ -236,12 +234,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             JsonNode powerIndex = responseObject.get("power_index");
             powerIndex.fields().forEachRemaining(entry -> {
                 long time = Long.parseLong(entry.getKey());
-                LocalDateTime localDateTime = LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(time),
-                    ZoneId.systemDefault()
-                );
                 String value = entry.getValue().asText();
-                DataPoint dataPoint = new DataPoint(localDateTime, new double[]{Double.parseDouble(value)});
+                ImmutableDataPoint dataPoint = new ImmutableDataPoint(time, new double[]{Double.parseDouble(value)});
                 dataPoints.add(dataPoint);
             });
             // Create an ObjectMapper
@@ -252,8 +246,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
     }
 
 
-    private List<DataPoint> getPowerLoss(DeviationDetection deviationDetection){
-        List<DataPoint> dataPoints = new ArrayList<>();
+    private List<ImmutableDataPoint> getPowerLoss(DeviationDetection deviationDetection){
+        List<ImmutableDataPoint> dataPoints = new ArrayList<>();
         try {
             List<String> cpStarts = new ArrayList<>();
             List<String> cpEnds = new ArrayList<>();
@@ -294,12 +288,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             JsonNode powerIndex = responseObject.get("estimated_power_lost");
             powerIndex.fields().forEachRemaining(entry -> {
                 long time = Long.parseLong(entry.getKey());
-                LocalDateTime localDateTime = LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(time),
-                    ZoneId.systemDefault()
-                );
                 String value = entry.getValue().asText();
-                DataPoint dataPoint = new DataPoint(localDateTime, new double[]{Double.parseDouble(value)});
+                ImmutableDataPoint dataPoint = new ImmutableDataPoint(time, new double[]{Double.parseDouble(value)});
                 dataPoints.add(dataPoint);
             });
             // Create an ObjectMapper
@@ -310,8 +300,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
     }
 
     @Override
-    public List<DataPoint> yawMisalignmentDetection(RangeDetection rangeDetection) {
-        List<DataPoint> dataPoints = new ArrayList<>();
+    public List<ImmutableDataPoint> yawMisalignmentDetection(RangeDetection rangeDetection) {
+        List<ImmutableDataPoint> dataPoints = new ArrayList<>();
         try {
             Map<String, Object> params = new LinkedHashMap<>();
             params.put("start_date", rangeDetection.getRange().getFrom().format(formatter));
@@ -327,33 +317,6 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
                 .usePlaintext()
                 .build();
-
-            // Create a stub using the generated code and the channel
-//            DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
-//
-//            // Invoke the remote method on the target server
-//            EstimateYawMisalignmentResponse response = stub.estimateYawMisalignment(request);
-//
-//            // Convert the response to JSON string
-//            String json = response.getResult();
-//            // Create an ObjectMapper
-//            ObjectMapper objectMapper = new ObjectMapper();
-//
-//            JsonNode responseObject = null;
-//
-//            responseObject = objectMapper.readTree(json);
-//            log.info("READ JSON: {}", responseObject);
-//            JsonNode powerLost = responseObject.get("estimated_power_lost");
-//            powerLost.fields().forEachRemaining(entry -> {
-//                long time = Long.parseLong(entry.getKey());
-//                LocalDateTime localDateTime = LocalDateTime.ofInstant(
-//                    Instant.ofEpochMilli(time),
-//                    ZoneId.systemDefault()
-//                );
-//                String value = entry.getValue().asText();
-//                DataPoint dataPoint = new DataPoint(localDateTime, new double[]{Double.parseDouble(value)});
-//                dataPoints.add(dataPoint);
-//            });
             dataPoints = getYawData(rangeDetection.getRange().getFrom(), rangeDetection.getRange().getTo());
 
         }
@@ -406,8 +369,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
         return  null;
     }
 
-    public static List<DataPoint> getYawData(LocalDateTime startDate, LocalDateTime endDate) {
-        List<DataPoint> dataPoints = new ArrayList<>();
+    public static List<ImmutableDataPoint> getYawData(LocalDateTime startDate, LocalDateTime endDate) {
+        List<ImmutableDataPoint> dataPoints = new ArrayList<>();
         Random random = new Random();
 
         double yawAngle = 0; // Initialize yaw angle at 0 degrees
@@ -417,7 +380,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             // Simulate slower yaw angle changes (e.g., from -4 to 4 degrees over a longer time)
             yawAngle += (random.nextDouble() * 0.2 - 0.1) * 4; // Small random change (-0.4 to 0.4 degrees)
             yawAngle = Math.min(4, Math.max(-4, yawAngle)); // Ensure angle stays within -4 to 4 degrees
-            DataPoint dataPoint = new DataPoint(currentTime, new double[]{yawAngle});
+            ImmutableDataPoint dataPoint = new ImmutableDataPoint(currentTime.toInstant(ZoneOffset.UTC).toEpochMilli(), new double[]{yawAngle});
             dataPoints.add(dataPoint);
 
             // Add some randomness to the time intervals (change every long time)

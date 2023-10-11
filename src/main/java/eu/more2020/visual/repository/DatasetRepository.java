@@ -1,6 +1,4 @@
 package eu.more2020.visual.repository;
-
-import eu.more2020.visual.domain.VisualDataset;
 import eu.more2020.visual.domain.FarmMeta;
 import eu.more2020.visual.domain.Sample;
 import eu.more2020.visual.index.domain.Dataset.AbstractDataset;

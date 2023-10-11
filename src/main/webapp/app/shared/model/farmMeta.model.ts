@@ -2,7 +2,8 @@ import { IDataset } from './dataset.model';
 
 export interface IFarmMeta {
   name?: string;
-  type?: number;
+  type?: string;
+  resType?: number;
   data?: IDataset[];
   latitude?: number | null;
   longitude?: number | null;

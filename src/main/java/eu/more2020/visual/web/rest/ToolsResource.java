@@ -2,11 +2,11 @@ package eu.more2020.visual.web.rest;
 
 import eu.more2020.visual.domain.Alert;
 import eu.more2020.visual.domain.Changepoint;
-import eu.more2020.visual.domain.DataPoint;
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
 import eu.more2020.visual.domain.Detection.PatternDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
+import eu.more2020.visual.index.domain.ImmutableDataPoint;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.ToolsRepository;
 import org.slf4j.Logger;
@@ -37,7 +37,6 @@ public class ToolsResource {
         log.debug("CP for {}", changepoints);
         List<Changepoint> detectedChangepoints = toolsRepository.changepointDetection(changepoints);
         log.debug("Detected CP for {}", detectedChangepoints);
-
         return new ResponseEntity<>(detectedChangepoints, HttpStatus.OK);
     }
 
@@ -48,13 +47,13 @@ public class ToolsResource {
     }
 
     @PostMapping("/tools/forecasting/{id}")
-    public List<DataPoint> forecast(@PathVariable String id) throws IOException {
+    public List<ImmutableDataPoint> forecast(@PathVariable String id) throws IOException {
         log.debug("REST request to get Forecast");
         return toolsRepository.forecasting(id);
     }
 
     @PostMapping("/tools/soiling")
-    public List<DataPoint> soilingDetection(@Valid @RequestBody DeviationDetection deviationDetection) {
+    public List<ImmutableDataPoint> soilingDetection(@Valid @RequestBody DeviationDetection deviationDetection) {
         return toolsRepository.soilingDetection(deviationDetection);
     }
 
@@ -65,7 +64,7 @@ public class ToolsResource {
 
 
     @PostMapping("/tools/yaw_misalignment")
-    public List<DataPoint> yawMisalignmentDetection(@Valid @RequestBody RangeDetection yawMisalignmentDetection) {
+    public List<ImmutableDataPoint> yawMisalignmentDetection(@Valid @RequestBody RangeDetection yawMisalignmentDetection) {
         return toolsRepository.yawMisalignmentDetection(yawMisalignmentDetection);
     }
 

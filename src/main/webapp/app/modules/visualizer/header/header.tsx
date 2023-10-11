@@ -12,7 +12,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 const Header = props => {
-  const { farmMeta, datasetChoice, selectedConnection } = props;
+  const { farmMeta, datasetChoice } = props;
   const [conModal, setConModal] = useState(false);
   const [menuChoice, setMenuChoice] = useState('CSV');
   const [keepChoice, setKeepChoice] = useState("CSV");
@@ -39,6 +39,18 @@ const Header = props => {
   //   }
   // };
 
+  const getSelectedConnection = () => {
+    const type = farmMeta.type;
+    switch (type){
+      case "modelar":
+        return "ModelarDB";
+      case "csv":
+        return "CSV"
+      default:
+        return "";
+    }
+  }
+
   return (
     <Grid
       sx={{
@@ -64,8 +76,9 @@ const Header = props => {
           {farmMeta.data[datasetChoice].name}
         </Typography>
       </Breadcrumbs>
-      <Chip label={selectedConnection} color="primary" sx={{ width: '6rem' }} 
-      // onClick={handleClick} 
+      <Chip label={getSelectedConnection()}
+            color="primary" sx={{ width: '6rem' }}
+      // onClick={handleClick}
       />
       {/* <Menu
         id="basic-menu"
