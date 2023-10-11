@@ -10,9 +10,14 @@ export const ChartType = () => {
   const { chartType } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
+  const handleTypeChange = (event, newVal) => {
+    if (newVal !== null) {
+      dispatch(setChartType(newVal))
+    }
+  };
   return (
     <>
-      <ToggleButtonGroup value={chartType} exclusive onChange={(e, newVal) => dispatch(setChartType(newVal))} aria-label="text alignment">
+      <ToggleButtonGroup value={chartType} exclusive onChange={(e, newVal) => handleTypeChange(e, newVal)} aria-label="text alignment">
         <ToggleButton value="line" aria-label="left aligned">
           <ShowChartIcon />
         </ToggleButton>

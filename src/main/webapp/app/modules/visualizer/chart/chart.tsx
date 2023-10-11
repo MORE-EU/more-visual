@@ -319,6 +319,7 @@ export const Chart = () => {
       }
     };
 
+
     const checkForDataOnPan = () => {
       const { max, min } = chart.current.xAxis[0].getExtremes();
       checkForData(min, max);
@@ -353,6 +354,13 @@ export const Chart = () => {
       }
     });
 
+    const renderLabelForLiveData = () => {
+      const { max } = chart.current.xAxis[0].getExtremes();
+      if (max >= data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp) {
+        toast('Live Data Mode');
+      }
+    };
+
     // CHART: PAN FUNCTION
     Highcharts.wrap(Highcharts.Chart.prototype, 'pan', function (proceed, ...args) {
       const event = args[0];
@@ -369,6 +377,7 @@ export const Chart = () => {
         true
       );
       checkForDataOnPan();
+      renderLabelForLiveData();
     })
 
     // LIVE DATA IMPLEMENTATION
