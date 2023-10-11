@@ -364,6 +364,7 @@ export const Chart = () => {
     // CHART: PAN FUNCTION
     Highcharts.wrap(Highcharts.Chart.prototype, 'pan', function (proceed, ...args) {
       const event = args[0];
+      console.log(args[1])
       const xAxis = chart.current.xAxis[0];
       const axisRange = xAxis.max - xAxis.min;
       const movementX = event.movementX;
@@ -375,6 +376,7 @@ export const Chart = () => {
         true,
         true
       );
+      console.log(event);
       checkForDataOnPan();
     })
 
@@ -425,10 +427,10 @@ export const Chart = () => {
     let chartData =
       data !== null
         ? selectedMeasures.map((measure, index) => ({
-            data: data[measure].map(d => {
+            data: data[measure] ? data[measure].map(d => {
               const val = d.value;
               return [d.timestamp, isNaN(val) ? null : val]
-            }),
+            }) : [],
             name: dataset.header[measure],
             yAxis: changeChart ? index : 0,
             color: measureColors[measure],

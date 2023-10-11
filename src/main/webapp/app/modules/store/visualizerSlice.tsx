@@ -318,7 +318,7 @@ const visualizer = createSlice({
       state = initialState;
     },
     updateSelectedMeasures(state, action) {
-      state.selectedMeasures = action.payload;
+      state.selectedMeasures = action.payload.sort((a, b) => a - b);
     },
     updateFrom(state, action) {
       state.from = action.payload;
