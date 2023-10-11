@@ -568,7 +568,6 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(applyChangepointDetection.fulfilled), (state, action) => {
       state.detectedChangepoints = action.payload.length === 0 ? null : action.payload;
     });
-
     builder.addMatcher(isAnyOf(getManualChangepoints.fulfilled), (state, action) => {
       state.manualChangepoints = action.payload.length === 0 ? null : action.payload;
     });

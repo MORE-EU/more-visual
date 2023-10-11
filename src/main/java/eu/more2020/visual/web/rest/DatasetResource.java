@@ -12,6 +12,7 @@ import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.FileHandlingRepository;
 import eu.more2020.visual.service.CsvDataService;
+import eu.more2020.visual.service.DataService;
 import eu.more2020.visual.service.IndexedModelarDataService;
 import eu.more2020.visual.service.ModelarDataService;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
@@ -175,7 +176,7 @@ public class DatasetResource {
         Optional<QueryResults> queryResultsOptional;
         queryResultsOptional = datasetRepository.findById(id, farmName).map(dataset -> {
             log.debug("Dataset {}", dataset);
-            TTI tti = new TTI(dataset, 0.95, 4, 1);
+            return DataService
             return tti.executeQueryMinMax(query);
         });
 //        queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
