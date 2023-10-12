@@ -470,6 +470,7 @@ const visualizer = createSlice({
     builder.addCase(getDataset.fulfilled, (state, action) => {
       state.loading = false;
       state.dataset = action.payload.data;
+      state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
       state.measureColors = [...state.dataset.header.map(() => generateColor())];
       state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
       state.selectedMeasures = [action.payload.data.measures[0]];
@@ -482,6 +483,7 @@ const visualizer = createSlice({
     builder.addCase(getFarmMeta.fulfilled, (state, action) => {
       state.loading = false;
       state.farmMeta = action.payload.data;
+      state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
     })
     builder.addCase(getDirectories.fulfilled, (state, action) => {
       state.loading = false;

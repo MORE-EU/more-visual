@@ -122,6 +122,8 @@ export const Filter = () => {
           selectedMeasures.map((col, idx) => {
             const stats = queryResults.measureStats[col];
             return (
+              <>
+              {stats &&
               <Box
                 key={col}
                 sx={{
@@ -195,6 +197,8 @@ export const Filter = () => {
                   />
                 </Box>
               </Box>
+              }
+              </>
             );
           })}
       </Box>
