@@ -513,24 +513,44 @@ export const Chart = () => {
         }))
       : [];
 
+  // const compareChartData =
+  //   compareData !== null && compare.length !== 0
+  //     ? [
+  //         ...[].concat(
+  //           ...compareData.map((compData, idx) =>
+  //             selectedMeasures.map((measure, index) => ({
+  //               data: compData.map(d => {
+  //                 const val = d.values[index];
+  //                 return [d.timestamp, isNaN(val) ? null : val];
+  //               }),
+  //               name: dataset.header[measure] + ' ' + compare[index],
+  //               yAxis: changeChart ? index : 0,
+  //               zoneAxis: 'x',
+  //               zones,
+  //             }))
+  //           )
+  //         ),
+  //       ]
+  //     : [];
+
   const compareChartData =
     compareData !== null && compare.length !== 0
-      ? [
-          ...[].concat(
-            ...compareData.map((compData, idx) =>
-              selectedMeasures.map((measure, index) => ({
-                data: compData.map(d => {
-                  const val = d.values[index];
-                  return [d.timestamp, isNaN(val) ? null : val];
-                }),
+      ?
+      [
+        ...[].concat(
+          ...compareData.map((compData, idx) =>
+            selectedMeasures.map((measure, index) => ({
+                data: compData[measure] ? data[measure].map(d => {
+                  const val = d.value;
+                  return [d.timestamp, isNaN(val) ? null : val]
+                }) : [],
                 name: dataset.header[measure] + ' ' + compare[idx],
                 yAxis: changeChart ? index : 0,
                 zoneAxis: 'x',
                 zones,
               }))
-            )
-          ),
-        ]
+          )
+      ),]
       : [];
 
   const handleMouseOverChart = () => {
