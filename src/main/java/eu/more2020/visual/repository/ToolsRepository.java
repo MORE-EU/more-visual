@@ -28,6 +28,6 @@ public interface ToolsRepository {
 
     List<ImmutableDataPoint> yawMisalignmentDetection(RangeDetection rangeDetection);
 
-    List<Changepoint> patternDetection(PatternDetection patternDetection);
+    // List<Changepoint> patternDetection(PatternDetection patternDetection);
 
 }

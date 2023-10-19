@@ -326,48 +326,48 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
         return dataPoints;
     }
 
-    @Override
-    public List<Changepoint> patternDetection(PatternDetection patternDetection){
-        try {
-            log.info(String.valueOf(patternDetection));
-             FrechetRequest request = FrechetRequest.newBuilder()
-//                .setDatasetId(patternDetection.getDatasetId())
-                .setStartDate(patternDetection.getRange().getFrom().format(formatter))
-//                 .setColumn(patternDetection.getMeasure())
-                .setEndDate(patternDetection.getRange().getTo().format(formatter))
-//                 .setW(1)
-                 .setR(1)
-                .build();
+//     @Override
+//     public List<Changepoint> patternDetection(PatternDetection patternDetection){
+//         try {
+//             log.info(String.valueOf(patternDetection));
+//              FrechetRequest request = FrechetRequest.newBuilder()
+// //                .setDatasetId(patternDetection.getDatasetId())
+//                 .setStartDate(patternDetection.getRange().getFrom().format(formatter))
+// //                 .setColumn(patternDetection.getMeasure())
+//                 .setEndDate(patternDetection.getRange().getTo().format(formatter))
+// //                 .setW(1)
+//                  .setR(1)
+//                 .build();
 
 
-            // Create a channel to connect to the target gRPC server
-            ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
-                .usePlaintext()
-                .build();
+//             // Create a channel to connect to the target gRPC server
+//             ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
+//                 .usePlaintext()
+//                 .build();
 
-            // Create a stub using the generated code and the channel
-            DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
+//             // Create a stub using the generated code and the channel
+//             DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
 
-            // Invoke the remote method on the target server
-            FrechetResponse response = stub.frechet(request);
+//             // Invoke the remote method on the target server
+//             FrechetResponse response = stub.frechet(request);
 
-            // Convert the response to JSON string
-            String json = response.getResult();
-            log.info("READ JSON: {}", json);
+//             // Convert the response to JSON string
+//             String json = response.getResult();
+//             log.info("READ JSON: {}", json);
 
-            // Create an ObjectMapper
-            ObjectMapper objectMapper = new ObjectMapper();
+//             // Create an ObjectMapper
+//             ObjectMapper objectMapper = new ObjectMapper();
 
-            JsonNode responseObject = null;
+//             JsonNode responseObject = null;
 
-            responseObject = objectMapper.readTree(json);
-            log.info("READ JSON: {}", responseObject);
-//
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return  null;
-    }
+//             responseObject = objectMapper.readTree(json);
+//             log.info("READ JSON: {}", responseObject);
+// //
+//         } catch (Exception e) {
+//             e.printStackTrace();
+//         }
+//         return  null;
+//     }
 
     public static List<ImmutableDataPoint> getYawData(LocalDateTime startDate, LocalDateTime endDate) {
         List<ImmutableDataPoint> dataPoints = new ArrayList<>();
