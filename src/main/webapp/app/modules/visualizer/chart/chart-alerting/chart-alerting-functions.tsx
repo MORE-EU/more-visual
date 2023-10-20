@@ -7,8 +7,6 @@ const chartAlertingChecker = (
   dataset: any,
   selectedMeasures: any[]
 ) => {
-  // const dataCut = alertResults.length === 0 ? data.slice(data.findIndex(o => o.timestamp === alert[0].dateCreated))
-  // : data.slice(data.findIndex(o => o.timestamp === alertResults[alertResults.length - 1][1]));
   const selAlertMeasures = getMatchedMeasures(alerts, dataset, selectedMeasures);
   let allAlerts = {};
   for (let x = 0; x < alerts.length; x++) {

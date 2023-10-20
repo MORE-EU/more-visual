@@ -134,7 +134,7 @@ const PatternCard = (props: IPatternCardProps) => {
               <TableCell align="center"></TableCell>
               <TableCell align="center">FROM</TableCell>
               <TableCell align="center">TO</TableCell>
-              <TableCell align="center">{farmMeta.type == 0 ? "SOILING RATIO" : "YAW ANGLE   "}</TableCell>
+              <TableCell align="center">{farmMeta.resType == 0 ? "SOILING RATIO" : "YAW ANGLE   "}</TableCell>
               <TableCell align="center">SHOW</TableCell>
               <TableCell align="center"></TableCell>
         </TableRow>

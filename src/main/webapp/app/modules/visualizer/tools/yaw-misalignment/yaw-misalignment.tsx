@@ -22,36 +22,37 @@ export const YawMisalignment = () => {
     if(action)
       dispatch(applyYawMisalignmentDetection({id: dataset.id, from, to}));
   }
-
   return (
-    <Box sx={{height: "fit-content", width: "50%", m: "auto", pt: 5}}>
-      <Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'left',
-            p:0,
-          }}
-        >
-          <ManageSearchIcon/>
-          <Typography variant="body1" gutterBottom sx={{fontWeight:600}}>
-            Detect
-          </Typography>
-        </Box>
+    // <Box sx={{height: "fit-content", width: "50%", m: "auto", pt: 5}}>
+    //   <Box>
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'row',
+    //         justifyContent: 'left',
+    //         p:0,
+    //       }}
+    //     >
+    //       <ManageSearchIcon/>
+    //       <Typography variant="body1" gutterBottom sx={{fontWeight:600}}>
+    //         Detect
+    //       </Typography>
+    //     </Box>
         <Box sx={{
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
         }}>
-          <Box sx={{pt: 1}}>Enable</Box>
+          {/*<Box sx={{pt: 1}}>Enable</Box>*/}
+
           <Switch
+            disabled={dataset.id !== 'BEZ2'}
             checked={yawMisalignmentEnabled}
             onChange={() => handleEnableYaw()}
             inputProps={{'aria-label': 'controlled'}}
           />
         </Box>
-      </Box>
-    </Box>
+      // </Box>
+    // </Box>
   );
 }

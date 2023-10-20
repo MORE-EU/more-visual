@@ -9,6 +9,7 @@ public class FarmInfo {
     private String schema;
     private String name;
     private Boolean hasHeader;
+    private String delimiter;
     private List<Integer> measures;
     private String timeCol;
     private String valueCol;
@@ -97,6 +98,14 @@ public class FarmInfo {
 
     public void setSchema(String schema) {
         this.schema = schema;
+    }
+
+    public String getDelimiter() {
+        return delimiter;
+    }
+
+    public void setDelimiter(String delimiter) {
+        this.delimiter = delimiter;
     }
 
     @Override

@@ -93,7 +93,7 @@ export const ChartCompare = () => {
             (file, idx) =>
               file.id !== dataset.id && (
                 <MenuItem key={`${file.id}-${idx}`} selected={compare.includes(file.id)} onClick={handleOnClick(file.id)}>
-                  <ListItemText>{file.name}</ListItemText>
+                  <ListItemText>{file.id}</ListItemText>
                   {compare.includes(file.id) ? <CheckCircleOutlineIcon /> : <RadioButtonUncheckedIcon />}
                 </MenuItem>
               )

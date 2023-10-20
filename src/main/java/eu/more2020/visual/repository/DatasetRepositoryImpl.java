@@ -3,11 +3,18 @@ package eu.more2020.visual.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvToBeanBuilder;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.config.ApplicationProperties;
+import eu.more2020.visual.index.domain.Dataset.CsvDataset;
 import eu.more2020.visual.index.datasource.QueryExecutor.ModelarDBQueryExecutor;
+import eu.more2020.visual.index.domain.DataFileInfo;
 import eu.more2020.visual.index.domain.Dataset.*;
 import eu.more2020.visual.index.domain.ModelarDB.ModelarDBConnection;
 import eu.more2020.visual.domain.*;
+import eu.more2020.visual.index.domain.TimeRange;
+import eu.more2020.visual.index.util.DateTimeUtil;
+import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,12 +25,15 @@ import org.springframework.util.Assert;
 
 import java.io.*;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Repository
 public class DatasetRepositoryImpl implements DatasetRepository {
@@ -77,24 +87,87 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         if (metadataFile.exists()) {
             JsonNode jsonNode = objectMapper.readTree(metadataFile);
             FarmMeta farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
+            String type = farm.getType();
 
-            String config = jsonNode.get("config").asText();
             for (JsonNode datasetNode : jsonNode.get("data")) {
-                // Extract data from JSON node and create the desired subclass of AbstractDataset
                 String datasetId = datasetNode.get("id").asText();
                 if(!datasetId.equals(id)) continue;
-                String path = datasetNode.get("path").asText();
-                String schema = datasetNode.get("schema").asText();
-
-                String name = datasetNode.get("name").asText();
-                String timeCol = datasetNode.get("timeCol").asText();
-                String valueCol = datasetNode.get("valueCol").asText();
-                String idCol = datasetNode.get("idCol").asText();
-                dataset = createDataset(datasetId, path, farm.getType(), schema, name, timeCol, valueCol, idCol, config);
-                log.info(String.valueOf(dataset));
+                // Extract data from JSON node and create the desired subclass of AbstractDataset
+                if(type.equals("csv")) {
+                    String name = datasetNode.get("name").asText();
+                    String path = datasetNode.get("path").asText();
+                    String timeCol = datasetNode.get("timeCol").asText();
+                    String delimiter = datasetNode.get("delimiter").asText();
+                    boolean hasHeader = datasetNode.get("hasHeader").asBoolean();
+                    File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, id + ".csv");
+                    dataset = new CsvDataset(path, id, name, timeCol, timeFormat, delimiter, hasHeader);
+                    CsvDataset finalDataset = (CsvDataset) dataset;
+                    if (!file.isDirectory()) {
+                        DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
+                        fillDataFileInfo((CsvDataset) dataset, dataFileInfo);
+                        dataset.getFileInfoList().add(dataFileInfo);
+                    } else {
+                        List<DataFileInfo> fileInfoList = Arrays.stream(file.listFiles(f -> !f.isDirectory() && f.getName().endsWith(".csv"))).map(f -> {
+                            DataFileInfo dataFileInfo = new DataFileInfo(f.getAbsolutePath());
+                            try {
+                                fillDataFileInfo(finalDataset, dataFileInfo);
+                            } catch (IOException e) {
+                                new RuntimeException(e);
+                            }
+                            return dataFileInfo;
+                        }).collect(Collectors.toList());
+                        // sort csv files by their time ranges ascending
+                        fileInfoList.sort(Comparator.comparing(i -> i.getTimeRange().getFrom()));
+                        dataset.setFileInfoList(fileInfoList);
+                    }
+                    List<Integer> measures =  IntStream.rangeClosed(0, dataset.getHeader().length - 1)
+                        .boxed()
+                        .filter(i -> i != finalDataset.getMeasureIndex(finalDataset.getTimeCol()))
+                        .collect(Collectors.toList());
+                    finalDataset.setMeasures(measures);
+                    if (dataset.getTimeRange() == null) {
+                        dataset.setTimeRange(dataset.getFileInfoList().get(0).getTimeRange());
+                    }
+                    dataset.setTimeRange(dataset.getFileInfoList().stream().map(DataFileInfo::getTimeRange)
+                        .reduce(dataset.getTimeRange(), TimeRange::span));
+                } else {
+                    String config = jsonNode.get("config").asText();
+                    String schema = datasetNode.get("schema").asText();
+                    String name = datasetNode.get("name").asText();
+                    String timeCol = datasetNode.get("timeCol").asText();
+                    String valueCol = datasetNode.get("valueCol").asText();
+                    String idCol = datasetNode.get("idCol").asText();
+                    dataset = createDBDataset(datasetId, farm.getType(), schema, name, timeCol, valueCol, idCol, config);
+                }
+                dataset.setType(type);
             }
+            log.info(String.valueOf(dataset));
         }
         return Optional.ofNullable(dataset);
+    }
+
+    private void fillDataFileInfo(CsvDataset dataset, DataFileInfo dataFileInfo) throws IOException {
+        CsvParserSettings parserSettings = new CsvParserSettings();
+        parserSettings.getFormat().setDelimiter(',');
+        parserSettings.setLineSeparatorDetectionEnabled(true);
+        parserSettings.setIgnoreLeadingWhitespaces(false);
+        parserSettings.setIgnoreTrailingWhitespaces(false);
+        CsvParser parser = new CsvParser(parserSettings);
+        parser.beginParsing(new File(dataFileInfo.getFilePath()), Charset.forName("US-ASCII"));
+        if (dataset.getHasHeader()) {
+            parser.parseNext();  //skip header row
+            dataset.setHeader(parser.getContext().parsedHeaders());
+        }
+        int timeColId = dataset.getMeasureIndex(dataset.getTimeCol());
+
+        long from = DateTimeUtil.parseDateTimeString(parser.parseNext()[timeColId], dataset.getTimeFormat());
+        parser.stopParsing();
+
+        ReversedLinesFileReader reversedLinesFileReader = new ReversedLinesFileReader(new File(dataFileInfo.getFilePath()), StandardCharsets.US_ASCII);
+        String lastRow = reversedLinesFileReader.readLine();
+        reversedLinesFileReader.close();
+        long to = DateTimeUtil.parseDateTimeString(parser.parseLine(lastRow)[timeColId], dataset.getTimeFormat());
+        dataFileInfo.setTimeRange(new TimeRange(from, to));
     }
 
     @Override
@@ -146,17 +219,10 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
 
-    private AbstractDataset createDataset(String id, String path, String type, String schema, String table, String timeCol,
-                                          String valueCol, String idCol, String config) throws IOException, SQLException {
-        String p = "";
+    private AbstractDataset createDBDataset(String id, String type, String schema, String table, String timeCol,
+                                          String valueCol, String idCol, String config) throws SQLException {
         AbstractDataset dataset = null;
         switch (type) {
-            case "csv":
-               dataset = new CsvDataset(path, "0", "test", timeCol, true, timeFormat, ",");
-               break;
-            case "parquet":
-                dataset = new ParquetDataset(path, "0", "test", timeCol, timeFormat);
-                break;
             case "postgres":
                 dataset = new PostgreSQLDataset(config, schema, table, timeFormat, timeCol);
                 break;

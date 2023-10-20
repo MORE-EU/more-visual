@@ -1,6 +1,6 @@
 package eu.more2020.visual.domain.Detection;
 
-import eu.more2020.visual.domain.TimeRange;
+import eu.more2020.visual.index.domain.TimeRange;
 
 public abstract class AbstractDetection {
 

@@ -192,10 +192,6 @@ export const Chart = () => {
     }
   }, [customChangepointsEnabled]);
 
-  useEffect(() => {
-    chart.current && toast(`Frequency: ${latestFrequency.current}`);
-  }, [latestFrequency.current]);
-
   const getChartRef = (chartR: any) => {
     dispatch(updateChartRef(chartR));
   };
@@ -381,24 +377,24 @@ export const Chart = () => {
     })
 
     // LIVE DATA IMPLEMENTATION
-    setInterval(() => {
-      if (!latestPreview.current) {
-        const { max, min, dataMax } = chart.current.xAxis[0].getExtremes();
-        if (max >= data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp) {
-          dispatch(
-            liveDataImplementation({
-              folder: latestFolder.current,
-              id: latestDatasetId.current,
-              from: dataMax,
-              to: dataMax + 50000,
-              selectedMeasures: latestMeasures.current,
-              filter: latestFilter.current,
-            })
-          );
-          max === dataMax && chart.current.xAxis[0].setExtremes(min, dataMax + 50000, true, true);
-        }
-      }
-    }, 500);
+    // setInterval(() => {
+    //   if (!latestPreview.current) {
+    //     const { max, min, dataMax } = chart.current.xAxis[0].getExtremes();
+    //     if (max >= data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp) {
+    //       dispatch(
+    //         liveDataImplementation({
+    //           folder: latestFolder.current,
+    //           id: latestDatasetId.current,
+    //           from: dataMax,
+    //           to: dataMax + 50000,
+    //           selectedMeasures: latestMeasures.current,
+    //           filter: latestFilter.current,
+    //         })
+    //       );
+    //       max === dataMax && chart.current.xAxis[0].setExtremes(min, dataMax + 50000, true, true);
+    //     }
+    //   }
+    // }, 500);
 
 
     // Set initial extremes
@@ -440,8 +436,7 @@ export const Chart = () => {
       const sData = secondaryData.map(d => {
         const val = d.values[0];
         return { x: d.timestamp, y: isNaN(val) ? null : val, tt: d.values[1] ? 'Est. Power Loss: ' + d.values[1].toFixed(2) : null };
-      });
-      // @ts-ignore
+      });// @ts-ignore
       chartData = [...chartData, { data: sData, yAxis: sz, name: getSecondaryText() }];
     }
     return chartData;
@@ -520,7 +515,7 @@ export const Chart = () => {
         ...[].concat(
           ...compareData.map((compData, idx) =>
             selectedMeasures.map((measure, index) => ({
-                data: compData[measure] ? data[measure].map(d => {
+                data: compData[measure] ? compData[measure].map(d => {
                   const val = d.value;
                   return [d.timestamp, isNaN(val) ? null : val]
                 }) : [],
@@ -607,6 +602,7 @@ export const Chart = () => {
                 connectNulls: false,
                 connectorAllowed: false,
                 maxPointWidth: 80,
+                turboThreshold: 100000, // TODO: REMOVE THIS IS ONLY FOR ALEX YAW
                 marker: {
                   enabled: Object.keys(filter).length !== 0 ? true : false,
                 },
@@ -650,11 +646,11 @@ export const Chart = () => {
             rangeSelector: {
               enabled: false,
             },
-            subtitle: {
-              text: `Frequency: ${resampleFreq}`,
-              align: 'right',
-              x: 0,
-            },
+            // subtitle: {
+            //   text: `Frequency: ${resampleFreq}`,
+            //   align: 'right',
+            //   x: 0,
+            // },
             navigator: {
               enabled: false,
               adaptToUpdatedData: false,

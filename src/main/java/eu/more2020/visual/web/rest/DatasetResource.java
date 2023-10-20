@@ -1,15 +1,14 @@
 package eu.more2020.visual.web.rest;
 
-import eu.more2020.visual.domain.DbConfig;
-import eu.more2020.visual.domain.FarmInfo;
-import eu.more2020.visual.domain.FarmMeta;
-import eu.more2020.visual.domain.Sample;
+import eu.more2020.visual.domain.*;
 import eu.more2020.visual.index.domain.*;
+import eu.more2020.visual.index.domain.Dataset.CsvDataset;
 import eu.more2020.visual.index.domain.Dataset.AbstractDataset;
 import eu.more2020.visual.index.domain.Query.Query;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.FileHandlingRepository;
+import eu.more2020.visual.service.CsvDataService;
 import eu.more2020.visual.service.DataService;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
@@ -44,7 +43,8 @@ public class DatasetResource {
     private final Logger log = LoggerFactory.getLogger(DatasetResource.class);
     private final DatasetRepository datasetRepository;
     private final DataService dataService;
-;
+    private final CsvDataService csvDataService;
+
     private final FileHandlingRepository fileHandlingRepository;
 
     @Value("${jhipster.clientApp.name}")
@@ -55,8 +55,10 @@ public class DatasetResource {
 
     public DatasetResource(DatasetRepository datasetRepository,
                            AlertRepository alertRepository,
+                           CsvDataService csvDataService,
                            DataService dataService, FileHandlingRepository fileHandlingRepository) {
         this.datasetRepository = datasetRepository;
+        this.csvDataService = csvDataService;
         this.dataService = dataService;
         this.fileHandlingRepository = fileHandlingRepository;
     }
@@ -163,11 +165,15 @@ public class DatasetResource {
     @PostMapping("/datasets/{farmName}/{id}/query")
     public ResponseEntity<QueryResults> executeQuery(@PathVariable String farmName, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
         log.debug("REST request to execute Query: {}", query);
-        Optional<QueryResults> queryResultsOptional;
-        queryResultsOptional = datasetRepository.findById(id, farmName).map(dataset -> {
-            log.debug("Dataset {}", dataset);
-            return dataService.executeQuery(dataset, query);
-        });
+        Optional<QueryResults> queryResultsOptional =
+            datasetRepository.findById(id, farmName).map(dataset ->
+                {
+                    if(dataset.getType().equals("csv")){
+                        return csvDataService.executeQuery((CsvDataset) dataset, query);
+                    } else {
+                        return dataService.executeQuery(dataset, query);
+                    }
+                });
 //        queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }

@@ -12,6 +12,7 @@ import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.grpc.RouteGuideGrpc;
 import eu.more2020.visual.grpc.tools.*;
 import eu.more2020.visual.index.domain.ImmutableDataPoint;
+import eu.more2020.visual.index.util.DateTimeUtil;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -141,8 +143,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
         try {
             CPDetectionRequest request = CPDetectionRequest.newBuilder()
                 .setDatasetId(changepointDetection.getId())
-                .setStartDate(changepointDetection.getRange().getFrom().format(formatter))
-                .setEndDate(changepointDetection.getRange().getTo().format(formatter))
+                .setStartDate(changepointDetection.getRange().getFromDate())
+                .setEndDate(changepointDetection.getRange().getToDate())
                 .setThrsh(1)
                 .setWa1(10)
                 .setWa2(5)
@@ -175,6 +177,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
                 detectedChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
                     LocalDateTime.parse(ends.get(ii).asText(), formatter)),0));
             }
+            channel.shutdown();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -203,8 +206,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             }
             CalculatePowerIndexRequest request = CalculatePowerIndexRequest.newBuilder()
                 .setDatasetId(deviationDetection.getId())
-                .setStartDate(deviationDetection.getRange().getFrom().format(formatter))
-                .setEndDate(deviationDetection.getRange().getTo().format(formatter))
+                .setStartDate(deviationDetection.getRange().getFromDate())
+                .setEndDate(deviationDetection.getRange().getToDate())
                 .setWeeksTrain(deviationDetection.getWeeks())
                 .addAllCpStarts(cpStarts)
                 .addAllCpEnds(cpEnds)
@@ -238,6 +241,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
                 ImmutableDataPoint dataPoint = new ImmutableDataPoint(time, new double[]{Double.parseDouble(value)});
                 dataPoints.add(dataPoint);
             });
+            channel.shutdown();
             // Create an ObjectMapper
         } catch (Exception e) {
             e.printStackTrace();
@@ -257,8 +261,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             }
             CalculatePowerIndexRequest request = CalculatePowerIndexRequest.newBuilder()
                 .setDatasetId(deviationDetection.getId())
-                .setStartDate(deviationDetection.getRange().getFrom().format(formatter))
-                .setEndDate(deviationDetection.getRange().getTo().format(formatter))
+                .setStartDate(deviationDetection.getRange().getFromDate())
+                .setEndDate(deviationDetection.getRange().getToDate())
                 .setWeeksTrain(deviationDetection.getWeeks())
                 .addAllCpStarts(cpStarts)
                 .addAllCpEnds(cpEnds)
@@ -292,6 +296,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
                 ImmutableDataPoint dataPoint = new ImmutableDataPoint(time, new double[]{Double.parseDouble(value)});
                 dataPoints.add(dataPoint);
             });
+            channel.shutdown();
             // Create an ObjectMapper
         } catch (Exception e) {
             e.printStackTrace();
@@ -304,21 +309,45 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
         List<ImmutableDataPoint> dataPoints = new ArrayList<>();
         try {
             Map<String, Object> params = new LinkedHashMap<>();
-            params.put("start_date", rangeDetection.getRange().getFrom().format(formatter));
-            params.put("end_date", rangeDetection.getRange().getTo().format(formatter));
+            params.put("start_date", rangeDetection.getRange().getFromDate());
+            params.put("end_date", rangeDetection.getRange().getToDate());
 
             EstimateYawMisalignmentRequest request = EstimateYawMisalignmentRequest.newBuilder()
                 .setDatasetId(rangeDetection.getId())
-                .setStartDate(rangeDetection.getRange().getFrom().format(formatter))
-                .setEndDate(rangeDetection.getRange().getTo().format(formatter))
+                .setStartDate(rangeDetection.getRange().getFromDate())
+                .setEndDate(rangeDetection.getRange().getToDate())
                 .build();
 
             // Create a channel to connect to the target gRPC server
-            ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
+            ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(),
+                    applicationProperties.getToolPort())
                 .usePlaintext()
                 .build();
-            dataPoints = getYawData(rangeDetection.getRange().getFrom(), rangeDetection.getRange().getTo());
 
+            // Invoke the remote method on the target server
+            DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
+            EstimateYawMisalignmentResponse response = stub.estimateYawMisalignment(request);
+//
+//            // Convert the response to JSON string
+            String json = response.getResult();
+            // Create an ObjectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            JsonNode responseObject = null;
+
+            responseObject = objectMapper.readTree(json);
+            log.info("READ JSON: {}", responseObject);
+            JsonNode yaw = responseObject.get("y_pred");
+
+            yaw.fields().forEachRemaining(entry -> {
+                String time = entry.getKey();
+                String value = entry.getValue().asText();
+                ImmutableDataPoint dataPoint = new ImmutableDataPoint(DateTimeUtil.parseDateTimeString(time, "yyyy-MM-dd[ HH:mm:ss]"),
+                    new double[]{Double.parseDouble(value)});
+                dataPoints.add(dataPoint);
+            });
+            channel.shutdown();
+//            dataPoints = getYawData(rangeDetection.getRange().getFrom(), rangeDetection.getRange().getTo());
         }
         catch (Exception e){
             e.printStackTrace();

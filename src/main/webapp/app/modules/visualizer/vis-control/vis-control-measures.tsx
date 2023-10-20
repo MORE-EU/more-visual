@@ -31,6 +31,7 @@ export const VisMeasures = () => {
 
   let indexes = [...selectedMeasures, dataset.timeCol];
   let shownMeasures = [...dataset.header];
+  shownMeasures = shownMeasures.filter(element => element !== dataset.timeCol);
   shownMeasures = shownMeasures.filter(function (value, index) {
     return indexes.indexOf(index) == -1;
   });

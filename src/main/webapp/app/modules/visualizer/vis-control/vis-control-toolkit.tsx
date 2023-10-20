@@ -1,11 +1,6 @@
 import React from 'react';
-import MuiDrawer from '@mui/material/Drawer';
-import {styled} from '@mui/material/styles';
-import IconButton from '@mui/material/IconButton';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
 import PatternIcon from '@mui/icons-material/Pattern'; // patterns
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows'; // deviation
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'; // changepoint
 import TimelineIcon from '@mui/icons-material/Timeline'; // segmentation
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -18,6 +13,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import {YawMisalignment} from "app/modules/visualizer/tools/yaw-misalignment/yaw-misalignment";
 
 const VisToolkit = () => {
 
@@ -46,11 +42,13 @@ const VisToolkit = () => {
               </ListItemIcon>
               <ListItemText primary={"Soiling Detection"}/>
             </ListItemButton></>}
-            {farmMeta.resType === 1 && <><ListItemButton key={2} onClick={handleToolClick("Yaw Misalignment")}>
-              <ListItemIcon>
-                <ManageSearchIcon/>
-              </ListItemIcon>
-              <ListItemText primary={"Yaw Misalignment"}/>
+            {farmMeta.resType === 1 && <>
+              <ListItemButton key={2}>
+                <ListItemIcon>
+                  <ManageSearchIcon/>
+                </ListItemIcon>
+                <ListItemText primary={"Yaw Misalignment Detection"}/>
+                <YawMisalignment />
             </ListItemButton></>}
             <ListItemButton key={3} onClick={handleToolClick("Forecasting")}>
               <ListItemIcon>

@@ -439,6 +439,7 @@ const visualizer = createSlice({
     },
     toggleYawMisalignmentDetection(state, action) {
       state.yawMisalignmentEnabled = action.payload;
+      state.secondaryData = state.yawMisalignmentEnabled ? state.secondaryData : null;
     },
     toggleForecasting(state, action) {
       state.forecasting = action.payload;

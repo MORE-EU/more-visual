@@ -3,10 +3,13 @@ package eu.more2020.visual.index;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.TemporalField;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.ChronoField.*;
 
@@ -44,6 +47,33 @@ public class TimeSeriesIndexUtil {
         return dateTime.truncatedTo(getTemporalFieldByName(unit).getBaseUnit());
     }
 
+
+    public static LocalDateTime getLocalDateTimeFromTimestamp(long timestampInMillis){
+        Instant instant = Instant.ofEpochMilli(timestampInMillis);
+        return instant.atZone(ZoneId.of("UTC")).toLocalDateTime();
+    }
+
+    public static long getTimestampFromLocalDateTime(LocalDateTime localDateTime) {
+        // Convert LocalDateTime to an Instant
+        Instant instant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+        // Get the timestamp in milliseconds
+        return instant.toEpochMilli();
+    }
+
+   public static String calculateFreqLevel(long from, long to){
+       long differenceInMillis = to - from;
+
+       if (differenceInMillis <= TimeUnit.SECONDS.toMillis(60)) {
+           return "SECOND";
+       } else if (differenceInMillis <= TimeUnit.MINUTES.toMillis(60)) {
+           return "MINUTE";
+       } else if (differenceInMillis <= TimeUnit.HOURS.toMillis(1)) {
+           return "HOUR";
+       } else {
+           // Handle the case where the difference is more than an hour
+           return "HOUR";
+       }
+   }
 
 
 }

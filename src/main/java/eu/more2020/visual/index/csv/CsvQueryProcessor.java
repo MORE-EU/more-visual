@@ -2,13 +2,15 @@ package eu.more2020.visual.index.csv;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
+import eu.more2020.visual.index.domain.Dataset.CsvDataset;
+import eu.more2020.visual.index.domain.ImmutableDataPoint;
+import eu.more2020.visual.index.domain.TimeRange;
 import eu.more2020.visual.index.TimeSeriesIndexUtil;
 import eu.more2020.visual.index.TreeNode;
-import eu.more2020.visual.index.domain.Dataset.AbstractDataset;
-import eu.more2020.visual.index.domain.Dataset.CsvDataset;
-import eu.more2020.visual.index.domain.Query.IndexQuery;
 import eu.more2020.visual.index.domain.Query.Query;
 import eu.more2020.visual.index.domain.QueryResults;
+import eu.more2020.visual.index.domain.UnivariateDataPoint;
+import eu.more2020.visual.index.util.DateTimeUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,7 +19,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,7 +29,7 @@ import java.util.stream.Collectors;
 public class CsvQueryProcessor {
 
     private static final Logger LOG = LogManager.getLogger(CsvQueryProcessor.class);
-    private IndexQuery query;
+    private Query query;
     private QueryResults queryResults;
     private CsvDataset dataset;
     private int freqLevel;
@@ -38,28 +42,27 @@ public class CsvQueryProcessor {
     private Integer accumulatorCounter;
 
 
-    public CsvQueryProcessor(IndexQuery query, CsvDataset dataset, CsvTTI tti) {
+    public CsvQueryProcessor(Query query, CsvDataset dataset, CsvTTI tti) {
         this.query = query;
         this.filter = query.getFilter();
-        this.measures = query.getMeasures() != null ? query.getMeasures() : dataset.getMeasures();
+        this.measures = query.getMeasures();
         this.queryResults = new QueryResults();
         this.dataset = dataset;
         this.tti = tti;
         this.accumulatorCounter = 0;
-        this.freqLevel = TimeSeriesIndexUtil.getTemporalLevelIndex(query.getFrequency()) + 1;
+        this.freqLevel = TimeSeriesIndexUtil.getTemporalLevelIndex(TimeSeriesIndexUtil.calculateFreqLevel(query.getFrom(), query.getTo()));
         CsvParserSettings parserSettings = tti.createCsvParserSettings();
         parser = new CsvParser(parserSettings);
     }
 
-    public QueryResults prepareQueryResults(CsvTreeNode root, HashMap<Integer, Double[]> filter) throws IOException {
-//        List<Integer> startLabels = getLabels(query.getFrom());
-//        List<Integer> endLabels = getLabels(query.getTo());
-//
-//        fileInputStream = new FileInputStream(tti.getCsv());
-//        this.processQueryNodes(root, startLabels, endLabels, true, true, 0);
-//        fileInputStream.close();
-//
-//        queryResults.setMeasureStats(tti.getMeasureStats());
+    public QueryResults prepareQueryResults(CsvTreeNode root,
+                                            HashMap<Integer, Double[]> filter) throws IOException {
+        List<Integer> startLabels = getLabels(query.getFrom());
+        List<Integer> endLabels = getLabels(query.getTo());
+        fileInputStream = new FileInputStream(tti.getCsv());
+        this.processQueryNodes(root, startLabels, endLabels, true, true, 0);
+        fileInputStream.close();
+        queryResults.setMeasureStats(tti.getMeasureStats());
         return queryResults;
     }
 
@@ -100,43 +103,62 @@ public class CsvQueryProcessor {
         }
     }
 
+    private void setNodeData(long timestamp, double[] values)  {
+        Map<Integer, List<UnivariateDataPoint>> data = queryResults.getData() == null ? new HashMap<>() : queryResults.getData();
+        int i = 0;
+        for(int measure : measures) {
+            data.computeIfAbsent(measure, m -> new ArrayList<>()).add(
+                new UnivariateDataPoint(timestamp, values[i]));
+            i++;
+        }
+        queryResults.setData(data);
+    }
+
     public void processNode(CsvTreeNode treeNode) throws IOException {
-//        if (treeNode.getLevel() == freqLevel) {
-//            queryResults.getData().add(new DataPoint(getCurrentNodeDateTime(), nodeSelection(treeNode)));
-//        } else {
-//            fileInputStream.getChannel().position(treeNode.getFileOffsetStart());
-//            String[] row;
-//            LocalDateTime previousDate, currentDate = null;
-//            DoubleSummaryStatistics[] statsAccumulators = new DoubleSummaryStatistics[measures.size()];
-//            for (int i = 0; i < statsAccumulators.length; i++) {
-//                statsAccumulators[i] = new DoubleSummaryStatistics();
-//            }
-//
-//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8));
-//            for (int i = 0; i < treeNode.getDataPointCount(); i++) {
-//                String s;
-//                while ((s = bufferedReader.readLine()).isEmpty()) ;
-//                row = this.parser.parseLine(s);
-//                queryResults.setIoCount(queryResults.getIoCount() + 1);
-//                previousDate = currentDate;
-//                currentDate = tti.parseStringToDate(row[dataset.getTimeCol()]).truncatedTo(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(freqLevel - 1).getBaseUnit());
-//                if (!currentDate.equals(previousDate) && previousDate != null) {
-//                    if (query.getRange() == null || query.getRange().contains(previousDate)) {
+        if (treeNode.getLevel() == freqLevel) {
+            long timestamp = TimeSeriesIndexUtil.getTimestampFromLocalDateTime(getCurrentNodeDateTime());
+            double[] values = nodeSelection(treeNode);
+            setNodeData(timestamp, values);
+        } else {
+            fileInputStream.getChannel().position(treeNode.getFileOffsetStart());
+            String[] row;
+            LocalDateTime previousDate, currentDate = null;
+            DoubleSummaryStatistics[] statsAccumulators = new DoubleSummaryStatistics[measures.size()];
+            for (int i = 0; i < statsAccumulators.length; i++) {
+                statsAccumulators[i] = new DoubleSummaryStatistics();
+            }
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8));
+            TimeRange queryRange = new TimeRange(query.getFrom(), query.getTo());
+            for (int i = 0; i < treeNode.getDataPointCount(); i++) {
+                String s;
+                while ((s = bufferedReader.readLine()).isEmpty()) ;
+                row = this.parser.parseLine(s);
+                queryResults.setIoCount(queryResults.getIoCount() + 1);
+                previousDate = currentDate;
+
+                currentDate = tti.parseStringToDate(row[dataset.getMeasureIndex(dataset.getTimeCol())]).truncatedTo(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(freqLevel - 1).getBaseUnit());
+                if (!currentDate.equals(previousDate) && previousDate != null) {
+                    long previousDateTimestamp = TimeSeriesIndexUtil.getTimestampFromLocalDateTime(previousDate);
+                    if (queryRange.contains(TimeSeriesIndexUtil.getTimestampFromLocalDateTime(previousDate))) {
 //                        queryResults.getData().add(new DataPoint(previousDate, nodeSelectionFromFile(statsAccumulators)));
-//                    }
-//                    statsAccumulators = new DoubleSummaryStatistics[measures.size()];
-//                    for (int j = 0; j < statsAccumulators.length; j++) {
-//                        statsAccumulators[j] = new DoubleSummaryStatistics();
-//                    }
-//                }
-//                for (int j = 0; j < measures.size(); j++) {
-//                    statsAccumulators[j].accept(Double.parseDouble(row[measures.get(j)]));
-//                }
-//                if (i == treeNode.getDataPointCount() - 1 && (query.getRange() == null || query.getRange().contains(currentDate))) {
+                        setNodeData(previousDateTimestamp, nodeSelectionFromFile(statsAccumulators));
+                    }
+                    statsAccumulators = new DoubleSummaryStatistics[measures.size()];
+                    for (int j = 0; j < statsAccumulators.length; j++) {
+                        statsAccumulators[j] = new DoubleSummaryStatistics();
+                    }
+                }
+                for (int j = 0; j < measures.size(); j++) {
+                    statsAccumulators[j].accept(Double.parseDouble(row[measures.get(j)]));
+                }
+                long currentDateTimestamp = TimeSeriesIndexUtil.getTimestampFromLocalDateTime(currentDate);
+                if (i == treeNode.getDataPointCount() - 1 && (queryRange.contains(TimeSeriesIndexUtil.getTimestampFromLocalDateTime(currentDate)))) {
 //                    queryResults.getData().add(new DataPoint(currentDate, nodeSelectionFromFile(statsAccumulators)));
-//                }
-//            }
-//        }
+                    setNodeData(currentDateTimestamp, nodeSelectionFromFile(statsAccumulators));
+                }
+            }
+        }
     }
 
     private void processQueryNodes(CsvTreeNode node, List<Integer> startLabels,
@@ -180,10 +202,10 @@ public class CsvQueryProcessor {
         return dateTime;
     }
 
-    private List<Integer> getLabels(LocalDateTime date) {
+    private List<Integer> getLabels(long timestamp) {
         List<Integer> labels = new ArrayList<>();
         for (TemporalField temporalField : TimeSeriesIndexUtil.TEMPORAL_HIERARCHY) {
-            labels.add(date.get(temporalField));
+            labels.add(TimeSeriesIndexUtil.getLocalDateTimeFromTimestamp(timestamp).get(temporalField));
         }
         return labels;
     }

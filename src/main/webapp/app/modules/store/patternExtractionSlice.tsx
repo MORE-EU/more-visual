@@ -53,16 +53,10 @@ function fetchPatternGroups(searchPatterns) {
   return patternGroups;
 }
 
-
-
-
-
 export const applySearchPatterns = createAsyncThunk(
   'applySearchPatterns',
   async (data: { dataset, searchPatterns: IPattern[]}) => {
     const { dataset, searchPatterns} = data;
-    // Fetch data (replace this with your actual API call)
-    // For now, let's mock some search results
     const response = Promise.all(
       searchPatterns.map(p => {
         const pattern = {
@@ -74,8 +68,8 @@ export const applySearchPatterns = createAsyncThunk(
         return axios.post(`api/tools/pattern`, pattern).then(res => res.data);
       })
     ).then(res => res.map(r => r.data));
-    return response;
-    // return fetchPatternGroups(searchPatterns);
+    // return response;
+    return fetchPatternGroups(searchPatterns);
   }
 );
 

@@ -29,7 +29,7 @@ const VisControlDatasets = () => {
     setUploadModalOpen(prev => !prev);
     setUploadFile(e.target.files);
   };
-  
+
   return (
     <Grid sx={{width: "100%", height: "100%"}}>
       {uploadFile && (
@@ -57,7 +57,7 @@ const VisControlDatasets = () => {
                 }}
                 divider
               >
-                <ListItemText primary={`${file.name}`} sx={{ pl: 4 }} />
+                <ListItemText primary={`${file.id}`} sx={{ pl: 4 }} />
                 {compare.includes(file.id) && (
                   <Tooltip title="Currently comparing this file">
                     <ListItemIcon>

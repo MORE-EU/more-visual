@@ -24,7 +24,7 @@ public class DataService {
     private synchronized TTI getIndex(AbstractDataset dataset, Query query) {
         TTI tti = indexes.get(dataset.getTable());
         if(tti == null){
-            tti = new TTI(dataset, 0.95, 4, 1);
+            tti = new TTI(dataset, 1, 4, 4);
             indexes.put(dataset.getTable(), tti);
         }
         return tti;
