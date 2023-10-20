@@ -1,10 +1,11 @@
 package eu.more2020.visual.web.rest;
 
 import eu.more2020.visual.domain.*;
-import eu.more2020.visual.index.domain.*;
-import eu.more2020.visual.index.domain.Dataset.CsvDataset;
-import eu.more2020.visual.index.domain.Dataset.AbstractDataset;
-import eu.more2020.visual.index.domain.Query.Query;
+import eu.more2020.visual.middleware.domain.*;
+import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
+import eu.more2020.visual.middleware.domain.Dataset.AbstractDataset;
+import eu.more2020.visual.middleware.domain.Query.Query;
+import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.FileHandlingRepository;

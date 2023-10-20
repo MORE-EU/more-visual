@@ -6,7 +6,7 @@ import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
 import eu.more2020.visual.domain.Detection.PatternDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
-import eu.more2020.visual.index.domain.ImmutableDataPoint;
+import eu.more2020.visual.middleware.domain.ImmutableDataPoint;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.ToolsRepository;
 import org.slf4j.Logger;

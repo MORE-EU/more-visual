@@ -1,10 +1,10 @@
 package eu.more2020.visual.service;
 
-import eu.more2020.visual.index.csv.CsvTTI;
-import eu.more2020.visual.index.domain.Query.Query;
-import eu.more2020.visual.index.domain.QueryResults;
-import eu.more2020.visual.index.domain.TimeRange;
-import eu.more2020.visual.index.domain.Dataset.CsvDataset;
+import eu.more2020.visual.middleware.domain.Query.Query;
+import eu.more2020.visual.middleware.domain.QueryResults;
+import eu.more2020.visual.middleware.domain.TimeRange;
+import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
+import eu.more2020.visual.middleware.index.csv.CsvTTI;
 import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class CsvDataService {
-    private static final org.apache.logging.log4j.Logger LOG = LogManager.getLogger(CsvTTI.class);
+    private static final org.apache.logging.log4j.Logger LOG = LogManager.getLogger(CsvDataService.class);
 
     private final Logger log = LoggerFactory.getLogger(CsvDataService.class);
     private HashMap<String, CsvTTI> indexes = new HashMap<>();

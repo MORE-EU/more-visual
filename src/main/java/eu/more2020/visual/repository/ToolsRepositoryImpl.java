@@ -7,12 +7,12 @@ import eu.more2020.visual.domain.*;
 
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
-import eu.more2020.visual.domain.Detection.PatternDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.grpc.RouteGuideGrpc;
 import eu.more2020.visual.grpc.tools.*;
-import eu.more2020.visual.index.domain.ImmutableDataPoint;
-import eu.more2020.visual.index.util.DateTimeUtil;
+import eu.more2020.visual.middleware.domain.ImmutableDataPoint;
+import eu.more2020.visual.middleware.domain.TimeRange;
+import eu.more2020.visual.middleware.util.DateTimeUtil;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.slf4j.Logger;
@@ -91,8 +91,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             Integer noOfIntervals = starts.size();
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
-                gtChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
-                    LocalDateTime.parse(ends.get(ii).asText(), formatter)), 0.0));
+                gtChangepoints.add(new Changepoint(i, new TimeRange(DateTimeUtil.parseDateTimeString(starts.get(ii).asText(), formatter, ZoneId.of("UTC")),
+                    DateTimeUtil.parseDateTimeString(ends.get(ii).asText(), formatter, ZoneId.of("UTC"))),0));
             }
             // Shutdown the channel
             channel.shutdown();
@@ -174,8 +174,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             Integer noOfIntervals = starts.size();
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
-                detectedChangepoints.add(new Changepoint(i, new TimeRange(LocalDateTime.parse(starts.get(ii).asText(), formatter),
-                    LocalDateTime.parse(ends.get(ii).asText(), formatter)),0));
+                detectedChangepoints.add(new Changepoint(i, new TimeRange(DateTimeUtil.parseDateTimeString(starts.get(ii).asText(), formatter, ZoneId.of("UTC")),
+                    DateTimeUtil.parseDateTimeString(ends.get(ii).asText(), formatter, ZoneId.of("UTC"))),0));
             }
             channel.shutdown();
         } catch (Exception e) {
@@ -201,8 +201,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             List<String> cpStarts = new ArrayList<>();
             List<String> cpEnds = new ArrayList<>();
             if (deviationDetection.getChangepoints() != null) {
-                cpStarts = deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getFrom().format(formatter)).collect(Collectors.toList());
-                cpEnds = deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getTo().format(formatter)).collect(Collectors.toList());
+                cpStarts = deviationDetection.getChangepoints().stream().map(changepoint -> DateTimeUtil.formatTimeStamp(formatter, changepoint.getRange().getFrom())).collect(Collectors.toList());
+                cpEnds = deviationDetection.getChangepoints().stream().map(changepoint -> DateTimeUtil.formatTimeStamp(formatter, changepoint.getRange().getTo())).collect(Collectors.toList());
             }
             CalculatePowerIndexRequest request = CalculatePowerIndexRequest.newBuilder()
                 .setDatasetId(deviationDetection.getId())
@@ -256,8 +256,8 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             List<String> cpStarts = new ArrayList<>();
             List<String> cpEnds = new ArrayList<>();
             if (deviationDetection.getChangepoints() != null) {
-                cpStarts = deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getFrom().format(formatter)).collect(Collectors.toList());
-                cpEnds = deviationDetection.getChangepoints().stream().map(changepoint -> changepoint.getRange().getTo().format(formatter)).collect(Collectors.toList());
+                cpStarts = deviationDetection.getChangepoints().stream().map(changepoint -> DateTimeUtil.formatTimeStamp(formatter, changepoint.getRange().getFrom())).collect(Collectors.toList());
+                cpEnds = deviationDetection.getChangepoints().stream().map(changepoint -> DateTimeUtil.formatTimeStamp(formatter, changepoint.getRange().getTo())).collect(Collectors.toList());
             }
             CalculatePowerIndexRequest request = CalculatePowerIndexRequest.newBuilder()
                 .setDatasetId(deviationDetection.getId())

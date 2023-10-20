@@ -1,7 +1,6 @@
 package eu.more2020.visual.domain.Detection;
 
 import eu.more2020.visual.domain.Changepoint;
-import eu.more2020.visual.domain.TimeRange;
 
 import java.util.List;
 
