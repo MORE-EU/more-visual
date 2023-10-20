@@ -50,7 +50,7 @@ public class CsvQueryProcessor {
         this.dataset = dataset;
         this.tti = tti;
         this.accumulatorCounter = 0;
-        this.freqLevel = TimeSeriesIndexUtil.getTemporalLevelIndex(TimeSeriesIndexUtil.calculateFreqLevel(query.getFrom(), query.getTo()));
+        this.freqLevel = TimeSeriesIndexUtil.getTemporalLevelIndex(TimeSeriesIndexUtil.calculateFreqLevel(query.getFrom(), query.getTo())) + 1;
         CsvParserSettings parserSettings = tti.createCsvParserSettings();
         parser = new CsvParser(parserSettings);
     }
@@ -127,7 +127,6 @@ public class CsvQueryProcessor {
             for (int i = 0; i < statsAccumulators.length; i++) {
                 statsAccumulators[i] = new DoubleSummaryStatistics();
             }
-
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8));
             TimeRange queryRange = new TimeRange(query.getFrom(), query.getTo());
             for (int i = 0; i < treeNode.getDataPointCount(); i++) {
@@ -137,7 +136,10 @@ public class CsvQueryProcessor {
                 queryResults.setIoCount(queryResults.getIoCount() + 1);
                 previousDate = currentDate;
 
-                currentDate = tti.parseStringToDate(row[dataset.getMeasureIndex(dataset.getTimeCol())]).truncatedTo(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY.get(freqLevel - 1).getBaseUnit());
+                currentDate = tti.parseStringToDate(row[dataset.getMeasureIndex(dataset.getTimeCol())])
+                    .truncatedTo(TimeSeriesIndexUtil.TEMPORAL_HIERARCHY
+                        .get(freqLevel - 1)
+                        .getBaseUnit());
                 if (!currentDate.equals(previousDate) && previousDate != null) {
                     long previousDateTimestamp = TimeSeriesIndexUtil.getTimestampFromLocalDateTime(previousDate);
                     if (queryRange.contains(TimeSeriesIndexUtil.getTimestampFromLocalDateTime(previousDate))) {

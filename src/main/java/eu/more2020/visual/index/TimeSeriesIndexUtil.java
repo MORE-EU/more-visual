@@ -2,6 +2,9 @@ package eu.more2020.visual.index;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import eu.more2020.visual.index.csv.CsvQueryProcessor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -16,6 +19,7 @@ import static java.time.temporal.ChronoField.*;
 public class TimeSeriesIndexUtil {
     public static final List<TemporalField> TEMPORAL_HIERARCHY = Arrays.asList(YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, MILLI_OF_SECOND);
     private static BiMap<String, TemporalField> temporalFieldMap = HashBiMap.create();
+    private static final Logger LOG = LogManager.getLogger(CsvQueryProcessor.class);
 
     static {
         temporalFieldMap.put("YEAR", YEAR);
@@ -62,12 +66,15 @@ public class TimeSeriesIndexUtil {
 
    public static String calculateFreqLevel(long from, long to){
        long differenceInMillis = to - from;
-
-       if (differenceInMillis <= TimeUnit.SECONDS.toMillis(60)) {
+       if (differenceInMillis <= TimeUnit.MINUTES.toMillis(60)) {
+           LOG.debug("SECOND");
            return "SECOND";
-       } else if (differenceInMillis <= TimeUnit.MINUTES.toMillis(60)) {
+       } else if (differenceInMillis <= 24 * TimeUnit.HOURS.toMillis(60)) {
+           LOG.debug("MINUTE");
            return "MINUTE";
-       } else if (differenceInMillis <= TimeUnit.HOURS.toMillis(1)) {
+       } else if (differenceInMillis <= 24 * 30 * TimeUnit.HOURS.toMillis(1)) {
+           LOG.debug("HOUR");
+
            return "HOUR";
        } else {
            // Handle the case where the difference is more than an hour

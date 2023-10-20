@@ -47,7 +47,6 @@ public class CsvTTI {
         if (root == null) {
             root = new CsvTreeNode(0, 0);
         }
-
         // adjust root node meta
         if (root.getDataPointCount() == 0) {
             root.setFileOffsetStart(fileOffset);
@@ -119,7 +118,6 @@ public class CsvTTI {
             objectsIndexed++;
             rowOffset = parser.getContext().currentChar() - 1;
         }
-
         parser.stopParsing();
         isInitialized = true;
 
@@ -127,7 +125,7 @@ public class CsvTTI {
             e -> new MeasureStats(e.getValue().getAverage(), e.getValue().getMin(), e.getValue().getMax())));*/
 
         LOG.debug("Indexing Complete. Total Indexed Objects: " + objectsIndexed);
-        traverse(root);
+//        traverse(root);
     }
 
     public synchronized QueryResults executeQuery(Query query) throws IOException {
