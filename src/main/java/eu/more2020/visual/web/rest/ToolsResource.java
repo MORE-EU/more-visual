@@ -57,10 +57,10 @@ public class ToolsResource {
         return toolsRepository.soilingDetection(deviationDetection);
     }
 
-    @PostMapping("/tools/pattern")
-    public List<Changepoint> patternDetection(@Valid @RequestBody PatternDetection patternDetection) {
-        return toolsRepository.patternDetection(patternDetection);
-    }
+    // @PostMapping("/tools/pattern")
+    // public List<Changepoint> patternDetection(@Valid @RequestBody PatternDetection patternDetection) {
+    //     return toolsRepository.patternDetection(patternDetection);
+    // }
 
 
     @PostMapping("/tools/yaw_misalignment")
