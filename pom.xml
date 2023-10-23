@@ -281,32 +281,30 @@
             <artifactId>univocity-parsers</artifactId>
             <version>2.9.1</version>
         </dependency>
-
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <version>2.0.1.Final</version>
         </dependency>
         <dependency>
-            <groupId>eu.more2020.grpc</groupId>
-            <artifactId>grpc-files</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
-            <version>3.21.5</version>
+            <version>${protobuf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>${grpc.version}</version>
         </dependency>
         <dependency>
             <groupId>net.devh</groupId>
             <artifactId>grpc-server-spring-boot-starter</artifactId>
             <version>2.13.1.RELEASE</version>
-            <!-- <exclusions>
-            <exclusion>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-netty-shaded</artifactId>
-            </exclusion>
-        </exclusions> -->
         </dependency>
         <dependency>
     		<groupId>org.springframework.boot</groupId>
@@ -323,12 +321,6 @@
             <artifactId>more-vis-index</artifactId>
             <version>2.0</version>
         </dependency>
-        <dependency>
-            <groupId>it.unimi.dsi</groupId>
-            <artifactId>fastutil</artifactId>
-            <version>8.5.12</version> <!-- Use the appropriate version -->
-            <scope>runtime</scope>
-        </dependency>
     </dependencies>
     <build>
         <extensions>
@@ -340,6 +332,33 @@
         </extensions>
         <defaultGoal>spring-boot:run</defaultGoal>
         <plugins>
+            <plugin>
+				<groupId>com.github.os72</groupId>
+				<artifactId>protoc-jar-maven-plugin</artifactId>
+				<version>3.6.0.1</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+						   <includeMavenTypes>direct</includeMavenTypes>
+							<outputTargets>
+								<outputTarget>
+									<type>java</type>
+									<outputDirectory>src/main/java</outputDirectory>
+								</outputTarget>
+								<outputTarget>
+									<type>grpc-java</type>
+									<pluginArtifact>io.grpc:protoc-gen-grpc-java:1.15.0</pluginArtifact>
+									<outputDirectory>src/main/java</outputDirectory>
+								</outputTarget>
+							</outputTargets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
