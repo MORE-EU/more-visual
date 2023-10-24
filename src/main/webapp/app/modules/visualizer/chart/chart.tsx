@@ -54,6 +54,7 @@ export const Chart = () => {
   //Refs
   const latestFrequency = useRef(resampleFreq);
   const latestLeftSide = useRef(null);
+  const fetchDataRef = useRef({isScrolling: false,scrollTimeout: null});
   const chart = useRef(chartRef);
   const timeRange = useRef(null);
   const latestRightSide = useRef(null);
@@ -316,16 +317,25 @@ export const Chart = () => {
     };
 
 
-    const checkForDataOnPan = () => {
+    const checkForDataOnAction = () => {
       const { max, min } = chart.current.xAxis[0].getExtremes();
       checkForData(min, max);
     };
 
-    const checkForDataOnZoom = () => {
-      const { max, min } = chart.current.xAxis[0].getExtremes();
-      checkForData(min, max);
+    const handleEventTimeout = (event) => {
+      if (fetchDataRef.current.scrollTimeout) {
+        clearTimeout(fetchDataRef.current.scrollTimeout);
+      }
+  
+      fetchDataRef.current = { ...fetchDataRef.current, isScrolling: true };
+  
+      fetchDataRef.current = { ...fetchDataRef.current,
+        scrollTimeout: setTimeout(() => {
+          fetchDataRef.current = { ...fetchDataRef.current, isScrolling: false };
+          checkForDataOnAction();
+        }, 500),
+      };
     };
-
 
     // CHART: ZOOM FUNCTION
     Highcharts.addEvent(chart.current.container, 'wheel', (event: WheelEvent) => {
@@ -336,17 +346,17 @@ export const Chart = () => {
       if (!chart.current.loadingShown) {
         if (event.deltaY < 0 && max - min > 10000) {
           // in, 10000 is the max range on a zoom level
-          chart.current.xAxis[0].setExtremes(min + stepleft, max - stepright, true, true);
+          chart.current.xAxis[0].setExtremes(min + stepleft, max - stepright, true, false);
         } else if (event.deltaY > 0) {
           // out
           chart.current.xAxis[0].setExtremes(
             Math.max(min - stepleft, dataset.timeRange.from),
             Math.min(max + stepright, dataset.timeRange.to),
             true,
-            true
+            false
           );
         }
-        checkForDataOnZoom();
+        handleEventTimeout(event);
       }
     });
 
@@ -358,22 +368,10 @@ export const Chart = () => {
     };
 
     // CHART: PAN FUNCTION
-    Highcharts.wrap(Highcharts.Chart.prototype, 'pan', function (proceed, ...args) {
-      const event = args[0];
-      console.log(args[1])
-      const xAxis = chart.current.xAxis[0];
-      const axisRange = xAxis.max - xAxis.min;
-      const movementX = event.movementX;
-      const percent = (movementX / 2) * Math.min(60, Math.sqrt(movementX ** 2 + 1));
-      const deltaX = (axisRange) * percent / 100000;
-      xAxis.setExtremes(
-        Math.max(xAxis.min - deltaX, dataset.timeRange.from),
-        Math.min(xAxis.max - deltaX, dataset.timeRange.to),
-        true,
-        true
-      );
-      checkForDataOnPan();
-      renderLabelForLiveData();
+    Highcharts.addEvent(chart.current.container, 'mouseup', (event: MouseEvent) => {
+      if (!chart.current.loadingShown) {
+      handleEventTimeout(event)
+      }
     })
 
     // LIVE DATA IMPLEMENTATION
@@ -425,10 +423,12 @@ export const Chart = () => {
               return [d.timestamp, isNaN(val) ? null : val]
             }) : [],
             name: dataset.header[measure],
-            yAxis: changeChart ? index : 0,
             color: measureColors[measure],
+            yAxis: changeChart ? index : 0,
             zoneAxis: 'x',
             zones: getZones(measureColors[measure]),
+            showInLegend: true,
+            enableMouseTracking: true
           }))
         : [];
     if (secondaryData) {
@@ -454,6 +454,27 @@ export const Chart = () => {
           height: `${selectedMeasures.length > 1 ? 100 / selectedMeasures.length - 5 : 100}%`,
           offset: 0,
         }))
+        .concat(...[{
+          title: {
+            enabled: false,
+            text: "minPoint",
+          },
+          opposite: false,
+          top: "0px",
+          height: "0px",
+          offset: 0,
+        },
+        {
+          title: {
+            enabled: false,
+            text: "maxPoint",
+          },
+          opposite: false,
+          top: "0px",
+          height: "0px",
+          offset: 0,
+        }
+      ])
       : selectedMeasures.map((measure, idx) => ({
           title: {
             enabled: false,
@@ -463,7 +484,28 @@ export const Chart = () => {
           top: '0%',
           height: '100%',
           offset: undefined,
-        }));
+        }))
+        .concat(...[{
+          title: {
+            enabled: false,
+            text: "minPoint",
+          },
+          opposite: false,
+          top: '0%',
+          height: '100%',
+          offset: undefined,
+        },
+        {
+          title: {
+            enabled: false,
+            text: "maxPoint",
+          },
+          opposite: false,
+          top: '0%',
+          height: '100%',
+          offset: undefined,
+        }
+      ]);
     if (secondaryData) {
       const sz = yAxisData.length;
       const percent = Math.floor(90 / sz);
@@ -624,13 +666,48 @@ export const Chart = () => {
               },
               split: true,
             },
-            series: [...computeChartData(), ...forecastChartData, ...compareChartData],
+            series: [...computeChartData(), ...forecastChartData, ...compareChartData, 
+              {
+              type: "line",
+              data: [
+                {
+                  x: dataset.timeRange.from,
+                  y: 0
+                }
+              ],
+              name: "minPoint",
+              color: "transparent",
+              yAxis: changeChart ? selectedMeasures.length : 0,
+              zoneAxis: 'x',
+              enableMouseTracking: false,
+              showInLegend: false
+            },
+            {
+              type: "line",
+              data: [
+                {
+                  x: dataset.timeRange.to,
+                  y: 0
+                }
+              ],
+              name: "maxPoint",
+              color: "transparent",
+              yAxis: changeChart ? selectedMeasures.length + 1: 0,
+              zoneAxis: 'x',
+              enableMouseTracking: false,
+              showInLegend: false
+            }
+          ],
             chart: {
               type: chartType,
               marginTop: 10,
               plotBorderWidth: 0,
               backgroundColor: !activeTool ? null : 'rgba(0,0,0, 0.05)',
               zoomType: customChangepointsEnabled ? 'x' : false,
+              panning: {
+                enabled: true,
+                type: "x"
+              },
               events: {
                 plotBackgroundColor: 'rgba(10,0,0,0)', // dummy color, to create an element
                 load: chartFunctions,
@@ -640,7 +717,7 @@ export const Chart = () => {
             xAxis: {
               ordinal: false,
               type: 'datetime',
-              plotBands: [...manualPlotBands, ...detectedPlotBands, ...customPlotBands, ...alertingPlotBands],
+              plotBands: [...manualPlotBands, ...detectedPlotBands, ...customPlotBands, ...alertingPlotBands]
             },
             yAxis: computeYAxisData(),
             rangeSelector: {
