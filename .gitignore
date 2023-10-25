@@ -76,7 +76,6 @@ out/
 ######################
 /log/
 /target/
-/grpc-files/target
 
 ######################
 # Gradle
@@ -150,8 +149,3 @@ Desktop.ini
 package-lock.json
 package-lock.json
 *.zip
-
-######################
-# GRPC-FORECASTING
-######################
-/grpc-files/target
