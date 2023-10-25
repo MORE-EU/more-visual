@@ -9,12 +9,14 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import CustomMeasureButton from "app/modules/visualizer/vis-control/measures/custom-measure-button";
+import CustomMeasureModal from "app/modules/visualizer/vis-control/measures/custom-measure-modal";
+import VisMeasuresList from "app/modules/visualizer/vis-control/measures/vis-measures-list";
+import Box from "@mui/material/Box";
 
 export const VisMeasures = () => {
   const { dataset, selectedMeasures, measureColors } = useAppSelector(state => state.visualizer);
-  const [dragOverId, setDragOverId] = useState();
-  const [isDraggable, setIsDraggable] = useState(true);
+  const [isCustomMeasureDialogOpen, setCustomMeasureDialogOpen] = useState(false);
 
   const dispatch = useAppDispatch();
 
@@ -38,25 +40,41 @@ export const VisMeasures = () => {
   const shownMeasures = dataset.header.filter(function (value, index) {
     return indexes.indexOf(index) == -1;
   });
+
+
+  const handleCustomMeasureClick = () => {
+    // Open the custom measure dialog
+    setCustomMeasureDialogOpen(true);
+  };
+
+  const handleCustomMeasureModalClose = () => {
+    // Close the custom measure dialog
+    setCustomMeasureDialogOpen(false);
+  };
   return (
     <Grid sx={{ height: '100%', width: '100%' }}>
       <Typography variant="h6" gutterBottom>
         Measures
       </Typography>
-      <Tooltip title={selectedMeasures.length === 6 ? 'You can only view up to 6 measures at a time' : ''}>
-        <Autocomplete
-          filterSelectedOptions
-          id="combo-box-demo"
-          options={shownMeasures}
-          value={null}
-          disabled={selectedMeasures.length === 6}
-          blurOnSelect={true}
-          sx={{ width: '100%' }}
-          onChange={handleAddMeasure}
-          renderInput={params => <TextField {...params} label={'Add Measure'} />}
-        />
-      </Tooltip>
-
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'left',
+          alignItems: 'center',
+          p:0,
+        }}
+      >
+        <Tooltip title={selectedMeasures.length === 6 ? 'You can only view up to 6 measures at a time' : ''}>
+          <VisMeasuresList width={"80%"}
+                           value = {null}
+                           onChange={handleAddMeasure}
+                           options={shownMeasures}
+                           disabled={selectedMeasures.length === 6}/>
+        </Tooltip>
+        <CustomMeasureButton onClick={handleCustomMeasureClick} />
+        <CustomMeasureModal open={isCustomMeasureDialogOpen} onClose={handleCustomMeasureModalClose} />
+      </Box>
       <List dense
             sx={{ width: '100%', maxWidth: 360, mb: 3 }}>
             {selectedMeasures.map(col => {

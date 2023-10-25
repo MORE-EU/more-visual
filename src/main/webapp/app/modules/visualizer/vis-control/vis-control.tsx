@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch } from '../../store/storeConfig';
 import { resetChartValues } from '../../store/visualizerSlice';
-import VisMeasures from 'app/modules/visualizer/vis-control/vis-control-measures';
+import VisMeasures from 'app/modules/visualizer/vis-control/measures/vis-control-measures';
 import VisToolkit from './vis-control-toolkit';
 import VisControlDatasets from './vis-control-datasets';
 import Grid from '@mui/material/Grid';
