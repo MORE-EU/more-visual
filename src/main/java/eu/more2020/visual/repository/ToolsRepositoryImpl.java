@@ -360,12 +360,9 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
      public List<Changepoint> patternDetection(PatternDetection patternDetection){
          try {
              log.info(String.valueOf(patternDetection));
-              FrechetRequest request = FrechetRequest.newBuilder()
- //                .setDatasetId(patternDetection.getDatasetId())
+              FrechetCalculatorRequest request = FrechetCalculatorRequest.newBuilder()
                   .setStartDate(DateTimeUtil.formatTimeStamp(formatter,patternDetection.getRange().getFrom()))
- //                 .setColumn(patternDetection.getMeasure())
                   .setEndDate(DateTimeUtil.formatTimeStamp(formatter,patternDetection.getRange().getTo()))
- //                 .setW(1)
                   .setR(1)
                  .build();
 
@@ -379,7 +376,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
              DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
 
              // Invoke the remote method on the target server
-             FrechetResponse response = stub.frechet(request);
+             FrechetCalculatorResponse response = stub.frechetCalculator(request);
 
              // Convert the response to JSON string
              String json = response.getResult();
