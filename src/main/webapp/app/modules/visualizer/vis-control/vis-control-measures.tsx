@@ -1,5 +1,5 @@
 import List from '@mui/material/List';
-import React from 'react';
+import React, {useState} from 'react';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { updateSelectedMeasures } from 'app/modules/store/visualizerSlice';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -9,8 +9,13 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
 export const VisMeasures = () => {
   const { dataset, selectedMeasures, measureColors } = useAppSelector(state => state.visualizer);
+  const [dragOverId, setDragOverId] = useState();
+  const [isDraggable, setIsDraggable] = useState(true);
+
   const dispatch = useAppDispatch();
 
   const handleDelete = col => () => {
@@ -29,13 +34,10 @@ export const VisMeasures = () => {
     }
   };
 
-  let indexes = [...selectedMeasures, dataset.timeCol];
-  let shownMeasures = [...dataset.header];
-  shownMeasures = shownMeasures.filter(element => element !== dataset.timeCol);
-  shownMeasures = shownMeasures.filter(function (value, index) {
+  let indexes = [...selectedMeasures, dataset.header.indexOf(dataset.timeCol)];
+  const shownMeasures = dataset.header.filter(function (value, index) {
     return indexes.indexOf(index) == -1;
   });
-
   return (
     <Grid sx={{ height: '100%', width: '100%' }}>
       <Typography variant="h6" gutterBottom>
@@ -54,25 +56,28 @@ export const VisMeasures = () => {
           renderInput={params => <TextField {...params} label={'Add Measure'} />}
         />
       </Tooltip>
-      <List dense sx={{ width: '100%', maxWidth: 360, mb: 3 }}>
-        {selectedMeasures.map(col => {
-          const labelId = `checkbox-list-secondary-label-${col}`;
-          return (
-            <Chip
-              label={dataset.header[col]}
-              key={labelId}
-              sx={{ bgcolor: measureColors[col], color: 'white', m: 0.5 }}
-              variant="outlined"
-              deleteIcon={
-                <Tooltip title={selectedMeasures.length === 1 ? 'Cannot remove last measure' : ''}>
-                  <HighlightOffIcon style={{ color: 'white' }} />
-                </Tooltip>
-              }
-              onDelete={handleDelete(col)}
-            />
-          );
-        })}
+
+      <List dense
+            sx={{ width: '100%', maxWidth: 360, mb: 3 }}>
+            {selectedMeasures.map(col => {
+                const labelId = `checkbox-list-secondary-label-${col}`;
+                return (
+                <Chip
+                  label={dataset.header[col]}
+                  key={labelId}
+                  sx={{bgcolor: measureColors[col], color: 'white', m: 0.5}}
+                  variant="outlined"
+                  deleteIcon={
+                    <Tooltip title={selectedMeasures.length === 1 ? 'Cannot remove last measure' : ''}>
+                      <HighlightOffIcon style={{color: 'white'}}/>
+                    </Tooltip>
+                  }
+                  onDelete={handleDelete(col)}
+                />
+                );}
+            )}
       </List>
+
     </Grid>
   );
 };

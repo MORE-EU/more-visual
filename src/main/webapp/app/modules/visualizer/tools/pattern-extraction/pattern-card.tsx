@@ -106,13 +106,6 @@ const PatternCard = (props: IPatternCardProps) => {
                     onChange={onCheckboxChange} />
           {checkForPatterns()  &&
             <>
-              <IconButton
-                sx={{ width: '20%' }}
-                onClick={() => handleResetSearchPattern()}
-                disabled={!checkForPatterns()} // Disable when search is not applied for this pattern
-              >
-              <RefreshIcon />
-            </IconButton>
             <IconButton
               sx={{ width: '20%' }}
               onClick={() => handleSavePattern()}
@@ -134,7 +127,7 @@ const PatternCard = (props: IPatternCardProps) => {
               <TableCell align="center"></TableCell>
               <TableCell align="center">FROM</TableCell>
               <TableCell align="center">TO</TableCell>
-              <TableCell align="center">{farmMeta.resType == 0 ? "SOILING RATIO" : "YAW ANGLE   "}</TableCell>
+              {/*<TableCell align="center">{farmMeta.resType == 0 ? "SOILING RATIO" : "YAW ANGLE   "}</TableCell>*/}
               <TableCell align="center">SHOW</TableCell>
               <TableCell align="center"></TableCell>
         </TableRow>
