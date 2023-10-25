@@ -6,23 +6,18 @@ import HighchartsMore from 'highcharts/highcharts-more';
 import annotationsAdvanced from 'highcharts/modules/annotations-advanced';
 import { useScrollBlock } from 'app/shared/util/useScrollBlock';
 import { ITimeRange } from 'app/shared/model/time-range.model';
-import moment from 'moment';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import {
   updateChartRef,
   updateCompareQueryResults,
   updateFrom,
   updateQueryResults,
-  updateResampleFreq,
   updateTo,
   applyChangepointDetection,
   toggleCustomChangepoints,
   applyDeviationDetection,
-  liveDataImplementation,
   applyYawMisalignmentDetection,
   updateAlertResults,
-  setAlertingPreview,
-  setAlertingPlotMode,
   updateCustomChangepoints
 } from 'app/modules/store/visualizerSlice';
 import { ChartPlotBands } from 'app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands';
@@ -69,24 +64,6 @@ export const Chart = () => {
   const isSoilingEnabled = useRef(soilingEnabled);
   const isYawMisalignmentEnabled = useRef(yawMisalignmentEnabled);
   const isChangepointDetectionEnabled = useRef(changepointDetectionEnabled);
-
-  // Color Zones For Patterns
-  // useEffect(() => {
-  //   const newZones =
-  //     patterns !== null &&
-  //     []
-  //       .concat(
-  //         ...patterns.patternGroups.map(patternGroup => {
-  //           return [].concat(
-  //             ...patternGroup.patterns.map(pattern => {
-  //               return [{ value: pattern.start }, { value: pattern.end, color: patternGroup.color }];
-  //             })
-  //           );
-  //         })
-  //       )
-  //       .sort((a, b) => a.value.getTime() - b.value.getTime());
-  //   setZones(newZones);
-  // }, [patterns]);
 
   //change zones if forecasting is activated and both start & end date is set
   const getZones = color => {
@@ -261,65 +238,48 @@ export const Chart = () => {
       Highcharts.removeEvent(chart.current.container, 'click');
     });
 
-    const fetchData = (leftSide: number, rightSide: number) => {
+    const fetchData = () => {
+      const { max, min } = chart.current.xAxis[0].getExtremes();
       chart.current.showLoading();
       dispatch(
         updateQueryResults({
           folder: latestFolder.current,
           id: latestDatasetId.current,
-          from: leftSide,
-          to: rightSide,
+          from: min,
+          to: max,
           selectedMeasures: latestMeasures.current,
           filter: latestFilter.current,
         })
       );
-      dispatch(updateFrom(leftSide));
-      dispatch(updateTo(rightSide));
+      dispatch(updateFrom(min));
+      dispatch(updateTo(max));
       if (latestCompare.current.length !== 0)
         dispatch(
           updateCompareQueryResults({
             folder: latestFolder.current,
             id: latestCompare.current,
-            from: leftSide,
-            to: rightSide,
+            from: min,
+            to: max,
             selectedMeasures: latestMeasures.current,
             filter: latestFilter.current,
           })
         );
-      latestLeftSide.current = leftSide;
-      latestRightSide.current = rightSide;
       if (isChangepointDetectionEnabled.current)
-        dispatch(applyChangepointDetection({ id: latestDatasetId.current, from: leftSide, to: rightSide })).then(res => {
+        dispatch(applyChangepointDetection({ id: latestDatasetId.current, from: min, to: max })).then(res => {
           if (isSoilingEnabled.current)
             dispatch(
               applyDeviationDetection({
                 id: latestDatasetId.current,
                 weeks: latestSoilingWeeks.current,
-                from: leftSide,
-                to: rightSide,
+                from: min,
+                to: max,
                 type: soilingType,
                 changepoints: filterChangepoints(res.payload, detectedChangepointFilter),
               })
             );
         });
       if (isYawMisalignmentEnabled.current)
-        dispatch(applyYawMisalignmentDetection({ id: latestDatasetId.current, from: leftSide, to: rightSide }));
-    };
-
-    const checkForData = (min: number, max: number) => {
-      const leftSide = min;
-      const rightSide = max;
-      latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
-      latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
-      if (leftSide !== latestLeftSide.current || rightSide !== latestRightSide.current) {
-        fetchData(leftSide, rightSide);
-      }
-    };
-
-
-    const checkForDataOnAction = () => {
-      const { max, min } = chart.current.xAxis[0].getExtremes();
-      checkForData(min, max);
+        dispatch(applyYawMisalignmentDetection({ id: latestDatasetId.current, from: min, to: max }));
     };
 
     const handleEventTimeout = (event) => {
@@ -332,7 +292,7 @@ export const Chart = () => {
       fetchDataRef.current = { ...fetchDataRef.current,
         scrollTimeout: setTimeout(() => {
           fetchDataRef.current = { ...fetchDataRef.current, isScrolling: false };
-          checkForDataOnAction();
+          fetchData();
         }, 500),
       };
     };
@@ -340,14 +300,15 @@ export const Chart = () => {
     // CHART: ZOOM FUNCTION
     Highcharts.addEvent(chart.current.container, 'wheel', (event: WheelEvent) => {
       const p = chart.current.xAxis[0].toValue(chart.current.pointer.normalize(event).chartX);
-      const { min, max } = chart.current.xAxis[0].getExtremes();
+      const { min, max, dataMax, dataMin } = chart.current.xAxis[0].getExtremes();
       const stepleft = (p - min) * 0.25;
       const stepright = (max - p) * 0.25;
       if (!chart.current.loadingShown) {
         if (event.deltaY < 0 && max - min > 10000) {
           // in, 10000 is the max range on a zoom level
           chart.current.xAxis[0].setExtremes(min + stepleft, max - stepright, true, false);
-        } else if (event.deltaY > 0) {
+          handleEventTimeout(event);
+        } else if (event.deltaY > 0 && (max - min) < (dataset.timeRange.to - dataset.timeRange.from)) {
           // out
           chart.current.xAxis[0].setExtremes(
             Math.max(min - stepleft, dataset.timeRange.from),
@@ -355,17 +316,10 @@ export const Chart = () => {
             true,
             false
           );
+          handleEventTimeout(event);
         }
-        handleEventTimeout(event);
       }
     });
-
-    const renderLabelForLiveData = () => {
-      const { max } = chart.current.xAxis[0].getExtremes();
-      if (max >= data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp) {
-        toast('Live Data Mode');
-      }
-    };
 
     // CHART: PAN FUNCTION
     Highcharts.addEvent(chart.current.container, 'mouseup', (event: MouseEvent) => {
@@ -414,6 +368,35 @@ export const Chart = () => {
     }
   };
 
+  // Required for pan to work
+  const dummyPointCreator = (text, top, height) => ({
+    title: {
+      enabled: false,
+      text,
+    },
+    opposite: false,
+    top,
+    height,
+    offset: 0,
+  })
+  
+  // Required for pan to work
+  const dummySeriesCreator = (name, x, idx) => ({
+    type: "line",
+    data: [
+      {
+        x,
+        y: 0
+      }
+    ],
+    name,
+    color: "transparent",
+    yAxis: changeChart ? selectedMeasures.length + idx : 0,
+    zoneAxis: 'x',
+    enableMouseTracking: false,
+    showInLegend: false
+  })
+
   const computeChartData = () => {
     let chartData =
       data !== null
@@ -454,27 +437,7 @@ export const Chart = () => {
           height: `${selectedMeasures.length > 1 ? 100 / selectedMeasures.length - 5 : 100}%`,
           offset: 0,
         }))
-        .concat(...[{
-          title: {
-            enabled: false,
-            text: "minPoint",
-          },
-          opposite: false,
-          top: "0px",
-          height: "0px",
-          offset: 0,
-        },
-        {
-          title: {
-            enabled: false,
-            text: "maxPoint",
-          },
-          opposite: false,
-          top: "0px",
-          height: "0px",
-          offset: 0,
-        }
-      ])
+        .concat(...[dummyPointCreator("minPoint", "0px", "0px"), dummyPointCreator("maxPoint", "0px", "0px")])
       : selectedMeasures.map((measure, idx) => ({
           title: {
             enabled: false,
@@ -485,27 +448,7 @@ export const Chart = () => {
           height: '100%',
           offset: undefined,
         }))
-        .concat(...[{
-          title: {
-            enabled: false,
-            text: "minPoint",
-          },
-          opposite: false,
-          top: '0%',
-          height: '100%',
-          offset: undefined,
-        },
-        {
-          title: {
-            enabled: false,
-            text: "maxPoint",
-          },
-          opposite: false,
-          top: '0%',
-          height: '100%',
-          offset: undefined,
-        }
-      ]);
+        .concat(...[dummyPointCreator("minPoint", "0%", "100%"), dummyPointCreator("maxPoint", "0%", "100%")]);
     if (secondaryData) {
       const sz = yAxisData.length;
       const percent = Math.floor(90 / sz);
@@ -546,12 +489,15 @@ export const Chart = () => {
           name: 'Forecasted ' + dataset.header[measure],
           yAxis: changeChart ? index : 0,
           zoneAxis: 'x',
+          color: "black",
+          showInLegend: true,
+          enableMouseTracking: true,
           zones,
         }))
       : [];
 
-  const compareChartData =
-    compareData !== null && compare.length !== 0
+  const compareChartData = () => {
+    return compareData !== null && compare.length !== 0
       ?
       [
         ...[].concat(
@@ -563,12 +509,15 @@ export const Chart = () => {
                 }) : [],
                 name: dataset.header[measure] + ' ' + compare[idx],
                 yAxis: changeChart ? index : 0,
+                color: "black",
+                showInLegend: true,
+                enableMouseTracking: true,
                 zoneAxis: 'x',
                 zones,
               }))
           )
       ),]
-      : [];
+      : []};
 
   const handleMouseOverChart = () => {
     blockScroll();
@@ -666,37 +615,9 @@ export const Chart = () => {
               },
               split: true,
             },
-            series: [...computeChartData(), ...forecastChartData, ...compareChartData, 
-              {
-              type: "line",
-              data: [
-                {
-                  x: dataset.timeRange.from,
-                  y: 0
-                }
-              ],
-              name: "minPoint",
-              color: "transparent",
-              yAxis: changeChart ? selectedMeasures.length : 0,
-              zoneAxis: 'x',
-              enableMouseTracking: false,
-              showInLegend: false
-            },
-            {
-              type: "line",
-              data: [
-                {
-                  x: dataset.timeRange.to,
-                  y: 0
-                }
-              ],
-              name: "maxPoint",
-              color: "transparent",
-              yAxis: changeChart ? selectedMeasures.length + 1: 0,
-              zoneAxis: 'x',
-              enableMouseTracking: false,
-              showInLegend: false
-            }
+            series: [...computeChartData(), ...forecastChartData, ...compareChartData(), 
+              dummySeriesCreator("minPoint",dataset.timeRange.from, 0),
+              dummySeriesCreator("maxPoint", dataset.timeRange.to, 1)
           ],
             chart: {
               type: chartType,
