@@ -69,14 +69,14 @@ const Header = props => {
           <HomeIcon sx={{ mr: 0.5 }} fontSize='medium' />
           Home
         </Link>
-        <Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`/visualize`}>
+        {farmMeta && (<Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`/visualize`}>
           {farmMeta.name}
-        </Link>
-        <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
+        </Link>)}
+        {farmMeta && (<Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
           {farmMeta.data[datasetChoice].name}
-        </Typography>
+        </Typography>)}
       </Breadcrumbs>
-      <Chip label={getSelectedConnection()}
+      <Chip label={farmMeta && getSelectedConnection()}
             color="primary" sx={{ width: '6rem' }}
       // onClick={handleClick}
       />

@@ -118,7 +118,7 @@ const initialState = {
   ...checkConnectionInitialState
 };
 
-export const checkConnection = createAsyncThunk('checkConnection', async (bdConfig: { url: string; port: string }) => {
+export const checkConnection = createAsyncThunk('checkConnection', async (bdConfig: { host: string; port: string; username: string; password: string }) => {
   try {
   const response = await axios.post(`api/datasets/checkConnection`, bdConfig).then(res => res);
   return response;
