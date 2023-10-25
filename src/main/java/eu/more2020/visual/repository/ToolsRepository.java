@@ -5,6 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import eu.more2020.visual.domain.*;
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
+import eu.more2020.visual.domain.Detection.PatternDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.middleware.domain.ImmutableDataPoint;
 
@@ -26,6 +27,8 @@ public interface ToolsRepository {
     List<ImmutableDataPoint> soilingDetection(DeviationDetection deviationDetection);
 
     List<ImmutableDataPoint> yawMisalignmentDetection(RangeDetection rangeDetection);
+
+    List<Changepoint> patternDetection(PatternDetection patternDetection);
 
     // List<Changepoint> patternDetection(PatternDetection patternDetection);
 
