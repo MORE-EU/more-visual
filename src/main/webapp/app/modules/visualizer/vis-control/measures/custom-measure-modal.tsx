@@ -7,12 +7,12 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import VisMeasuresList from "app/modules/visualizer/vis-control/measures/vis-measures-list";
-import {updateCustomSelectedMeasures} from "app/modules/store/visualizerSlice";
+import {updateCustomSelectedMeasures, updateQueryResults} from "app/modules/store/visualizerSlice";
 
 const CustomMeasureModal = ({ open, onClose }) => {
   const [selectedMeasure1, setSelectedMeasure1] = useState('');
   const [selectedMeasure2, setSelectedMeasure2] = useState('');
-  const { dataset, customSelectedMeasures } = useAppSelector(state => state.visualizer);
+  const { dataset, folder, from, to, selectedMeasures, filter, customSelectedMeasures } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   let indexes = [dataset.header.indexOf(dataset.timeCol)];
@@ -49,6 +49,11 @@ const CustomMeasureModal = ({ open, onClose }) => {
     const id1 = dataset.header.indexOf(selectedMeasure1);
     const id2 = dataset.header.indexOf(selectedMeasure2);
     dispatch(updateCustomSelectedMeasures([...customSelectedMeasures, {measure1: id1, measure2: id2}]));
+    dispatch(
+      updateQueryResults({ folder, id: dataset.id,
+        from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
+        to: to ? to : dataset.timeRange.to, selectedMeasures, filter })
+    );
     // Close the modal
     onClose();
   };

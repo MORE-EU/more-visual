@@ -397,6 +397,19 @@ export const Chart = () => {
     showInLegend: false
   })
 
+  function normalizeData(array) {
+    const max = Math.max(...array.map(item => item.value));
+    return array.map(item => ({ timestamp: item.timestamp, value: item.value / max }));
+  }
+
+  // used for custom measure creation
+  const combineData = (data1, data2) => {
+    // Normalize both arrays
+    const normalizedData1 = normalizeData(data1);
+    const normalizedData2 = normalizeData(data2);
+    return normalizedData1.map((item, index) => (
+      [item.timestamp, item.value / normalizedData2[index].value]));
+  }
   const computeChartData = () => {
     let chartData =
       data !== null
@@ -414,10 +427,7 @@ export const Chart = () => {
             enableMouseTracking: true
           })).concat(
             customSelectedMeasures.map((customMeasure, index) => ({
-              data: data[customMeasure.measure1] ? data[customMeasure.measure1].map(d => {
-                const val = d.value;
-                return [d.timestamp, isNaN(val) ? null : val]
-              }) : [],
+              data: (data[customMeasure.measure1] && data[customMeasure.measure2]) ? combineData(data[customMeasure.measure1], data[customMeasure.measure2]) : [],
               name: dataset.header[customMeasure.measure1] + "/" + dataset.header[customMeasure.measure2],
               color: measureColors[customMeasure.measure1],
               yAxis: changeChart ? index + selectedMeasures.length : 0,
