@@ -1,12 +1,10 @@
 import List from '@mui/material/List';
 import React, {useState} from 'react';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { updateSelectedMeasures } from 'app/modules/store/visualizerSlice';
+import {updateCustomSelectedMeasures, updateSelectedMeasures} from 'app/modules/store/visualizerSlice';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import CustomMeasureButton from "app/modules/visualizer/vis-control/measures/custom-measure-button";
@@ -15,7 +13,7 @@ import VisMeasuresList from "app/modules/visualizer/vis-control/measures/vis-mea
 import Box from "@mui/material/Box";
 
 export const VisMeasures = () => {
-  const { dataset, selectedMeasures, measureColors } = useAppSelector(state => state.visualizer);
+  const { dataset, selectedMeasures, customSelectedMeasures, measureColors } = useAppSelector(state => state.visualizer);
   const [isCustomMeasureDialogOpen, setCustomMeasureDialogOpen] = useState(false);
 
   const dispatch = useAppDispatch();
@@ -25,6 +23,13 @@ export const VisMeasures = () => {
     let newSelectedMeasures = [...selectedMeasures];
     newSelectedMeasures.splice(newSelectedMeasures.indexOf(col), 1);
     dispatch(updateSelectedMeasures(newSelectedMeasures));
+  };
+
+  const handleCustomMeasureDelete = customMeasure => () => {
+    let newCustomSelectedMeasures = [...customSelectedMeasures];
+    newCustomSelectedMeasures = newCustomSelectedMeasures.filter(obj => obj.measure1 !== customMeasure.measure1
+    || obj.measure2 !== customMeasure.measure2);
+    dispatch(updateCustomSelectedMeasures(newCustomSelectedMeasures));
   };
 
   const handleAddMeasure = (event, value) => {
@@ -77,25 +82,42 @@ export const VisMeasures = () => {
       </Box>
       <List dense
             sx={{ width: '100%', maxWidth: 360, mb: 3 }}>
-            {selectedMeasures.map(col => {
-                const labelId = `checkbox-list-secondary-label-${col}`;
-                return (
-                <Chip
-                  label={dataset.header[col]}
-                  key={labelId}
-                  sx={{bgcolor: measureColors[col], color: 'white', m: 0.5}}
-                  variant="outlined"
-                  deleteIcon={
-                    <Tooltip title={selectedMeasures.length === 1 ? 'Cannot remove last measure' : ''}>
-                      <HighlightOffIcon style={{color: 'white'}}/>
-                    </Tooltip>
-                  }
-                  onDelete={handleDelete(col)}
-                />
-                );}
-            )}
+        {selectedMeasures.map(col => {
+            const labelId = `checkbox-list-secondary-label-${col}`;
+            return (
+              <Chip
+                label={dataset.header[col]}
+                key={labelId}
+                sx={{bgcolor: measureColors[col], color: 'white', m: 0.5}}
+                variant="outlined"
+                deleteIcon={
+                  <Tooltip title={selectedMeasures.length === 1 ? 'Cannot remove last measure' : ''}>
+                    <HighlightOffIcon style={{color: 'white'}}/>
+                  </Tooltip>
+                }
+                onDelete={handleDelete(col)}
+              />
+            );
+          }
+        ).concat(customSelectedMeasures.map(customMeasure => {
+          const labelId = `custom-checkbox-list-secondary-label-${customMeasure.measure1 - customMeasure.measure2}`;
+          return (
+            <Chip
+              label={dataset.header[customMeasure.measure1] + "/" + dataset.header[customMeasure.measure2]}
+              key={labelId}
+              sx={{bgcolor: measureColors[customMeasure.measure1], color: 'white', m: 0.5}}
+              variant="outlined"
+              deleteIcon={
+                <Tooltip title=''>
+                  <HighlightOffIcon style={{color: 'white'}}/>
+                </Tooltip>
+              }
+              onDelete={handleCustomMeasureDelete(customMeasure)}
+            />
+          );
+        }))
+        }
       </List>
-
     </Grid>
   );
 };

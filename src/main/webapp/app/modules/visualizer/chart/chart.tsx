@@ -31,7 +31,7 @@ HighchartsMore(Highcharts);
 annotationsAdvanced(Highcharts);
 
 export const Chart = () => {
-  const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,measureColors,queryResultsLoading,filter, customChangepoints,
+  const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,customSelectedMeasures,measureColors,queryResultsLoading,filter, customChangepoints,
     queryResults,changeChart,compare,changepointDetectionEnabled,detectedChangepointFilter,customChangepointsEnabled,data,compareData,
     forecastData,soilingEnabled,soilingType,alertingPlotMode,alertResults,forecastingDataSplit,soilingWeeks,yawMisalignmentEnabled,secondaryData,chartType,
     liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate} = useAppSelector(state => state.visualizer);
@@ -286,9 +286,9 @@ export const Chart = () => {
       if (fetchDataRef.current.scrollTimeout) {
         clearTimeout(fetchDataRef.current.scrollTimeout);
       }
-  
+
       fetchDataRef.current = { ...fetchDataRef.current, isScrolling: true };
-  
+
       fetchDataRef.current = { ...fetchDataRef.current,
         scrollTimeout: setTimeout(() => {
           fetchDataRef.current = { ...fetchDataRef.current, isScrolling: false };
@@ -379,7 +379,7 @@ export const Chart = () => {
     height,
     offset: 0,
   })
-  
+
   // Required for pan to work
   const dummySeriesCreator = (name, x, idx) => ({
     type: "line",
@@ -412,7 +412,21 @@ export const Chart = () => {
             zones: getZones(measureColors[measure]),
             showInLegend: true,
             enableMouseTracking: true
-          }))
+          })).concat(
+            customSelectedMeasures.map((customMeasure, index) => ({
+              data: data[customMeasure.measure1] ? data[customMeasure.measure1].map(d => {
+                const val = d.value;
+                return [d.timestamp, isNaN(val) ? null : val]
+              }) : [],
+              name: dataset.header[customMeasure.measure1] + "/" + dataset.header[customMeasure.measure2],
+              color: measureColors[customMeasure.measure1],
+              yAxis: changeChart ? index + selectedMeasures.length : 0,
+              zoneAxis: 'x',
+              zones: getZones(measureColors[customMeasure.measure1]),
+              showInLegend: true,
+              enableMouseTracking: true
+            }))
+          )
         : [];
     if (secondaryData) {
       const sz = chartData !== null ? chartData.length : 0;
@@ -422,10 +436,12 @@ export const Chart = () => {
       });// @ts-ignore
       chartData = [...chartData, { data: sData, yAxis: sz, name: getSecondaryText() }];
     }
+    console.log(chartData);
     return chartData;
   };
 
   const computeYAxisData = () => {
+    const allMeasuresLength = selectedMeasures.length + customSelectedMeasures.length;
     let yAxisData = changeChart
       ? selectedMeasures.map((measure, idx) => ({
           title: {
@@ -433,10 +449,22 @@ export const Chart = () => {
             text: dataset.header[measure],
           },
           opposite: false,
-          top: `${(100 / selectedMeasures.length) * idx}%`,
-          height: `${selectedMeasures.length > 1 ? 100 / selectedMeasures.length - 5 : 100}%`,
+          top: `${(100 / allMeasuresLength) * idx}%`,
+          height: `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%`,
           offset: 0,
         }))
+        .concat(
+          customSelectedMeasures.map((customMeasure, idx) => ({
+            title: {
+              enabled: true,
+              text: dataset.header[customMeasure.measure1] + "/" + dataset.header[customMeasure.measure2],
+            },
+            opposite: false,
+            top: `${(100 / allMeasuresLength) * (idx + selectedMeasures.length)}%`,
+            height: `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%`,
+            offset: 0,
+            }))
+        )
         .concat(...[dummyPointCreator("minPoint", "0px", "0px"), dummyPointCreator("maxPoint", "0px", "0px")])
       : selectedMeasures.map((measure, idx) => ({
           title: {
@@ -615,7 +643,7 @@ export const Chart = () => {
               },
               split: true,
             },
-            series: [...computeChartData(), ...forecastChartData, ...compareChartData(), 
+            series: [...computeChartData(), ...forecastChartData, ...compareChartData(),
               dummySeriesCreator("minPoint",dataset.timeRange.from, 0),
               dummySeriesCreator("maxPoint", dataset.timeRange.to, 1)
           ],

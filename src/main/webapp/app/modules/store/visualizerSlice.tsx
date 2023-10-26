@@ -5,7 +5,7 @@ import { IDataPoint } from 'app/shared/model/data-point.model';
 import { IFarmMeta } from 'app/shared/model/farmMeta.model';
 import { IQueryResults } from 'app/shared/model/query-results.model';
 import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
-import {ICustomMeasures} from "app/shared/model/custom-measures.model";
+import {ICustomMeasure} from "app/shared/model/custom-measures.model";
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import axios from 'axios';
 import moment, { Moment } from 'moment';
@@ -70,7 +70,7 @@ const initialState = {
   liveDataImplLoading: false,
   queryResultsLoading: true,
   selectedMeasures: [],
-  customSelectedMeasures: null as ICustomMeasures[],
+  customSelectedMeasures: [] as ICustomMeasure[],
   measureColors: [],
   from: null as number,
   to: null as number,
@@ -171,6 +171,20 @@ export const deleteAlert = createAsyncThunk('deleteAlert', async (alertName: Str
   return response;
 });
 
+
+const concatenateAndSortDistinctArrays = (array1: number[], array2: number[]) => {
+  // Concatenate the two arrays
+  const combinedArray = array1.concat(array2);
+  // Create a new Set to store only distinct values
+  const uniqueValues = new Set<number>(combinedArray);
+  // Convert the Set back to an array
+  const distinctArray = Array.from(uniqueValues);
+  // Sort the distinct array numerically
+  distinctArray.sort((a, b) => a - b);
+  return distinctArray;
+}
+
+
 export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
   async (data: {
@@ -180,15 +194,20 @@ export const updateQueryResults = createAsyncThunk(
     to: number;
     selectedMeasures: any[];
     filter?: {};
-  }) => {
+  }, {getState}) => {
     const { folder, id, from, to, selectedMeasures, filter } = data;
     let query;
+    const state:any = getState();
+    const customSelectedMeasures = [];
+    state.visualizer.customSelectedMeasures
+      .forEach(customMeasure => customSelectedMeasures.push(customMeasure.measure1, customMeasure.measure2));
+    let measures = concatenateAndSortDistinctArrays(selectedMeasures, customSelectedMeasures);
     from !== null && to !== null
       ? (query = {
           from,
           to,
           viewPort: {width: 1000, height: 600},
-          measures: selectedMeasures,
+          measures,
           filter: filter ? filter : null,
         } as IQuery)
       : (query = {range: null});
@@ -318,6 +337,9 @@ const visualizer = createSlice({
     },
     updateSelectedMeasures(state, action) {
       state.selectedMeasures = action.payload.sort((a, b) => a - b);
+    },
+    updateCustomSelectedMeasures(state, action) {
+      state.customSelectedMeasures = action.payload;
     },
     updateFrom(state, action) {
       state.from = action.payload;
@@ -590,7 +612,7 @@ const visualizer = createSlice({
 });
 
 export const {
-  resetChartValues,resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
+  resetChartValues,resetFetchData,updateSelectedMeasures,updateCustomSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
   updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef,
   updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks,
   updateSoilingType,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
