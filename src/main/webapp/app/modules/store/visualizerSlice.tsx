@@ -118,7 +118,16 @@ const initialState = {
   ...checkConnectionInitialState
 };
 
-export const checkConnection = createAsyncThunk('checkConnection', async (bdConfig: { host: string; port: string; username: string; password: string }) => {
+export const connector = createAsyncThunk('connector', async (dbConnector: {host: string, port: string, username: string, password: string}) => {
+  try {
+    const response = await axios.post(`api/connect`, dbConnector).then(res => res);
+    return response;
+  } catch (error) {
+    throw new Error(error.response.data);
+  }
+});
+
+export const checkConnection = createAsyncThunk('checkConnection', async (bdConfig: { url: string; port: string; }) => {
   try {
   const response = await axios.post(`api/datasets/checkConnection`, bdConfig).then(res => res);
   return response;
@@ -476,6 +485,11 @@ const visualizer = createSlice({
       state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
       state.selectedMeasures = [action.payload.data.measures[0]];
     });
+    builder.addCase(connector.fulfilled, (state, action) => {
+      state.checkConnectionLoading = false;
+      state.checkConnectionResponse = action.payload.data;
+      state.checkConnectionError = false;
+    });
     builder.addCase(checkConnection.fulfilled, (state, action) => {
       state.checkConnectionLoading = false;
       state.checkConnectionResponse = action.payload.data;
@@ -543,6 +557,9 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
       state.queryResultsLoading = true;
     });
+    builder.addMatcher(isAnyOf(connector.pending), state => {
+      state.checkConnectionLoading = true;
+    });
     builder.addMatcher(isAnyOf(checkConnection.pending), state => {
       state.checkConnectionLoading = true;
     });
@@ -560,6 +577,12 @@ const visualizer = createSlice({
         state.errorMessage = action.payload;
       }
     );
+    builder.addMatcher(isAnyOf(connector.rejected), (state, action) => {
+      state.checkConnectionLoading = false;
+      state.checkConnectionResponse = action.error.message;
+      state.checkConnectionError = true;
+    });
+
     builder.addMatcher(isAnyOf(checkConnection.rejected), (state, action) => {
       state.checkConnectionLoading = false;
       state.checkConnectionResponse = action.error.message;

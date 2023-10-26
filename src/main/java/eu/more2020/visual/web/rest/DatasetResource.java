@@ -28,6 +28,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -230,5 +231,17 @@ public class DatasetResource {
     public ResponseEntity<String> checkConnection (@RequestBody DbConfig dbConfig) throws URISyntaxException, IOException {
     log.debug("Rest request to connect to DB with url {} and port {}", dbConfig.getUrl(), dbConfig.getPort());
       return datasetRepository.checkConnection(dbConfig.getUrl(), dbConfig.getPort());
+    }
+
+    @PostMapping("/connect")
+    public ResponseEntity<String> connector(@RequestBody DbConnector dbConnector) throws URISyntaxException, IOException {
+        String url = "jdbc:" + dbConnector.getHost() + ":" + dbConnector.getPort() + "/";
+        try{
+        DriverManager.getConnection(url, dbConnector.getUsername(), dbConnector.getPassword());
+        return new ResponseEntity<>("Successfull login", HttpStatus.OK);
+        }
+        catch(Exception e) {
+            return new ResponseEntity<>("Credentials Error", HttpStatus.BAD_REQUEST);
+        }
     }
 }

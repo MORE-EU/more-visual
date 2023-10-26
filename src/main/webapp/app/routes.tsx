@@ -7,7 +7,7 @@ import PageNotFound from 'app/shared/error/page-not-found';
 import Visualizer from "app/modules/visualizer/visualizer";
 import Upload from './modules/upload/upload-farm';
 import Dashboard from './modules/dashboard/farm-dashboard';
-import Connector from './modules/connector/connector';
+// import Connector from './modules/connector/connector';
 import EmptyVisualizer from './modules/visualizer/empty-visualizer';
 
 const Routes = () => (
