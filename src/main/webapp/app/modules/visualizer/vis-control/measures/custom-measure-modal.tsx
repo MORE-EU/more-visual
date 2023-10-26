@@ -4,10 +4,11 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import {useAppSelector} from "app/modules/store/storeConfig";
+import Typography from '@mui/material/Typography';
+import { useAppSelector } from "app/modules/store/storeConfig";
 import VisMeasuresList from "app/modules/visualizer/vis-control/measures/vis-measures-list";
-import {Divider} from "@mui/material";
-import {updateSelectedMeasures} from "app/modules/store/visualizerSlice";
+import { Divider } from "@mui/material";
+import { updateSelectedMeasures } from "app/modules/store/visualizerSlice";
 
 const CustomMeasureModal = ({ open, onClose }) => {
   const [selectedMeasure1, setSelectedMeasure1] = useState('');
@@ -16,7 +17,7 @@ const CustomMeasureModal = ({ open, onClose }) => {
 
   let indexes = [dataset.header.indexOf(dataset.timeCol)];
   const shownMeasures = dataset.header.filter(function (value, index) {
-    return indexes.indexOf(index) == -1;
+    return indexes.indexOf(index) === -1;
   });
 
   const handleSelectedMeasure1 = (event, value) => {
@@ -44,19 +45,34 @@ const CustomMeasureModal = ({ open, onClose }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open}
+            maxWidth="sm" fullWidth={true}
+            onClose={onClose}>
       <DialogTitle>Create Custom Measure</DialogTitle>
       <DialogContent>
         {/* Dropdowns for selecting measures */}
-        <VisMeasuresList width={"100%"}
-                         onChange={handleSelectedMeasure1}
-                         value={selectedMeasure1}
-                         options={shownMeasures} disabled={false} />
-        <VisMeasuresList width={"100%"}
-                         onChange={handleSelectedMeasure2}
-                         value={selectedMeasure2}
-                         options={shownMeasures}
-                         disabled={false} />
+        <Typography variant="subtitle1" color="textSecondary">
+          Select the measures for the ratio:
+        </Typography>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <VisMeasuresList
+            width={"45%"}
+            onChange={handleSelectedMeasure1}
+            value={selectedMeasure1}
+            options={shownMeasures}
+            disabled={false}
+          />
+          <Typography variant="subtitle1" color="textSecondary">
+            ÷
+          </Typography>
+          <VisMeasuresList
+            width={"45%"}
+            onChange={handleSelectedMeasure2}
+            value={selectedMeasure2}
+            options={shownMeasures}
+            disabled={false}
+          />
+        </div>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">

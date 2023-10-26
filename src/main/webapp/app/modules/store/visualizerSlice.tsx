@@ -5,6 +5,7 @@ import { IDataPoint } from 'app/shared/model/data-point.model';
 import { IFarmMeta } from 'app/shared/model/farmMeta.model';
 import { IQueryResults } from 'app/shared/model/query-results.model';
 import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
+import {ICustomMeasures} from "app/shared/model/custom-measures.model";
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import axios from 'axios';
 import moment, { Moment } from 'moment';
@@ -69,6 +70,7 @@ const initialState = {
   liveDataImplLoading: false,
   queryResultsLoading: true,
   selectedMeasures: [],
+  customSelectedMeasures: ICustomMeasures[],
   measureColors: [],
   from: null as number,
   to: null as number,

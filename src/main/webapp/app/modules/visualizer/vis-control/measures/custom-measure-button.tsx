@@ -1,5 +1,5 @@
 import React from 'react';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import TuneIcon from '@mui/icons-material/Tune';
 import IconButton from "@mui/material/IconButton";
 const CustomMeasureButton = ({ onClick }) => {
 
@@ -10,7 +10,7 @@ const CustomMeasureButton = ({ onClick }) => {
       onClick={onClick}
       size="large"
     >
-      <AddCircleOutlineIcon/>
+      <TuneIcon/>
     </IconButton>
   );
 };
