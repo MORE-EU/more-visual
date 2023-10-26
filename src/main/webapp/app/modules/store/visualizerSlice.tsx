@@ -70,7 +70,7 @@ const initialState = {
   liveDataImplLoading: false,
   queryResultsLoading: true,
   selectedMeasures: [],
-  customSelectedMeasures: ICustomMeasures[],
+  customSelectedMeasures: null as ICustomMeasures[],
   measureColors: [],
   from: null as number,
   to: null as number,
