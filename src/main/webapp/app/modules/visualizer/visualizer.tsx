@@ -9,6 +9,7 @@ import { Divider, Grid } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
 import Header from './header/header';
+import VisConnector from './vis-connector/vis-connector';
 
 const mdTheme = createTheme();
 
@@ -20,8 +21,9 @@ export const Visualizer = () => {
   const history = useHistory();
 
   useEffect(() => {
+    if (params.folder !== undefined)
     dispatch(getFarmMeta(params.folder));
-  }, []);
+  }, [params.folder]);
 
   useEffect(() => {
     if (params.id !== undefined) {
@@ -44,8 +46,6 @@ export const Visualizer = () => {
   }, [loadingButton]);
 
   return (
-    dataset &&
-    farmMeta && (
       <div>
         <ThemeProvider theme={mdTheme}>
           <Grid sx={{ height: '100%', width: '100%' }}>
@@ -62,7 +62,7 @@ export const Visualizer = () => {
             >
               <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
                 <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  <VisControl />
+                  {dataset && farmMeta ? <VisControl /> : <VisConnector />}
                 </Paper>
               </Grid>
               <Grid sx={{ width: '80%', p: 1, flexGrow: 1, height: 'calc(100% - 30px)' }}>
@@ -74,14 +74,13 @@ export const Visualizer = () => {
                     height: '100%',
                   }}
                 >
-                  <ChartContainer />
+                  {dataset && farmMeta && <ChartContainer />}
                 </Paper>
               </Grid>
             </Grid>
           </Grid>
         </ThemeProvider>
       </div>
-    )
   );
 };
 

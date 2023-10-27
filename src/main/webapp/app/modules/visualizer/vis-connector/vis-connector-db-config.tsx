@@ -15,7 +15,6 @@ import DBFormInput from "./db-form-input";
 
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
 import { setCheckConnectionResponse } from '../../store/visualizerSlice';
-import { checkConnection } from '../../store/visualizerSlice';
 import { connector } from '../../store/visualizerSlice';
 
 interface IDBForm  {
@@ -44,9 +43,9 @@ const VisConnectorDBConfig = ({closeHandler}) => {
             if (checkConnectionError) {
                 setOpenSnack(true);
                 
-            } else {
+            } else { // to remove
                 setOpenSnack(true);
-                //if success redirect????
+                
             }
         }
     }, [checkConnectionResponse]);
@@ -62,7 +61,7 @@ const VisConnectorDBConfig = ({closeHandler}) => {
     const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
         event.preventDefault();
         dispatch(connector(dbForm));
-        // dispatch(checkConnection({url: dbForm.host, port: dbForm.port}));
+        //if success redirect????
     }
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -81,7 +80,7 @@ const VisConnectorDBConfig = ({closeHandler}) => {
                         <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
                             {checkConnectionResponse}
                         </Alert>
-                    ): (
+                    ): (// to remove 
                         <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
                             {checkConnectionResponse}
                         </Alert>

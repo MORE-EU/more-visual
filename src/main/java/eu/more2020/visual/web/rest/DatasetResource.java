@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.DriverManager;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -236,8 +237,9 @@ public class DatasetResource {
     @PostMapping("/connect")
     public ResponseEntity<String> connector(@RequestBody DbConnector dbConnector) throws URISyntaxException, IOException {
         String url = "jdbc:" + dbConnector.getHost() + ":" + dbConnector.getPort() + "/";
+        Connection con;
         try{
-        DriverManager.getConnection(url, dbConnector.getUsername(), dbConnector.getPassword());
+        con = DriverManager.getConnection(url, dbConnector.getUsername(), dbConnector.getPassword());
         return new ResponseEntity<>("Successfull login", HttpStatus.OK);
         }
         catch(Exception e) {
