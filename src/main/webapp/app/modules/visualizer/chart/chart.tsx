@@ -1,28 +1,28 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import '../visualizer.scss';
 import Highcharts from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsMore from 'highcharts/highcharts-more';
 import annotationsAdvanced from 'highcharts/modules/annotations-advanced';
-import { useScrollBlock } from 'app/shared/util/useScrollBlock';
-import { ITimeRange } from 'app/shared/model/time-range.model';
-import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
+import {useScrollBlock} from 'app/shared/util/useScrollBlock';
+import {ITimeRange} from 'app/shared/model/time-range.model';
+import {useAppDispatch, useAppSelector} from 'app/modules/store/storeConfig';
 import {
-  updateChartRef,
-  updateCompareQueryResults,
-  updateFrom,
-  updateQueryResults,
-  updateTo,
   applyChangepointDetection,
-  toggleCustomChangepoints,
   applyDeviationDetection,
   applyYawMisalignmentDetection,
+  toggleCustomChangepoints,
   updateAlertResults,
-  updateCustomChangepoints
+  updateChartRef,
+  updateCompareQueryResults,
+  updateCustomChangepoints,
+  updateFrom,
+  updateQueryResults,
+  updateTo
 } from 'app/modules/store/visualizerSlice';
-import { ChartPlotBands } from 'app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands';
-import chartAlertingChecker, { alertingPlotBandsCreator } from './chart-alerting/chart-alerting-functions';
-import { filterChangepoints } from 'app/modules/visualizer/tools/changepoint-detection/changepoint-detection';
+import {ChartPlotBands} from 'app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands';
+import chartAlertingChecker, {alertingPlotBandsCreator} from './chart-alerting/chart-alerting-functions';
+import {filterChangepoints} from 'app/modules/visualizer/tools/changepoint-detection/changepoint-detection';
 import grey from '@mui/material/colors/grey';
 import LinearProgress from '@mui/material/LinearProgress';
 import Grid from '@mui/material/Grid';
@@ -146,7 +146,7 @@ export const Chart = () => {
     if (compare.length !== 0) {
       dispatch(updateCompareQueryResults({ folder, id: compare, from, to, selectedMeasures, filter }));
     }
-    if (selectedMeasures.length === 6) toast('Maximum number of measures reached');
+    if ((selectedMeasures.length + customSelectedMeasures.length) === 6) toast('Maximum number of measures reached');
   }, [dataset, selectedMeasures]);
 
   useEffect(() => {
@@ -201,15 +201,14 @@ export const Chart = () => {
 
   const getChangepointData = (start, end, series) => {
     return series.map((s, idx) => {
-      const newCustomChangepoint = {
-          range: { from: start, to: end } as ITimeRange,
-          measure: dataset.header.indexOf(s.userOptions.name),
-          measureChartId: s.userOptions.index,
-          id: latestCustomChangepoints.current.reduce((max, obj) => obj.id > max ? obj.id : max, 0) + 1,
-          custom: true,
-        };
-      return newCustomChangepoint;
-    })
+      return {
+        range: {from: start, to: end} as ITimeRange,
+        measure: dataset.header.indexOf(s.userOptions.name),
+        measureChartId: s.userOptions.index,
+        id: latestCustomChangepoints.current.reduce((max, obj) => obj.id > max ? obj.id : max, 0) + 1,
+        custom: true,
+      };
+    }).filter(c => c.measure !== -1)
   }
 
   const customChangepointSelection = event => {
@@ -446,7 +445,6 @@ export const Chart = () => {
       });// @ts-ignore
       chartData = [...chartData, { data: sData, yAxis: sz, name: getSecondaryText() }];
     }
-    console.log(chartData);
     return chartData;
   };
 

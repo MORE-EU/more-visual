@@ -360,11 +360,11 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
      public List<Changepoint> patternDetection(PatternDetection patternDetection){
          try {
              log.info(String.valueOf(patternDetection));
-              FrechetCalculatorRequest request = FrechetCalculatorRequest.newBuilder()
+              FrecehetRequest request = FrecehetRequest.newBuilder()
                   .setStartDate(DateTimeUtil.formatTimeStamp(formatter,patternDetection.getRange().getFrom()))
                   .setEndDate(DateTimeUtil.formatTimeStamp(formatter,patternDetection.getRange().getTo()))
                   .setR(1)
-                 .build();
+                  .build();
 
 
              // Create a channel to connect to the target gRPC server
@@ -376,7 +376,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
              DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
 
              // Invoke the remote method on the target server
-             FrechetCalculatorResponse response = stub.frechetCalculator(request);
+             FrechetResponse response = stub.frechet(request);
 
              // Convert the response to JSON string
              String json = response.getResult();

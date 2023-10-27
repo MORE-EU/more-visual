@@ -33,9 +33,9 @@ const PatternCard = (props: IPatternCardProps) => {
   };
 
   const getData = (from, to) => {
-    return data[changepoint.measure].filter((d) =>
+    return data[changepoint.measure] ? data[changepoint.measure].filter((d) =>
       (d.timestamp >= from)  && (d.timestamp <= to)
-    ).map((d) => d.value);
+    ).map((d) => d.value) : [];
   }
 
 

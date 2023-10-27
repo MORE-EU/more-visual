@@ -538,8 +538,8 @@ const visualizer = createSlice({
       state.queryResultsLoading = false;
       state.queryResults = action.payload;
       state.data = action.payload.data;
-      state.from = action.payload.data[state.selectedMeasures[0]][0].timestamp;
-      state.to = action.payload.data[state.selectedMeasures[0]][action.payload.data[state.selectedMeasures[0]].length - 1].timestamp;
+      state.from = action.payload.data[Object.keys(action.payload.data)[0]][0].timestamp;
+      state.to = action.payload.data[Object.keys(action.payload.data)[0]][action.payload.data[Object.keys(action.payload.data)[0]].length - 1].timestamp;
     });
     builder.addCase(updateCompareQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;
@@ -550,10 +550,11 @@ const visualizer = createSlice({
     //   state.queryResultsLoading = false;
     //   state.data = action.payload.data.length !== 0 ? [...state.data, ...action.payload.data.slice(0)] : state.data;
     // });
-    builder.addCase(liveDataImplementation.fulfilled, (state, action) => {
+    builder.addCase(liveDataImplementation.fulfilled, (state, action) =>
+    {
       state.liveDataImplLoading = false;
       state.queryResultsLoading = false;
-      state.data = action.payload.data[state.selectedMeasures[0]].length !== 0 ?
+      state.data = action.payload.data[Object.keys(action.payload.data)[0]].length !== 0 ?
         state.selectedMeasures.map(m => {
           const d = action.payload.data[m];
           return [...state.data[m], ...d.slice(0)];

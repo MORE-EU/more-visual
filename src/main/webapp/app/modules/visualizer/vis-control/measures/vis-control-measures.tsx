@@ -19,13 +19,14 @@ export const VisMeasures = () => {
   const dispatch = useAppDispatch();
 
   const handleDelete = col => () => {
-    if (selectedMeasures.length === 1) return;
+    if ((selectedMeasures.length + customSelectedMeasures.length) === 1) return;
     let newSelectedMeasures = [...selectedMeasures];
     newSelectedMeasures.splice(newSelectedMeasures.indexOf(col), 1);
     dispatch(updateSelectedMeasures(newSelectedMeasures));
   };
 
   const handleCustomMeasureDelete = customMeasure => () => {
+    if ((selectedMeasures.length + customSelectedMeasures.length) === 1) return;
     let newCustomSelectedMeasures = [...customSelectedMeasures];
     newCustomSelectedMeasures = newCustomSelectedMeasures.filter(obj => obj.measure1 !== customMeasure.measure1
     || obj.measure2 !== customMeasure.measure2);
@@ -70,7 +71,7 @@ export const VisMeasures = () => {
           p:0,
         }}
       >
-        <Tooltip title={selectedMeasures.length === 6 ? 'You can only view up to 6 measures at a time' : ''}>
+        <Tooltip title={(selectedMeasures.length + customSelectedMeasures.length === 6) ? 'You can only view up to 6 measures at a time' : ''}>
           <VisMeasuresList width={"80%"}
                            value = {null}
                            onChange={handleAddMeasure}
@@ -91,7 +92,7 @@ export const VisMeasures = () => {
                 sx={{bgcolor: measureColors[col], color: 'white', m: 0.5}}
                 variant="outlined"
                 deleteIcon={
-                  <Tooltip title={selectedMeasures.length === 1 ? 'Cannot remove last measure' : ''}>
+                  <Tooltip title={(customSelectedMeasures.length + selectedMeasures.length === 1) ? 'Cannot remove last measure' : ''}>
                     <HighlightOffIcon style={{color: 'white'}}/>
                   </Tooltip>
                 }
@@ -108,7 +109,7 @@ export const VisMeasures = () => {
               sx={{bgcolor: measureColors[customMeasure.measure1], color: 'white', m: 0.5}}
               variant="outlined"
               deleteIcon={
-                <Tooltip title=''>
+                <Tooltip title={(customSelectedMeasures.length + selectedMeasures.length === 1) ? 'Cannot remove last measure' : ''}>
                   <HighlightOffIcon style={{color: 'white'}}/>
                 </Tooltip>
               }
