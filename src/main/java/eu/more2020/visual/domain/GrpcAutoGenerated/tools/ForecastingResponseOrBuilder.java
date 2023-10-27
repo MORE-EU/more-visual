@@ -9,10 +9,12 @@ public interface ForecastingResponseOrBuilder extends
 
   /**
    * <code>string filename = 1;</code>
+   * @return The filename.
    */
   java.lang.String getFilename();
   /**
    * <code>string filename = 1;</code>
+   * @return The bytes for filename.
    */
   com.google.protobuf.ByteString
       getFilenameBytes();

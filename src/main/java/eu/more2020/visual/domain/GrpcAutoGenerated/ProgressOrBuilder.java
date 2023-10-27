@@ -9,10 +9,12 @@ public interface ProgressOrBuilder extends
 
   /**
    * <code>string id = 1;</code>
+   * @return The id.
    */
   java.lang.String getId();
   /**
    * <code>string id = 1;</code>
+   * @return The bytes for id.
    */
   com.google.protobuf.ByteString
       getIdBytes();

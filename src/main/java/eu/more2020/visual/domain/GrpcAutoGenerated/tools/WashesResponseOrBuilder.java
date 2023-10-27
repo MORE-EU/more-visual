@@ -9,10 +9,12 @@ public interface WashesResponseOrBuilder extends
 
   /**
    * <code>string washes = 1;</code>
+   * @return The washes.
    */
   java.lang.String getWashes();
   /**
    * <code>string washes = 1;</code>
+   * @return The bytes for washes.
    */
   com.google.protobuf.ByteString
       getWashesBytes();
