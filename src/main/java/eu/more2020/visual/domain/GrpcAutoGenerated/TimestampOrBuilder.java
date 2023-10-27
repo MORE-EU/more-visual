@@ -9,15 +9,18 @@ public interface TimestampOrBuilder extends
 
   /**
    * <code>int64 timestamp = 1;</code>
+   * @return The timestamp.
    */
   long getTimestamp();
 
   /**
    * <code>string model_name = 2;</code>
+   * @return The modelName.
    */
   java.lang.String getModelName();
   /**
    * <code>string model_name = 2;</code>
+   * @return The bytes for modelName.
    */
   com.google.protobuf.ByteString
       getModelNameBytes();

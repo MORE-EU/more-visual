@@ -9,10 +9,12 @@ public interface ResultsOrBuilder extends
 
   /**
    * <code>string target = 1;</code>
+   * @return The target.
    */
   java.lang.String getTarget();
   /**
    * <code>string target = 1;</code>
+   * @return The bytes for target.
    */
   com.google.protobuf.ByteString
       getTargetBytes();

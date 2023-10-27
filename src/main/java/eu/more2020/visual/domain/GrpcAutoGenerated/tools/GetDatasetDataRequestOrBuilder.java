@@ -9,10 +9,12 @@ public interface GetDatasetDataRequestOrBuilder extends
 
   /**
    * <code>string data_id = 1;</code>
+   * @return The dataId.
    */
   java.lang.String getDataId();
   /**
    * <code>string data_id = 1;</code>
+   * @return The bytes for dataId.
    */
   com.google.protobuf.ByteString
       getDataIdBytes();

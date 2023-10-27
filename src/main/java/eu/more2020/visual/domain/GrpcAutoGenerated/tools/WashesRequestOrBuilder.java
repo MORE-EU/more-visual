@@ -9,10 +9,12 @@ public interface WashesRequestOrBuilder extends
 
   /**
    * <code>string dataset_id = 1;</code>
+   * @return The datasetId.
    */
   java.lang.String getDatasetId();
   /**
    * <code>string dataset_id = 1;</code>
+   * @return The bytes for datasetId.
    */
   com.google.protobuf.ByteString
       getDatasetIdBytes();

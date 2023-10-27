@@ -9,30 +9,36 @@ public interface ModelInfoOrBuilder extends
 
   /**
    * <code>string model_type = 1;</code>
+   * @return The modelType.
    */
   java.lang.String getModelType();
   /**
    * <code>string model_type = 1;</code>
+   * @return The bytes for modelType.
    */
   com.google.protobuf.ByteString
       getModelTypeBytes();
 
   /**
    * <code>string model_name = 2;</code>
+   * @return The modelName.
    */
   java.lang.String getModelName();
   /**
    * <code>string model_name = 2;</code>
+   * @return The bytes for modelName.
    */
   com.google.protobuf.ByteString
       getModelNameBytes();
 
   /**
    * <code>string target = 3;</code>
+   * @return The target.
    */
   java.lang.String getTarget();
   /**
    * <code>string target = 3;</code>
+   * @return The bytes for target.
    */
   com.google.protobuf.ByteString
       getTargetBytes();
