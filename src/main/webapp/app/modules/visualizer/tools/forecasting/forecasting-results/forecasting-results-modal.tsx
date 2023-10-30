@@ -44,7 +44,8 @@ const ModalWithChart = props => {
   };
 
   const generateCharts = () => {
-    const initialSeriesData = forecastingInitialSeries.map(d => [parseInt(d.timestamp), d.values[0]]);
+    const initialSeriesData = forecastingInitialSeries[dataset.header.indexOf(resultsModal)].map(d => [parseInt(d.timestamp), d.value]);
+    console.log(initialSeriesData)
     return [
       ...Object.keys(forecastingData.results[resultsModal]).map(key => ({
         name: key,

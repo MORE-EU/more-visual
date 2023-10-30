@@ -360,10 +360,10 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
      public List<Changepoint> patternDetection(PatternDetection patternDetection){
          try {
              log.info(String.valueOf(patternDetection));
-              FrecehetRequest request = FrecehetRequest.newBuilder()
+              FrechetRequest request = FrechetRequest.newBuilder()
                   .setStartDate(DateTimeUtil.formatTimeStamp(formatter,patternDetection.getRange().getFrom()))
                   .setEndDate(DateTimeUtil.formatTimeStamp(formatter,patternDetection.getRange().getTo()))
-                  .setR(1)
+                  .setR("1")
                   .build();
 
 

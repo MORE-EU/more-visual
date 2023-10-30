@@ -85,8 +85,9 @@ export const getInitialSeries = createAsyncThunk(
     const { from, to, folder, id, measure } = data;
     const state: any = getState();
     const query = {
-      range: { from, to },
-      frequency: 'MINUTE',
+      from,
+      to,
+      viewPort: {width: 1000, height: 600},
       measures: [state.visualizer.dataset.header.indexOf(measure)],
       filter: null,
     };
