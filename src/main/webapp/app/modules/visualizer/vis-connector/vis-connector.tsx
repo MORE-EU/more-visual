@@ -8,6 +8,10 @@ import Box from "@mui/material/Box";
 import { styled } from '@mui/material/styles';
 import grey from '@mui/material/colors/grey';
 import { Typography } from "@mui/material";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import CloseIcon from '@mui/icons-material/Close';
+
 
 import VisConnectorDBConfig from "./vis-connector-db-config";
 
@@ -24,29 +28,45 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const VisConnector = () => {
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedSource, setSelectedSource] = useState('');
+    const [dbSystem, setDbSystem] = useState('');
+    const [dbConfig, setDbconfing] = useState(false);
 
     const closeHandler = () => {
-        setSelectedItem(null);
+        setSelectedSource('');
+        setDbSystem('');
+        setDbconfing(false);
     }
 
 
     return (
         <>
-        {!selectedItem && (
+        {!selectedSource && (
             <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1 }}>
                 <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
-                    Connect to Datasource
+                    Connect to Data Source
                 </Typography>
-                <Button variant="contained" startIcon={<StorageIcon />} onClick={() => {setSelectedItem('db');}}>Database</Button>
+                <Button variant="contained" startIcon={<StorageIcon />} onClick={() => {setSelectedSource('db');}}>Database</Button>
                     <Button component="label" variant="contained" startIcon={<UploadFileIcon/>}>
                         Filesystem
                         <VisuallyHiddenInput type="file" />
                     </Button>
             </Box>
         )}
-        {selectedItem === 'db' && (
-            <VisConnectorDBConfig closeHandler={closeHandler}/>
+        { selectedSource === 'db' && !dbConfig && (
+            <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1 }}>
+                <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
+                    Select DB System
+                </Typography>
+                    <Select size="small" value={dbSystem} onChange={(e) => setDbSystem(e.target.value)}>
+                        <MenuItem value='postgres'>postgres</MenuItem>
+                    </Select>
+                    <Button variant="contained" type='submit' onClick={() => { if(dbSystem) setDbconfing(true);}}>Continue</Button>
+                <Button variant="text" startIcon={<CloseIcon />} onClick={closeHandler}>Close</Button>
+            </Box>
+        )}
+        {selectedSource === 'db' && dbConfig && (
+            <VisConnectorDBConfig closeHandler={closeHandler} dbSystem={dbSystem}/>
         )}
         </>
     );

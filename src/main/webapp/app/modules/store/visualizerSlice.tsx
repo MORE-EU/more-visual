@@ -118,7 +118,7 @@ const initialState = {
   ...checkConnectionInitialState
 };
 
-export const connector = createAsyncThunk('connector', async (dbConnector: {host: string, port: string, username: string, password: string}) => {
+export const connector = createAsyncThunk('connector', async (dbConnector: {dbSystem: string, host: string, port: string, username: string, password: string, database: string}) => {
   try {
     const response = await axios.post(`api/connect`, dbConnector).then(res => res);
     return response;
@@ -557,10 +557,7 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
       state.queryResultsLoading = true;
     });
-    builder.addMatcher(isAnyOf(connector.pending), state => {
-      state.checkConnectionLoading = true;
-    });
-    builder.addMatcher(isAnyOf(checkConnection.pending), state => {
+    builder.addMatcher(isAnyOf(checkConnection.pending, connector.pending), state => {
       state.checkConnectionLoading = true;
     });
     builder.addMatcher(isAnyOf(liveDataImplementation.pending), state => {
@@ -577,13 +574,7 @@ const visualizer = createSlice({
         state.errorMessage = action.payload;
       }
     );
-    builder.addMatcher(isAnyOf(connector.rejected), (state, action) => {
-      state.checkConnectionLoading = false;
-      state.checkConnectionResponse = action.error.message;
-      state.checkConnectionError = true;
-    });
-
-    builder.addMatcher(isAnyOf(checkConnection.rejected), (state, action) => {
+    builder.addMatcher(isAnyOf(checkConnection.rejected, connector.rejected), (state, action) => {
       state.checkConnectionLoading = false;
       state.checkConnectionResponse = action.error.message;
       state.checkConnectionError = true;

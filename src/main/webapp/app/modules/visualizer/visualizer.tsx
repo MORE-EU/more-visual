@@ -9,7 +9,6 @@ import { Divider, Grid } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
 import Header from './header/header';
-import VisConnector from './vis-connector/vis-connector';
 
 const mdTheme = createTheme();
 
@@ -23,7 +22,7 @@ export const Visualizer = () => {
   useEffect(() => {
     if (params.folder !== undefined)
     dispatch(getFarmMeta(params.folder));
-  }, [params.folder]);
+  }, []);
 
   useEffect(() => {
     if (params.id !== undefined) {
@@ -62,7 +61,7 @@ export const Visualizer = () => {
             >
               <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
                 <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  {dataset && farmMeta ? <VisControl /> : <VisConnector />}
+                  {dataset && farmMeta && <VisControl />}
                 </Paper>
               </Grid>
               <Grid sx={{ width: '80%', p: 1, flexGrow: 1, height: 'calc(100% - 30px)' }}>

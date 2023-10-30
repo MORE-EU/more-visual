@@ -236,7 +236,15 @@ public class DatasetResource {
 
     @PostMapping("/connect")
     public ResponseEntity<String> connector(@RequestBody DbConnector dbConnector) throws URISyntaxException, IOException {
-        String url = "jdbc:" + dbConnector.getHost() + ":" + dbConnector.getPort() + "/";
+        String url = null;
+        switch (dbConnector.getDbSystem()) {
+            case "postgres":
+                url = "jdbc:postgresql://" + dbConnector.getHost() + ":" + dbConnector.getPort() + "/" + dbConnector.getDatabase();
+                break;
+
+            default:
+                break;
+        }
         Connection con;
         try{
         con = DriverManager.getConnection(url, dbConnector.getUsername(), dbConnector.getPassword());

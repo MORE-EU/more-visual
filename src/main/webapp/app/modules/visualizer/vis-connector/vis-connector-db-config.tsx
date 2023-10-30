@@ -18,25 +18,35 @@ import { setCheckConnectionResponse } from '../../store/visualizerSlice';
 import { connector } from '../../store/visualizerSlice';
 
 interface IDBForm  {
+    dbSystem: string;
     host: string;
     port: string;
     username: string;
     password: string;
+    database: string;
 }
 
 const defaultForm: IDBForm = {
+    dbSystem: '',
     host: '',
     port: '',
     username: '',
     password: '',
+    database: '',
 }
 
-const VisConnectorDBConfig = ({closeHandler}) => {
+const VisConnectorDBConfig = ({closeHandler, dbSystem}) => {
     const { checkConnectionResponse, checkConnectionLoading, checkConnectionError } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const [dbForm, setDbForm] = useState<IDBForm>(defaultForm);
-    const { host, port, username, password } = dbForm;
+    const { host, port, username, password, database } = dbForm;
     const [openSnack, setOpenSnack] = React.useState(false);
+
+    useEffect(() => {
+        setDbForm((prevDbForm) => {
+            return {...prevDbForm, dbSystem: dbSystem};
+        })        
+    },[]);
 
     useEffect(() => {
         if (checkConnectionResponse) {
@@ -95,6 +105,7 @@ const VisConnectorDBConfig = ({closeHandler}) => {
                         <DBFormInput label='port' type='text' value={port} handleChange={handleTextFields} />
                         <DBFormInput label='username' type='text' value={username} handleChange={handleTextFields} />
                         <DBFormInput label='password' type='password' value={password} handleChange={handleTextFields} />
+                        <DBFormInput label='database' type="database" value={database} handleChange={handleTextFields} />
                         {checkConnectionLoading ? <CircularProgress /> : <Button variant="contained" startIcon={<LoginIcon />} type="submit" >Connect </Button>}
                     </Box>
                 </form> 
