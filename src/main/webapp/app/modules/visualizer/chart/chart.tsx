@@ -131,8 +131,8 @@ export const Chart = () => {
   }, [queryResultsLoading]);
 
   useEffect(() => {
-    if (compare.length !== 0) {
-      dispatch(updateCompareQueryResults({ folder, id: compare, from, to, selectedMeasures, filter }));
+    if (Object.keys(compare).length !== 0) {
+      dispatch(updateCompareQueryResults({ folder, compare, from, to, filter }));
     }
   }, [compare]);
 
@@ -143,8 +143,8 @@ export const Chart = () => {
         from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
         to: to ? to : dataset.timeRange.to, selectedMeasures, filter })
     );
-    if (compare.length !== 0) {
-      dispatch(updateCompareQueryResults({ folder, id: compare, from, to, selectedMeasures, filter }));
+    if (Object.keys(compare).length !== 0) {
+      dispatch(updateCompareQueryResults({ folder, compare, from, to, filter }));
     }
     if ((selectedMeasures.length + customSelectedMeasures.length) === 6) toast('Maximum number of measures reached');
   }, [dataset, selectedMeasures]);
@@ -252,14 +252,13 @@ export const Chart = () => {
       );
       dispatch(updateFrom(min));
       dispatch(updateTo(max));
-      if (latestCompare.current.length !== 0)
+      if (Object.keys(latestCompare.current).length !== 0)
         dispatch(
           updateCompareQueryResults({
             folder: latestFolder.current,
-            id: latestCompare.current,
+            compare: latestCompare.current,
             from: min,
             to: max,
-            selectedMeasures: latestMeasures.current,
             filter: latestFilter.current,
           })
         );
@@ -533,7 +532,7 @@ export const Chart = () => {
       : [];
 
   const compareChartData = () => {
-    return compareData !== null && compare.length !== 0
+    return compareData !== null && Object.keys(compare).length !== 0
       ?
       [
         ...[].concat(

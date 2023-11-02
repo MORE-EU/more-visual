@@ -11,11 +11,12 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export const ChartCompare = () => {
   const dispatch = useAppDispatch();
 
-  const { farmMeta, dataset, comparePopover, compare } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, comparePopover, compare, datasets } = useAppSelector(state => state.visualizer);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -25,8 +26,23 @@ export const ChartCompare = () => {
     dispatch(setComparePopover(true));
   };
 
-  const handleOnClick = id => e => {
-    dispatch(updateCompare(id));
+  const handleOnClick = (datasetId, measureId) => e => {
+    let comp = {}
+    if(Object.keys(compare).includes(datasetId)){
+      if(compare[datasetId].includes(measureId)){
+        if(compare[datasetId].length === 1){
+          delete comp[datasetId];
+          console.log(typeof comp)
+        }else{
+          comp = {...compare, [datasetId]: compare[datasetId].filter(entry => entry !== measureId)}
+        }
+      }else{
+        comp = {...compare, [datasetId]: [...compare[datasetId], measureId]}
+      }
+    }else{
+        comp = {...compare, [datasetId]: [measureId]}
+    }
+    dispatch(updateCompare(comp));
   };
 
   const handleClose = () => {
@@ -35,6 +51,7 @@ export const ChartCompare = () => {
 
   return (
     <>
+      {console.log(compare)}
       <Tooltip title="Compare Charts">
         <IconButton
           aria-label="more"
@@ -43,8 +60,9 @@ export const ChartCompare = () => {
           aria-expanded={open ? 'true' : undefined}
           aria-haspopup="true"
           onClick={handleOpen}
+          disabled={datasets.loading}
         >
-          <AddchartIcon />
+          {datasets.loading ? <CircularProgress size={20} /> : <AddchartIcon />}
         </IconButton>
       </Tooltip>
       <Popover
@@ -59,7 +77,7 @@ export const ChartCompare = () => {
         PaperProps={{
           style: {
             maxHeight: 200,
-            width: '10%',
+            width: 'fit-content',
             margin: '1em',
           },
         }}
@@ -68,15 +86,14 @@ export const ChartCompare = () => {
           sx={{
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'left',
+            justifyContent: 'center',
             alignItems: 'top',
-            pl: 1,
-            pr: 1,
+            px: 1,
             pt: 1,
           }}
         >
           <AddchartIcon sx={{ pr: 1 }} />
-          <Typography variant="body1" gutterBottom sx={{ fontWeight: 600, fontSize: '1em' }}>
+          <Typography variant="body1" gutterBottom sx={{ fontWeight: 600, fontSize: '1em', alignSelf: "end" }}>
             Compare
           </Typography>
         </Box>
@@ -89,7 +106,36 @@ export const ChartCompare = () => {
             p: 1,
           }}
         >
-          {farmMeta.data.map(
+          {datasets.data.length !== 0 &&
+            datasets.data.map(
+              (dat, idx) =>
+                dat.id !== dataset.id && (
+                  <Box key={`compare-${dat.id}-header`}>
+                    <Typography variant="body1" gutterBottom sx={{ fontWeight: 600, fontSize: '1em' }}>
+                      {dat.id}
+                    </Typography>
+                    {dat.header.map(hed => (
+                      <MenuItem
+                        key={`${dat.id}-${hed}`}
+                        selected={Object.keys(compare).length !== 0 ? compare[dat.id].includes(dat.header.indexOf(hed)) : false}
+                        onClick={handleOnClick(dat.id, dat.header.indexOf(hed))}
+                      >
+                        <ListItemText>{hed}</ListItemText>
+                        {Object.keys(compare).length !== 0 ? (
+                          compare[dat.id].includes(dat.header.indexOf(hed)) ? (
+                            <CheckCircleOutlineIcon />
+                          ) : (
+                            <RadioButtonUncheckedIcon />
+                          )
+                        ) : (
+                          <RadioButtonUncheckedIcon />
+                        )}
+                      </MenuItem>
+                    ))}
+                  </Box>
+                )
+            )}
+          {/* {farmMeta.data.map(
             (file, idx) =>
               file.id !== dataset.id && (
                 <MenuItem key={`${file.id}-${idx}`} selected={compare.includes(file.id)} onClick={handleOnClick(file.id)}>
@@ -97,7 +143,7 @@ export const ChartCompare = () => {
                   {compare.includes(file.id) ? <CheckCircleOutlineIcon /> : <RadioButtonUncheckedIcon />}
                 </MenuItem>
               )
-          )}
+          )} */}
         </Box>
       </Popover>
     </>

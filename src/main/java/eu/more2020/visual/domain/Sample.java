@@ -1,14 +1,13 @@
 package eu.more2020.visual.domain;
 
 import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvToBean;
 
 import java.util.Objects;
 
 /**
  * A Dataset.
  */
-public class Sample extends CsvToBean {
+public class Sample {
 
     @CsvBindByName(column = "Continent")
     private String continent;

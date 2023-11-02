@@ -22,6 +22,8 @@ public interface DatasetRepository {
 
     List<AbstractDataset> findAll() throws IOException;
 
+    List<Optional<AbstractDataset>> getFarmDetails(String farmName) throws IOException;
+
     List<Sample> findSample(String farmName) throws IOException;
 
     List<String> findDirectories() throws IOException;

@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { IAlerts } from 'app/shared/model/alert.model';
 import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
@@ -9,6 +9,7 @@ import {ICustomMeasure} from "app/shared/model/custom-measures.model";
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import axios from 'axios';
 import moment, { Moment } from 'moment';
+import { IDatasets, defaultDatasets } from 'app/shared/model/datasets.model';
 
 
 const seedrandom = require('seedrandom');
@@ -63,6 +64,7 @@ const initialState = {
   loading: true,
   errorMessage: null,
   dataset: null,
+  datasets: defaultDatasets as IDatasets,
   chartType: 'line',
   queryResults: null as IQueryResults,
   data: null as any,
@@ -86,7 +88,7 @@ const initialState = {
   folder: '',
   graphZoom: null,
   activeTool: null as null | string,
-  compare: [],
+  compare: {},
   chartRef: null,
   showDatePick: false,
   showChangepointFunction: false,
@@ -133,6 +135,11 @@ export const checkConnection = createAsyncThunk('checkConnection', async (bdConf
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
   const { folder, id } = data;
   const response = await axios.get(`api/datasets/${folder}/${id}`).then(res => res);
+  return response;
+});
+
+export const getDatasets = createAsyncThunk('getDatasets', async (folder: string) => {
+  const response = await axios.get(`api/datasets/all/${folder}`).then(res => res);
   return response;
 });
 
@@ -244,24 +251,14 @@ export const liveDataImplementation = createAsyncThunk(
 
 export const updateCompareQueryResults = createAsyncThunk(
   'updateCompareQueryResults',
-  async (data: { folder: string; id: string[]; from: number; to: number; selectedMeasures: any[]; filter: {} }) => {
-    const { folder, id, from, to, selectedMeasures, filter } = data;
-    let query;
-    from !== null && to !== null
-      ? (query = {
-          from,
-          to,
-          viewPort: {width: 1000, height: 600},
-          measures: selectedMeasures,
-          filter,
-        } as IQuery)
-      : (query = { range: null,
-      });
-    const response = Promise.all(
-      id.map(name => {
-        return axios.post(`api/datasets/${folder}/${name}/query`, query).then(res => res.data);
-      })
-    ).then(res => res.map(r => r.data));
+  async (data: { folder: string, compare: {[key: number]: any[]}; from: number; to: number; filter: {} }) => {
+    const { compare, from, to, filter, folder } = data;
+    const response = Promise.all(Object.keys(compare).map(
+      key => {
+        const query = from !== null && to !== null ? {from,to,viewPort: {width: 1000, height: 600}, measures: compare[key], filter} : {range: null}
+        return axios.post(`api/datasets/${folder}/${key}/query`, query).then(res => res.data)
+      }
+    )).then(res => res.map(r => r.data));
     return response;
   }
 );
@@ -378,9 +375,7 @@ const visualizer = createSlice({
       state.activeTool = action.payload;
     },
     updateCompare(state, action) {
-      state.compare = !state.compare.includes(action.payload)
-        ? [...state.compare, action.payload]
-        : state.compare.filter(comp => comp !== action.payload);
+      state.compare = action.payload
     },
     updateData(state, action) {
       state.data = [...state.data, action.payload];
@@ -510,6 +505,9 @@ const visualizer = createSlice({
       state.farmMeta = action.payload.data;
       state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
     })
+    builder.addCase(getDatasets.fulfilled, (state, action) => {
+      state.datasets = {data: action.payload.data, loading: false, error: null};
+    })
     builder.addCase(getDirectories.fulfilled, (state, action) => {
       state.loading = false;
       state.directories = action.payload.data;
@@ -560,6 +558,12 @@ const visualizer = createSlice({
           return [...state.data[m], ...d.slice(0)];
         })
         : state.data;
+    });
+    builder.addCase(getDatasets.pending, state => {
+      state.datasets = {data: [], loading: true, error: null}
+    });
+    builder.addCase(getDatasets.rejected, (state, action) => {
+      state.datasets = {...state.datasets, loading: false, error: "there was an error loading the data"}
     });
     builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending), state => {
       state.errorMessage = null;
