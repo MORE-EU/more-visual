@@ -10,6 +10,7 @@ import { ITimeRange } from 'app/shared/model/time-range.model';
 import axios from 'axios';
 import moment, { Moment } from 'moment';
 import { IDatasets, defaultDatasets } from 'app/shared/model/datasets.model';
+import { RootState } from './storeConfig';
 
 
 const seedrandom = require('seedrandom');
@@ -63,14 +64,15 @@ const checkConnectionInitialState = {
 const initialState = {
   loading: true,
   errorMessage: null,
+  alldata: null as {[key: string]: {[key: number]: {timestamp: number, value: number}[]}} | null,
   dataset: null,
   datasets: defaultDatasets as IDatasets,
-  chartType: 'line',
+  chartType: 'line' as String,
   queryResults: null as IQueryResults,
   data: null as any,
   compareData: null,
   liveDataImplLoading: false,
-  queryResultsLoading: true,
+  queryResultsLoading: true as boolean,
   selectedMeasures: [],
   customSelectedMeasures: [] as ICustomMeasure[],
   measureColors: [],
@@ -178,6 +180,32 @@ export const deleteAlert = createAsyncThunk('deleteAlert', async (alertName: Str
   return response;
 });
 
+const handleAllDataCategorization = (allDataState, data, id, datasets) => {
+  // if(datasets.data.length > 2){
+  //   const ok = datasets.data.filter(d => d.id === id)[0].header
+  //   console.log(ok)
+  //   return data;
+  // }else{
+  //   return data;
+  // }
+  return {...allDataState, [id]: {...data}};
+  // let comp = {}
+  //   if(Object.keys(allDataState).includes(id)){
+  //     if(Object.keys(allDataState[id]).includes(measureId)){
+  //       if(compare[datasetId].length === 1){
+  //         delete comp[datasetId];
+  //         console.log(typeof comp)
+  //       }else{
+  //         comp = {...compare, [datasetId]: compare[datasetId].filter(entry => entry !== measureId)}
+  //       }
+  //     }else{
+  //       comp = {...compare, [datasetId]: [...compare[datasetId], measureId]}
+  //     }
+  //   }else{
+  //       comp = {...allDataState, [id]: {...data}}
+  //   }
+}
+
 
 const concatenateAndSortDistinctArrays = (array1: number[], array2: number[]) => {
   // Concatenate the two arrays
@@ -196,7 +224,7 @@ export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
   async (data: {
     folder: string;
-    id: string[];
+    id: string;
     from: number;
     to: number;
     selectedMeasures: any[];
@@ -204,9 +232,9 @@ export const updateQueryResults = createAsyncThunk(
   }, {getState}) => {
     const { folder, id, from, to, selectedMeasures, filter } = data;
     let query;
-    const state:any = getState();
+    const {visualizer} = getState() as RootState;
     const customSelectedMeasures = [];
-    state.visualizer.customSelectedMeasures
+    visualizer.customSelectedMeasures
       .forEach(customMeasure => customSelectedMeasures.push(customMeasure.measure1, customMeasure.measure2));
     let measures = concatenateAndSortDistinctArrays(selectedMeasures, customSelectedMeasures);
     from !== null && to !== null
@@ -217,9 +245,10 @@ export const updateQueryResults = createAsyncThunk(
           measures,
           filter: filter ? filter : null,
         } as IQuery)
-      : (query = {range: null});
+      : (query = {});
+
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
-    return response.data;
+    return {id, response: response.data};
   }
 );
 
@@ -534,10 +563,11 @@ const visualizer = createSlice({
     });
     builder.addCase(updateQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;
-      state.queryResults = action.payload;
-      state.data = action.payload.data;
-      state.from = action.payload.data[Object.keys(action.payload.data)[0]][0].timestamp;
-      state.to = action.payload.data[Object.keys(action.payload.data)[0]][action.payload.data[Object.keys(action.payload.data)[0]].length - 1].timestamp;
+      state.queryResults = action.payload.response;
+      state.data = action.payload.response.data;
+      state.alldata = {...state.alldata, [action.payload.id]: {...action.payload.response.data}};
+      state.from = action.payload.response.data[Object.keys(action.payload.response.data)[0]][0].timestamp;
+      state.to = action.payload.response.data[Object.keys(action.payload.response.data)[0]][action.payload.response.data[Object.keys(action.payload.response.data)[0]].length - 1].timestamp;
     });
     builder.addCase(updateCompareQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;

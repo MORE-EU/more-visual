@@ -34,7 +34,7 @@ export const Chart = () => {
   const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,customSelectedMeasures,measureColors,queryResultsLoading,filter, customChangepoints,
     queryResults,changeChart,compare,changepointDetectionEnabled,detectedChangepointFilter,customChangepointsEnabled,data,compareData,
     forecastData,soilingEnabled,soilingType,alertingPlotMode,alertResults,forecastingDataSplit,soilingWeeks,yawMisalignmentEnabled,secondaryData,chartType,
-    liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate} = useAppSelector(state => state.visualizer);
+    liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate, alldata} = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
 
@@ -571,6 +571,7 @@ export const Chart = () => {
       onMouseOver={() => data ? handleMouseOverChart() : null}
       onMouseLeave={() => data ? handleMouseLeaveChart() : null}
     >
+      {console.log(compareData)}
       {!data ? <LinearProgress /> : <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />}
       {data && (
         <HighchartsReact
@@ -641,7 +642,7 @@ export const Chart = () => {
                 return ['<b>' + new Date(this.x) + '</b>'].concat(
                   this.points
                     ? this.points.map(function (point) {
-                        let ss = `<span style="color:${point.color}">•</span> ${point.series.name}: ${point.y.toFixed(2)}`;
+                        let ss = `<div><span style="color: ${point.color}; font-size: 12px; margin-right:5px;">●</span>  ${point.series.name}: ${point.y.toFixed(2)}</div>`;
                         ss += point.point.tt ? `<br>${point.point.tt}</br>` : '';
                         return ss;
                       })
