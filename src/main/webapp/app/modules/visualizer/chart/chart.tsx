@@ -146,7 +146,7 @@ export const Chart = () => {
     if (Object.keys(compare).length !== 0) {
       dispatch(updateCompareQueryResults({ folder, compare, from, to, filter }));
     }
-    if ((selectedMeasures.length + customSelectedMeasures.length) === 6) toast('Maximum number of measures reached');
+    if ((selectedMeasures.length + customSelectedMeasures.length) + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) === 6) toast('Maximum number of measures reached');
   }, [dataset, selectedMeasures]);
 
   useEffect(() => {

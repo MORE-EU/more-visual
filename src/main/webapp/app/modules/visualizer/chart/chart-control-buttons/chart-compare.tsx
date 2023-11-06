@@ -16,7 +16,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 export const ChartCompare = () => {
   const dispatch = useAppDispatch();
 
-  const { farmMeta, dataset, comparePopover, compare, datasets } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, comparePopover, compare, datasets, selectedMeasures, customSelectedMeasures } = useAppSelector(state => state.visualizer);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -37,9 +37,11 @@ export const ChartCompare = () => {
           comp = {...compare, [datasetId]: compare[datasetId].filter(entry => entry !== measureId)}
         }
       }else{
+        if(selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) === 6) return
         comp = {...compare, [datasetId]: [...compare[datasetId], measureId]}
       }
     }else{
+        if(selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) === 6) return
         comp = {...compare, [datasetId]: [measureId]}
     }
     dispatch(updateCompare(comp));

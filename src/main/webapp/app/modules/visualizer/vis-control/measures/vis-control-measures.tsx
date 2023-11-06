@@ -13,7 +13,7 @@ import VisMeasuresList from "app/modules/visualizer/vis-control/measures/vis-mea
 import Box from "@mui/material/Box";
 
 export const VisMeasures = () => {
-  const { dataset, selectedMeasures, customSelectedMeasures, measureColors } = useAppSelector(state => state.visualizer);
+  const { dataset, selectedMeasures, customSelectedMeasures, measureColors, compare } = useAppSelector(state => state.visualizer);
   const [isCustomMeasureDialogOpen, setCustomMeasureDialogOpen] = useState(false);
 
   const dispatch = useAppDispatch();
@@ -71,12 +71,12 @@ export const VisMeasures = () => {
           p:0,
         }}
       >
-        <Tooltip title={(selectedMeasures.length + customSelectedMeasures.length === 6) ? 'You can only view up to 6 measures at a time' : ''}>
+        <Tooltip title={(selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) === 6) ? 'You can only view up to 6 measures at a time' : ''}>
           <VisMeasuresList width={"80%"}
                            value = {null}
                            onChange={handleAddMeasure}
                            options={shownMeasures}
-                           disabled={selectedMeasures.length === 6}/>
+                           disabled={selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) === 6}/>
         </Tooltip>
         <CustomMeasureButton onClick={handleCustomMeasureClick} />
         <CustomMeasureModal open={isCustomMeasureDialogOpen} onClose={handleCustomMeasureModalClose} />
