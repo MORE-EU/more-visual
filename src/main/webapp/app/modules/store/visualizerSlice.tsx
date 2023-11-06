@@ -64,13 +64,12 @@ const checkConnectionInitialState = {
 const initialState = {
   loading: true,
   errorMessage: null,
-  alldata: null as {[key: string]: {[key: number]: {timestamp: number, value: number}[]}} | null,
   dataset: null,
   datasets: defaultDatasets as IDatasets,
   chartType: 'line' as String,
   queryResults: null as IQueryResults,
   data: null as any,
-  compareData: null,
+  compareData: [],
   liveDataImplLoading: false,
   queryResultsLoading: true as boolean,
   selectedMeasures: [],
@@ -90,7 +89,7 @@ const initialState = {
   folder: '',
   graphZoom: null,
   activeTool: null as null | string,
-  compare: {},
+  compare: {} as {[key: string]: number[]},
   chartRef: null,
   showDatePick: false,
   showChangepointFunction: false,
@@ -180,32 +179,6 @@ export const deleteAlert = createAsyncThunk('deleteAlert', async (alertName: Str
   return response;
 });
 
-const handleAllDataCategorization = (allDataState, data, id, datasets) => {
-  // if(datasets.data.length > 2){
-  //   const ok = datasets.data.filter(d => d.id === id)[0].header
-  //   console.log(ok)
-  //   return data;
-  // }else{
-  //   return data;
-  // }
-  return {...allDataState, [id]: {...data}};
-  // let comp = {}
-  //   if(Object.keys(allDataState).includes(id)){
-  //     if(Object.keys(allDataState[id]).includes(measureId)){
-  //       if(compare[datasetId].length === 1){
-  //         delete comp[datasetId];
-  //         console.log(typeof comp)
-  //       }else{
-  //         comp = {...compare, [datasetId]: compare[datasetId].filter(entry => entry !== measureId)}
-  //       }
-  //     }else{
-  //       comp = {...compare, [datasetId]: [...compare[datasetId], measureId]}
-  //     }
-  //   }else{
-  //       comp = {...allDataState, [id]: {...data}}
-  //   }
-}
-
 
 const concatenateAndSortDistinctArrays = (array1: number[], array2: number[]) => {
   // Concatenate the two arrays
@@ -280,9 +253,10 @@ export const liveDataImplementation = createAsyncThunk(
 
 export const updateCompareQueryResults = createAsyncThunk(
   'updateCompareQueryResults',
-  async (data: { folder: string, compare: {[key: number]: any[]}; from: number; to: number; filter: {} }) => {
+  async (data: { folder: string, compare: {[key: number]: any[]}; from: number; to: number; filter: {} }, {getState}) => {
+    const {visualizer} = getState() as RootState;
     const { compare, from, to, filter, folder } = data;
-    const response = Promise.all(Object.keys(compare).map(
+    const response = await Promise.all(Object.keys(compare).map(
       key => {
         const query = from !== null && to !== null ? {from,to,viewPort: {width: 1000, height: 600}, measures: compare[key], filter} : {range: null}
         return axios.post(`api/datasets/${folder}/${key}/query`, query).then(res => res.data)
@@ -565,7 +539,6 @@ const visualizer = createSlice({
       state.queryResultsLoading = false;
       state.queryResults = action.payload.response;
       state.data = action.payload.response.data;
-      state.alldata = {...state.alldata, [action.payload.id]: {...action.payload.response.data}};
       state.from = action.payload.response.data[Object.keys(action.payload.response.data)[0]][0].timestamp;
       state.to = action.payload.response.data[Object.keys(action.payload.response.data)[0]][action.payload.response.data[Object.keys(action.payload.response.data)[0]].length - 1].timestamp;
     });

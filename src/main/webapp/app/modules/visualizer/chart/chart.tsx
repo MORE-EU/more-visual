@@ -34,7 +34,7 @@ export const Chart = () => {
   const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,customSelectedMeasures,measureColors,queryResultsLoading,filter, customChangepoints,
     queryResults,changeChart,compare,changepointDetectionEnabled,detectedChangepointFilter,customChangepointsEnabled,data,compareData,
     forecastData,soilingEnabled,soilingType,alertingPlotMode,alertResults,forecastingDataSplit,soilingWeeks,yawMisalignmentEnabled,secondaryData,chartType,
-    liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate, alldata} = useAppSelector(state => state.visualizer);
+    liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate, datasets} = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
 
@@ -375,7 +375,8 @@ export const Chart = () => {
     opposite: false,
     top,
     height,
-    offset: 0,
+    lineWidth: 2,
+    offset: 10,
   })
 
   // Required for pan to work
@@ -389,7 +390,7 @@ export const Chart = () => {
     ],
     name,
     color: "transparent",
-    yAxis: changeChart ? selectedMeasures.length + idx : 0,
+    yAxis: changeChart ? selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) + idx : 0,
     zoneAxis: 'x',
     enableMouseTracking: false,
     showInLegend: false
@@ -448,7 +449,7 @@ export const Chart = () => {
   };
 
   const computeYAxisData = () => {
-    const allMeasuresLength = selectedMeasures.length + customSelectedMeasures.length;
+    const allMeasuresLength = selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0);
     let yAxisData = changeChart
       ? selectedMeasures.map((measure, idx) => ({
           title: {
@@ -458,7 +459,8 @@ export const Chart = () => {
           opposite: false,
           top: `${(100 / allMeasuresLength) * idx}%`,
           height: `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%`,
-          offset: 0,
+          lineWidth: 2,
+          offset: 10,
         }))
         .concat(
           customSelectedMeasures.map((customMeasure, idx) => ({
@@ -469,9 +471,30 @@ export const Chart = () => {
             opposite: false,
             top: `${(100 / allMeasuresLength) * (idx + selectedMeasures.length)}%`,
             height: `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%`,
-            offset: 0,
+            lineWidth: 2,
+            offset: 10,
             }))
         )
+        .concat(Object.keys(compare).reduce((acc, curval) => {
+          let counter = 0;
+          return(
+            [...acc, ...compare[curval].map(measureVal => {
+              const returnVal = {
+              title: {
+                enabled: true,
+                text: curval + ": " + datasets.data.find(d => d.id === curval).header[measureVal],
+              },
+              opposite: false,
+              top: `${(100 / allMeasuresLength) * (counter + (selectedMeasures.length + customSelectedMeasures.length))}%`,
+              height: `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%`,
+              lineWidth: 2,
+              offset: 10,  
+            }
+            counter++;
+            return returnVal;
+          })]
+          )
+        }, []))
         .concat(...[dummyPointCreator("minPoint", "0px", "0px"), dummyPointCreator("maxPoint", "0px", "0px")])
       : selectedMeasures.map((measure, idx) => ({
           title: {
@@ -532,27 +555,26 @@ export const Chart = () => {
       : [];
 
   const compareChartData = () => {
-    return compareData !== null && Object.keys(compare).length !== 0
-      ?
-      [
-        ...[].concat(
-          ...compareData.map((compData, idx) =>
-            selectedMeasures.map((measure, index) => ({
-                data: compData[measure] ? compData[measure].map(d => {
-                  const val = d.value;
-                  return [d.timestamp, isNaN(val) ? null : val]
-                }) : [],
-                name: dataset.header[measure] + ' ' + compare[idx],
-                yAxis: changeChart ? index : 0,
-                color: "black",
-                showInLegend: true,
-                enableMouseTracking: true,
-                zoneAxis: 'x',
-                zones,
-              }))
-          )
-      ),]
-      : []};
+    const allMeasuresLength = selectedMeasures.length + customSelectedMeasures.length;
+    return Object.keys(compare).reduce((acc, curval, idx) => {
+      let counter = 0;
+      return([...acc, ...compare[curval].map(index => {
+        console.log("counter is", counter, allMeasuresLength)
+        const returnVal = {
+        data: compareData.length > 0 ? (Object.hasOwn(compareData[idx], index) ? compareData[idx][index].map(obj => ([obj.timestamp, obj.value])) : []) : [],
+        name: curval + ' ' + datasets.data.find(obj => obj.id === curval).header[index],
+        yAxis: changeChart ? allMeasuresLength + counter : 0,
+        color: "black",
+        showInLegend: true,
+        enableMouseTracking: true,
+        zoneAxis: 'x',
+        zones,
+      }
+      counter++;
+      return returnVal;
+    })])   
+    }, [])
+    };
 
   const handleMouseOverChart = () => {
     blockScroll();
@@ -571,7 +593,6 @@ export const Chart = () => {
       onMouseOver={() => data ? handleMouseOverChart() : null}
       onMouseLeave={() => data ? handleMouseLeaveChart() : null}
     >
-      {console.log(compareData)}
       {!data ? <LinearProgress /> : <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />}
       {data && (
         <HighchartsReact
