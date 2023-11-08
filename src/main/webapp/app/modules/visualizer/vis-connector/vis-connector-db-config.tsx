@@ -35,7 +35,7 @@ const defaultForm: IDBForm = {
     database: '',
 }
 
-const VisConnectorDBConfig = ({closeHandler, dbSystem}) => {
+const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
     const { checkConnectionResponse, checkConnectionLoading, checkConnectionError } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const [dbForm, setDbForm] = useState<IDBForm>(defaultForm);
@@ -52,13 +52,12 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem}) => {
         if (checkConnectionResponse) {
             if (checkConnectionError) {
                 setOpenSnack(true);
-                
-            } else { // to remove
-                setOpenSnack(true);
-                
+            } else{
+                setStep(3);
             }
         }
     }, [checkConnectionResponse]);
+
     
 
     const handleTextFields = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,15 +85,9 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem}) => {
         <>
             <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1, }}>
                 <Snackbar open={openSnack} autoHideDuration={2000} onClose={handleClose}>
-                    {checkConnectionError ? (
-                        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-                            {checkConnectionResponse}
-                        </Alert>
-                    ): (// to remove 
-                        <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
-                            {checkConnectionResponse}
-                        </Alert>
-                    )}
+                    <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+                        {checkConnectionResponse}
+                    </Alert>
                 </Snackbar>
                 <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
                     DB Configuration

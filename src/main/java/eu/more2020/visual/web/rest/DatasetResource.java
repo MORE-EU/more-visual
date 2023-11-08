@@ -1,8 +1,11 @@
 package eu.more2020.visual.web.rest;
 
 import eu.more2020.visual.domain.*;
+import eu.more2020.visual.middleware.datasource.QueryExecutor.QueryExecutor;
+import eu.more2020.visual.middleware.datasource.QueryExecutor.SQLQueryExecutor;
 import eu.more2020.visual.middleware.domain.*;
 import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
+import eu.more2020.visual.middleware.domain.PostgreSQL.JDBCConnection;
 import eu.more2020.visual.middleware.domain.Dataset.AbstractDataset;
 import eu.more2020.visual.middleware.domain.Query.Query;
 import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
@@ -29,7 +32,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +52,9 @@ public class DatasetResource {
     private final DatasetRepository datasetRepository;
     private final DataService dataService;
     private final CsvDataService csvDataService;
+
+    //db conncetion
+    private DatabaseConnection databaseConnection;
 
     private final FileHandlingRepository fileHandlingRepository;
 
@@ -237,21 +245,47 @@ public class DatasetResource {
     @PostMapping("/connect")
     public ResponseEntity<String> connector(@RequestBody DbConnector dbConnector) throws URISyntaxException, IOException {
         String url = null;
+        // DatabaseConnection connection = null;
         switch (dbConnector.getDbSystem()) {
             case "postgres":
                 url = "jdbc:postgresql://" + dbConnector.getHost() + ":" + dbConnector.getPort() + "/" + dbConnector.getDatabase();
+                databaseConnection = new JDBCConnection(url, dbConnector.getUsername(), dbConnector.getPassword());
                 break;
-
             default:
                 break;
-        }
-        Connection con;
-        try{
-        con = DriverManager.getConnection(url, dbConnector.getUsername(), dbConnector.getPassword());
-        return new ResponseEntity<>("Successfull login", HttpStatus.OK);
-        }
-        catch(Exception e) {
-            return new ResponseEntity<>("Credentials Error", HttpStatus.BAD_REQUEST);
+    }
+    try {
+        databaseConnection.connect();
+        return new ResponseEntity<String>("Succesfull login", HttpStatus.OK);
+    } catch (Exception e) {
+        return new ResponseEntity<String>("Credentials Error", HttpStatus.BAD_REQUEST);
+    }
+}
+
+    // @GetMapping("/database/metadata/tables")
+    // public ResponseEntity<ArrayList<String>> getDbTables() throws URISyntaxException, IOException, SQLException {
+    //     DatabaseMetaData databaseMetaData = conn.getMetaData();
+    //     ArrayList<String> tables = new ArrayList<String>();
+    //     try(ResultSet resultSet = databaseMetaData.getTables(null, null, null, new String[]{"TABLE"})){ 
+    //         while(resultSet.next()) { 
+    //             String tableName = resultSet.getString("TABLE_NAME"); 
+    //             tables.add(tableName);
+
+    //         }
+    //         return new ResponseEntity<>(tables, HttpStatus.OK);
+    //     }
+    //     catch(Exception e) {
+    //         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+    //     }
+    // }
+
+    @PostMapping("/disconnect")
+    public ResponseEntity<String> disconnector() throws URISyntaxException, IOException {
+        try {
+            databaseConnection.closeConnection();
+            return new ResponseEntity<>("Successfull disconnecting", HttpStatus.OK);
+        } catch(Exception e) {
+            return new ResponseEntity<>("Error disconnecting", HttpStatus.BAD_REQUEST);
         }
     }
 }

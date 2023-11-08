@@ -15,8 +15,8 @@ const Routes = () => (
       <ErrorBoundaryRoute path="/" exact component={Home}/>
       <ErrorBoundaryRoute path="/upload" exact component={Upload}/>
       <ErrorBoundaryRoute path="/dashboard/:id" exact component={Dashboard}/>
-      <ErrorBoundaryRoute path="/visualize" exact component={EmptyVisualizer} />
-      <ErrorBoundaryRoute exact path={"/visualize/:folder/:id?"} component={Visualizer}/>
+      {/* <ErrorBoundaryRoute path="/visualize" exact component={EmptyVisualizer} /> */}
+      <ErrorBoundaryRoute exact path={"/visualize/:folder?/:id?"} component={Visualizer}/>
       <ErrorBoundaryRoute component={PageNotFound}/>
     </Switch>
   </div>

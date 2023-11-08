@@ -115,7 +115,8 @@ const initialState = {
   alertResults: {},
   alertingPlotMode: false,
   ...forecastingInitialState,
-  ...checkConnectionInitialState
+  ...checkConnectionInitialState,
+  connected: false,
 };
 
 export const connector = createAsyncThunk('connector', async (dbConnector: {dbSystem: string, host: string, port: string, username: string, password: string, database: string}) => {
@@ -126,6 +127,25 @@ export const connector = createAsyncThunk('connector', async (dbConnector: {dbSy
     throw new Error(error.response.data);
   }
 });
+
+export const disconnector = createAsyncThunk('disconnector', async () => {
+  try {
+    const response = await axios.post(`api/disconnect`).then(res => res);
+    return response;
+  } catch (error) {
+    throw new Error(error.response.data);
+  }
+});
+
+
+// export const getDbTableNames = createAsyncThunk('getDbTableNames', async () => {
+//   try {
+//     const response = await axios.get(`api/database/metadata/tables`).then(res => res);
+//     return response;
+//   } catch (error) {
+//     throw new Error(error.response.data);
+//   }
+// })
 
 export const checkConnection = createAsyncThunk('checkConnection', async (bdConfig: { url: string; port: string; }) => {
   try {
@@ -489,7 +509,21 @@ const visualizer = createSlice({
       state.checkConnectionLoading = false;
       state.checkConnectionResponse = action.payload.data;
       state.checkConnectionError = false;
+      state.connected = true;
     });
+    builder.addCase(disconnector.fulfilled, (state, action) => {
+      state.checkConnectionLoading = false;
+      state.checkConnectionResponse = action.payload.data;
+      state.checkConnectionError = false;
+      state.connected = false;
+    });
+
+    // builder.addCase(getDbTableNames.fulfilled, (state, action) => {
+    //   state.dbTableNames = action.payload.data;
+    //   state.checkConnectionLoading = false;
+    //   state.checkConnectionError = false;
+    // });
+
     builder.addCase(checkConnection.fulfilled, (state, action) => {
       state.checkConnectionLoading = false;
       state.checkConnectionResponse = action.payload.data;
@@ -557,7 +591,7 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
       state.queryResultsLoading = true;
     });
-    builder.addMatcher(isAnyOf(checkConnection.pending, connector.pending), state => {
+    builder.addMatcher(isAnyOf(checkConnection.pending, connector.pending, disconnector.pending), state => {
       state.checkConnectionLoading = true;
     });
     builder.addMatcher(isAnyOf(liveDataImplementation.pending), state => {
@@ -574,7 +608,8 @@ const visualizer = createSlice({
         state.errorMessage = action.payload;
       }
     );
-    builder.addMatcher(isAnyOf(checkConnection.rejected, connector.rejected), (state, action) => {
+
+    builder.addMatcher(isAnyOf(checkConnection.rejected, connector.rejected, disconnector.rejected), (state, action) => {
       state.checkConnectionLoading = false;
       state.checkConnectionResponse = action.error.message;
       state.checkConnectionError = true;
@@ -608,6 +643,6 @@ export const {
   updateSoilingType,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
   setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
-  setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,setCheckConnectionResponse, setSelectedConnection
+  setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,setCheckConnectionResponse, setSelectedConnection,
 } = visualizer.actions;
 export default visualizer.reducer;

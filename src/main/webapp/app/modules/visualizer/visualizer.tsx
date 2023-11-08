@@ -1,27 +1,34 @@
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
 import { Divider, Grid } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
 import Header from './header/header';
+import VisConnector from './vis-connector/vis-connector';
 
 const mdTheme = createTheme();
 
 export const Visualizer = () => {
-  const { farmMeta, dataset, datasetChoice, selectedConnection } = useAppSelector(state => state.visualizer);
+  const [isBusy, setIsBusy] = useState(true);
+  const { farmMeta, dataset, datasetChoice, selectedConnection, connected } = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
   const params: any = useParams();
   const history = useHistory();
 
-  useEffect(() => {
-    if (params.folder !== undefined)
-    dispatch(getFarmMeta(params.folder));
+  useEffect(() => { //will propably rerun on history change
+    if (params.folder !== undefined) {
+      dispatch(getFarmMeta(params.folder));
+    }
+    else
+      setIsBusy(false);
   }, []);
 
   useEffect(() => {
@@ -61,7 +68,7 @@ export const Visualizer = () => {
             >
               <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
                 <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  {dataset && farmMeta && <VisControl />}
+                  {isBusy ? dataset && farmMeta ? <VisControl /> : <CircularProgress /> : <VisConnector />}
                 </Paper>
               </Grid>
               <Grid sx={{ width: '80%', p: 1, flexGrow: 1, height: 'calc(100% - 30px)' }}>

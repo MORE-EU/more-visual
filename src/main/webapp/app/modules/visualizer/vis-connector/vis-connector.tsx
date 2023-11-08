@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { useState } from "react";
 
 import Button from "@mui/material/Button";
@@ -12,6 +12,8 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import CloseIcon from '@mui/icons-material/Close';
 
+import { useAppSelector, useAppDispatch } from "app/modules/store/storeConfig";
+import { disconnector, setCheckConnectionResponse} from "app/modules/store/visualizerSlice";
 
 import VisConnectorDBConfig from "./vis-connector-db-config";
 
@@ -28,32 +30,39 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const VisConnector = () => {
-    const [selectedSource, setSelectedSource] = useState('');
+    const dispatch = useAppDispatch();
+    const { connected } = useAppSelector(state => state.visualizer);
+    const [ step, setStep ] = useState(0);
     const [dbSystem, setDbSystem] = useState('');
-    const [dbConfig, setDbconfing] = useState(false);
+
+    useEffect(() => {
+        if (!connected){
+            closeHandler();
+            dispatch(setCheckConnectionResponse(null));
+        }
+    },[connected]);
 
     const closeHandler = () => {
-        setSelectedSource('');
         setDbSystem('');
-        setDbconfing(false);
+        setStep(0);
     }
 
 
     return (
         <>
-        {!selectedSource && (
+        {step === 0 && (
             <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1 }}>
                 <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
                     Connect to Data Source
                 </Typography>
-                <Button variant="contained" startIcon={<StorageIcon />} onClick={() => {setSelectedSource('db');}}>Database</Button>
+                <Button variant="contained" startIcon={<StorageIcon />} onClick={() => {setStep(1);}}>Database</Button>
                     <Button component="label" variant="contained" startIcon={<UploadFileIcon/>}>
                         Filesystem
                         <VisuallyHiddenInput type="file" />
                     </Button>
             </Box>
         )}
-        { selectedSource === 'db' && !dbConfig && (
+        { step === 1 && (
             <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1 }}>
                 <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
                     Select DB System
@@ -61,12 +70,17 @@ const VisConnector = () => {
                     <Select size="small" value={dbSystem} onChange={(e) => setDbSystem(e.target.value)}>
                         <MenuItem value='postgres'>postgres</MenuItem>
                     </Select>
-                    <Button variant="contained" type='submit' onClick={() => { if(dbSystem) setDbconfing(true);}}>Continue</Button>
+                    <Button variant="contained" type='submit' onClick={() => { if(dbSystem) setStep(2); }}>Continue</Button>
                 <Button variant="text" startIcon={<CloseIcon />} onClick={closeHandler}>Close</Button>
             </Box>
         )}
-        {selectedSource === 'db' && dbConfig && (
-            <VisConnectorDBConfig closeHandler={closeHandler} dbSystem={dbSystem}/>
+        { step === 2 && (
+            <VisConnectorDBConfig closeHandler={closeHandler} dbSystem={dbSystem} setStep={setStep}/>
+        )}
+        { connected && (
+            <Button variant="contained" onClick={() => { dispatch(disconnector()); }}>
+                Disconnect
+            </Button>
         )}
         </>
     );
