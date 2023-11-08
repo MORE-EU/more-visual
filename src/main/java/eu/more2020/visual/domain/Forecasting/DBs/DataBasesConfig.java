@@ -11,6 +11,8 @@ public class DataBasesConfig {
 
     private String bucket;
 
+    private String kind;
+
     private String org;
 
     private String mongo_uri;
@@ -21,11 +23,12 @@ public class DataBasesConfig {
 
     private String mongo_user_password;
 
-    public DataBasesConfig(String influx_url, String token, String bucket, String org, String mongo_uri, String mongo_db_name,
+    public DataBasesConfig(String influx_url, String token, String bucket, String org, String mongo_uri, String mongo_db_name, String kind,
             String mongo_user_name, String mongo_user_password) {
         this.influx_url = influx_url;
         this.token = token;
         this.bucket = bucket;
+        this.kind = kind;
         this.org = org;
         this.mongo_uri = mongo_uri;
         this.mongo_db_name = mongo_db_name;
@@ -34,6 +37,14 @@ public class DataBasesConfig {
     }
 
     public DataBasesConfig() {
+    }
+
+    public String getKind() {
+        return kind;
+    }
+
+    public void setKind(String kind) {
+        this.kind = kind;
     }
     
     public String getInflux_url() {

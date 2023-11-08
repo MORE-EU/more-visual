@@ -110,6 +110,7 @@ public class ForecastingUtils {
             FileInputStream inputStream = new FileInputStream(dbSettings);
             properties.load(inputStream);
             dbConfig.setBucket(properties.getProperty("bucket"));
+            dbConfig.setKind(properties.getProperty("kind"));
             dbConfig.setOrg(properties.getProperty("org"));
             dbConfig.setToken(properties.getProperty("token"));
             dbConfig.setMongo_uri(properties.getProperty("mongo_uri"));
@@ -145,7 +146,6 @@ public class ForecastingUtils {
                 String dt = record.get("datetime");
                 Date date = sdf.parse(dt);
                 Instant datetime = date.toInstant();
-
                 Double active_power = Double.parseDouble(record.get("active_power"));
                 Double roto_speed = Double.parseDouble(record.get("roto_speed"));
                 Double wind_speed = Double.parseDouble(record.get("wind_speed"));
@@ -188,7 +188,7 @@ public class ForecastingUtils {
 
         String query = String.format(
                 "from(bucket:\"%s\") |> range(start: 0) |> filter(fn: (r) => r._measurement == \"%s\") |> limit(n: 1)",
-                dbCon.getBucket(), "bebeze");
+                dbCon.getBucket(), dbCon.getKind());
 
         List<FluxTable> tables = queryApi.query(query);
         if (tables.isEmpty()) {
