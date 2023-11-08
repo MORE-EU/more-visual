@@ -10,7 +10,7 @@ import {
   toggleSoilingDetection,
   setDetectedChangepointFilter,
   toggleCustomChangepoints,
-  applyDeviationDetection,
+  applyDeviationDetection, updateDetectedChangepointFilter,
 } from "app/modules/store/visualizerSlice";
 import {AddCustomChangepoint} from "./add-custom-changepoint";
 import Box from "@mui/material/Box";
@@ -44,6 +44,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   shownMeasures} = props;
 
   useEffect(()=>{
+    dispatch(updateDetectedChangepointFilter(90));
     dispatch(getManualChangepoints(dataset.id));
   }, []);
 
@@ -135,7 +136,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
           size="small"
           disabled={!changepointDetectionEnabled}
           onChange= {(e) => handleChangepointsChange(e)}
-          defaultValue={detectedChangepointFilter}
+          value={detectedChangepointFilter}
           getAriaValueText = {(val) => ("Top" + val.toString() + "%")}
           aria-label="Small"
           valueLabelDisplay="auto"

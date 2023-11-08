@@ -31,7 +31,7 @@ HighchartsMore(Highcharts);
 annotationsAdvanced(Highcharts);
 
 export const Chart = () => {
-  const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,customSelectedMeasures,measureColors,queryResultsLoading,filter, customChangepoints,
+  const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,customSelectedMeasures,measureColors,queryResultsLoading,filter,
     queryResults,changeChart,compare,changepointDetectionEnabled,detectedChangepointFilter,customChangepointsEnabled,data,compareData,
     forecastData,soilingEnabled,soilingType,alertingPlotMode,alertResults,forecastingDataSplit,soilingWeeks,yawMisalignmentEnabled,secondaryData,chartType,
     liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate} = useAppSelector(state => state.visualizer);
@@ -48,11 +48,9 @@ export const Chart = () => {
   const [changepointHighlight, setChangepointHighlight] = useState(false);
   //Refs
   const latestFrequency = useRef(resampleFreq);
-  const latestLeftSide = useRef(null);
   const fetchDataRef = useRef({isScrolling: false,scrollTimeout: null});
   const chart = useRef(chartRef);
   const timeRange = useRef(null);
-  const latestRightSide = useRef(null);
   const latestFolder = useRef(null);
   const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
@@ -390,7 +388,8 @@ export const Chart = () => {
     ],
     name,
     color: "transparent",
-    yAxis: changeChart ? selectedMeasures.length + idx : 0,
+    yAxis: changeChart ?
+      (secondaryData ? ( 1 + customSelectedMeasures.length + selectedMeasures.length + idx) : (customSelectedMeasures.length + selectedMeasures.length + idx)) : 0,
     zoneAxis: 'x',
     enableMouseTracking: false,
     showInLegend: false
@@ -443,7 +442,7 @@ export const Chart = () => {
         const val = d.values[0];
         return { x: d.timestamp, y: isNaN(val) ? null : val, tt: d.values[1] ? 'Est. Power Loss: ' + d.values[1].toFixed(2) : null };
       });// @ts-ignore
-      chartData = [...chartData, { data: sData, yAxis: sz, name: getSecondaryText() }];
+      chartData = [...chartData, { data: sData, yAxis: sz, color: 'blue', enableMouseTracking: true, name: getSecondaryText() }];
     }
     return chartData;
   };
@@ -473,7 +472,6 @@ export const Chart = () => {
             offset: 0,
             }))
         )
-        .concat(...[dummyPointCreator("minPoint", "0px", "0px"), dummyPointCreator("maxPoint", "0px", "0px")])
       : selectedMeasures.map((measure, idx) => ({
           title: {
             enabled: false,
@@ -484,7 +482,6 @@ export const Chart = () => {
           height: '100%',
           offset: undefined,
         }))
-        .concat(...[dummyPointCreator("minPoint", "0%", "100%"), dummyPointCreator("maxPoint", "0%", "100%")]);
     if (secondaryData) {
       const sz = yAxisData.length;
       const percent = Math.floor(90 / sz);
@@ -512,6 +509,8 @@ export const Chart = () => {
           }));
       yAxisData.push(newAxis);
     }
+    yAxisData = yAxisData
+      .concat(...[dummyPointCreator("minPoint", "-10px", "0px"), dummyPointCreator("maxPoint", "-10px", "0px")])
     return yAxisData;
   };
 
@@ -652,9 +651,9 @@ export const Chart = () => {
               split: true,
             },
             series: [...computeChartData(), ...forecastChartData, ...compareChartData(),
-              dummySeriesCreator("minPoint",dataset.timeRange.from, 0),
+              dummySeriesCreator("minPoint", dataset.timeRange.from, 0),
               dummySeriesCreator("maxPoint", dataset.timeRange.to, 1)
-          ],
+            ],
             chart: {
               type: chartType,
               marginTop: 10,

@@ -1,5 +1,5 @@
 export interface IDataPoint {
-  timestamp: string;
+  timestamp: number;
   values: number[];
   timeRange: number[];
 }

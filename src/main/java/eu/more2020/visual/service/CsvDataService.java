@@ -43,7 +43,7 @@ public class CsvDataService {
     }
 
     public QueryResults executeQuery(CsvDataset dataset, Query query) {
-        log.debug(query.toString());
+//        log.debug(query.toString());
         QueryResults queryResults = new QueryResults();
         queryResults.setData(new HashMap<>());
         queryResults.setTimeRange(new TimeRange(query.getFrom(), query.getTo()));
@@ -53,7 +53,7 @@ public class CsvDataService {
             List<CsvTTI> ttis = this.getIndexes(dataset, query);
             for (CsvTTI tti : ttis) {
                 QueryResults partialResults = tti.executeQuery(query);
-                LOG.debug("{}", partialResults);
+//                LOG.debug("{}", partialResults);
 //                queryResults.getData().addAll(partialResults.getData());
                 partialResults.getData().forEach((key, list2) -> queryResults.getData().merge(key, list2, (list1, listToAdd) -> {
                     list1.addAll(listToAdd);

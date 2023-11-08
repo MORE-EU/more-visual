@@ -93,7 +93,6 @@ const PatternCard = (props: IPatternCardProps) => {
         <TableCell>
           <SmallTimeSeriesChart data={getData(changepoint.range.from, changepoint.range.to)} />
         </TableCell>
-        <TableCell align="center">{dataset.header[changepoint.measure]}</TableCell>
         <TableCell align="center">
           <span style={{ textAlign: "center" }}>{getDateFormatted(new Date(changepoint.range.from))}<br />
           -<br />

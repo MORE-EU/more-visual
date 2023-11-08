@@ -106,7 +106,7 @@ const initialState = {
   changepointDetectionEnabled: false,
   manualChangepointsEnabled: false,
   customChangepointsEnabled: false,
-  detectedChangepointFilter: 90,
+  detectedChangepointFilter: 0,
   forecasting: false,
   soilingEnabled: false,
   yawMisalignmentEnabled: false,
@@ -397,6 +397,12 @@ const visualizer = createSlice({
     updateSoilingType(state, action) {
       state.soilingType = action.payload;
     },
+    updateDetectedChangepoints(state, action) {
+      state.detectedChangepoints  = action.payload;
+    },
+    updateDetectedChangepointFilter(state, action) {
+      state.detectedChangepointFilter = action.payload;
+    },
     updateAlertResults(state, action) {
       state.alertResults = { ...action.payload };
     },
@@ -614,9 +620,9 @@ const visualizer = createSlice({
 
 export const {
   resetChartValues,resetFetchData,updateSelectedMeasures,updateCustomSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
-  updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef,
+  updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef, updateDetectedChangepoints,
   updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks,
-  updateSoilingType,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
+  updateDetectedChangepointFilter, updateSoilingType,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
   setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
   setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,setCheckConnectionResponse, setSelectedConnection

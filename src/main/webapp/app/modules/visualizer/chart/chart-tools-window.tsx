@@ -39,7 +39,7 @@ const ChartToolsWindow = () => {
         <Grid sx={{ height: '90%' }}>
           {activeTool === 'Pattern Extraction' && <PatternExtraction />}
           {activeTool === 'Soiling Detection' && <SoilingDetection />}
-          {activeTool === 'Yaw Misalignment' && <YawMisalignment />}
+          {activeTool === 'Yaw Misalignment Detection' && <YawMisalignment />}
           {activeTool === 'Forecasting' && <Forecasting />}
           {activeTool === 'Filtering' && <Filter />}
         </Grid>

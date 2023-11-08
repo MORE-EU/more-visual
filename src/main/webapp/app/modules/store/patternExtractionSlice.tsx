@@ -55,7 +55,7 @@ export const applySearchPatterns = createAsyncThunk(
   'applySearchPatterns',
   async (data: { dataset, searchPatterns: IPattern[]}) => {
     const { dataset, searchPatterns} = data;
-    const response = Promise.all(
+    return Promise.all(
       searchPatterns.map(p => {
         const pattern = {
           id: p.id,
@@ -66,8 +66,6 @@ export const applySearchPatterns = createAsyncThunk(
         return axios.post(`api/tools/pattern`, pattern).then(res => res.data);
       })
     ).then(res => res.map(r => r.data));
-    return response;
-    // return fetchPatternGroups(searchPatterns);
   }
 );
 

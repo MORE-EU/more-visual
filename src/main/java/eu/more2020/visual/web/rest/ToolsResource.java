@@ -8,7 +8,7 @@ import eu.more2020.visual.domain.Detection.PatternDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.middleware.domain.ImmutableDataPoint;
 import eu.more2020.visual.repository.AlertRepository;
-import eu.more2020.visual.repository.ToolsRepository;
+import eu.more2020.visual.service.ToolsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,10 +22,10 @@ import java.util.List;
 @RequestMapping("/api")
 public class ToolsResource {
     private final Logger log = LoggerFactory.getLogger(DatasetResource.class);
-    private final ToolsRepository toolsRepository;
+    private final ToolsService toolsRepository;
     private final AlertRepository alertRepository;
 
-    public ToolsResource(ToolsRepository toolsRepository,
+    public ToolsResource(ToolsService toolsRepository,
                          AlertRepository alertRepository) {
         this.toolsRepository = toolsRepository;
 

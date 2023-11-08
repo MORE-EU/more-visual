@@ -1,4 +1,4 @@
-package eu.more2020.visual.repository;
+package eu.more2020.visual.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,31 +16,31 @@ import eu.more2020.visual.middleware.domain.TimeRange;
 import eu.more2020.visual.middleware.util.DateTimeUtil;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.NettyChannelBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Repository
-public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase implements ToolsRepository {
+@Service
+public class ToolsServiceImpl extends RouteGuideGrpc.RouteGuideImplBase implements ToolsService {
 
     private final ApplicationProperties applicationProperties;
 
     private final DateTimeFormatter formatter;
 
-    private final Logger log = LoggerFactory.getLogger(ToolsRepositoryImpl.class);
+    private final Logger log = LoggerFactory.getLogger(ToolsServiceImpl.class);
 
-    public ToolsRepositoryImpl(ApplicationProperties applicationProperties) {
+    public ToolsServiceImpl(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
         this.formatter =
             new DateTimeFormatterBuilder().appendPattern(applicationProperties.getTimeFormat())
@@ -71,6 +71,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             // Create a channel to connect to the target gRPC server
             ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
                 .usePlaintext()
+                .idleTimeout(2, TimeUnit.SECONDS)
                 .build();
 
             // Create a stub using the generated code and the channel
@@ -93,23 +94,22 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
                 gtChangepoints.add(new Changepoint(i, new TimeRange(DateTimeUtil.parseDateTimeString(starts.get(ii).asText(), formatter, ZoneId.of("UTC")),
-                    DateTimeUtil.parseDateTimeString(ends.get(ii).asText(), formatter, ZoneId.of("UTC"))),0));
+                    DateTimeUtil.parseDateTimeString(ends.get(ii).asText(), formatter, ZoneId.of("UTC"))), 0));
             }
             // Shutdown the channel
             channel.shutdown();
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return gtChangepoints;
     }
 
     @Override
-    public List<ImmutableDataPoint> forecasting(String id){
+    public List<ImmutableDataPoint> forecasting(String id) {
         String jsonName = applicationProperties.getWorkspacePath() + "/" + id + "_predict.json";
         File json = new File(jsonName);
         List<ImmutableDataPoint> forecastData = new ArrayList<>();
-        if(json.exists()){
+        if (json.exists()) {
             // read json
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -122,15 +122,14 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
                 }
                 JsonNode responseObject = objectMapper.readTree(content.toString());
                 Iterator<Map.Entry<String, JsonNode>> iter = responseObject.fields();
-                while(iter.hasNext()){
+                while (iter.hasNext()) {
                     Map.Entry<String, JsonNode> datum = iter.next();
                     double[] vals = new double[1];
                     vals[0] = datum.getValue().asDouble();
                     ImmutableDataPoint dataPoint = new ImmutableDataPoint(Instant.ofEpochMilli(Long.parseLong(datum.getKey())).toEpochMilli(), vals);
                     forecastData.add(dataPoint);
                 }
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -153,8 +152,9 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
                 .build();
 
             // Create a channel to connect to the target gRPC server
-            ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
+            ManagedChannel channel = NettyChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
                 .usePlaintext()
+                .idleTimeout(5, TimeUnit.SECONDS)
                 .build();
 
             // Create a stub using the generated code and the channel
@@ -175,9 +175,11 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             Integer noOfIntervals = starts.size();
             for (Integer i = 0; i < noOfIntervals; i++) {
                 String ii = i.toString();
-                detectedChangepoints.add(new Changepoint(i, new TimeRange(DateTimeUtil.parseDateTimeString(starts.get(ii).asText(), formatter, ZoneId.of("UTC")),
-                    DateTimeUtil.parseDateTimeString(ends.get(ii).asText(), formatter, ZoneId.of("UTC"))),0));
+                detectedChangepoints.add(
+                    new Changepoint(i, new TimeRange(DateTimeUtil.parseDateTimeString(starts.get(ii).asText(), formatter, ZoneId.of("UTC")),
+                    DateTimeUtil.parseDateTimeString(ends.get(ii).asText(), formatter, ZoneId.of("UTC"))), 0));
             }
+            log.info("{}", detectedChangepoints);
             channel.shutdown();
         } catch (Exception e) {
             e.printStackTrace();
@@ -187,16 +189,14 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
 
     @Override
     public List<ImmutableDataPoint> soilingDetection(DeviationDetection deviationDetection) {
-        if(deviationDetection.getType().equals("soilingRatio")){
+        if (deviationDetection.getType().equals("soilingRatio")) {
             return getSoilingIndex(deviationDetection);
-        }
-        else if(deviationDetection.getType().equals("powerLoss")){
+        } else if (deviationDetection.getType().equals("powerLoss")) {
             return getPowerLoss(deviationDetection);
-        }
-        else return getSoilingIndex(deviationDetection);
+        } else return getSoilingIndex(deviationDetection);
     }
 
-    private List<ImmutableDataPoint> getSoilingIndex(DeviationDetection deviationDetection){
+    private List<ImmutableDataPoint> getSoilingIndex(DeviationDetection deviationDetection) {
         List<ImmutableDataPoint> dataPoints = new ArrayList<>();
         try {
             List<String> cpStarts = new ArrayList<>();
@@ -218,6 +218,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             // Create a channel to connect to the target gRPC server
             ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
                 .usePlaintext()
+                .idleTimeout(5, TimeUnit.SECONDS)
                 .build();
 
             // Create a stub using the generated code and the channel
@@ -251,7 +252,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
     }
 
 
-    private List<ImmutableDataPoint> getPowerLoss(DeviationDetection deviationDetection){
+    private List<ImmutableDataPoint> getPowerLoss(DeviationDetection deviationDetection) {
         List<ImmutableDataPoint> dataPoints = new ArrayList<>();
         try {
             List<String> cpStarts = new ArrayList<>();
@@ -273,6 +274,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             // Create a channel to connect to the target gRPC server
             ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
                 .usePlaintext()
+                .idleTimeout(5, TimeUnit.SECONDS)
                 .build();
 
             // Create a stub using the generated code and the channel
@@ -323,6 +325,7 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
             ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(),
                     applicationProperties.getToolPort())
                 .usePlaintext()
+                .idleTimeout(5, TimeUnit.SECONDS)
                 .build();
 
             // Invoke the remote method on the target server
@@ -348,75 +351,57 @@ public class ToolsRepositoryImpl extends RouteGuideGrpc.RouteGuideImplBase imple
                 dataPoints.add(dataPoint);
             });
             channel.shutdown();
-//            dataPoints = getYawData(rangeDetection.getRange().getFrom(), rangeDetection.getRange().getTo());
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return dataPoints;
     }
 
-     @Override
-     public List<Changepoint> patternDetection(PatternDetection patternDetection){
-         try {
-             log.info(String.valueOf(patternDetection));
-              FrecehetRequest request = FrecehetRequest.newBuilder()
-                  .setStartDate(DateTimeUtil.formatTimeStamp(formatter,patternDetection.getRange().getFrom()))
-                  .setEndDate(DateTimeUtil.formatTimeStamp(formatter,patternDetection.getRange().getTo()))
-                  .setR(1)
-                  .build();
+    @Override
+    public List<Changepoint> patternDetection(PatternDetection patternDetection) {
+        List<Changepoint> detectedPatterns = new ArrayList<>();
+        try {
+            log.info(String.valueOf(patternDetection));
+            FrechetRequest request = FrechetRequest.newBuilder()
+                .setStartDate(DateTimeUtil.formatTimeStamp(formatter, patternDetection.getRange().getFrom()))
+                .setEndDate(DateTimeUtil.formatTimeStamp(formatter, patternDetection.getRange().getTo()))
+                .build();
 
 
-             // Create a channel to connect to the target gRPC server
-             ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
-                 .usePlaintext()
-                 .build();
+            // Create a channel to connect to the target gRPC server
+            ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getToolHost(), applicationProperties.getToolPort())
+                .usePlaintext()
+                .idleTimeout(5, TimeUnit.SECONDS)
+                .build();
 
-             // Create a stub using the generated code and the channel
-             DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
+            // Create a stub using the generated code and the channel
+            DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
 
-             // Invoke the remote method on the target server
-             FrechetResponse response = stub.frechet(request);
+            // Invoke the remote method on the target server
+            FrechetResponse response = stub.frechet(request);
 
-             // Convert the response to JSON string
-             String json = response.getResult();
-             log.info("READ JSON: {}", json);
+            // Convert the response to JSON string
+            String json = response.getResult();
 
-             // Create an ObjectMapper
-             ObjectMapper objectMapper = new ObjectMapper();
+            // Create an ObjectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
 
-             JsonNode responseObject = null;
+            JsonNode responseObject = null;
 
-             responseObject = objectMapper.readTree(json);
-             log.info("READ JSON: {}", responseObject);
- //
-         } catch (Exception e) {
-             e.printStackTrace();
-         }
-         return  null;
-     }
-
-    public static List<ImmutableDataPoint> getYawData(LocalDateTime startDate, LocalDateTime endDate) {
-        List<ImmutableDataPoint> dataPoints = new ArrayList<>();
-        Random random = new Random();
-
-        double yawAngle = 0; // Initialize yaw angle at 0 degrees
-        LocalDateTime currentTime = startDate;
-
-        while (currentTime.isBefore(endDate)) {
-            // Simulate slower yaw angle changes (e.g., from -4 to 4 degrees over a longer time)
-            yawAngle += (random.nextDouble() * 0.2 - 0.1) * 4; // Small random change (-0.4 to 0.4 degrees)
-            yawAngle = Math.min(4, Math.max(-4, yawAngle)); // Ensure angle stays within -4 to 4 degrees
-            ImmutableDataPoint dataPoint = new ImmutableDataPoint(currentTime.toInstant(ZoneOffset.UTC).toEpochMilli(), new double[]{yawAngle});
-            dataPoints.add(dataPoint);
-
-            // Add some randomness to the time intervals (change every long time)
-            int minutesToAdd = random.nextInt(60) + 30; // Random interval between 30 and 90 minutes
-            currentTime = currentTime.plusMinutes(minutesToAdd);
+            responseObject = objectMapper.readTree(json);
+            JsonNode starts = responseObject.get("start_date");
+            JsonNode ends = responseObject.get("end_date");
+            for (Integer i = 0; i < starts.size(); i++) {
+                String ii = i.toString();
+                detectedPatterns.add(new Changepoint(i, new TimeRange(DateTimeUtil.parseDateTimeString(starts.get(ii).asText(), formatter, ZoneId.of("UTC")),
+                    DateTimeUtil.parseDateTimeString(ends.get(ii).asText(), formatter, ZoneId.of("UTC"))), 0));
+            }
+            channel.shutdown();
+            //
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        return dataPoints;
+        return detectedPatterns;
     }
-
 
 }

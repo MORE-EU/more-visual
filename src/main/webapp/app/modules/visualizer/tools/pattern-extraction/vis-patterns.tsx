@@ -62,15 +62,14 @@ export const VisPatterns = () => {
   const handleNewPatternChange = () => {
     dispatch(toggleCustomChangepoints(!customChangepointsEnabled));
   }
+
   const handleToggleSearchPatterns = async () => {
     setLoading(true); // Set loading to true before dispatching
     try {
-      const result = await dispatch(applySearchPatterns({ dataset, searchPatterns }));
+      await dispatch(applySearchPatterns({ dataset, searchPatterns }));
       // If the dispatch is successful, you can access the result here if needed
-      console.log('Dispatch successful:', result);
     } catch (error) {
       // Handle any errors that occur during dispatch here
-      console.error('Dispatch error:', error);
     } finally {
       setLoading(false); // Set loading to false whether dispatch succeeds or fails
     }
@@ -94,7 +93,6 @@ export const VisPatterns = () => {
           <TableHead>
             <TableRow>
               <TableCell align="center">PATTERN</TableCell>
-              <TableCell align="center">MEASURE NAME</TableCell>
               <TableCell align="center">RANGE</TableCell>
               <TableCell align="center"></TableCell>
               <TableCell align="center"></TableCell>

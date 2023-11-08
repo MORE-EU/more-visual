@@ -7,10 +7,12 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.*;
+import eu.more2020.visual.middleware.datasource.QueryExecutor.InfluxDBQueryExecutor;
 import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
 import eu.more2020.visual.middleware.datasource.QueryExecutor.ModelarDBQueryExecutor;
 import eu.more2020.visual.middleware.domain.DataFileInfo;
 import eu.more2020.visual.middleware.domain.Dataset.*;
+import eu.more2020.visual.middleware.domain.InfluxDB.InfluxDBConnection;
 import eu.more2020.visual.middleware.domain.ModelarDB.ModelarDBConnection;
 import eu.more2020.visual.middleware.domain.TimeRange;
 import eu.more2020.visual.middleware.util.DateTimeUtil;
@@ -232,7 +234,12 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 dataset = new ModelarDBDataset(modelarDBQueryExecutor, id, schema, table, timeFormat, timeCol, idCol, valueCol);
                 break;
             case "influx":
-                dataset = new InfluxDBDataset(config, schema, table, timeFormat, timeCol);
+                String url = "http://leviathan.imsi.athenarc.gr:8086";
+                String token = "jGlRrSisGuDn6MEyIcJMMoiqirFXwbdNnKPtoZAasaRSQZJ0iTRx8FQrQ-zob5j_UlUBuGzq_mYdf1LNWtSbqg==";
+                String org = "ATHENA";
+                InfluxDBConnection influxDBConnection = new InfluxDBConnection(url, org, token);
+                InfluxDBQueryExecutor influxDBQueryExecutor = influxDBConnection.getSqlQueryExecutor();
+                dataset = new InfluxDBDataset(influxDBQueryExecutor, id, org, schema, table, timeFormat, timeCol);
                 break;
             default:
                 break;

@@ -17,7 +17,7 @@ import {YawMisalignment} from "app/modules/visualizer/tools/yaw-misalignment/yaw
 
 const VisToolkit = () => {
 
-  const {farmMeta, openToolkit, activeTool} = useAppSelector(state => state.visualizer);
+  const {farmMeta, dataset} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const handleToolClick = key => e => {
@@ -30,20 +30,19 @@ const VisToolkit = () => {
           Tools
           </Typography>
           <List>
-            <ListItemButton key={0} onClick={handleToolClick("Pattern Extraction")}>
+            {dataset.id == "eugene" && <ListItemButton key={0} onClick={handleToolClick("Pattern Extraction")}>
               <ListItemIcon>
                 <PatternIcon/>
               </ListItemIcon>
               <ListItemText primary={"Pattern Extraction"}/>
-            </ListItemButton>
+            </ListItemButton>}
             {farmMeta.resType === 0 && <><ListItemButton key={1} onClick={handleToolClick("Soiling Detection")}>
               <ListItemIcon>
                 <ManageSearchIcon/>
               </ListItemIcon>
               <ListItemText primary={"Soiling Detection"}/>
             </ListItemButton></>}
-            {farmMeta.resType === 1 && <>
-              <ListItemButton key={2}>
+            {farmMeta.resType === 1 && <><ListItemButton key={2}>
                 <ListItemIcon>
                   <ManageSearchIcon/>
                 </ListItemIcon>
