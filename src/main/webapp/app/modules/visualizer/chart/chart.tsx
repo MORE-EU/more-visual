@@ -47,12 +47,9 @@ export const Chart = () => {
   const [detectedPlotBands, setDetectedPlotBands] = useState([]);
   const [changepointHighlight, setChangepointHighlight] = useState(false);
   //Refs
-  const latestFrequency = useRef(resampleFreq);
-  const latestLeftSide = useRef(null);
   const fetchDataRef = useRef({isScrolling: false,scrollTimeout: null});
   const chart = useRef(chartRef);
   const timeRange = useRef(null);
-  const latestRightSide = useRef(null);
   const latestFolder = useRef(null);
   const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
@@ -109,12 +106,16 @@ export const Chart = () => {
   }, [soilingEnabled]);
 
   useEffect(() => {
-    !liveDataImplLoading && data && alerts && dispatch(updateAlertResults(chartAlertingChecker(data, alerts, dataset, selectedMeasures)));
-  }, [liveDataImplLoading, selectedMeasures, alerts]);
+    data && alerts && dispatch(updateAlertResults(chartAlertingChecker(data, alerts, dataset, selectedMeasures, alertResults)))
+  }, [selectedMeasures, data, alerts])
+
+  // useEffect(() => {
+  //   !liveDataImplLoading && data && alerts && dispatch(updateAlertResults(chartAlertingChecker(data, alerts, dataset, selectedMeasures, alertResults)));
+  // }, [liveDataImplLoading, selectedMeasures, alerts]);
 
   useEffect(() => {
-    alertingPlotMode && data && Object.keys(alertResults).length > 0 && setAlertingPlotBands(alertingPlotBandsCreator(alertResults));
-  }, [alertingPlotMode, selectedMeasures, alertResults]);
+    Object.keys(alertResults).length > 0 && setAlertingPlotBands(alertingPlotBandsCreator(alertResults, alerts));
+  }, [alertResults, alerts]);
 
   useEffect(() => {
     isYawMisalignmentEnabled.current = yawMisalignmentEnabled;
@@ -146,7 +147,7 @@ export const Chart = () => {
     if (Object.keys(compare).length !== 0) {
       dispatch(updateCompareQueryResults({ folder, compare, from, to, filter }));
     }
-    if ((selectedMeasures.length + customSelectedMeasures.length) + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) === 6) toast('Maximum number of measures reached');
+    if ((selectedMeasures.length + customSelectedMeasures.length) + Object.values(compare).reduce((acc: number, arr: number[]) => acc + arr.length, 0) === 6) toast('Maximum number of measures reached');
   }, [dataset, selectedMeasures]);
 
   useEffect(() => {
@@ -390,7 +391,7 @@ export const Chart = () => {
     ],
     name,
     color: "transparent",
-    yAxis: changeChart ? selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) + idx : 0,
+    yAxis: changeChart ? selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc: number, arr: number[]) => acc + arr.length, 0) + idx : 0,
     zoneAxis: 'x',
     enableMouseTracking: false,
     showInLegend: false
@@ -449,7 +450,7 @@ export const Chart = () => {
   };
 
   const computeYAxisData = () => {
-    const allMeasuresLength = selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0);
+    const allMeasuresLength = selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc: number, arr: number[]) => acc + arr.length, 0);
     let yAxisData = changeChart
       ? selectedMeasures.map((measure, idx) => ({
           title: {

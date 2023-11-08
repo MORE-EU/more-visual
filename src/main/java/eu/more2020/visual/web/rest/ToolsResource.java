@@ -80,10 +80,10 @@ public class ToolsResource {
         return alertRepository.saveAlert(alertInfo);
     }
 
-    @PostMapping("/alerts/remove/{alertName}")
-    public List<Alert> deleteAlert(@PathVariable String alertName) throws IOException {
+    @PostMapping("/alerts/remove/{datasetId}/{alertName}")
+    public List<Alert> deleteAlert(@PathVariable String datasetId, @PathVariable String alertName) throws IOException {
         log.debug("REST request to remove alert with name: {}", alertName);
-        return alertRepository.deleteAlert(alertName);
+        return alertRepository.deleteAlert(alertName, datasetId);
     }
 
     @PostMapping("/alerts/edit")

@@ -13,7 +13,7 @@ import Header from './header/header';
 const mdTheme = createTheme();
 
 export const Visualizer = () => {
-  const { farmMeta, dataset, datasetChoice, selectedConnection } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, datasetChoice, selectedConnection, alerts } = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
   const params: any = useParams();

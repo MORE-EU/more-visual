@@ -46,9 +46,40 @@ public class Alert implements Serializable {
     
     }
 
+    class DurationClass {
+
+        private Float number;
+        private String unit;
+
+        public DurationClass() {
+        }
+
+        public DurationClass(Float number, String unit) {
+            this.number = number;
+            this.unit = unit;
+        }
+
+        public Float getNumber() {
+            return number;
+        }
+
+        public void setNumber(Float number) {
+            this.number = number;
+        }
+
+        public String getUnit() {
+            return unit;
+        }
+
+        public void setUnit(String unit) {
+            this.unit = unit;
+        }
+        
+    }
+
     private String name;
     private LocalDateTime dateCreated;
-    private Integer duration;
+    private DurationClass duration;
     private String measure;
     private String operation;
     private AlertValues values;
@@ -119,11 +150,11 @@ public class Alert implements Serializable {
         this.datasetId = datasetId;
     }
 
-    public Integer getDuration() {
+    public DurationClass getDuration() {
         return this.duration;
     }
 
-    public void setDuration(Integer duration) {
+    public void setDuration(DurationClass duration) {
         this.duration = duration;
     }
 

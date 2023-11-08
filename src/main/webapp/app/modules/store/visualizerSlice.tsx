@@ -11,6 +11,7 @@ import axios from 'axios';
 import moment, { Moment } from 'moment';
 import { IDatasets, defaultDatasets } from 'app/shared/model/datasets.model';
 import { RootState } from './storeConfig';
+import { IDataset } from 'app/shared/model/dataset.model';
 
 
 const seedrandom = require('seedrandom');
@@ -117,7 +118,7 @@ const initialState = {
   alerts: [] as IAlerts[],
   alertsLoading: false,
   alertingPreview: false,
-  alertResults: {},
+  alertResults: {} as {[key: string]: IAlertResults},
   alertingPlotMode: false,
   ...forecastingInitialState,
   ...checkConnectionInitialState
@@ -174,8 +175,9 @@ export const editAlert = createAsyncThunk('editAlert', async (alertInfo: IAlerts
   return response;
 });
 
-export const deleteAlert = createAsyncThunk('deleteAlert', async (alertName: String) => {
-  const response = await axios.post(`api/alerts/remove/${alertName}`).then(res => res);
+export const deleteAlert = createAsyncThunk('deleteAlert', async (info: {alertName: String, datasetId: String}) => {
+  const {alertName, datasetId} = info;
+  const response = await axios.post(`api/alerts/remove/${datasetId}/${alertName}`).then(res => res);
   return response;
 });
 
