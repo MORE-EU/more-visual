@@ -52,6 +52,13 @@ const chartAlertingChecker = (
           severity: alert.severity,
           show: Object.hasOwn(alertResults, alert.name) ? alertResults[alert.name].show : false,
         };
+      }else{
+        allAlerts[alert.name] = {
+          results: [],
+          color: null,
+          severity: null,
+          show: Object.hasOwn(alertResults, alert.name) ? alertResults[alert.name].show : false
+        }
       }
     }
   }
