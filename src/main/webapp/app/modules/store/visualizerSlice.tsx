@@ -258,12 +258,13 @@ export const updateCompareQueryResults = createAsyncThunk(
   async (data: { folder: string, compare: {[key: number]: any[]}; from: number; to: number; filter: {} }, {getState}) => {
     const {visualizer} = getState() as RootState;
     const { compare, from, to, filter, folder } = data;
-    const response = await Promise.all(Object.keys(compare).map(
+    const response = await Promise.all(
+      Object.keys(compare).map(
       key => {
         const query = from !== null && to !== null ? {from,to,viewPort: {width: 1000, height: 600}, measures: compare[key], filter} : {range: null}
-        return axios.post(`api/datasets/${folder}/${key}/query`, query).then(res => res.data)
+        return axios.post(`api/datasets/${folder}/${key}/query`, query).then(res => ({name: key, data: res.data.data}))
       }
-    )).then(res => res.map(r => r.data));
+    )).then(res => res.map(r => r));
     return response;
   }
 );
@@ -438,6 +439,9 @@ const visualizer = createSlice({
     },
     setCheckConnectionResponse(state, action) {
       state.checkConnectionResponse = action.payload;
+    },
+    setCompareData(state, action) {
+      state.compareData = action.payload;
     },
     setSelectedConnection(state, action) {
       state.selectedConnection = action.payload;
@@ -623,7 +627,7 @@ const visualizer = createSlice({
 
 export const {
   resetChartValues,resetFetchData,updateSelectedMeasures,updateCustomSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
-  updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef,
+  updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef,setCompareData,
   updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks,
   updateSoilingType,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,

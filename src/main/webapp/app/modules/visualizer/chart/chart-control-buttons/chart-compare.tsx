@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { setComparePopover, updateCompare } from 'app/modules/store/visualizerSlice';
+import { setCompareData, setComparePopover, updateCompare } from 'app/modules/store/visualizerSlice';
 import AddchartIcon from '@mui/icons-material/Addchart';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
@@ -16,7 +16,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 export const ChartCompare = () => {
   const dispatch = useAppDispatch();
 
-  const { farmMeta, dataset, comparePopover, compare, datasets, selectedMeasures, customSelectedMeasures } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, comparePopover, compare, datasets, selectedMeasures, customSelectedMeasures, compareData } = useAppSelector(state => state.visualizer);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -27,25 +27,38 @@ export const ChartCompare = () => {
   };
 
   const handleOnClick = (datasetId, measureId) => e => {
-    let comp = {}
-    if(Object.keys(compare).includes(datasetId)){
-      if(compare[datasetId].includes(measureId)){
-        if(compare[datasetId].length === 1){
-          delete comp[datasetId];
-          console.log(typeof comp)
-        }else{
-          comp = {...compare, [datasetId]: compare[datasetId].filter(entry => entry !== measureId)}
+    // Create an empty object to store the updated comparison state
+    let comp = {};
+
+    // Case 1: Check if the datasetId is already present in the comparison
+    if (Object.keys(compare).includes(datasetId)) {
+        // Case 1.1: Check if the measureId is already selected for the dataset
+        if (compare[datasetId].includes(measureId)) {
+            // Case 1.1.1: If only one measure is selected for the dataset, remove the dataset from comparison
+            if (compare[datasetId].length === 1) {
+                const {[datasetId]: removedProperty, ...filteredCompare} = compare; 
+                comp = filteredCompare;
+                dispatch(setCompareData(compareData.filter(obj => obj.name !== datasetId)))
+            } else {
+                // Case 1.1.2: Remove the selected measure from the dataset
+                comp = { ...compare, [datasetId]: compare[datasetId].filter(entry => entry !== measureId) };
+            }
+        } else {
+            // Case 1.2: If measureId is not selected, add it to the dataset
+            if (selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) === 6) return;
+            comp = { ...compare, [datasetId]: [...compare[datasetId], measureId] };
         }
-      }else{
-        if(selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) === 6) return
-        comp = {...compare, [datasetId]: [...compare[datasetId], measureId]}
-      }
-    }else{
-        if(selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) === 6) return
-        comp = {...compare, [datasetId]: [measureId]}
+    } else {
+        // Case 2: If datasetId is not present in the comparison, create a new entry
+        // Case 2.1: Check if the maximum number of allowed measures is reached
+        if (selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) === 6) return;
+        comp = { ...compare, [datasetId]: [measureId] };
     }
+
+    // Dispatch the action to update the comparison state with the new 'comp' object
     dispatch(updateCompare(comp));
-  };
+};
+
 
   const handleClose = () => {
     dispatch(setComparePopover(false));
@@ -61,7 +74,6 @@ export const ChartCompare = () => {
           aria-expanded={open ? 'true' : undefined}
           aria-haspopup="true"
           onClick={handleOpen}
-          disabled={datasets.loading}
         >
           {datasets.loading ? <CircularProgress size={20} /> : <AddchartIcon />}
         </IconButton>
@@ -115,14 +127,14 @@ export const ChartCompare = () => {
                     <Typography variant="body1" gutterBottom sx={{ fontWeight: 600, fontSize: '1em' }}>
                       {dat.id}
                     </Typography>
-                    {dat.header.map(hed => (
+                    {dat.header.map((hed, index) => (
                       <MenuItem
                         key={`${dat.id}-${hed}`}
-                        selected={Object.keys(compare).length !== 0 ? compare[dat.id].includes(dat.header.indexOf(hed)) : false}
+                        selected={Object.hasOwn(compare, dat.id) ? compare[`${dat.id}`].includes(index) : false}
                         onClick={handleOnClick(dat.id, dat.header.indexOf(hed))}
                       >
                         <ListItemText>{hed}</ListItemText>
-                        {Object.keys(compare).length !== 0 ? (
+                        {Object.hasOwn(compare, dat.id) ? (
                           compare[dat.id].includes(dat.header.indexOf(hed)) ? (
                             <CheckCircleOutlineIcon />
                           ) : (

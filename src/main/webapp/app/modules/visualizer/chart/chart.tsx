@@ -451,6 +451,7 @@ export const Chart = () => {
 
   const computeYAxisData = () => {
     const allMeasuresLength = selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc: number, arr: number[]) => acc + arr.length, 0);
+    let counter = 0;
     let yAxisData = changeChart
       ? selectedMeasures.map((measure, idx) => ({
           title: {
@@ -477,7 +478,6 @@ export const Chart = () => {
             }))
         )
         .concat(Object.keys(compare).reduce((acc, curval) => {
-          let counter = 0;
           return(
             [...acc, ...compare[curval].map(measureVal => {
               const returnVal = {
@@ -557,13 +557,13 @@ export const Chart = () => {
 
   const compareChartData = () => {
     const allMeasuresLength = selectedMeasures.length + customSelectedMeasures.length;
-    return Object.keys(compare).reduce((acc, curval, idx) => {
-      let counter = 0;
-      return([...acc, ...compare[curval].map(index => {
-        console.log("counter is", counter, allMeasuresLength)
+    let counter = 0;
+    return compareData.reduce((acc, curval, idx) => {
+      return([...acc, ...Object.keys(curval.data).map((index, indx) => {
+        console.log(allMeasuresLength + counter)
         const returnVal = {
-        data: compareData.length > 0 ? (Object.hasOwn(compareData[idx], index) ? compareData[idx][index].map(obj => ([obj.timestamp, obj.value])) : []) : [],
-        name: curval + ' ' + datasets.data.find(obj => obj.id === curval).header[index],
+        data: compareData.length > 0 ? (Object.hasOwn(curval.data, index) ? curval.data[index].map(obj => ([obj.timestamp, obj.value])) : []) : [],
+        name: curval.name + ' ' + datasets.data.find(obj => obj.id === curval.name).header[index],
         yAxis: changeChart ? allMeasuresLength + counter : 0,
         color: "black",
         showInLegend: true,
@@ -594,6 +594,8 @@ export const Chart = () => {
       onMouseOver={() => data ? handleMouseOverChart() : null}
       onMouseLeave={() => data ? handleMouseLeaveChart() : null}
     >
+      {console.log(compare)}
+      {console.log(compareData)}
       {!data ? <LinearProgress /> : <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />}
       {data && (
         <HighchartsReact
@@ -673,7 +675,8 @@ export const Chart = () => {
               },
               split: true,
             },
-            series: [...computeChartData(), ...forecastChartData, ...compareChartData(),
+            series: [...computeChartData(), ...forecastChartData, 
+              ...compareChartData(),
               dummySeriesCreator("minPoint",dataset.timeRange.from, 0),
               dummySeriesCreator("maxPoint", dataset.timeRange.to, 1)
           ],

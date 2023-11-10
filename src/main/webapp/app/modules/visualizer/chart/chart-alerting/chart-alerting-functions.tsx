@@ -50,15 +50,15 @@ const chartAlertingChecker = (
           results: acceptedValues,
           color: alert.color,
           severity: alert.severity,
-          show: Object.hasOwn(alertResults, alert.name) ? alertResults[alert.name].show : false,
+          show: Object.hasOwn(alertResults, alert.name) ? alertResults[alert.name].show : true,
         };
-      }else{
+      } else {
         allAlerts[alert.name] = {
           results: [],
           color: null,
           severity: null,
-          show: Object.hasOwn(alertResults, alert.name) ? alertResults[alert.name].show : false
-        }
+          show: Object.hasOwn(alertResults, alert.name) ? alertResults[alert.name].show : false,
+        };
       }
     }
   }
@@ -86,25 +86,28 @@ const checker = (val, operation, targetValue) => {
 export const alertingPlotBandsCreator = (vals: {}, alerts: any[]) => {
   const plotBands = [];
   for (const [key, values] of Object.entries(vals)) {
-    if (vals[key].show && alerts.find(obj => obj.name === key).active) {
-      vals[key].results.map((val, idx) =>
-        plotBands.push({
-          color: vals[key].color,
-          from: val[0],
-          to: val[1],
-          id: `${key}${idx}`,
-          borderWidth: 0,
-          borderColor: '#424242',
-          label: {
-            text: key,
-            style: {
-              color: '#424242',
-              fontWeight: 'bold',
-              fontSize: 12,
+    const alert = alerts.find(obj => obj.name === key);
+    if (alert !== undefined) {
+      if (vals[key].show && alert.active) {
+        vals[key].results.map((val, idx) =>
+          plotBands.push({
+            color: vals[key].color,
+            from: val[0],
+            to: val[1],
+            id: `${key}${idx}`,
+            borderWidth: 0,
+            borderColor: '#424242',
+            label: {
+              text: key,
+              style: {
+                color: '#424242',
+                fontWeight: 'bold',
+                fontSize: 12,
+              },
             },
-          },
-        })
-      );
+          })
+        );
+      }
     }
   }
   return plotBands;
