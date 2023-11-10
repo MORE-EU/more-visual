@@ -182,7 +182,6 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
       entry !== null && key !== 'values' && alertErrors.set(entry[0], entry[1]);
     }
     if (alertErrors.size === 0) {
-      console.log(finalInput)
       resetEntries();
       props.action === 'add' ? dispatch(saveAlert(finalInput)) : dispatch(editAlert(finalInput));
     } else {

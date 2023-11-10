@@ -560,7 +560,6 @@ export const Chart = () => {
     let counter = 0;
     return compareData.reduce((acc, curval, idx) => {
       return([...acc, ...Object.keys(curval.data).map((index, indx) => {
-        console.log(allMeasuresLength + counter)
         const returnVal = {
         data: compareData.length > 0 ? (Object.hasOwn(curval.data, index) ? curval.data[index].map(obj => ([obj.timestamp, obj.value])) : []) : [],
         name: curval.name + ' ' + datasets.data.find(obj => obj.id === curval.name).header[index],
@@ -594,8 +593,6 @@ export const Chart = () => {
       onMouseOver={() => data ? handleMouseOverChart() : null}
       onMouseLeave={() => data ? handleMouseLeaveChart() : null}
     >
-      {console.log(compare)}
-      {console.log(compareData)}
       {!data ? <LinearProgress /> : <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />}
       {data && (
         <HighchartsReact
