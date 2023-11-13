@@ -59,7 +59,7 @@ const checkConnectionInitialState = {
 }
 
 const initialState = {
-  loading: true,
+  loading: false,
   errorMessage: null,
   dataset: null,
   chartType: 'line',
@@ -124,7 +124,7 @@ export const connector = createAsyncThunk('connector', async (dbConnector: {dbSy
     const response = await axios.post(`api/connect`, dbConnector).then(res => res);
     return response;
   } catch (error) {
-    throw new Error(error.response.data);
+    throw new Error("Credentials Error");
   }
 });
 
@@ -133,19 +133,19 @@ export const disconnector = createAsyncThunk('disconnector', async () => {
     const response = await axios.post(`api/disconnect`).then(res => res);
     return response;
   } catch (error) {
-    throw new Error(error.response.data);
+    throw new Error("Disconnect Error");
   }
 });
 
 
-// export const getDbTableNames = createAsyncThunk('getDbTableNames', async () => {
-//   try {
-//     const response = await axios.get(`api/database/metadata/tables`).then(res => res);
-//     return response;
-//   } catch (error) {
-//     throw new Error(error.response.data);
-//   }
-// })
+export const getDbMetadata = createAsyncThunk('getDbMetadata', async (schema: string) => {
+  try {
+    const response = await axios.get(`api/database/metadata/${schema}`).then(res => res);
+    return response;
+  } catch (error) {
+    throw new Error(error.response.data);
+  }
+})
 
 export const checkConnection = createAsyncThunk('checkConnection', async (bdConfig: { url: string; port: string; }) => {
   try {
@@ -507,8 +507,8 @@ const visualizer = createSlice({
     });
     builder.addCase(connector.fulfilled, (state, action) => {
       state.checkConnectionLoading = false;
-      state.checkConnectionResponse = action.payload.data;
       state.checkConnectionError = false;
+      state.checkConnectionResponse = action.payload.data;
       state.connected = true;
     });
     builder.addCase(disconnector.fulfilled, (state, action) => {
@@ -516,18 +516,17 @@ const visualizer = createSlice({
       state.checkConnectionResponse = action.payload.data;
       state.checkConnectionError = false;
       state.connected = false;
+      state.farmMeta = null;
     });
-
-    // builder.addCase(getDbTableNames.fulfilled, (state, action) => {
-    //   state.dbTableNames = action.payload.data;
-    //   state.checkConnectionLoading = false;
-    //   state.checkConnectionError = false;
-    // });
-
     builder.addCase(checkConnection.fulfilled, (state, action) => {
       state.checkConnectionLoading = false;
       state.checkConnectionResponse = action.payload.data;
       state.checkConnectionError = false;
+    });
+    builder.addCase(getDbMetadata.fulfilled, (state, action) => {
+      state.loading = false;
+      state.farmMeta = action.payload.data;
+      state.errorMessage = false;
     });
     builder.addCase(getFarmMeta.fulfilled, (state, action) => {
       state.loading = false;
@@ -584,7 +583,8 @@ const visualizer = createSlice({
         })
         : state.data;
     });
-    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending), state => {
+    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending), 
+    state => {
       state.errorMessage = null;
       state.loading = true;
     });
@@ -602,7 +602,7 @@ const visualizer = createSlice({
       state.alertsLoading = true;
     });
     builder.addMatcher(
-      isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected),
+      isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected, getDbMetadata.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.payload;

@@ -17,25 +17,29 @@ const mdTheme = createTheme();
 
 export const Visualizer = () => {
   const [isBusy, setIsBusy] = useState(true);
-  const { farmMeta, dataset, datasetChoice, selectedConnection, connected } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, datasetChoice, selectedConnection, connected, loading } = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
   const params: any = useParams();
   const history = useHistory();
 
-  useEffect(() => { //will propably rerun on history change
+  useEffect(() => {
     if (params.folder !== undefined) {
-      dispatch(getFarmMeta(params.folder));
+      setIsBusy(true);
+      if (!connected)
+        dispatch(getFarmMeta(params.folder));
     }
     else
       setIsBusy(false);
-  }, []);
+  }, [history.location]);
 
   useEffect(() => {
-    if (params.id !== undefined) {
-      dispatch(setFolder(params.folder));
-      dispatch(getDataset({ folder: params.folder, id: params.id }));
-      farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
+    if (!connected){
+      if (params.id !== undefined) {
+        dispatch(setFolder(params.folder));
+        dispatch(getDataset({ folder: params.folder, id: params.id }));
+        farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
+      }
     }
   }, [params.id]);
 
@@ -44,7 +48,10 @@ export const Visualizer = () => {
   }, [dataset]);
 
   useEffect(() => {
-    params.id === undefined && farmMeta && history.push(`${params.folder}/${farmMeta.data[0].id}`);
+    if (connected)
+      params.id === undefined && farmMeta && history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[0].id}`);
+    else
+      params.id === undefined && farmMeta && history.push(`${params.folder}/${farmMeta.data[0].id}`);
   }, [farmMeta]);
 
   useEffect(() => {
@@ -68,7 +75,7 @@ export const Visualizer = () => {
             >
               <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
                 <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  {isBusy ? dataset && farmMeta ? <VisControl /> : <CircularProgress /> : <VisConnector />}
+                  {isBusy || loading ?  farmMeta ? <VisControl /> : <CircularProgress /> : <VisConnector />}
                 </Paper>
               </Grid>
               <Grid sx={{ width: '80%', p: 1, flexGrow: 1, height: 'calc(100% - 30px)' }}>

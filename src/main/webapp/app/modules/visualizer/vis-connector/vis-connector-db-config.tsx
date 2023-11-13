@@ -14,7 +14,7 @@ import Alert from '@mui/material/Alert';
 import DBFormInput from "./db-form-input";
 
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import { setCheckConnectionResponse } from '../../store/visualizerSlice';
+import { getDbMetadata, setCheckConnectionResponse } from '../../store/visualizerSlice';
 import { connector } from '../../store/visualizerSlice';
 
 interface IDBForm  {
@@ -54,6 +54,7 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
                 setOpenSnack(true);
             } else{
                 setStep(3);
+                dispatch(getDbMetadata(dbForm.database));
             }
         }
     }, [checkConnectionResponse]);
@@ -70,7 +71,6 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
     const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
         event.preventDefault();
         dispatch(connector(dbForm));
-        //if success redirect????
     }
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -86,7 +86,7 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
             <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1, }}>
                 <Snackbar open={openSnack} autoHideDuration={2000} onClose={handleClose}>
                     <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-                        {checkConnectionResponse}
+                        <>{checkConnectionResponse}</>
                     </Alert>
                 </Snackbar>
                 <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
@@ -102,7 +102,7 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
                         {checkConnectionLoading ? <CircularProgress /> : <Button variant="contained" startIcon={<LoginIcon />} type="submit" >Connect </Button>}
                     </Box>
                 </form> 
-                <Button variant="text" startIcon={<CloseIcon />} onClick={closeHandler}>Close</Button>
+                { !checkConnectionLoading && (<Button variant="text" startIcon={<CloseIcon />} onClick={closeHandler}>Close</Button>) }
             </Box>
         </>
     )

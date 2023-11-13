@@ -13,7 +13,7 @@ import MenuItem from "@mui/material/MenuItem";
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useAppSelector, useAppDispatch } from "app/modules/store/storeConfig";
-import { disconnector, setCheckConnectionResponse} from "app/modules/store/visualizerSlice";
+import { setCheckConnectionResponse} from "app/modules/store/visualizerSlice";
 
 import VisConnectorDBConfig from "./vis-connector-db-config";
 
@@ -39,7 +39,7 @@ const VisConnector = () => {
         if (!connected){
             closeHandler();
             dispatch(setCheckConnectionResponse(null));
-        }
+        } 
     },[connected]);
 
     const closeHandler = () => {
@@ -76,11 +76,6 @@ const VisConnector = () => {
         )}
         { step === 2 && (
             <VisConnectorDBConfig closeHandler={closeHandler} dbSystem={dbSystem} setStep={setStep}/>
-        )}
-        { connected && (
-            <Button variant="contained" onClick={() => { dispatch(disconnector()); }}>
-                Disconnect
-            </Button>
         )}
         </>
     );

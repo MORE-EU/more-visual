@@ -42,8 +42,8 @@ const Header = props => {
   const getSelectedConnection = () => {
     const type = farmMeta.type;
     switch (type){
-      case "modelar":
-        return "ModelarDB";
+      case "db":
+        return "DB";
       case "csv":
         return "CSV"
       default:

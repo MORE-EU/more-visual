@@ -2,15 +2,17 @@ import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import LogoutIcon from '@mui/icons-material/Logout';
 import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { Button } from '@mui/material';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getDataset, updateDatasetChoice } from 'app/modules/store/visualizerSlice';
+import { getDataset, updateDatasetChoice, disconnector } from 'app/modules/store/visualizerSlice';
 import React, { useState } from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import VisControlDatasetUpload from './vis-control-dataset-upload';
 
 const VisControlDatasets = () => {
@@ -18,6 +20,7 @@ const VisControlDatasets = () => {
   const dispatch = useAppDispatch();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
+  const history = useHistory();
 
   const handleDataset = idx => {
     if (datasetChoice !== idx) {
@@ -42,9 +45,11 @@ const VisControlDatasets = () => {
       )}
       {farmMeta && (
         <>
-          <Typography variant="h6" gutterBottom>
-            {dataset.farmName}
-          </Typography>
+          {dataset && (
+            <Typography variant="h6" gutterBottom>
+              {dataset.farmName}
+            </Typography>)
+          }
           <List disablePadding dense>
             {farmMeta.data.map((file, idx) => (
               <ListItemButton
@@ -67,11 +72,21 @@ const VisControlDatasets = () => {
                 )}
               </ListItemButton>
             ))}
-            <ListItemButton key={'new-dataset-list-button-sd'} component="label">
-              <input hidden type="file" accept=".csv" onChange={handleUploadChange} />
-              <ListItemText primary={`new dataset`} sx={{ pl: 4 }} />
-              <ControlPointIcon />
-            </ListItemButton>
+            { farmMeta.type === "csv" ? (
+              <ListItemButton key={'new-dataset-list-button-sd'} component="label">
+                <input hidden type="file" accept=".csv" onChange={handleUploadChange} />
+                <ListItemText primary={`new dataset`} sx={{ pl: 4 }} />
+                <ControlPointIcon />
+              </ListItemButton>
+            ) : farmMeta.type === "db" && (
+                <ListItemButton key={'new-dataset-list-button-sd'} component="label" onClick={() => { 
+                  dispatch(disconnector());
+                  history.push('/visualize'); 
+                }}>
+                  <ListItemText primary={`Disconnect`} sx={{ pl: 4 }} />
+                  <LogoutIcon />
+              </ListItemButton>
+            )}
           </List>
         </>
       )}

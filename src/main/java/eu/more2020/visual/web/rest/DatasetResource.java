@@ -242,10 +242,10 @@ public class DatasetResource {
       return datasetRepository.checkConnection(dbConfig.getUrl(), dbConfig.getPort());
     }
 
-    @PostMapping("/connect")
-    public ResponseEntity<String> connector(@RequestBody DbConnector dbConnector) throws URISyntaxException, IOException {
+    @PostMapping("/connect") //create new FarmMeta and get here the metadata 
+    public ResponseEntity<Boolean> connector(@RequestBody DbConnector dbConnector) throws URISyntaxException, SQLException {
+        log.debug("Rest request to connect to db");
         String url = null;
-        // DatabaseConnection connection = null;
         switch (dbConnector.getDbSystem()) {
             case "postgres":
                 url = "jdbc:postgresql://" + dbConnector.getHost() + ":" + dbConnector.getPort() + "/" + dbConnector.getDatabase();
@@ -253,39 +253,48 @@ public class DatasetResource {
                 break;
             default:
                 break;
-    }
-    try {
-        databaseConnection.connect();
-        return new ResponseEntity<String>("Succesfull login", HttpStatus.OK);
-    } catch (Exception e) {
-        return new ResponseEntity<String>("Credentials Error", HttpStatus.BAD_REQUEST);
-    }
+        }
+        try {
+            databaseConnection.connect();
+            return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+        } catch (Exception e) {
+        return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
 }
 
-    // @GetMapping("/database/metadata/tables")
-    // public ResponseEntity<ArrayList<String>> getDbTables() throws URISyntaxException, IOException, SQLException {
-    //     DatabaseMetaData databaseMetaData = conn.getMetaData();
-    //     ArrayList<String> tables = new ArrayList<String>();
-    //     try(ResultSet resultSet = databaseMetaData.getTables(null, null, null, new String[]{"TABLE"})){ 
-    //         while(resultSet.next()) { 
-    //             String tableName = resultSet.getString("TABLE_NAME"); 
-    //             tables.add(tableName);
 
-    //         }
-    //         return new ResponseEntity<>(tables, HttpStatus.OK);
-    //     }
-    //     catch(Exception e) {
-    //         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-    //     }
-    // }
-
+    @GetMapping("/database/metadata/{farmName}")
+    public ResponseEntity<FarmMeta> getDbTables(@PathVariable String farmName) throws SQLException {
+        log.debug("Rest request to get db metadata");
+        FarmMeta farmMeta = new FarmMeta();
+        List<FarmInfo> farmInfos = new ArrayList<FarmInfo>();
+        ArrayList<String> tables = new ArrayList<String>();
+        try {
+            farmMeta.setName(farmName);
+            farmMeta.setType("db");
+            QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
+            tables = queryExecutor.getDbTables();
+            for (String tableName : tables) {
+                FarmInfo farmInfo = new FarmInfo();
+                farmInfo.setId(tableName);
+                farmInfo.setSchema(farmName);
+                farmInfo.setName(tableName);
+                farmInfos.add(farmInfo);
+            }
+            farmMeta.setData(farmInfos);
+            return new ResponseEntity<FarmMeta>(farmMeta, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
     @PostMapping("/disconnect")
-    public ResponseEntity<String> disconnector() throws URISyntaxException, IOException {
+    public ResponseEntity<Boolean> disconnector() throws SQLException, IOException {
+        log.debug("Rest request to disconnect to db");
         try {
             databaseConnection.closeConnection();
-            return new ResponseEntity<>("Successfull disconnecting", HttpStatus.OK);
+            return new ResponseEntity<>(true, HttpStatus.OK);
         } catch(Exception e) {
-            return new ResponseEntity<>("Error disconnecting", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         }
     }
 }
