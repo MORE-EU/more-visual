@@ -138,9 +138,9 @@ export const disconnector = createAsyncThunk('disconnector', async () => {
 });
 
 
-export const getDbMetadata = createAsyncThunk('getDbMetadata', async (schema: string) => {
+export const getDbMetadata = createAsyncThunk('getDbMetadata', async (farmName: string) => {
   try {
-    const response = await axios.get(`api/database/metadata/${schema}`).then(res => res);
+    const response = await axios.get(`api/database/metadata/${farmName}`).then(res => res);
     return response;
   } catch (error) {
     throw new Error(error.response.data);

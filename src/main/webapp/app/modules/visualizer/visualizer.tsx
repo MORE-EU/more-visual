@@ -40,6 +40,8 @@ export const Visualizer = () => {
         dispatch(getDataset({ folder: params.folder, id: params.id }));
         farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
       }
+    } else {
+      if (params.id !== undefined) dispatch(setFolder(farmMeta.name));
     }
   }, [params.id]);
 

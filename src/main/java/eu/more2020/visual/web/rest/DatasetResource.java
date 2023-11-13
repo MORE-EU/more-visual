@@ -288,7 +288,7 @@ public class DatasetResource {
         }
     }
     @PostMapping("/disconnect")
-    public ResponseEntity<Boolean> disconnector() throws SQLException, IOException {
+    public ResponseEntity<Boolean> disconnector() throws SQLException {
         log.debug("Rest request to disconnect to db");
         try {
             databaseConnection.closeConnection();

@@ -6,7 +6,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Button } from '@mui/material';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { getDataset, updateDatasetChoice, disconnector } from 'app/modules/store/visualizerSlice';
 import React, { useState } from 'react';
@@ -83,7 +82,7 @@ const VisControlDatasets = () => {
                   dispatch(disconnector());
                   history.push('/visualize'); 
                 }}>
-                  <ListItemText primary={`Disconnect`} sx={{ pl: 4 }} />
+                  <ListItemText primary={`close connection`} sx={{ pl: 4 }} />
                   <LogoutIcon />
               </ListItemButton>
             )}
