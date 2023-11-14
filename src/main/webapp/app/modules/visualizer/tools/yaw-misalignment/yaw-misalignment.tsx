@@ -29,9 +29,14 @@ export const YawMisalignment = () => {
   const handleSliderChange = (event, newValue) => {
     setMin(newValue[0]);
     setMax(newValue[1]);
-    const filteredData = filterData();
-    dispatch(updateDetectedChangepoints(mergeConsecutiveRanges(filteredData)));
   };
+
+  const handleSliderCommit = (e, newVals) => {
+    console.log(newVals)
+    const filteredData = filterData(newVals);
+    console.log(filteredData)
+    dispatch(updateDetectedChangepoints(mergeConsecutiveRanges(filteredData)));
+  }
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -76,12 +81,12 @@ export const YawMisalignment = () => {
 
     // Push the last merged range
     mergedArray.push({ range: { ...currentRange } });
-
     return mergedArray;
   }
 
-  const filterData = () => {
-    const filteredArray = secondaryData.filter((obj : IDataPoint) => (obj.values[0] >= min && obj.values[0] <= max));
+  const filterData = (newVals: number[]) => {
+    console.log(newVals)
+    const filteredArray = secondaryData.filter((obj : IDataPoint) => (obj.values[0] >= (newVals !== null ? newVals[0] : min) && obj.values[0] <= (newVals !== null ? newVals[1] : max)));
     const transformedArray = filteredArray.map((obj, idx) => ({
       id: idx,
       range: {
@@ -93,7 +98,7 @@ export const YawMisalignment = () => {
   }
   useEffect(() => {
     if(secondaryData == null) return;
-    const filteredData = filterData();
+    const filteredData = filterData(null);
     dispatch(updateDetectedChangepoints(mergeConsecutiveRanges(filteredData)));
   }, [secondaryData]);
 
@@ -182,6 +187,7 @@ export const YawMisalignment = () => {
             min={0}
             max={90}
             onChange={handleSliderChange}
+            onChangeCommitted={handleSliderCommit}
             valueLabelDisplay="auto"
             sx={{
               '& .MuiSlider-thumb': { backgroundColor: grey[700] },

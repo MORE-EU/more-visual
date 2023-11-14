@@ -61,7 +61,7 @@ export const SoilingDetection = () => {
   }
 
   return (
-    <Box sx = {{width:'100%',}}>
+    <Box sx = {{width:'100%', height: "100%"}}>
       <Box sx={{display: 'flex', margin: 'auto', overflowY: 'scroll', flexDirection: 'column', width:'80%', height: '90%', fontSize:'2em'}}>
         <ChangepointDetection
           changepointsName={"Washing Events"} manualChangepointsName={"Manual Washes"} potentialChangepointsName={"Rains"}

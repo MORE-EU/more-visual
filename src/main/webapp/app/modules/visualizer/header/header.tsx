@@ -7,9 +7,6 @@ import Typography from '@mui/material/Typography';
 import grey from '@mui/material/colors/grey';
 import { useParams } from 'react-router-dom';
 import Chip from '@mui/material/Chip';
-import ConnectionModal from './connection-modal';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 
 const Header = props => {
   const { farmMeta, datasetChoice } = props;
@@ -76,33 +73,9 @@ const Header = props => {
           {farmMeta.data[datasetChoice].name}
         </Typography>
       </Breadcrumbs>
-      <Chip label={getSelectedConnection()}
+      {/* <Chip label={getSelectedConnection()}
             color="primary" sx={{ width: '6rem' }}
-      // onClick={handleClick}
-      />
-      {/* <Menu
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={menuOpen}
-        onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
-      >
-        <MenuItem onClick={onMenuClick} selected={menuChoice === 'CSV'}>
-          CSV
-        </MenuItem>
-        <MenuItem onClick={onMenuClick} selected={menuChoice === 'PostgreSQL'}>
-          PostgreSQL
-        </MenuItem>
-        <MenuItem onClick={onMenuClick} selected={menuChoice === 'InfluxDB'}>
-          InfluxDB
-        </MenuItem>
-        <MenuItem onClick={onMenuClick} selected={menuChoice === 'ModelarDB'}>
-          ModelarDB
-        </MenuItem>
-      </Menu> */}
-      {/* <ConnectionModal conModal={conModal} setConModal={setConModal} menuChoice={menuChoice} setMenuChoice={setMenuChoice} keepChoice={keepChoice} /> */}
+      /> */}
     </Grid>
   );
 };

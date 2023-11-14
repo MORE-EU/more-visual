@@ -1,5 +1,6 @@
-import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { IAlerts } from 'app/shared/model/alert.model';
+import { IAlertResults } from 'app/shared/model/alert-results.model';
 import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
 import { IFarmMeta } from 'app/shared/model/farmMeta.model';
@@ -9,6 +10,9 @@ import {ICustomMeasure} from "app/shared/model/custom-measures.model";
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import axios from 'axios';
 import moment, { Moment } from 'moment';
+import { IDatasets, defaultDatasets } from 'app/shared/model/datasets.model';
+import { RootState } from './storeConfig';
+import { IDataset } from 'app/shared/model/dataset.model';
 
 
 const seedrandom = require('seedrandom');
@@ -63,12 +67,13 @@ const initialState = {
   loading: true,
   errorMessage: null,
   dataset: null,
-  chartType: 'line',
+  datasets: defaultDatasets as IDatasets,
+  chartType: 'line' as String,
   queryResults: null as IQueryResults,
   data: null as any,
-  compareData: null,
+  compareData: [],
   liveDataImplLoading: false,
-  queryResultsLoading: true,
+  queryResultsLoading: true as boolean,
   selectedMeasures: [],
   customSelectedMeasures: [] as ICustomMeasure[],
   measureColors: [],
@@ -86,7 +91,7 @@ const initialState = {
   folder: '',
   graphZoom: null,
   activeTool: null as null | string,
-  compare: [],
+  compare: {} as {[key: string]: number[]},
   chartRef: null,
   showDatePick: false,
   showChangepointFunction: false,
@@ -114,7 +119,7 @@ const initialState = {
   alerts: [] as IAlerts[],
   alertsLoading: false,
   alertingPreview: false,
-  alertResults: {},
+  alertResults: {} as {[key: string]: IAlertResults},
   alertingPlotMode: false,
   ...forecastingInitialState,
   ...checkConnectionInitialState
@@ -133,6 +138,11 @@ export const checkConnection = createAsyncThunk('checkConnection', async (bdConf
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
   const { folder, id } = data;
   const response = await axios.get(`api/datasets/${folder}/${id}`).then(res => res);
+  return response;
+});
+
+export const getDatasets = createAsyncThunk('getDatasets', async (folder: string) => {
+  const response = await axios.get(`api/datasets/all/${folder}`).then(res => res);
   return response;
 });
 
@@ -166,8 +176,9 @@ export const editAlert = createAsyncThunk('editAlert', async (alertInfo: IAlerts
   return response;
 });
 
-export const deleteAlert = createAsyncThunk('deleteAlert', async (alertName: String) => {
-  const response = await axios.post(`api/alerts/remove/${alertName}`).then(res => res);
+export const deleteAlert = createAsyncThunk('deleteAlert', async (info: {alertName: String, datasetId: String}) => {
+  const {alertName, datasetId} = info;
+  const response = await axios.post(`api/alerts/remove/${datasetId}/${alertName}`).then(res => res);
   return response;
 });
 
@@ -189,7 +200,7 @@ export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
   async (data: {
     folder: string;
-    id: string[];
+    id: string;
     from: number;
     to: number;
     selectedMeasures: any[];
@@ -197,9 +208,9 @@ export const updateQueryResults = createAsyncThunk(
   }, {getState}) => {
     const { folder, id, from, to, selectedMeasures, filter } = data;
     let query;
-    const state:any = getState();
+    const {visualizer} = getState() as RootState;
     const customSelectedMeasures = [];
-    state.visualizer.customSelectedMeasures
+    visualizer.customSelectedMeasures
       .forEach(customMeasure => customSelectedMeasures.push(customMeasure.measure1, customMeasure.measure2));
     let measures = concatenateAndSortDistinctArrays(selectedMeasures, customSelectedMeasures);
     from !== null && to !== null
@@ -210,9 +221,10 @@ export const updateQueryResults = createAsyncThunk(
           measures,
           filter: filter ? filter : null,
         } as IQuery)
-      : (query = {range: null});
+      : (query = {});
+
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
-    return response.data;
+    return {id, response: response.data};
   }
 );
 
@@ -244,24 +256,16 @@ export const liveDataImplementation = createAsyncThunk(
 
 export const updateCompareQueryResults = createAsyncThunk(
   'updateCompareQueryResults',
-  async (data: { folder: string; id: string[]; from: number; to: number; selectedMeasures: any[]; filter: {} }) => {
-    const { folder, id, from, to, selectedMeasures, filter } = data;
-    let query;
-    from !== null && to !== null
-      ? (query = {
-          from,
-          to,
-          viewPort: {width: 1000, height: 600},
-          measures: selectedMeasures,
-          filter,
-        } as IQuery)
-      : (query = { range: null,
-      });
-    const response = Promise.all(
-      id.map(name => {
-        return axios.post(`api/datasets/${folder}/${name}/query`, query).then(res => res.data);
-      })
-    ).then(res => res.map(r => r.data));
+  async (data: { folder: string, compare: {[key: number]: any[]}; from: number; to: number; filter: {} }, {getState}) => {
+    const {visualizer} = getState() as RootState;
+    const { compare, from, to, filter, folder } = data;
+    const response = await Promise.all(
+      Object.keys(compare).map(
+      key => {
+        const query = from !== null && to !== null ? {from,to,viewPort: {width: 1000, height: 600}, measures: compare[key], filter} : {range: null}
+        return axios.post(`api/datasets/${folder}/${key}/query`, query).then(res => ({name: key, data: res.data.data}))
+      }
+    )).then(res => res.map(r => r));
     return response;
   }
 );
@@ -378,9 +382,7 @@ const visualizer = createSlice({
       state.activeTool = action.payload;
     },
     updateCompare(state, action) {
-      state.compare = !state.compare.includes(action.payload)
-        ? [...state.compare, action.payload]
-        : state.compare.filter(comp => comp !== action.payload);
+      state.compare = action.payload
     },
     updateData(state, action) {
       state.data = [...state.data, action.payload];
@@ -400,7 +402,7 @@ const visualizer = createSlice({
     updateDetectedChangepoints(state, action) {
       state.detectedChangepoints  = action.payload;
     },
-    updateDetectedChangepointFilter(state, action) {
+    setDetectedChangepointFilter(state, action) {
       state.detectedChangepointFilter = action.payload;
     },
     updateAlertResults(state, action) {
@@ -445,11 +447,11 @@ const visualizer = createSlice({
     setCheckConnectionResponse(state, action) {
       state.checkConnectionResponse = action.payload;
     },
+    setCompareData(state, action) {
+      state.compareData = action.payload;
+    },
     setSelectedConnection(state, action) {
       state.selectedConnection = action.payload;
-    },
-    setDetectedChangepointFilter(state, action) {
-      state.detectedChangepointFilter = action.payload;
     },
     setAutoMLStartDate(state, action) {
       state.forecastingStartDate = action.payload;
@@ -516,6 +518,9 @@ const visualizer = createSlice({
       state.farmMeta = action.payload.data;
       state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
     })
+    builder.addCase(getDatasets.fulfilled, (state, action) => {
+      state.datasets = {data: action.payload.data, loading: false, error: null};
+    })
     builder.addCase(getDirectories.fulfilled, (state, action) => {
       state.loading = false;
       state.directories = action.payload.data;
@@ -542,10 +547,10 @@ const visualizer = createSlice({
     });
     builder.addCase(updateQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;
-      state.queryResults = action.payload;
-      state.data = action.payload.data;
-      state.from = action.payload.data[Object.keys(action.payload.data)[0]][0].timestamp;
-      state.to = action.payload.data[Object.keys(action.payload.data)[0]][action.payload.data[Object.keys(action.payload.data)[0]].length - 1].timestamp;
+      state.queryResults = action.payload.response;
+      state.data = action.payload.response.data;
+      state.from = action.payload.response.data[Object.keys(action.payload.response.data)[0]][0].timestamp;
+      state.to = action.payload.response.data[Object.keys(action.payload.response.data)[0]][action.payload.response.data[Object.keys(action.payload.response.data)[0]].length - 1].timestamp;
     });
     builder.addCase(updateCompareQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;
@@ -567,11 +572,17 @@ const visualizer = createSlice({
         })
         : state.data;
     });
+    builder.addCase(getDatasets.pending, state => {
+      state.datasets = {data: [], loading: true, error: null}
+    });
+    builder.addCase(getDatasets.rejected, (state, action) => {
+      state.datasets = {...state.datasets, loading: false, error: "there was an error loading the data"}
+    });
     builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending), state => {
       state.errorMessage = null;
       state.loading = true;
     });
-    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
+    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending, applyDeviationDetection.pending), state => {
       state.queryResultsLoading = true;
     });
     builder.addMatcher(isAnyOf(checkConnection.pending), state => {
@@ -596,7 +607,7 @@ const visualizer = createSlice({
       state.checkConnectionResponse = action.error.message;
       state.checkConnectionError = true;
     });
-    builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected), (state, action) => {
+    builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected, applyDeviationDetection.rejected), (state, action) => {
       state.queryResultsLoading = false;
     });
     builder.addMatcher(isAnyOf(liveDataImplementation.rejected), (state, action) => {
@@ -621,8 +632,7 @@ const visualizer = createSlice({
 export const {
   resetChartValues,resetFetchData,updateSelectedMeasures,updateCustomSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
   updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef, updateDetectedChangepoints,
-  updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks,
-  updateDetectedChangepointFilter, updateSoilingType,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
+  updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks, setCompareData, updateSoilingType,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
   setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
   setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,setCheckConnectionResponse, setSelectedConnection

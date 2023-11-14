@@ -42,7 +42,7 @@ export const Filter = () => {
   const filterReset = () => {
     dispatch(resetFilters());
     updateWindowFilters(getFirstFilters());
-    dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures }));
+    dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: {} }));
   };
 
   const onSliderChange = measureCol => (e, range) => {
@@ -96,7 +96,6 @@ export const Filter = () => {
   };
 
   return (
-    <>
       <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', rowGap: 2, pt: 2 }}>
         <Box
           sx={{
@@ -125,7 +124,7 @@ export const Filter = () => {
               <>
               {stats &&
               <Box
-                key={col}
+                key={`filters-container-${col}-${idx}`}
                 sx={{
                   width: '80%',
                   marginLeft: 'auto',
@@ -140,7 +139,7 @@ export const Filter = () => {
                 }}
               >
                 <Box
-                  key={`${col}-filter-name`}
+                  key={`filter-name-${idx}`}
                   sx={{
                     border: `2px solid ${grey[600]}`,
                     alignItems: 'end',
@@ -156,7 +155,7 @@ export const Filter = () => {
                     {`${dataset.header[col]}`}
                   </Typography>
                 </Box>
-                <Box key={`${col}-slider`} sx={{ width: '30%', display: 'flex' }}>
+                <Box key={`filter-slider-${idx}`} sx={{ width: '30%', display: 'flex' }}>
                   <Slider
                     value={!Object.hasOwn(windowFilters, col) ? [stats.min, stats.max] : windowFilters[col]}
                     min={parseFloat(parseFloat(stats.min).toFixed(2))}
@@ -171,7 +170,7 @@ export const Filter = () => {
                     }}
                   />
                 </Box>
-                <Box sx={{ width: '30%', display: 'flex', columnGap: 1 }}>
+                <Box key={`filter-details-${idx}`} sx={{ width: '30%', display: 'flex', columnGap: 1 }}>
                   <TextField
                     id="outlined-basic"
                     label="Min-Value"
@@ -202,7 +201,6 @@ export const Filter = () => {
             );
           })}
       </Box>
-    </>
   );
 };
 

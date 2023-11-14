@@ -5,7 +5,6 @@ import eu.more2020.visual.middleware.domain.*;
 import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
 import eu.more2020.visual.middleware.domain.Dataset.AbstractDataset;
 import eu.more2020.visual.middleware.domain.Query.Query;
-import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.FileHandlingRepository;
@@ -121,6 +120,12 @@ public class DatasetResource {
      * @param id the id of the dataset to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the dataset, or with status {@code 404 (Not Found)}.
      */
+    @GetMapping("/datasets/all/{farmName}")
+    public ResponseEntity<List<Optional<AbstractDataset>>> getDatasets(@PathVariable String farmName) throws IOException, SQLException {
+        log.debug("REST request to get Dataset : {}/{}", farmName);
+        return ResponseEntity.ok().body(datasetRepository.getFarmDetails(farmName));
+    }
+
     @GetMapping("/datasets/{farmName}/{id}")
     public ResponseEntity<AbstractDataset> getDataset(@PathVariable String farmName, @PathVariable String id) throws IOException, SQLException {
         log.debug("REST request to get Dataset : {}/{}", farmName, id);

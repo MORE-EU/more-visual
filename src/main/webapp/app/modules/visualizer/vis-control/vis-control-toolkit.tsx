@@ -14,6 +14,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import {YawMisalignment} from "app/modules/visualizer/tools/yaw-misalignment/yaw-misalignment";
+import ListItem from '@mui/material/ListItem';
 
 const VisToolkit = () => {
 
@@ -42,19 +43,19 @@ const VisToolkit = () => {
               </ListItemIcon>
               <ListItemText primary={"Soiling Detection"}/>
             </ListItemButton></>}
-            {farmMeta.resType === 1 && <><ListItemButton key={2}>
+            {dataset.id === "BEZ2" && <><ListItem key={2}>
                 <ListItemIcon>
                   <ManageSearchIcon/>
                 </ListItemIcon>
                 <ListItemText primary={"Yaw Misalignment Detection"}/>
                 <YawMisalignment />
-            </ListItemButton></>}
-            <ListItemButton key={3} onClick={handleToolClick("Forecasting")}>
+            </ListItem></>}
+            {dataset.id === "bbz1big" && <ListItemButton key={3} onClick={handleToolClick("Forecasting")}>
               <ListItemIcon>
                 <TimelineIcon/>
               </ListItemIcon>
               <ListItemText primary={"Forecasting"}/>
-            </ListItemButton>
+            </ListItemButton>}
             <ListItemButton key={4} onClick={handleToolClick("Filtering")}>
               <ListItemIcon>
                 <FilterAltIcon/>

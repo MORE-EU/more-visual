@@ -140,7 +140,6 @@ public class ForecastingUtils {
             BufferedReader reader = Files.newBufferedReader(pathInput);
             Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
             for (CSVRecord record : records) {
-
                 String format = "yyyy-MM-dd HH:mm:ss";
                 SimpleDateFormat sdf = new SimpleDateFormat(format);
                 String dt = record.get("datetime");

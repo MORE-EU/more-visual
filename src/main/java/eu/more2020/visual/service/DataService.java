@@ -47,9 +47,9 @@ public class DataService {
         QueryExecutor queryExecutor = null;
         switch (dataset.getType()) {
             case "postgres":
-                JDBCConnection postgreSQLConnection =
-                    new JDBCConnection("", "", "");
-                queryExecutor = postgreSQLConnection.getSqlQueryExecutor(dataset);
+                // JDBCConnection postgreSQLConnection =
+                //     new JDBCConnection("", "", "");
+                // queryExecutor = postgreSQLConnection.getSqlQueryExecutor(dataset);
                 break;
             case "modelar":
                 ModelarDBConnection modelarDBConnection =
@@ -60,8 +60,8 @@ public class DataService {
                 String url = "http://leviathan.imsi.athenarc.gr:8086";
                 String token = "jGlRrSisGuDn6MEyIcJMMoiqirFXwbdNnKPtoZAasaRSQZJ0iTRx8FQrQ-zob5j_UlUBuGzq_mYdf1LNWtSbqg==";
                 String org = "ATHENA";
-                InfluxDBConnection influxDBConnection = new InfluxDBConnection(url, org, token);
-                queryExecutor = influxDBConnection.getSqlQueryExecutor(dataset);
+                // InfluxDBConnection influxDBConnection = new InfluxDBConnection(url, org, token);
+                // queryExecutor = influxDBConnection.getSqlQueryExecutor(dataset);
             default:
                 break;
         }

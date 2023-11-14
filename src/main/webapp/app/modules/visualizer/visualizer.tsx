@@ -7,13 +7,13 @@ import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
 import { Divider, Grid } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getDatasets, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
 import Header from './header/header';
 
 const mdTheme = createTheme();
 
 export const Visualizer = () => {
-  const { farmMeta, dataset, datasetChoice, selectedConnection } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, datasetChoice, selectedConnection, alerts } = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
   const params: any = useParams();
@@ -21,6 +21,7 @@ export const Visualizer = () => {
 
   useEffect(() => {
     dispatch(getFarmMeta(params.folder));
+    dispatch(getDatasets(params.folder));
   }, []);
 
   useEffect(() => {
