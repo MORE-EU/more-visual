@@ -62,7 +62,7 @@ const VisConnector = () => {
             </Box>
         )}
         { step === 2 && (
-            <VisConnectorDBConfig closeHandler={closeHandler} dbSystem={dbSystem} setStep={setStep}/>
+            <VisConnectorDBConfig closeHandler={closeHandler} dbSystem={dbSystem} />
         )}
         </>
     );

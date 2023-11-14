@@ -35,12 +35,13 @@ const defaultForm: IDBForm = {
     database: '',
 }
 
-const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
-    const { connected, loading, errorMessage } = useAppSelector(state => state.visualizer);
+const VisConnectorDBConfig = ({closeHandler, dbSystem}) => {
+    const { connected, errorMessage } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const [dbForm, setDbForm] = useState<IDBForm>(defaultForm);
     const { host, port, username, password, database } = dbForm;
-    const [openSnack, setOpenSnack] = React.useState(false);
+    const [openSnack, setOpenSnack] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setDbForm((prevDbForm) => {
@@ -55,6 +56,7 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
     }, [connected]);
 
     useEffect(() => {
+        setLoading(false);
         if(errorMessage) 
             setOpenSnack(true);
     }, [errorMessage]);
@@ -70,6 +72,7 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
 
     const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setLoading(true);
         dispatch(connector(dbForm));
     }
 
