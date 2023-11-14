@@ -12,9 +12,6 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import CloseIcon from '@mui/icons-material/Close';
 
-import { useAppSelector, useAppDispatch } from "app/modules/store/storeConfig";
-import { setCheckConnectionResponse} from "app/modules/store/visualizerSlice";
-
 import VisConnectorDBConfig from "./vis-connector-db-config";
 
 const VisuallyHiddenInput = styled('input')({
@@ -30,23 +27,13 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const VisConnector = () => {
-    const dispatch = useAppDispatch();
-    const { connected } = useAppSelector(state => state.visualizer);
     const [ step, setStep ] = useState(0);
     const [dbSystem, setDbSystem] = useState('');
-
-    useEffect(() => {
-        if (!connected){
-            closeHandler();
-            dispatch(setCheckConnectionResponse(null));
-        } 
-    },[connected]);
 
     const closeHandler = () => {
         setDbSystem('');
         setStep(0);
     }
-
 
     return (
         <>

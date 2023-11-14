@@ -242,7 +242,7 @@ public class DatasetResource {
       return datasetRepository.checkConnection(dbConfig.getUrl(), dbConfig.getPort());
     }
 
-    @PostMapping("/connect") //create new FarmMeta and get here the metadata 
+    @PostMapping("/connect") 
     public ResponseEntity<Boolean> connector(@RequestBody DbConnector dbConnector) throws URISyntaxException, SQLException {
         log.debug("Rest request to connect to db");
         String url = null;
@@ -264,7 +264,7 @@ public class DatasetResource {
 
 
     @GetMapping("/database/metadata/{farmName}")
-    public ResponseEntity<FarmMeta> getDbTables(@PathVariable String farmName) throws SQLException {
+    public ResponseEntity<FarmMeta> getDbMetadata(@PathVariable String farmName) throws SQLException {
         log.debug("Rest request to get db metadata");
         FarmMeta farmMeta = new FarmMeta();
         List<FarmInfo> farmInfos = new ArrayList<FarmInfo>();
@@ -289,12 +289,12 @@ public class DatasetResource {
     }
     @PostMapping("/disconnect")
     public ResponseEntity<Boolean> disconnector() throws SQLException {
-        log.debug("Rest request to disconnect to db");
+        log.debug("Rest request to disconnect from db");
         try {
             databaseConnection.closeConnection();
-            return new ResponseEntity<>(true, HttpStatus.OK);
+            return new ResponseEntity<Boolean>(true, HttpStatus.OK);
         } catch(Exception e) {
-            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
         }
     }
 }

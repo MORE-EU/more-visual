@@ -7,19 +7,26 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getDataset, updateDatasetChoice, disconnector } from 'app/modules/store/visualizerSlice';
-import React, { useState } from 'react';
+import { getDataset, updateDatasetChoice, disconnector, resetFetchData } from 'app/modules/store/visualizerSlice';
+import React, { useState, useEffect } from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { Link, useHistory } from 'react-router-dom';
 import VisControlDatasetUpload from './vis-control-dataset-upload';
 
 const VisControlDatasets = () => {
-  const { folder, dataset, compare, resampleFreq, datasetChoice, farmMeta } = useAppSelector(state => state.visualizer);
+  const { folder, dataset, compare, resampleFreq, datasetChoice, farmMeta, connected } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
   const history = useHistory();
+  
+  useEffect(() => {
+    if(farmMeta.type === 'db' && !connected) {
+      dispatch(resetFetchData());
+      history.push('/visualize');
+    }
+  },[connected]);
 
   const handleDataset = idx => {
     if (datasetChoice !== idx) {
@@ -80,7 +87,6 @@ const VisControlDatasets = () => {
             ) : farmMeta.type === "db" && (
                 <ListItemButton key={'new-dataset-list-button-sd'} component="label" onClick={() => { 
                   dispatch(disconnector());
-                  history.push('/visualize'); 
                 }}>
                   <ListItemText primary={`close connection`} sx={{ pl: 4 }} />
                   <LogoutIcon />

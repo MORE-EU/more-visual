@@ -143,7 +143,7 @@ export const getDbMetadata = createAsyncThunk('getDbMetadata', async (farmName: 
     const response = await axios.get(`api/database/metadata/${farmName}`).then(res => res);
     return response;
   } catch (error) {
-    throw new Error(error.response.data);
+    throw new Error("Can't get database metadata");
   }
 })
 
@@ -340,9 +340,7 @@ const visualizer = createSlice({
   name: 'VisualizerState',
   initialState,
   reducers: {
-    resetFetchData(state) {
-      state = initialState;
-    },
+    resetFetchData: () => initialState,
     updateSelectedMeasures(state, action) {
       state.selectedMeasures = action.payload.sort((a, b) => a - b);
     },
@@ -444,6 +442,10 @@ const visualizer = createSlice({
     setCheckConnectionResponse(state, action) {
       state.checkConnectionResponse = action.payload;
     },
+    setErrorMessage(state, action) {
+      state.errorMessage = action.payload;
+    },
+
     setSelectedConnection(state, action) {
       state.selectedConnection = action.payload;
     },
@@ -505,18 +507,13 @@ const visualizer = createSlice({
       state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
       state.selectedMeasures = [action.payload.data.measures[0]];
     });
-    builder.addCase(connector.fulfilled, (state, action) => {
-      state.checkConnectionLoading = false;
-      state.checkConnectionError = false;
-      state.checkConnectionResponse = action.payload.data;
+    builder.addCase(connector.fulfilled, state => {
+      state.loading = false;
       state.connected = true;
     });
-    builder.addCase(disconnector.fulfilled, (state, action) => {
-      state.checkConnectionLoading = false;
-      state.checkConnectionResponse = action.payload.data;
-      state.checkConnectionError = false;
+    builder.addCase(disconnector.fulfilled, state => {
+      state.loading = false;
       state.connected = false;
-      state.farmMeta = null;
     });
     builder.addCase(checkConnection.fulfilled, (state, action) => {
       state.checkConnectionLoading = false;
@@ -526,7 +523,6 @@ const visualizer = createSlice({
     builder.addCase(getDbMetadata.fulfilled, (state, action) => {
       state.loading = false;
       state.farmMeta = action.payload.data;
-      state.errorMessage = false;
     });
     builder.addCase(getFarmMeta.fulfilled, (state, action) => {
       state.loading = false;
@@ -583,16 +579,13 @@ const visualizer = createSlice({
         })
         : state.data;
     });
-    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending), 
+    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending, connector.pending, disconnector.pending), 
     state => {
       state.errorMessage = null;
       state.loading = true;
     });
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
       state.queryResultsLoading = true;
-    });
-    builder.addMatcher(isAnyOf(checkConnection.pending, connector.pending, disconnector.pending), state => {
-      state.checkConnectionLoading = true;
     });
     builder.addMatcher(isAnyOf(liveDataImplementation.pending), state => {
       state.liveDataImplLoading = true;
@@ -602,14 +595,20 @@ const visualizer = createSlice({
       state.alertsLoading = true;
     });
     builder.addMatcher(
-      isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected, getDbMetadata.rejected),
+      isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.payload;
       }
     );
-
-    builder.addMatcher(isAnyOf(checkConnection.rejected, connector.rejected, disconnector.rejected), (state, action) => {
+    builder.addMatcher(
+      isAnyOf( getDbMetadata.rejected, connector.rejected, disconnector.rejected),
+      (state, action) => {
+        state.loading = false;
+        state.errorMessage = action.error.message;
+      }
+    );
+    builder.addMatcher(isAnyOf(checkConnection.rejected, disconnector.rejected), (state, action) => {
       state.checkConnectionLoading = false;
       state.checkConnectionResponse = action.error.message;
       state.checkConnectionError = true;
@@ -644,5 +643,6 @@ export const {
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
   setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
   setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,setCheckConnectionResponse, setSelectedConnection,
+  setErrorMessage
 } = visualizer.actions;
 export default visualizer.reducer;

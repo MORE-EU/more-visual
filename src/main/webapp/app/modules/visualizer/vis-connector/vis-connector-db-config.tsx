@@ -14,7 +14,7 @@ import Alert from '@mui/material/Alert';
 import DBFormInput from "./db-form-input";
 
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import { getDbMetadata, setCheckConnectionResponse } from '../../store/visualizerSlice';
+import { disconnector, getDbMetadata, setErrorMessage } from '../../store/visualizerSlice';
 import { connector } from '../../store/visualizerSlice';
 
 interface IDBForm  {
@@ -36,7 +36,7 @@ const defaultForm: IDBForm = {
 }
 
 const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
-    const { checkConnectionResponse, checkConnectionLoading, checkConnectionError } = useAppSelector(state => state.visualizer);
+    const { connected, loading, errorMessage } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const [dbForm, setDbForm] = useState<IDBForm>(defaultForm);
     const { host, port, username, password, database } = dbForm;
@@ -45,19 +45,19 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
     useEffect(() => {
         setDbForm((prevDbForm) => {
             return {...prevDbForm, dbSystem: dbSystem};
-        })        
+        })
     },[]);
 
     useEffect(() => {
-        if (checkConnectionResponse) {
-            if (checkConnectionError) {
-                setOpenSnack(true);
-            } else{
-                setStep(3);
-                dispatch(getDbMetadata(dbForm.database));
-            }
+        if (connected) {
+            dispatch(getDbMetadata(dbForm.database));
         }
-    }, [checkConnectionResponse]);
+    }, [connected]);
+
+    useEffect(() => {
+        if(errorMessage) 
+            setOpenSnack(true);
+    }, [errorMessage]);
 
     
 
@@ -77,16 +77,17 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
         if (reason === 'clickaway') {
             return;
         }
-        dispatch(setCheckConnectionResponse(null));
+        dispatch(setErrorMessage(null));
+        if (connected) dispatch(disconnector()); //get metadata causes the error
         setOpenSnack(false);
     };
     
     return (
         <>
             <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1, }}>
-                <Snackbar open={openSnack} autoHideDuration={2000} onClose={handleClose}>
+                <Snackbar open={openSnack} autoHideDuration={3000} onClose={handleClose}>
                     <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-                        <>{checkConnectionResponse}</>
+                        <>{errorMessage}</>
                     </Alert>
                 </Snackbar>
                 <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
@@ -99,10 +100,10 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem, setStep}) => {
                         <DBFormInput label='username' type='text' value={username} handleChange={handleTextFields} />
                         <DBFormInput label='password' type='password' value={password} handleChange={handleTextFields} />
                         <DBFormInput label='database' type="database" value={database} handleChange={handleTextFields} />
-                        {checkConnectionLoading ? <CircularProgress /> : <Button variant="contained" startIcon={<LoginIcon />} type="submit" >Connect </Button>}
+                        { loading ? <CircularProgress /> : <Button variant="contained" startIcon={<LoginIcon />} type="submit" >Connect </Button> }
                     </Box>
                 </form> 
-                { !checkConnectionLoading && (<Button variant="text" startIcon={<CloseIcon />} onClick={closeHandler}>Close</Button>) }
+                { !loading && (<Button variant="text" startIcon={<CloseIcon />} onClick={closeHandler}>Close</Button>) }
             </Box>
         </>
     )

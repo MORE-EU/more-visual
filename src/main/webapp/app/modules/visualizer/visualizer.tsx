@@ -17,7 +17,7 @@ const mdTheme = createTheme();
 
 export const Visualizer = () => {
   const [isBusy, setIsBusy] = useState(true);
-  const { farmMeta, dataset, datasetChoice, selectedConnection, connected, loading } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, datasetChoice, selectedConnection, connected } = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
   const params: any = useParams();
@@ -77,7 +77,7 @@ export const Visualizer = () => {
             >
               <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
                 <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  {isBusy || loading ?  farmMeta ? <VisControl /> : <CircularProgress /> : <VisConnector />}
+                  {isBusy ?  farmMeta ? <VisControl /> : <CircularProgress /> : <VisConnector />}
                 </Paper>
               </Grid>
               <Grid sx={{ width: '80%', p: 1, flexGrow: 1, height: 'calc(100% - 30px)' }}>
