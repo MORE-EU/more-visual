@@ -111,7 +111,7 @@ const initialState = {
   changepointDetectionEnabled: false,
   manualChangepointsEnabled: false,
   customChangepointsEnabled: false,
-  detectedChangepointFilter: 0,
+  detectedChangepointFilter: null,
   forecasting: false,
   soilingEnabled: false,
   yawMisalignmentEnabled: false,

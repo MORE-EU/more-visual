@@ -31,7 +31,7 @@ const VisToolkit = () => {
           Tools
           </Typography>
           <List>
-            {dataset.id == "eugene" && <ListItemButton key={0} onClick={handleToolClick("Pattern Extraction")}>
+            {dataset.id == "eugene" && <ListItemButton key={0} onClick={handleToolClick("Pattern Extraction")} disabled={true}>
               <ListItemIcon>
                 <PatternIcon/>
               </ListItemIcon>
@@ -43,19 +43,18 @@ const VisToolkit = () => {
               </ListItemIcon>
               <ListItemText primary={"Soiling Detection"}/>
             </ListItemButton></>}
-            {dataset.id === "BEZ2" && <><ListItem key={2}>
+            {dataset.id === "BEZ2" && <><ListItemButton key={2} onClick={handleToolClick("Yaw Misalignment Detection")}>
                 <ListItemIcon>
                   <ManageSearchIcon/>
                 </ListItemIcon>
                 <ListItemText primary={"Yaw Misalignment Detection"}/>
-                <YawMisalignment />
-            </ListItem></>}
-            {dataset.id === "bbz1big" && <ListItemButton key={3} onClick={handleToolClick("Forecasting")}>
+            </ListItemButton></>}
+            <ListItemButton key={3} onClick={handleToolClick("Forecasting")} disabled={dataset.id !== "bbz1big"}>
               <ListItemIcon>
                 <TimelineIcon/>
               </ListItemIcon>
               <ListItemText primary={"Forecasting"}/>
-            </ListItemButton>}
+            </ListItemButton>
             <ListItemButton key={4} onClick={handleToolClick("Filtering")}>
               <ListItemIcon>
                 <FilterAltIcon/>

@@ -56,9 +56,15 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   shownMeasures} = props;
 
   useEffect(()=>{
-    dispatch(setDetectedChangepointFilter(90));
     setSliderValue(90);
     dispatch(getManualChangepoints(dataset.id));
+
+    return () => {
+      dispatch(toggleSoilingDetection(false));
+      dispatch(toggleChangepointDetection(false));
+      dispatch(toggleManualChangepoints(false))
+      dispatch(setDetectedChangepointFilter(null));
+    }
   }, []);
 
   const handleSliderValueChange = (e, val) => {
@@ -81,6 +87,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
     dispatch(updateSelectedMeasures(shownMeasures));
     dispatch(toggleSoilingDetection(true));
     if(action) {
+      dispatch(setDetectedChangepointFilter(sliderValue));
       dispatch(applyChangepointDetection({id: dataset.id, from, to})).then(res => {
         dispatch(applyDeviationDetection({id: dataset.id,
           from, to,

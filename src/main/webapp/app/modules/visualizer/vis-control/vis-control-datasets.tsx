@@ -6,7 +6,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getDataset, updateDatasetChoice } from 'app/modules/store/visualizerSlice';
+import { getDataset, toggleYawMisalignmentDetection, updateActiveTool, updateDatasetChoice, updateDetectedChangepoints, updateSecondaryData } from 'app/modules/store/visualizerSlice';
 import React, { useState } from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
@@ -19,10 +19,17 @@ const VisControlDatasets = () => {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
 
-  const handleDataset = idx => {
+  const handleDataset = (idx, fileId) => {
     if (datasetChoice !== idx) {
       dispatch(updateDatasetChoice(idx));
     }
+    dispatch(getDataset({ folder, id: fileId }))
+    dispatch(updateActiveTool(null));
+    dispatch(updateSecondaryData(null));
+
+    //Yaw missalignment case
+    dispatch(toggleYawMisalignmentDetection(false));
+    dispatch(updateDetectedChangepoints([]));
   };
 
   const handleUploadChange = e => {
@@ -43,7 +50,7 @@ const VisControlDatasets = () => {
       {farmMeta && (
         <>
           <Typography variant="h6" gutterBottom>
-            {dataset.farmName}
+            {farmMeta.name}
           </Typography>
           <List disablePadding dense>
             {farmMeta.data.map((file, idx) => (
@@ -53,7 +60,7 @@ const VisControlDatasets = () => {
                 component={Link}
                 to={`/visualize/${folder}/${file.id}`}
                 onClick={() => {
-                  handleDataset(idx), dispatch(getDataset({ folder, id: file.id }));
+                  handleDataset(idx, file.id);
                 }}
                 divider
               >

@@ -89,7 +89,7 @@ export const getInitialSeries = createAsyncThunk(
       to,
       viewPort: {width: 1000, height: 600},
       measures: [state.visualizer.dataset.header.indexOf(measure)],
-      filter: null,
+      filter: {},
     };
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
     return response.data;

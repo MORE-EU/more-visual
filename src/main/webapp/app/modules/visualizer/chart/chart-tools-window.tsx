@@ -25,7 +25,7 @@ const ChartToolsWindow = () => {
   };
 
   return (
-    <Grid sx={{ height: '60%', pt: 2 }}>
+    <Grid sx={{ height: activeTool === 'Yaw Misalignment Detection' ? '30%' : '60%', pt: 2 }}>
       <Paper elevation={1} sx={{ border: '1px solid rgba(0,0,0, 0.1)', height: '100%' }}>
         <Grid sx={{ height: 'fit-content', textAlign: 'left', display: "flex", bgcolor: grey[300] }}>
           <Typography variant="subtitle1" fontSize={25} fontWeight={500} sx={{ color: grey[600], pl: 1, pr: 1 }}>

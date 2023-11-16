@@ -62,13 +62,17 @@ const Header = props => {
       }}
     >
       <Breadcrumbs aria-label="breadcrumb">
-        <Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href="/">
+        {/* <Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href="/"> */}
+        <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
           <HomeIcon sx={{ mr: 0.5 }} fontSize='medium' />
           Home
-        </Link>
-        <Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`/visualize`}>
+          </Typography>
+        {/* </Link> */}
+        {/* <Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`/visualize`}> */}
+        <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
           {farmMeta.name}
-        </Link>
+          </Typography>
+        {/* </Link> */}
         <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
           {farmMeta.data[datasetChoice].name}
         </Typography>

@@ -27,7 +27,7 @@ export const SoilingDetection = () => {
 
 
   useEffect(() => {
-      dispatch(applyDeviationDetection({id: dataset.id,
+     detectedChangepointFilter && dispatch(applyDeviationDetection({id: dataset.id,
         from, to,
         weeks : soilingWeeks,
         type: soilingType,

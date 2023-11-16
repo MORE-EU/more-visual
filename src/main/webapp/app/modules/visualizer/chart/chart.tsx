@@ -11,7 +11,10 @@ import {
   applyChangepointDetection,
   applyDeviationDetection,
   applyYawMisalignmentDetection,
+  toggleChangepointDetection,
   toggleCustomChangepoints,
+  toggleSoilingDetection,
+  toggleYawMisalignmentDetection,
   updateAlertResults,
   updateChartRef,
   updateCompareQueryResults,
@@ -391,8 +394,7 @@ export const Chart = () => {
     ],
     name,
     color: "transparent",
-    yAxis: changeChart ?
-      (secondaryData ? ( 1 + customSelectedMeasures.length + selectedMeasures.length + idx) : (customSelectedMeasures.length + selectedMeasures.length + idx)) : 0,
+    yAxis: 0,
     // yAxis: changeChart ? selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc: number, arr: number[]) => acc + arr.length, 0) + idx : 0,
     // TODO: fix this
     zoneAxis: 'x',
@@ -442,7 +444,7 @@ export const Chart = () => {
           )
         : [];
     if (secondaryData) {
-      const sz = chartData !== null ? chartData.length : 0;
+      const sz = chartData !== null ? chartData.length + Object.values(compare).reduce((acc: number, arr: number[]) => acc + arr.length, 0) : 0;
       const sData = secondaryData.map(d => {
         const val = d.values[0];
         return { x: d.timestamp, y: isNaN(val) ? null : val, tt: d.values[1] ? 'Est. Power Loss: ' + d.values[1].toFixed(2) : null };
@@ -595,7 +597,7 @@ export const Chart = () => {
 
   return (
     <Grid
-      sx={{ border: '1px solid rgba(0, 0, 0, .1)', height: activeTool ? '40%' : '70%', position: 'relative' }}
+      sx={{ border: '1px solid rgba(0, 0, 0, .1)', height: activeTool ? (activeTool === 'Yaw Misalignment Detection' ? '70%' : '40%') : '70%', position: 'relative' }}
       onMouseOver={() => data ? handleMouseOverChart() : null}
       onMouseLeave={() => data ? handleMouseLeaveChart() : null}
     >
