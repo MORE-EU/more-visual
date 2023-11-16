@@ -11,9 +11,10 @@ const chartAlertingChecker = (
 ) => {
   const selAlertMeasuresSet = new Set(getMatchedMeasures(alerts, dataset, selectedMeasures));
   const allAlerts = {};
-
+  console.log(selAlertMeasuresSet)
+  console.log(data)
   for (const alert of alerts) {
-    if (selAlertMeasuresSet.has(alert.measure) && alert.active) {
+    if (selAlertMeasuresSet.has(alert.measure) && alert.active && Object.hasOwn(data, dataset.header.indexOf(alert.measure))) {
       const measureIndex = dataset.header.indexOf(alert.measure);
       const dataCut = data[measureIndex];
       const acceptedValues = [];
