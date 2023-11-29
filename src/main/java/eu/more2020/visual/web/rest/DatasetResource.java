@@ -175,7 +175,7 @@ public class DatasetResource {
             datasetRepository.findById(id, farmName).map(dataset -> {
                     return csvDataService.executeQuery((CsvDataset) dataset, query);
                 });
-//        queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
+        //queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 
@@ -254,7 +254,7 @@ public class DatasetResource {
         } catch (Exception e) {
         return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
         }
-}
+    }
 
 
     @GetMapping("/datasets/metadata/{database}/{farmName}")
@@ -274,7 +274,7 @@ public class DatasetResource {
     public ResponseEntity<AbstractDataset> getDbDataset(@RequestBody FarmInfo farmInfo) throws SQLException {
         log.debug("REST request to get db Dataset");
         QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
-        Optional<AbstractDataset> dataset = datasetRepository.createDBDataset(farmInfo, queryExecutor);
+        Optional<AbstractDataset> dataset = datasetRepository.findDBDatasetById(farmInfo, queryExecutor);
         return ResponseUtil.wrapOrNotFound(dataset);
     }
 
@@ -285,7 +285,7 @@ public class DatasetResource {
         FarmInfo farmInfo =  mapper.convertValue(map.get("farmInfo"), FarmInfo.class);
         QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
         log.debug("REST request to execute Query: {}", query);
-        AbstractDataset dataset =  datasetRepository.createDBDataset(farmInfo, queryExecutor).get();
+        AbstractDataset dataset =  datasetRepository.findDBDatasetById(farmInfo, queryExecutor).get();
         Optional<QueryResults> queryResultsOptional = Optional.ofNullable(dataService.executeQuery(databaseConnection.getSqlQueryExecutor(dataset), dataset, query));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }   

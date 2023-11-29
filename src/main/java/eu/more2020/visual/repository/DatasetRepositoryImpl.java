@@ -14,7 +14,6 @@ import eu.more2020.visual.middleware.datasource.QueryExecutor.SQLQueryExecutor;
 import eu.more2020.visual.middleware.domain.DataFileInfo;
 import eu.more2020.visual.middleware.domain.Dataset.*;
 import eu.more2020.visual.middleware.domain.InfluxDB.InfluxDBConnection;
-import eu.more2020.visual.middleware.domain.PostgreSQL.JDBCConnection;
 import eu.more2020.visual.middleware.domain.TimeRange;
 import eu.more2020.visual.middleware.util.DateTimeUtil;
 import org.apache.commons.io.input.ReversedLinesFileReader;
@@ -45,6 +44,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
     private final Logger log = LoggerFactory.getLogger(DatasetRepositoryImpl.class);
 
+    private Map<String, AbstractDataset> datasets = new HashMap();
 
     @Value("${application.timeFormat}")
     private String timeFormat;
@@ -85,55 +85,58 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         AbstractDataset dataset = null;
         File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName, farmName + ".meta.json");
         ObjectMapper objectMapper = new ObjectMapper();
+        if(datasets.containsKey(id)) dataset = datasets.get(id);
+        else{
+            if (metadataFile.exists()) {
+                JsonNode jsonNode = objectMapper.readTree(metadataFile);
+                FarmMeta farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
+                String type = farm.getType();
 
-        if (metadataFile.exists()) {
-            JsonNode jsonNode = objectMapper.readTree(metadataFile);
-            FarmMeta farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
-            String type = farm.getType();
-
-            for (JsonNode datasetNode : jsonNode.get("data")) {
-                String datasetId = datasetNode.get("id").asText();
-                if(!datasetId.equals(id)) continue;
-                // Extract data from JSON node and create the desired subclass of AbstractDataset
-                String name = datasetNode.get("name").asText();
-                String path = datasetNode.get("path").asText();
-                String timeCol = datasetNode.get("timeCol").asText();
-                String delimiter = datasetNode.get("delimiter").asText();
-                boolean hasHeader = datasetNode.get("hasHeader").asBoolean();
-                File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, id + ".csv");
-                dataset = new CsvDataset(path, id, name, timeCol, timeFormat, delimiter, hasHeader);
-                CsvDataset finalDataset = (CsvDataset) dataset;
-                if (!file.isDirectory()) {
-                    DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
-                    fillDataFileInfo((CsvDataset) dataset, dataFileInfo);
-                    dataset.getFileInfoList().add(dataFileInfo);
-                } else {
-                    List<DataFileInfo> fileInfoList = Arrays.stream(file.listFiles(f -> !f.isDirectory() && f.getName().endsWith(".csv"))).map(f -> {
-                        DataFileInfo dataFileInfo = new DataFileInfo(f.getAbsolutePath());
-                        try {
-                            fillDataFileInfo(finalDataset, dataFileInfo);
-                        } catch (IOException e) {
-                            new RuntimeException(e);
-                        }
-                        return dataFileInfo;
-                    }).collect(Collectors.toList());
-                    // sort csv files by their time ranges ascending
-                    fileInfoList.sort(Comparator.comparing(i -> i.getTimeRange().getFrom()));
-                    dataset.setFileInfoList(fileInfoList);
+                for (JsonNode datasetNode : jsonNode.get("data")) {
+                    String datasetId = datasetNode.get("id").asText();
+                    if(!datasetId.equals(id)) continue;
+                    // Extract data from JSON node and create the desired subclass of AbstractDataset
+                    String name = datasetNode.get("name").asText();
+                    String path = datasetNode.get("path").asText();
+                    String timeCol = datasetNode.get("timeCol").asText();
+                    String delimiter = datasetNode.get("delimiter").asText();
+                    boolean hasHeader = datasetNode.get("hasHeader").asBoolean();
+                    File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, id + ".csv");
+                    dataset = new CsvDataset(path, id, name, timeCol, timeFormat, delimiter, hasHeader);
+                    CsvDataset finalDataset = (CsvDataset) dataset;
+                    if (!file.isDirectory()) {
+                        DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
+                        fillDataFileInfo((CsvDataset) dataset, dataFileInfo);
+                        dataset.getFileInfoList().add(dataFileInfo);
+                    } else {
+                        List<DataFileInfo> fileInfoList = Arrays.stream(file.listFiles(f -> !f.isDirectory() && f.getName().endsWith(".csv"))).map(f -> {
+                            DataFileInfo dataFileInfo = new DataFileInfo(f.getAbsolutePath());
+                            try {
+                                fillDataFileInfo(finalDataset, dataFileInfo);
+                            } catch (IOException e) {
+                                new RuntimeException(e);
+                            }
+                            return dataFileInfo;
+                        }).collect(Collectors.toList());
+                        // sort csv files by their time ranges ascending
+                        fileInfoList.sort(Comparator.comparing(i -> i.getTimeRange().getFrom()));
+                        dataset.setFileInfoList(fileInfoList);
+                    }
+                    List<Integer> measures =  IntStream.rangeClosed(0, dataset.getHeader().length - 1)
+                        .boxed()
+                        .filter(i -> i != finalDataset.getMeasureIndex(finalDataset.getTimeCol()))
+                        .collect(Collectors.toList());
+                    finalDataset.setMeasures(measures);
+                    if (dataset.getTimeRange() == null) {
+                        dataset.setTimeRange(dataset.getFileInfoList().get(0).getTimeRange());
+                    }
+                    dataset.setTimeRange(dataset.getFileInfoList().stream().map(DataFileInfo::getTimeRange)
+                        .reduce(dataset.getTimeRange(), TimeRange::span));
+                    dataset.setType(type);
                 }
-                List<Integer> measures =  IntStream.rangeClosed(0, dataset.getHeader().length - 1)
-                    .boxed()
-                    .filter(i -> i != finalDataset.getMeasureIndex(finalDataset.getTimeCol()))
-                    .collect(Collectors.toList());
-                finalDataset.setMeasures(measures);
-                if (dataset.getTimeRange() == null) {
-                    dataset.setTimeRange(dataset.getFileInfoList().get(0).getTimeRange());
-                }
-                dataset.setTimeRange(dataset.getFileInfoList().stream().map(DataFileInfo::getTimeRange)
-                    .reduce(dataset.getTimeRange(), TimeRange::span));
-                dataset.setType(type);
+                log.info(String.valueOf(dataset));
+                datasets.put(id, dataset);
             }
-            log.info(String.valueOf(dataset));
         }
         return Optional.ofNullable(dataset);
     }
@@ -211,6 +214,18 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
     @Override
+    public Optional<AbstractDataset> findDBDatasetById(FarmInfo farmInfo, QueryExecutor queryExecutor) throws SQLException {
+        Assert.notNull(farmInfo.getId(), "Id must not be null!");
+        AbstractDataset dataset = null;
+        if(datasets.containsKey(farmInfo.getId())) dataset = datasets.get(farmInfo.getId());
+        else {
+            dataset = createDBDataset(farmInfo, queryExecutor);
+            datasets.put(farmInfo.getId(), dataset);
+        }
+        return Optional.ofNullable(dataset);
+    }
+
+    @Override
     public FarmMeta getDBMetadata (String database, String farmName, QueryExecutor queryExecutor) throws SQLException {
         FarmMeta farmMeta = new FarmMeta();
         List<FarmInfo> farmInfos = new ArrayList<FarmInfo>();
@@ -239,8 +254,9 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
 
-    public Optional<AbstractDataset> createDBDataset(FarmInfo farmInfo, QueryExecutor queryExecutor) throws SQLException {
+    private AbstractDataset createDBDataset(FarmInfo farmInfo, QueryExecutor queryExecutor) throws SQLException {
         AbstractDataset dataset = null;
+        log.debug("creating new dataset {}", farmInfo.getId());
         switch (farmInfo.getType()) {
             case "postgres":
                 SQLQueryExecutor sqlQueryExecutor = (SQLQueryExecutor) queryExecutor;
@@ -263,6 +279,6 @@ public class DatasetRepositoryImpl implements DatasetRepository {
             default:
                 break;
         }
-        return Optional.ofNullable(dataset);
+        return dataset;
     }
 }
