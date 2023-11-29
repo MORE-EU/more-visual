@@ -1,6 +1,9 @@
 package eu.more2020.visual.repository;
+import eu.more2020.visual.domain.DbConnector;
+import eu.more2020.visual.domain.FarmInfo;
 import eu.more2020.visual.domain.FarmMeta;
 import eu.more2020.visual.domain.Sample;
+import eu.more2020.visual.middleware.datasource.QueryExecutor.QueryExecutor;
 import eu.more2020.visual.middleware.domain.Dataset.AbstractDataset;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +35,10 @@ public interface DatasetRepository {
     Optional<AbstractDataset> findById(String id, String farmName) throws IOException, SQLException;
 
     AbstractDataset save(AbstractDataset dataset) throws IOException;
+
+    FarmMeta getDBMetadata (String database, String farmName, QueryExecutor queryExecutor) throws SQLException;
+
+    Optional<AbstractDataset> createDBDataset(FarmInfo farmInfo, QueryExecutor queryExecutor) throws SQLException;
 
     void deleteById(String id);
 

@@ -9,7 +9,7 @@ import { Divider, Grid } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getDbDataset, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
 import Header from './header/header';
 import VisConnector from './vis-connector/vis-connector';
 
@@ -26,7 +26,7 @@ export const Visualizer = () => {
   useEffect(() => {
     if (params.folder !== undefined) {
       setIsBusy(true);
-      if (!connected)
+      if (!connected) // change to farmMeta.type === csv when possible
         dispatch(getFarmMeta(params.folder));
     }
     else
@@ -34,14 +34,13 @@ export const Visualizer = () => {
   }, [history.location]);
 
   useEffect(() => {
-    if (!connected){
       if (params.id !== undefined) {
         dispatch(setFolder(params.folder));
-        dispatch(getDataset({ folder: params.folder, id: params.id }));
+        if(!connected) 
+          dispatch(getDataset({ folder: params.folder, id: params.id }));
+        else
+          farmMeta && dispatch(getDbDataset({ farmInfo: farmMeta.data.filter(data => data.id === params.id)[0] }));
         farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
-      }
-    } else {
-      if (params.id !== undefined) dispatch(setFolder(farmMeta.name));
     }
   }, [params.id]);
 
@@ -50,10 +49,10 @@ export const Visualizer = () => {
   }, [dataset]);
 
   useEffect(() => {
-    if (connected)
-      params.id === undefined && farmMeta && history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[0].id}`);
-    else
+    if (!connected)
       params.id === undefined && farmMeta && history.push(`${params.folder}/${farmMeta.data[0].id}`);
+    else
+      params.id === undefined && farmMeta && history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[0].id}`);
   }, [farmMeta]);
 
   useEffect(() => {
@@ -76,7 +75,7 @@ export const Visualizer = () => {
               }}
             >
               <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
-                <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
                   {isBusy ?  farmMeta ? <VisControl /> : <CircularProgress /> : <VisConnector />}
                 </Paper>
               </Grid>
@@ -89,7 +88,7 @@ export const Visualizer = () => {
                     height: '100%',
                   }}
                 >
-                  {dataset && farmMeta && <ChartContainer />}
+                  {farmMeta && (dataset ?  <ChartContainer /> : <CircularProgress />) }
                 </Paper>
               </Grid>
             </Grid>

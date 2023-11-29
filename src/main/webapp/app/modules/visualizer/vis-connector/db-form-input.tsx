@@ -6,13 +6,14 @@ import TextField from "@mui/material/TextField";
 
 type DBFormPropsType = {
     label: string;
+    name: string;
     value: string;
     type: string;
     handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 
-const DBFormInput = ({label, value, type, handleChange}: DBFormPropsType ) => {
+const DBFormInput = ({label, name, value, type, handleChange}: DBFormPropsType ) => {
     return (
     <Box sx={{ display: 'flex',flexDirection: 'column' ,alignItems: 'center', columnGap: 1, width: '100%' }}>
         <Typography variant="subtitle1">
@@ -25,7 +26,7 @@ const DBFormInput = ({label, value, type, handleChange}: DBFormPropsType ) => {
             size="small" 
             fullWidth 
             value={value} 
-            name={label} 
+            name={name} 
             onChange={handleChange}
             type={type}
         />

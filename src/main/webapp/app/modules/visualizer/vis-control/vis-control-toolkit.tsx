@@ -34,33 +34,33 @@ const VisToolkit = () => {
               <ListItemIcon>
                 <PatternIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Pattern Extraction"}/>
+              <ListItemText primary={"Pattern Extraction"} sx={ {display: { xs: 'none', md: 'block' }}}/>
             </ListItemButton>
             {farmMeta.resType === 0 && <><ListItemButton key={1} onClick={handleToolClick("Soiling Detection")}>
               <ListItemIcon>
                 <ManageSearchIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Soiling Detection"}/>
+              <ListItemText primary={"Soiling Detection"} sx={ {display: { xs: 'none', md: 'block' }}}/>
             </ListItemButton></>}
             {farmMeta.resType === 1 && <>
               <ListItemButton key={2}>
                 <ListItemIcon>
                   <ManageSearchIcon/>
                 </ListItemIcon>
-                <ListItemText primary={"Yaw Misalignment Detection"}/>
+                <ListItemText primary={"Yaw Misalignment Detection"} sx={ {display: { xs: 'none', md: 'block' }}}/>
                 <YawMisalignment />
             </ListItemButton></>}
             <ListItemButton key={3} onClick={handleToolClick("Forecasting")}>
               <ListItemIcon>
                 <TimelineIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Forecasting"}/>
+              <ListItemText primary={"Forecasting"} sx={ {display: { xs: 'none', md: 'block' }}}/>
             </ListItemButton>
             <ListItemButton key={4} onClick={handleToolClick("Filtering")}>
               <ListItemIcon>
                 <FilterAltIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Filtering"}/>
+              <ListItemText primary={"Filtering"} sx={ {display: { xs: 'none', md: 'block' }}}/>
             </ListItemButton>
           </List>
         </Grid>

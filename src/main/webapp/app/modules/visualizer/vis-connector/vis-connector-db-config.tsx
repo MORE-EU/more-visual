@@ -51,7 +51,7 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem}) => {
 
     useEffect(() => {
         if (connected) {
-            dispatch(getDbMetadata(dbForm.database));
+            dispatch(getDbMetadata({database:dbForm.dbSystem, farmName:dbForm.database}));
         }
     }, [connected]);
 
@@ -81,14 +81,14 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem}) => {
             return;
         }
         dispatch(setErrorMessage(null));
-        if (connected) dispatch(disconnector()); //get metadata causes the error
+        if (connected) dispatch(disconnector()); //get metadata causes the error here
         setOpenSnack(false);
     };
     
     return (
         <>
             <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1, }}>
-                <Snackbar open={openSnack} autoHideDuration={3000} onClose={handleClose}>
+                <Snackbar open={openSnack} autoHideDuration={2000} onClose={handleClose}>
                     <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
                         <>{errorMessage}</>
                     </Alert>
@@ -96,13 +96,19 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem}) => {
                 <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
                     DB Configuration
                 </Typography>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} autoComplete="off">
                     <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1, }}>
-                        <DBFormInput label='host' type='text' value={host} handleChange={handleTextFields} />
-                        <DBFormInput label='port' type='text' value={port} handleChange={handleTextFields} />
-                        <DBFormInput label='username' type='text' value={username} handleChange={handleTextFields} />
-                        <DBFormInput label='password' type='password' value={password} handleChange={handleTextFields} />
-                        <DBFormInput label='database' type="database" value={database} handleChange={handleTextFields} />
+                        <DBFormInput label='host' name="host" type='text' value={host} handleChange={handleTextFields} />
+                        <DBFormInput label='port' name="port" type='text' value={port} handleChange={handleTextFields} />
+                        { dbSystem === "influx" ? 
+                        (<DBFormInput label='org' name="username" type='text' value={username} handleChange={handleTextFields} />) :
+                        (<DBFormInput label='username' name="username" type='text' value={username} handleChange={handleTextFields} />)}
+                        { dbSystem === "influx" ?
+                        (<DBFormInput label='token' name="password" type='password' value={password} handleChange={handleTextFields} />) :
+                        (<DBFormInput label='password' name="password" type='password' value={password} handleChange={handleTextFields} />)}
+                        { dbSystem === "influx" ?
+                        (<DBFormInput label='bucket' name="database" type="database" value={database} handleChange={handleTextFields} />) :
+                        (<DBFormInput label='database' name="database" type="database" value={database} handleChange={handleTextFields} />)}
                         { loading ? <CircularProgress /> : <Button variant="contained" startIcon={<LoginIcon />} type="submit" >Connect </Button> }
                     </Box>
                 </form> 

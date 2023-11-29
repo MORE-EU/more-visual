@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { IAlerts } from 'app/shared/model/alert.model';
 import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
+import { IDataset } from 'app/shared/model/dataset.model';
 import { IFarmMeta } from 'app/shared/model/farmMeta.model';
 import { IQueryResults } from 'app/shared/model/query-results.model';
 import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
@@ -121,7 +122,7 @@ const initialState = {
 
 export const connector = createAsyncThunk('connector', async (dbConnector: {dbSystem: string, host: string, port: string, username: string, password: string, database: string}) => {
   try {
-    const response = await axios.post(`api/connect`, dbConnector).then(res => res);
+    const response = await axios.post(`api/database/connect`, dbConnector).then(res => res);
     return response;
   } catch (error) {
     throw new Error("Credentials Error");
@@ -130,22 +131,21 @@ export const connector = createAsyncThunk('connector', async (dbConnector: {dbSy
 
 export const disconnector = createAsyncThunk('disconnector', async () => {
   try {
-    const response = await axios.post(`api/disconnect`).then(res => res);
+    const response = await axios.post(`api/database/disconnect`).then(res => res);
     return response;
   } catch (error) {
     throw new Error("Disconnect Error");
   }
 });
 
-
-export const getDbMetadata = createAsyncThunk('getDbMetadata', async (farmName: string) => {
+export const getDbMetadata = createAsyncThunk('getDbMetadata', async (data: { database: string; farmName: string; }) => {
   try {
-    const response = await axios.get(`api/database/metadata/${farmName}`).then(res => res);
+    const response = await axios.get(`api/datasets/metadata/${data.database}/${data.farmName}`).then(res => res);
     return response;
   } catch (error) {
     throw new Error("Can't get database metadata");
   }
-})
+});
 
 export const checkConnection = createAsyncThunk('checkConnection', async (bdConfig: { url: string; port: string; }) => {
   try {
@@ -160,6 +160,12 @@ export const checkConnection = createAsyncThunk('checkConnection', async (bdConf
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
   const { folder, id } = data;
   const response = await axios.get(`api/datasets/${folder}/${id}`).then(res => res);
+  return response;
+});
+
+export const getDbDataset = createAsyncThunk('getDbDataset', async (data: {farmInfo: IDataset}) => {
+  const { farmInfo } = data;
+  const response = await axios.post(`api/datasets/database/create`, farmInfo).then(res => res);
   return response;
 });
 
@@ -220,6 +226,33 @@ export const updateQueryResults = createAsyncThunk(
         } as IQuery)
       : (query = {range: null});
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
+    return response.data;
+  }
+);
+
+export const updateDbQueryResults = createAsyncThunk(
+  'updateDbQueryResults',
+  async (data: {
+    folder: string;
+    id: string[];
+    from: number;
+    to: number;
+    selectedMeasures: any[];
+    filter?: {};
+    farmInfo: IDataset;
+  }) => {
+    const { from, to, selectedMeasures, filter, farmInfo } = data;
+    let query;
+    from !== null && to !== null
+      ? (query = {
+          from,
+          to,
+          viewPort: {width: 1000, height: 600},
+          measures: selectedMeasures,
+          filter: filter ? filter : null,
+        } as IQuery)
+      : (query = {range: null});
+    const response = await axios.post(`api/datasets/database/query`, {query: query, farmInfo: farmInfo}).then(res => res);
     return response.data;
   }
 );
@@ -507,6 +540,14 @@ const visualizer = createSlice({
       state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
       state.selectedMeasures = [action.payload.data.measures[0]];
     });
+    builder.addCase(getDbDataset.fulfilled, (state, action) => {
+      state.loading = false;
+      state.dataset = action.payload.data;
+      state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
+      state.measureColors = [...state.dataset.header.map(() => generateColor())];
+      state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
+      state.selectedMeasures = [action.payload.data.measures[0]];
+    });
     builder.addCase(connector.fulfilled, state => {
       state.loading = false;
       state.connected = true;
@@ -560,6 +601,14 @@ const visualizer = createSlice({
       state.from = action.payload.data[state.selectedMeasures[0]][0].timestamp;
       state.to = action.payload.data[state.selectedMeasures[0]][action.payload.data[state.selectedMeasures[0]].length - 1].timestamp;
     });
+    builder.addCase(updateDbQueryResults.fulfilled, (state, action) => {
+      state.queryResultsLoading = false;
+      state.queryResults = action.payload;
+      state.data = action.payload.data;
+      state.from = action.payload.data[state.selectedMeasures[0]][0].timestamp;
+      state.to = action.payload.data[state.selectedMeasures[0]][action.payload.data[state.selectedMeasures[0]].length - 1].timestamp;
+    });
+
     builder.addCase(updateCompareQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;
       state.compareData = action.payload;
@@ -579,12 +628,12 @@ const visualizer = createSlice({
         })
         : state.data;
     });
-    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending, connector.pending, disconnector.pending), 
+    builder.addMatcher(isAnyOf(getDataset.pending, getDbDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending, connector.pending, disconnector.pending), 
     state => {
       state.errorMessage = null;
       state.loading = true;
     });
-    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
+    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateDbQueryResults.pending, updateCompareQueryResults.pending), state => {
       state.queryResultsLoading = true;
     });
     builder.addMatcher(isAnyOf(liveDataImplementation.pending), state => {
@@ -595,7 +644,7 @@ const visualizer = createSlice({
       state.alertsLoading = true;
     });
     builder.addMatcher(
-      isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected),
+      isAnyOf(getDataset.rejected, getDbDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.payload;
@@ -613,7 +662,7 @@ const visualizer = createSlice({
       state.checkConnectionResponse = action.error.message;
       state.checkConnectionError = true;
     });
-    builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected), (state, action) => {
+    builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateDbQueryResults.rejected, updateCompareQueryResults.rejected), (state, action) => {
       state.queryResultsLoading = false;
     });
     builder.addMatcher(isAnyOf(liveDataImplementation.rejected), (state, action) => {

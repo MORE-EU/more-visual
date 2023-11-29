@@ -22,7 +22,7 @@ const VisControlDatasets = () => {
   const history = useHistory();
   
   useEffect(() => {
-    if(farmMeta.type === 'db' && !connected) {
+    if(farmMeta.type !== 'csv' && !connected) {
       dispatch(resetFetchData());
       history.push('/visualize');
     }
@@ -68,7 +68,7 @@ const VisControlDatasets = () => {
                 }}
                 divider
               >
-                <ListItemText primary={`${file.id}`} sx={{ pl: 4 }} />
+                <ListItemText primary={`${file.id}`} />
                 {compare.includes(file.id) && (
                   <Tooltip title="Currently comparing this file">
                     <ListItemIcon>
@@ -81,14 +81,14 @@ const VisControlDatasets = () => {
             { farmMeta.type === "csv" ? (
               <ListItemButton key={'new-dataset-list-button-sd'} component="label">
                 <input hidden type="file" accept=".csv" onChange={handleUploadChange} />
-                <ListItemText primary={`new dataset`} sx={{ pl: 4 }} />
+                <ListItemText  primary={`new dataset`} sx={ {display: { xs: 'none', md: 'block' }}} />
                 <ControlPointIcon />
               </ListItemButton>
-            ) : farmMeta.type === "db" && (
+            ) :  (
                 <ListItemButton key={'new-dataset-list-button-sd'} component="label" onClick={() => { 
                   dispatch(disconnector());
                 }}>
-                  <ListItemText primary={`close connection`} sx={{ pl: 4 }} />
+                  <ListItemText primary={`close connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
                   <LogoutIcon />
               </ListItemButton>
             )}

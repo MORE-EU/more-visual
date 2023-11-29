@@ -13,6 +13,7 @@ import {
   updateCompareQueryResults,
   updateFrom,
   updateQueryResults,
+  updateDbQueryResults,
   updateResampleFreq,
   updateTo,
   applyChangepointDetection,
@@ -39,7 +40,7 @@ export const Chart = () => {
   const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,measureColors,queryResultsLoading,filter, customChangepoints,
     queryResults,changeChart,compare,changepointDetectionEnabled,detectedChangepointFilter,customChangepointsEnabled,data,compareData,
     forecastData,soilingEnabled,soilingType,alertingPlotMode,alertResults,forecastingDataSplit,soilingWeeks,yawMisalignmentEnabled,secondaryData,chartType,
-    liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate} = useAppSelector(state => state.visualizer);
+    liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate, farmMeta, datasetChoice} = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
 
@@ -160,11 +161,18 @@ export const Chart = () => {
 
   useEffect(() => {
     latestMeasures.current = selectedMeasures;
-    dispatch(
-      updateQueryResults({ folder, id: dataset.id,
-        from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
-        to: to ? to : dataset.timeRange.to, selectedMeasures, filter })
-    );
+    if (farmMeta.type === "csv")
+      dispatch(
+        updateQueryResults({ folder, id: dataset.id,
+          from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
+          to: to ? to : dataset.timeRange.to, selectedMeasures, filter })
+      );
+    else 
+      dispatch(
+        updateDbQueryResults({ folder, id: dataset.id,
+          from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
+          to: to ? to : dataset.timeRange.to, selectedMeasures, filter, farmInfo: farmMeta.data[datasetChoice] })
+      );
     if (compare.length !== 0) {
       dispatch(updateCompareQueryResults({ folder, id: compare, from, to, selectedMeasures, filter }));
     }
@@ -262,16 +270,29 @@ export const Chart = () => {
 
     const fetchData = (leftSide: number, rightSide: number) => {
       chart.current.showLoading();
-      dispatch(
-        updateQueryResults({
-          folder: latestFolder.current,
-          id: latestDatasetId.current,
-          from: leftSide,
-          to: rightSide,
-          selectedMeasures: latestMeasures.current,
-          filter: latestFilter.current,
-        })
-      );
+      if(farmMeta.type === "csv")
+        dispatch(
+          updateQueryResults({
+            folder: latestFolder.current,
+            id: latestDatasetId.current,
+            from: leftSide,
+            to: rightSide,
+            selectedMeasures: latestMeasures.current,
+            filter: latestFilter.current,
+          })
+        );
+      else
+        dispatch(
+          updateDbQueryResults({
+            folder: latestFolder.current,
+            id: latestDatasetId.current,
+            from: leftSide,
+            to: rightSide,
+            selectedMeasures: latestMeasures.current,
+            filter: latestFilter.current,
+            farmInfo: farmMeta.data[datasetChoice]
+          })
+        );
       dispatch(updateFrom(leftSide));
       dispatch(updateTo(rightSide));
       if (latestCompare.current.length !== 0)

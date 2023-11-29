@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { resetFilters, updateFilter, updateQueryResults } from 'app/modules/store/visualizerSlice';
+import { resetFilters, updateDbQueryResults, updateFilter, updateQueryResults } from 'app/modules/store/visualizerSlice';
 import { grey } from '@mui/material/colors';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import Box from '@mui/material/Box';
@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Slider from '@mui/material/Slider';
 
 export const Filter = () => {
-  const { queryResults, filter, folder, dataset, from, to, resampleFreq, selectedMeasures, chartRef, queryResultsLoading } = useAppSelector(
+  const { queryResults, filter, folder, dataset, from, to, resampleFreq, selectedMeasures, chartRef, queryResultsLoading, farmMeta, datasetChoice } = useAppSelector(
     state => state.visualizer
   );
   const dispatch = useAppDispatch();
@@ -42,7 +42,10 @@ export const Filter = () => {
   const filterReset = () => {
     dispatch(resetFilters());
     updateWindowFilters(getFirstFilters());
-    dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures }));
+    if (farmMeta.type === "csv")
+      dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures }));
+    else
+      dispatch(updateDbQueryResults({ folder, id: dataset.id, from, to, selectedMeasures,farmInfo: farmMeta.data[datasetChoice] }));
   };
 
   const onSliderChange = measureCol => (e, range) => {
@@ -52,7 +55,10 @@ export const Filter = () => {
   const handleFilterSlider = colName => (e, newRange) => {
     const newFilter = { ...windowFilters, [colName]: newRange };
     dispatch(updateFilter(newFilter));
-    dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
+    if (farmMeta.type === "csv")
+      dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
+    else
+      dispatch(updateDbQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter,farmInfo: farmMeta.data[datasetChoice] }));
   };
 
   const getParsedValue = val => {
@@ -74,7 +80,10 @@ export const Filter = () => {
         const newFilter = { ...windowFilters, [col]: [value, windowFilters[col][1]] };
         clearTimeout(debounceTimer.current);
         debounceTimer.current = setTimeout(() => {
-          dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
+          if (farmMeta.type === "csv")
+            dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
+          else
+            dispatch(updateDbQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter,farmInfo: farmMeta.data[datasetChoice] }));
         }, 1000);
       }
     } else {
@@ -89,7 +98,10 @@ export const Filter = () => {
         const newFilter = { ...windowFilters, [col]: [windowFilters[col][0], value] };
         clearTimeout(debounceTimer.current);
         debounceTimer.current = setTimeout(() => {
-          dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
+          if (farmMeta.type === "csv")
+            dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
+          else
+            dispatch(updateDbQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter, farmInfo: farmMeta.data[datasetChoice]}));
         }, 1000);
       }
     }

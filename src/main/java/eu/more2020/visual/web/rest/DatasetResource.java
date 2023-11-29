@@ -2,13 +2,11 @@ package eu.more2020.visual.web.rest;
 
 import eu.more2020.visual.domain.*;
 import eu.more2020.visual.middleware.datasource.QueryExecutor.QueryExecutor;
-import eu.more2020.visual.middleware.datasource.QueryExecutor.SQLQueryExecutor;
 import eu.more2020.visual.middleware.domain.*;
 import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
 import eu.more2020.visual.middleware.domain.PostgreSQL.JDBCConnection;
 import eu.more2020.visual.middleware.domain.Dataset.AbstractDataset;
 import eu.more2020.visual.middleware.domain.Query.Query;
-import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.FileHandlingRepository;
@@ -26,19 +24,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.influxdb.exceptions.InfluxException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -171,19 +166,14 @@ public class DatasetResource {
     }
 
     /**
-     * POST executeQuery
+     * POST executeQuery for csv dataset
      */
     @PostMapping("/datasets/{farmName}/{id}/query")
     public ResponseEntity<QueryResults> executeQuery(@PathVariable String farmName, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
         log.debug("REST request to execute Query: {}", query);
         Optional<QueryResults> queryResultsOptional =
-            datasetRepository.findById(id, farmName).map(dataset ->
-                {
-                    if(dataset.getType().equals("csv")){
-                        return csvDataService.executeQuery((CsvDataset) dataset, query);
-                    } else {
-                        return dataService.executeQuery(dataset, query);
-                    }
+            datasetRepository.findById(id, farmName).map(dataset -> {
+                    return csvDataService.executeQuery((CsvDataset) dataset, query);
                 });
 //        queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
@@ -242,8 +232,8 @@ public class DatasetResource {
       return datasetRepository.checkConnection(dbConfig.getUrl(), dbConfig.getPort());
     }
 
-    @PostMapping("/connect") 
-    public ResponseEntity<Boolean> connector(@RequestBody DbConnector dbConnector) throws URISyntaxException, SQLException {
+    @PostMapping("/database/connect") 
+    public ResponseEntity<Boolean> connector(@RequestBody DbConnector dbConnector) throws SQLException, InfluxException {
         log.debug("Rest request to connect to db");
         String url = null;
         switch (dbConnector.getDbSystem()) {
@@ -251,6 +241,10 @@ public class DatasetResource {
                 url = "jdbc:postgresql://" + dbConnector.getHost() + ":" + dbConnector.getPort() + "/" + dbConnector.getDatabase();
                 databaseConnection = new JDBCConnection(url, dbConnector.getUsername(), dbConnector.getPassword());
                 break;
+            // case "influxDB":
+            //     url = "http://" + dbConnector.getHost() + ":" + dbConnector.getPort();
+            //     databaseConnection = new InfluxDBConnection(url, dbConnector.getUsername(), dbConnector.getPassword(), dbConnector.getDatabase());
+            //     break;
             default:
                 break;
         }
@@ -263,33 +257,43 @@ public class DatasetResource {
 }
 
 
-    @GetMapping("/database/metadata/{farmName}")
-    public ResponseEntity<FarmMeta> getDbMetadata(@PathVariable String farmName) throws SQLException {
-        log.debug("Rest request to get db metadata");
+    @GetMapping("/datasets/metadata/{database}/{farmName}")
+    public ResponseEntity<FarmMeta> getDbMetadata(@PathVariable String database, @PathVariable String farmName) throws SQLException {
+        log.debug("Rest request to get db metadata from {} database with name {}", database, farmName);
         FarmMeta farmMeta = new FarmMeta();
-        List<FarmInfo> farmInfos = new ArrayList<FarmInfo>();
-        ArrayList<String> tables = new ArrayList<String>();
         try {
-            farmMeta.setName(farmName);
-            farmMeta.setType("db");
-            QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-            tables = queryExecutor.getDbTables();
-            for (String tableName : tables) {
-                FarmInfo farmInfo = new FarmInfo();
-                farmInfo.setId(tableName);
-                farmInfo.setSchema(farmName);
-                farmInfo.setName(tableName);
-                farmInfos.add(farmInfo);
-            }
-            farmMeta.setData(farmInfos);
+            QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+            farmMeta = datasetRepository.getDBMetadata(database, farmName, queryExecutor);
             return new ResponseEntity<FarmMeta>(farmMeta, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
-    @PostMapping("/disconnect")
+
+    @PostMapping("/datasets/database/create")
+    public ResponseEntity<AbstractDataset> getDbDataset(@RequestBody FarmInfo farmInfo) throws SQLException {
+        log.debug("REST request to get db Dataset");
+        QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+        Optional<AbstractDataset> dataset = datasetRepository.createDBDataset(farmInfo, queryExecutor);
+        return ResponseUtil.wrapOrNotFound(dataset);
+    }
+
+    @PostMapping("/datasets/database/query")
+    public ResponseEntity<QueryResults> executeQuery(@RequestBody Map<String, Object> map) throws SQLException {
+        ObjectMapper mapper = new ObjectMapper();
+        Query query = mapper.convertValue(map.get("query"), Query.class);
+        FarmInfo farmInfo =  mapper.convertValue(map.get("farmInfo"), FarmInfo.class);
+        QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+        log.debug("REST request to execute Query: {}", query);
+        AbstractDataset dataset =  datasetRepository.createDBDataset(farmInfo, queryExecutor).get();
+        Optional<QueryResults> queryResultsOptional = Optional.ofNullable(dataService.executeQuery(databaseConnection.getSqlQueryExecutor(dataset), dataset, query));
+        return ResponseUtil.wrapOrNotFound(queryResultsOptional);
+    }   
+
+
+    @PostMapping("/database/disconnect")
     public ResponseEntity<Boolean> disconnector() throws SQLException {
-        log.debug("Rest request to disconnect from db");
+        log.debug("Rest request to close db connection");
         try {
             databaseConnection.closeConnection();
             return new ResponseEntity<Boolean>(true, HttpStatus.OK);

@@ -54,8 +54,9 @@ const VisConnector = () => {
                 <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
                     Select DB System
                 </Typography>
-                    <Select size="small" value={dbSystem} onChange={(e) => setDbSystem(e.target.value)}>
+                    <Select name="dbSystem" size="small" value={dbSystem} onChange={(e) => setDbSystem(e.target.value)}>
                         <MenuItem value='postgres'>postgres</MenuItem>
+                        <MenuItem value='influxDB'>influx</MenuItem>
                     </Select>
                     <Button variant="contained" type='submit' onClick={() => { if(dbSystem) setStep(2); }}>Continue</Button>
                 <Button variant="text" startIcon={<CloseIcon />} onClick={closeHandler}>Close</Button>
