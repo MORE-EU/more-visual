@@ -9,7 +9,7 @@ import { Divider, Grid } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { getAlerts, getDataset, getDbDataset, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
 import Header from './header/header';
 import VisConnector from './vis-connector/vis-connector';
 
@@ -36,10 +36,7 @@ export const Visualizer = () => {
   useEffect(() => {
       if (params.id !== undefined) {
         dispatch(setFolder(params.folder));
-        if(!connected) 
-          dispatch(getDataset({ folder: params.folder, id: params.id }));
-        else
-          farmMeta && dispatch(getDbDataset({ farmInfo: farmMeta.data.filter(data => data.id === params.id)[0] }));
+        dispatch(getDataset({ folder: params.folder, id: params.id }));
         farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
     }
   }, [params.id]);
@@ -88,7 +85,7 @@ export const Visualizer = () => {
                     height: '100%',
                   }}
                 >
-                  {farmMeta && (dataset ?  <ChartContainer /> : <CircularProgress />) }
+                  {farmMeta && (dataset ?  <ChartContainer /> : <CircularProgress sx={{margin: 'auto'}}/>) }
                 </Paper>
               </Grid>
             </Grid>

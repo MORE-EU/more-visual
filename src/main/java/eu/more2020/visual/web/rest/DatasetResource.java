@@ -33,7 +33,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -129,7 +128,13 @@ public class DatasetResource {
     @GetMapping("/datasets/{farmName}/{id}")
     public ResponseEntity<AbstractDataset> getDataset(@PathVariable String farmName, @PathVariable String id) throws IOException, SQLException {
         log.debug("REST request to get Dataset : {}/{}", farmName, id);
-        Optional<AbstractDataset> dataset = datasetRepository.findById(id, farmName);
+        Optional<AbstractDataset> dataset = null;
+        if (datasetRepository.getFarmType() == "csv" || datasetRepository.getFarmType() == null) //null case to be removed
+            dataset = datasetRepository.findById(id, farmName);
+        else{
+            QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+            dataset = datasetRepository.findDBDatasetById(id, queryExecutor);
+        }
         log.debug(dataset.toString());
         return ResponseUtil.wrapOrNotFound(dataset);
     }
@@ -166,15 +171,25 @@ public class DatasetResource {
     }
 
     /**
-     * POST executeQuery for csv dataset
+     * POST executeQuery
      */
     @PostMapping("/datasets/{farmName}/{id}/query")
     public ResponseEntity<QueryResults> executeQuery(@PathVariable String farmName, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
         log.debug("REST request to execute Query: {}", query);
-        Optional<QueryResults> queryResultsOptional =
-            datasetRepository.findById(id, farmName).map(dataset -> {
-                    return csvDataService.executeQuery((CsvDataset) dataset, query);
-                });
+        Optional<QueryResults> queryResultsOptional = null;
+        log.debug(datasetRepository.getFarmType());
+        if (datasetRepository.getFarmType() == "csv" || datasetRepository.getFarmType() == null) //null case to be removed
+            queryResultsOptional =
+                datasetRepository.findById(id, farmName).map(dataset -> {
+                        return csvDataService.executeQuery((CsvDataset) dataset, query);
+                    });
+        else {
+            QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+            queryResultsOptional =  datasetRepository.findDBDatasetById(id, queryExecutor).map(dataset -> {
+                return dataService.executeQuery(databaseConnection.getSqlQueryExecutor(dataset), dataset, query);
+            });
+        }
+
         //queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
@@ -270,32 +285,12 @@ public class DatasetResource {
         }
     }
 
-    @PostMapping("/datasets/database/create")
-    public ResponseEntity<AbstractDataset> getDbDataset(@RequestBody FarmInfo farmInfo) throws SQLException {
-        log.debug("REST request to get db Dataset");
-        QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
-        Optional<AbstractDataset> dataset = datasetRepository.findDBDatasetById(farmInfo, queryExecutor);
-        return ResponseUtil.wrapOrNotFound(dataset);
-    }
-
-    @PostMapping("/datasets/database/query")
-    public ResponseEntity<QueryResults> executeQuery(@RequestBody Map<String, Object> map) throws SQLException {
-        ObjectMapper mapper = new ObjectMapper();
-        Query query = mapper.convertValue(map.get("query"), Query.class);
-        FarmInfo farmInfo =  mapper.convertValue(map.get("farmInfo"), FarmInfo.class);
-        QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
-        log.debug("REST request to execute Query: {}", query);
-        AbstractDataset dataset =  datasetRepository.findDBDatasetById(farmInfo, queryExecutor).get();
-        Optional<QueryResults> queryResultsOptional = Optional.ofNullable(dataService.executeQuery(databaseConnection.getSqlQueryExecutor(dataset), dataset, query));
-        return ResponseUtil.wrapOrNotFound(queryResultsOptional);
-    }   
-
-
     @PostMapping("/database/disconnect")
     public ResponseEntity<Boolean> disconnector() throws SQLException {
         log.debug("Rest request to close db connection");
         try {
             databaseConnection.closeConnection();
+            datasetRepository.deleteAll();
             return new ResponseEntity<Boolean>(true, HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);

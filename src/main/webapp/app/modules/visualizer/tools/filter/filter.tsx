@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { resetFilters, updateDbQueryResults, updateFilter, updateQueryResults } from 'app/modules/store/visualizerSlice';
+import { resetFilters, updateFilter, updateQueryResults } from 'app/modules/store/visualizerSlice';
 import { grey } from '@mui/material/colors';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import Box from '@mui/material/Box';
@@ -42,10 +42,7 @@ export const Filter = () => {
   const filterReset = () => {
     dispatch(resetFilters());
     updateWindowFilters(getFirstFilters());
-    if (farmMeta.type === "csv")
-      dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures }));
-    else
-      dispatch(updateDbQueryResults({ folder, id: dataset.id, from, to, selectedMeasures,farmInfo: farmMeta.data[datasetChoice] }));
+    dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures }));
   };
 
   const onSliderChange = measureCol => (e, range) => {
@@ -55,10 +52,7 @@ export const Filter = () => {
   const handleFilterSlider = colName => (e, newRange) => {
     const newFilter = { ...windowFilters, [colName]: newRange };
     dispatch(updateFilter(newFilter));
-    if (farmMeta.type === "csv")
-      dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
-    else
-      dispatch(updateDbQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter,farmInfo: farmMeta.data[datasetChoice] }));
+    dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
   };
 
   const getParsedValue = val => {
@@ -80,10 +74,7 @@ export const Filter = () => {
         const newFilter = { ...windowFilters, [col]: [value, windowFilters[col][1]] };
         clearTimeout(debounceTimer.current);
         debounceTimer.current = setTimeout(() => {
-          if (farmMeta.type === "csv")
-            dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
-          else
-            dispatch(updateDbQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter,farmInfo: farmMeta.data[datasetChoice] }));
+        dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
         }, 1000);
       }
     } else {
@@ -98,10 +89,7 @@ export const Filter = () => {
         const newFilter = { ...windowFilters, [col]: [windowFilters[col][0], value] };
         clearTimeout(debounceTimer.current);
         debounceTimer.current = setTimeout(() => {
-          if (farmMeta.type === "csv")
-            dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
-          else
-            dispatch(updateDbQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter, farmInfo: farmMeta.data[datasetChoice]}));
+        dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
         }, 1000);
       }
     }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { updateQueryResults, updateDbQueryResults } from 'app/modules/store/visualizerSlice';
+import { updateQueryResults } from 'app/modules/store/visualizerSlice';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -15,16 +15,10 @@ const ChartDatePicker = () => {
   const handleOnAccept = (e, category) => {
     if (category === 'from') {
       chartRef.xAxis[0].setExtremes(e.getTime() + 200, to - 200);
-      if (farmMeta.type === "csv")
-        dispatch(updateQueryResults({ folder, id: dataset.id, from: e.getTime(), to, selectedMeasures, filter: null }));
-      else
-      dispatch(updateDbQueryResults({ folder, id: dataset.id, from: e.getTime(), to, selectedMeasures, filter: null, farmInfo: farmMeta.data[datasetChoice] }));
+      dispatch(updateQueryResults({ folder, id: dataset.id, from: e.getTime(), to, selectedMeasures, filter: null }));
     } else {
       chartRef.xAxis[0].setExtremes(from + 200, e.getTime() - 200);
-      if (farmMeta.type === "csv")
-        dispatch(updateQueryResults({ folder, id: dataset.id, from, to: e.getTime(), selectedMeasures, filter: null }));
-      else
-        dispatch(updateDbQueryResults({ folder, id: dataset.id, from, to: e.getTime(), selectedMeasures, filter: null, farmInfo: farmMeta.data[datasetChoice] }));
+      dispatch(updateQueryResults({ folder, id: dataset.id, from, to: e.getTime(), selectedMeasures, filter: null }));
     }
   };
 

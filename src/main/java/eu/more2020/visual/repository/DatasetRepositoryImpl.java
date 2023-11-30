@@ -46,6 +46,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
     private Map<String, AbstractDataset> datasets = new HashMap();
 
+    private FarmMeta farm = new FarmMeta();
+
     @Value("${application.timeFormat}")
     private String timeFormat;
 
@@ -89,7 +91,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         else{
             if (metadataFile.exists()) {
                 JsonNode jsonNode = objectMapper.readTree(metadataFile);
-                FarmMeta farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
+                if (farm == null)
+                    farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
                 String type = farm.getType();
 
                 for (JsonNode datasetNode : jsonNode.get("data")) {
@@ -209,29 +212,45 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
     @Override
+    public String getFarmType() {
+        return farm.getType();
+    }
+
+    @Override
     public void deleteById(String id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<AbstractDataset> findDBDatasetById(FarmInfo farmInfo, QueryExecutor queryExecutor) throws SQLException {
-        Assert.notNull(farmInfo.getId(), "Id must not be null!");
+    public void deleteAll() {
+        datasets.clear();
+        farm.getData().clear();
+        farm.setType(null); //remove
+    }
+
+    @Override
+    public Optional<AbstractDataset> findDBDatasetById(String id,QueryExecutor queryExecutor) throws SQLException {
+        Assert.notNull(id, "Id must not be null!");
         AbstractDataset dataset = null;
-        if(datasets.containsKey(farmInfo.getId())) dataset = datasets.get(farmInfo.getId());
+        if(datasets.containsKey(id)) dataset = datasets.get(id);
         else {
-            dataset = createDBDataset(farmInfo, queryExecutor);
-            datasets.put(farmInfo.getId(), dataset);
+            for(FarmInfo farmInfo : farm.getData()) {
+                if (farmInfo.getId().equals(id)) {
+                    dataset = createDBDataset(farmInfo, queryExecutor);
+                    datasets.put(farmInfo.getId(), dataset);
+                    break;
+                }
+            }
         }
         return Optional.ofNullable(dataset);
     }
 
     @Override
     public FarmMeta getDBMetadata (String database, String farmName, QueryExecutor queryExecutor) throws SQLException {
-        FarmMeta farmMeta = new FarmMeta();
         List<FarmInfo> farmInfos = new ArrayList<FarmInfo>();
         ArrayList<String> tables = new ArrayList<String>();
-        farmMeta.setName(farmName);
-        farmMeta.setType(database);
+        farm.setName(farmName);
+        farm.setType(database);
         try {
             tables = queryExecutor.getDbTableNames();
             for (String tableName : tables) {
@@ -246,8 +265,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 farmInfo.setValueCol("value");
                 farmInfos.add(farmInfo);
             }
-            farmMeta.setData(farmInfos);
-            return farmMeta;
+            farm.setData(farmInfos);
+            return farm;
         } catch (Exception e) {
             throw e;
         }

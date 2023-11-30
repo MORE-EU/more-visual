@@ -36,9 +36,13 @@ public interface DatasetRepository {
 
     AbstractDataset save(AbstractDataset dataset) throws IOException;
 
-    Optional<AbstractDataset> findDBDatasetById(FarmInfo farmInfo, QueryExecutor queryExecutor) throws SQLException;
+    Optional<AbstractDataset> findDBDatasetById(String id, QueryExecutor queryExecutor) throws SQLException;
 
     FarmMeta getDBMetadata (String database, String farmName, QueryExecutor queryExecutor) throws SQLException;
 
+    String getFarmType();
+
     void deleteById(String id);
+
+    void deleteAll();
 }
