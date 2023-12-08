@@ -149,7 +149,7 @@ export const getDbMetadata = createAsyncThunk('getDbMetadata', async (data: { da
 });
 
 export const getDBColumnNames = createAsyncThunk('getDBColumnNames', async (data: { tableName: string;}) => {
-  const response = await axios.get(`api/datasets/metadata/columns/}/${data.tableName}`).then(res => res);
+  const response = await axios.get(`api/datasets/metadata/columns/${data.tableName}`).then(res => res);
   return response;  
 });
 

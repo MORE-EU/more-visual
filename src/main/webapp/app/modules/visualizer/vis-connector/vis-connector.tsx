@@ -42,8 +42,8 @@ const VisConnector = () => {
                 <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
                     Connect to Data Source
                 </Typography>
-                <Button variant="contained" startIcon={<StorageIcon />} onClick={() => {setStep(1);}}>Database</Button>
-                    <Button component="label" variant="contained" startIcon={<UploadFileIcon/>}>
+                <Button variant="contained" component="label" sx={{borderRadius: 8}} startIcon={<StorageIcon />} onClick={() => {setStep(1);}}>Database</Button>
+                    <Button component="label" variant="contained" sx={{borderRadius: 8}} startIcon={<UploadFileIcon/>}>
                         Filesystem
                         <VisuallyHiddenInput type="file" />
                     </Button>
