@@ -14,7 +14,15 @@ public class FarmInfo {
     private String timeCol;
     private String valueCol;
     private String idCol;
+    private Boolean isConfiged;
 
+    public Boolean getIsConfiged() {
+        return isConfiged;
+    }
+
+    public void setIsConfiged(Boolean isConfiged) {
+        this.isConfiged = isConfiged;
+    }
 
     public String getId() {
         return this.id;

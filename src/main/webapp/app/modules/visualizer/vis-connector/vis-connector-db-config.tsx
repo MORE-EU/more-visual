@@ -100,15 +100,9 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem}) => {
                     <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1, }}>
                         <DBFormInput label='host' name="host" type='text' value={host} handleChange={handleTextFields} />
                         <DBFormInput label='port' name="port" type='text' value={port} handleChange={handleTextFields} />
-                        { dbSystem === "influx" ? 
-                        (<DBFormInput label='org' name="username" type='text' value={username} handleChange={handleTextFields} />) :
-                        (<DBFormInput label='username' name="username" type='text' value={username} handleChange={handleTextFields} />)}
-                        { dbSystem === "influx" ?
-                        (<DBFormInput label='token' name="password" type='password' value={password} handleChange={handleTextFields} />) :
-                        (<DBFormInput label='password' name="password" type='password' value={password} handleChange={handleTextFields} />)}
-                        { dbSystem === "influx" ?
-                        (<DBFormInput label='bucket' name="database" type="database" value={database} handleChange={handleTextFields} />) :
-                        (<DBFormInput label='database' name="database" type="database" value={database} handleChange={handleTextFields} />)}
+                        <DBFormInput label='username' name="username" type='text' value={username} handleChange={handleTextFields} />
+                        <DBFormInput label='password' name="password" type='password' value={password} handleChange={handleTextFields} />
+                        <DBFormInput label='database' name="database" type="database" value={database} handleChange={handleTextFields} />
                         { loading ? <CircularProgress /> : <Button variant="contained" startIcon={<LoginIcon />} type="submit" >Connect </Button> }
                     </Box>
                 </form> 

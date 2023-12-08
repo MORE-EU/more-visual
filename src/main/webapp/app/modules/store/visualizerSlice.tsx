@@ -117,6 +117,8 @@ const initialState = {
   ...forecastingInitialState,
   ...checkConnectionInitialState,
   connected: false,
+  columnNames: [],
+  datasetIsConfiged: false,
 };
 
 export const connector = createAsyncThunk('connector', async (dbConnector: {dbSystem: string, host: string, port: string, username: string, password: string, database: string}) => {
@@ -143,6 +145,22 @@ export const getDbMetadata = createAsyncThunk('getDbMetadata', async (data: { da
     return response;
   } catch (error) {
     throw new Error("Can't get database metadata");
+  }
+});
+
+export const getDBColumnNames = createAsyncThunk('getDBColumnNames', async (data: { tableName: string;}) => {
+  const response = await axios.get(`api/datasets/metadata/columns/}/${data.tableName}`).then(res => res);
+  return response;  
+});
+
+
+export const updateFarmInfoColumnNames = createAsyncThunk('updateFarmInfoColumnNames', async (data: { tableName: string, columns: {timeCol: string; idCol: string; valueCol: string;}}) => {
+  const { tableName, columns } = data;
+  try {
+    const response = await axios.put(`api/datasets/metadata/columns/${tableName}`, columns).then(res => res);
+    return response;
+  } catch (e) {
+    throw new Error("Can't update metadata");
   }
 });
 
@@ -460,6 +478,12 @@ const visualizer = createSlice({
     setForecastingDataSplit(state, action) {
       state.forecastingDataSplit = action.payload;
     },
+    setDatasetIsConfiged(state, action) {
+      state.datasetIsConfiged = action.payload
+    },
+    setConnented(state, action) {
+      state.connected = action.payload;
+    },
     toggleChangepointDetection(state, action) {
       state.changepointDetectionEnabled = action.payload;
     },
@@ -496,6 +520,12 @@ const visualizer = createSlice({
       state.compare = initialState.compare;
       state.chartRef = initialState.chartRef;
     },
+    resetSampleFile(state) {
+      state.sampleFile = [];
+    },
+    resetColumnNames(state) {
+      state.columnNames = [];
+    },
   },
   extraReducers: function (builder) {
     builder.addCase(getDataset.fulfilled, (state, action) => {
@@ -523,6 +553,16 @@ const visualizer = createSlice({
       state.loading = false;
       state.farmMeta = action.payload.data;
     });
+    builder.addCase(updateFarmInfoColumnNames.fulfilled, (state, action) => {
+      state.loading = false;
+      state.farmMeta = action.payload.data;
+    });
+
+    builder.addCase(getDBColumnNames.fulfilled, (state, action) => {
+      state.loading = false;
+      state.columnNames = action.payload.data;
+    });
+
     builder.addCase(getFarmMeta.fulfilled, (state, action) => {
       state.loading = false;
       state.farmMeta = action.payload.data;
@@ -578,7 +618,7 @@ const visualizer = createSlice({
         })
         : state.data;
     });
-    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending, connector.pending, disconnector.pending), 
+    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending,updateFarmInfoColumnNames.pending,getDBColumnNames.pending, connector.pending, disconnector.pending), 
     state => {
       state.errorMessage = null;
       state.loading = true;
@@ -594,14 +634,14 @@ const visualizer = createSlice({
       state.alertsLoading = true;
     });
     builder.addMatcher(
-      isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected),
+      isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected, getDBColumnNames.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.payload;
       }
     );
     builder.addMatcher(
-      isAnyOf( getDbMetadata.rejected, connector.rejected, disconnector.rejected),
+      isAnyOf( getDbMetadata.rejected,updateFarmInfoColumnNames.rejected, connector.rejected, disconnector.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.error.message;
@@ -642,6 +682,6 @@ export const {
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
   setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
   setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,setCheckConnectionResponse, setSelectedConnection,
-  setErrorMessage
+  setErrorMessage,setDatasetIsConfiged,resetSampleFile,resetColumnNames, setConnented
 } = visualizer.actions;
 export default visualizer.reducer;

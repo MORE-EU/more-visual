@@ -146,9 +146,14 @@ public class DatasetResource {
     }
 
     @GetMapping("/datasets/{farmName}/sample")
-    public List<Sample> getSample(@PathVariable String farmName) throws IOException {
+    public List<?> getSample(@PathVariable String farmName) throws IOException, SQLException {
         log.debug("REST request to get Sample File");
-        return datasetRepository.findSample(farmName);
+        if (datasetRepository.getFarmType() == "csv")
+            return datasetRepository.findSample(farmName); // remove sample type
+        else {
+            QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+            return datasetRepository.findDbSample(farmName, queryExecutor);
+        }
     }
 
     @GetMapping("/datasets/directories")
@@ -177,7 +182,6 @@ public class DatasetResource {
     public ResponseEntity<QueryResults> executeQuery(@PathVariable String farmName, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
         log.debug("REST request to execute Query: {}", query);
         Optional<QueryResults> queryResultsOptional = null;
-        log.debug(datasetRepository.getFarmType());
         if (datasetRepository.getFarmType() == "csv" || datasetRepository.getFarmType() == null) //null case to be removed
             queryResultsOptional =
                 datasetRepository.findById(id, farmName).map(dataset -> {
@@ -285,12 +289,42 @@ public class DatasetResource {
         }
     }
 
+    @GetMapping("/datasets/metadata/columns/{tableName}")
+    public ResponseEntity<List<String>> getDBColumnNames(@PathVariable String tableName) throws SQLException {
+        log.debug("Rest request to get column names form table {}", tableName);
+        List<String> columnNames = new ArrayList<>();
+        try {
+            QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+            columnNames = queryExecutor.getColumns(tableName);
+            return new ResponseEntity<List<String>>(columnNames, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/datasets/metadata/columns/{tableName}")
+    public ResponseEntity<FarmMeta> updateFarmInfoColumnNames( @PathVariable String tableName,@Valid @RequestBody DbColumns dbColumns) {
+        log.debug("Rest request to update columns of farmInfo with id {} with columns {}", tableName, dbColumns.toString());
+        if (tableName == null) {
+            throw new BadRequestAlertException("Invalid tableName", ENTITY_NAME, "tableNamenull");
+        }
+        FarmMeta result = datasetRepository.updateFarmInfoColumns(tableName, dbColumns);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.toString()))
+            .body(result);
+    }
+
+
     @PostMapping("/database/disconnect")
     public ResponseEntity<Boolean> disconnector() throws SQLException {
         log.debug("Rest request to close db connection");
         try {
-            databaseConnection.closeConnection();
-            datasetRepository.deleteAll();
+            if (datasetRepository.getFarmType() != null) {
+                datasetRepository.deleteAll();
+                if (datasetRepository.getFarmType() != "csv")
+                    databaseConnection.closeConnection();
+
+            }
             return new ResponseEntity<Boolean>(true, HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);

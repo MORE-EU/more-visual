@@ -1,4 +1,5 @@
 package eu.more2020.visual.repository;
+import eu.more2020.visual.domain.DbColumns;
 import eu.more2020.visual.domain.DbConnector;
 import eu.more2020.visual.domain.FarmInfo;
 import eu.more2020.visual.domain.FarmMeta;
@@ -27,6 +28,8 @@ public interface DatasetRepository {
 
     List<Sample> findSample(String farmName) throws IOException;
 
+    List<Object[]> findDbSample(String tableName, QueryExecutor queryExecutor) throws SQLException;
+
     List<String> findDirectories() throws IOException;
 
     Optional<FarmMeta> findFarm(String farmName) throws IOException;
@@ -41,6 +44,8 @@ public interface DatasetRepository {
     FarmMeta getDBMetadata (String database, String farmName, QueryExecutor queryExecutor) throws SQLException;
 
     String getFarmType();
+
+    FarmMeta updateFarmInfoColumns(String id, DbColumns columns);
 
     void deleteById(String id);
 

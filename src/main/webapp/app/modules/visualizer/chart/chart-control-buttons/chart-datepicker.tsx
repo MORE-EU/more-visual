@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 const ChartDatePicker = () => {
   const dispatch = useAppDispatch();
 
-  const { chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, queryResults, connected, farmMeta, datasetChoice } = useAppSelector(state => state.visualizer);
+  const { chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, queryResults } = useAppSelector(state => state.visualizer);
 
   const handleOnAccept = (e, category) => {
     if (category === 'from') {

@@ -9,15 +9,16 @@ import { Divider, Grid } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice, setDatasetIsConfiged, resetFetchData, disconnector } from '../store/visualizerSlice';
 import Header from './header/header';
 import VisConnector from './vis-connector/vis-connector';
+import VisControlDatasetConfig from './vis-control/vis-control-dataset-config';
 
 const mdTheme = createTheme();
 
 export const Visualizer = () => {
   const [isBusy, setIsBusy] = useState(true);
-  const { farmMeta, dataset, datasetChoice, selectedConnection, connected } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, datasetChoice, selectedConnection, connected, datasetIsConfiged } = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
   const params: any = useParams();
@@ -26,17 +27,21 @@ export const Visualizer = () => {
   useEffect(() => {
     if (params.folder !== undefined) {
       setIsBusy(true);
-      if (!connected) // change to farmMeta.type === csv when possible
+      if (!connected) {
         dispatch(getFarmMeta(params.folder));
+        dispatch(setDatasetIsConfiged(true));
+      } 
     }
-    else
+    else {
       setIsBusy(false);
+      dispatch(setDatasetIsConfiged(false));
+      dispatch(disconnector());
+    }
   }, [history.location]);
 
   useEffect(() => {
       if (params.id !== undefined) {
         dispatch(setFolder(params.folder));
-        dispatch(getDataset({ folder: params.folder, id: params.id }));
         farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
     }
   }, [params.id]);
@@ -48,8 +53,10 @@ export const Visualizer = () => {
   useEffect(() => {
     if (!connected)
       params.id === undefined && farmMeta && history.push(`${params.folder}/${farmMeta.data[0].id}`);
-    else
+    else 
       params.id === undefined && farmMeta && history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[0].id}`);
+    if (datasetIsConfiged && params.id !== undefined) 
+      dispatch(getDataset({ folder: params.folder, id: params.id }));
   }, [farmMeta]);
 
   useEffect(() => {
@@ -85,7 +92,8 @@ export const Visualizer = () => {
                     height: '100%',
                   }}
                 >
-                  {farmMeta && (dataset ?  <ChartContainer /> : <CircularProgress sx={{margin: 'auto'}}/>) }
+                  {farmMeta && (datasetIsConfiged ? (dataset ?  <ChartContainer /> : <CircularProgress sx={{margin: 'auto'}}/>) 
+                  : <VisControlDatasetConfig /> )}
                 </Paper>
               </Grid>
             </Grid>

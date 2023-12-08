@@ -7,7 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getDataset, updateDatasetChoice, disconnector, resetFetchData } from 'app/modules/store/visualizerSlice';
+import { getDataset, updateDatasetChoice, disconnector, resetFetchData, setDatasetIsConfiged, setConnented } from 'app/modules/store/visualizerSlice';
 import React, { useState, useEffect } from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
@@ -28,9 +28,14 @@ const VisControlDatasets = () => {
     }
   },[connected]);
 
-  const handleDataset = idx => {
+  const handleDataset = (idx, file) => {
     if (datasetChoice !== idx) {
       dispatch(updateDatasetChoice(idx));
+      if (farmMeta.data[idx].isConfiged ) {
+        dispatch(getDataset({ folder, id: file.id }))
+        dispatch(setDatasetIsConfiged(true));
+      }
+      else dispatch(setDatasetIsConfiged(false));
     }
   };
 
@@ -64,7 +69,7 @@ const VisControlDatasets = () => {
                 component={Link}
                 to={`/visualize/${folder}/${file.id}`}
                 onClick={() => {
-                  handleDataset(idx), dispatch(getDataset({ folder, id: file.id }));
+                  handleDataset(idx, file);
                 }}
                 divider
               >
@@ -86,7 +91,7 @@ const VisControlDatasets = () => {
               </ListItemButton>
             ) :  (
                 <ListItemButton key={'new-dataset-list-button-sd'} component="label" onClick={() => { 
-                  dispatch(disconnector());
+                  dispatch(setConnented(false));
                 }}>
                   <ListItemText primary={`close connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
                   <LogoutIcon />

@@ -5,7 +5,11 @@ export interface IDataset {
   name?: string;
   hasHeader?: boolean;
   measures?: number[];
-  timeCol?: number;
+  schema?: string;
+  timeCol?: string;
+  idCol ?: string;
+  valueCol ?: string;
+  isConfiged ?: boolean;
 }
 
 export const defaultValue: Readonly<IDataset> = {};

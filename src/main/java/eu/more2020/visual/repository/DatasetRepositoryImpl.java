@@ -11,6 +11,7 @@ import eu.more2020.visual.middleware.datasource.QueryExecutor.QueryExecutor;
 import eu.more2020.visual.middleware.datasource.QueryExecutor.InfluxDBQueryExecutor;
 import eu.more2020.visual.middleware.datasource.QueryExecutor.ModelarDBQueryExecutor;
 import eu.more2020.visual.middleware.datasource.QueryExecutor.SQLQueryExecutor;
+import eu.more2020.visual.middleware.domain.TableInfo;
 import eu.more2020.visual.middleware.domain.DataFileInfo;
 import eu.more2020.visual.middleware.domain.Dataset.*;
 import eu.more2020.visual.middleware.domain.InfluxDB.InfluxDBConnection;
@@ -44,7 +45,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
     private final Logger log = LoggerFactory.getLogger(DatasetRepositoryImpl.class);
 
-    private Map<String, AbstractDataset> datasets = new HashMap();
+    private Map<String, AbstractDataset> datasets = new HashMap<String, AbstractDataset>();
 
     private FarmMeta farm = new FarmMeta();
 
@@ -77,6 +78,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         if (metadataFile.exists()) {
             FileReader reader = new FileReader(metadataFile);
             farm = mapper.readValue(reader, FarmMeta.class);
+            for (FarmInfo farmInfo : farm.getData()) farmInfo.setIsConfiged(true);
         }
         return Optional.ofNullable(farm);
     }
@@ -91,8 +93,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         else{
             if (metadataFile.exists()) {
                 JsonNode jsonNode = objectMapper.readTree(metadataFile);
-                if (farm == null)
-                    farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
+                FarmMeta farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
                 String type = farm.getType();
 
                 for (JsonNode datasetNode : jsonNode.get("data")) {
@@ -191,6 +192,24 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         return beans;
     }
 
+    @Override
+    public List<Object[]> findDbSample(String tableName, QueryExecutor queryExecutor) throws SQLException {
+        List<Object[]> resultList = new ArrayList<>();
+        String schemaName = null;
+        for (FarmInfo farmInfo : farm.getData()) {
+            if (farmInfo.getId().equals(tableName)) {
+                schemaName = farmInfo.getSchema();
+                break;
+            }
+        }
+        try {
+        resultList = queryExecutor.getSample(schemaName, tableName);
+        } catch (Exception e) {
+            throw e;
+        }
+        return resultList;
+    }
+
     public List<String> findDirectories() throws IOException {
         File file = new File(applicationProperties.getWorkspacePath());
         String[] names = file.list();
@@ -248,21 +267,18 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     @Override
     public FarmMeta getDBMetadata (String database, String farmName, QueryExecutor queryExecutor) throws SQLException {
         List<FarmInfo> farmInfos = new ArrayList<FarmInfo>();
-        ArrayList<String> tables = new ArrayList<String>();
+        List<TableInfo> tableInfoArray = new ArrayList<TableInfo>();
         farm.setName(farmName);
         farm.setType(database);
         try {
-            tables = queryExecutor.getDbTableNames();
-            for (String tableName : tables) {
+            tableInfoArray = queryExecutor.getTableInfo();
+            for (TableInfo tableInfo : tableInfoArray) {
                 FarmInfo farmInfo = new FarmInfo();
-                farmInfo.setId(tableName);
-                farmInfo.setSchema(farmName);
-                farmInfo.setName(tableName);
+                farmInfo.setId(tableInfo.getTable());
+                farmInfo.setSchema(tableInfo.getSchema());
+                farmInfo.setName(tableInfo.getTable());
                 farmInfo.setType(database);
-                // String timeCol = queryExecutor.getTimeCol(tableName);
-                farmInfo.setTimeCol("epoch");
-                farmInfo.setIdCol("id");
-                farmInfo.setValueCol("value");
+                farmInfo.setIsConfiged(false);
                 farmInfos.add(farmInfo);
             }
             farm.setData(farmInfos);
@@ -270,6 +286,21 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    @Override
+    public FarmMeta updateFarmInfoColumns(String id, DbColumns columns) {
+        Assert.notNull(id, "FarmInfo must not be null");
+        for (FarmInfo farmInfo : farm.getData()) {
+            if (farmInfo.getId().equals(id)) {
+                farmInfo.setTimeCol(columns.getTimeCol());
+                farmInfo.setIdCol(columns.getIdCol());
+                farmInfo.setValueCol(columns.getValueCol());
+                farmInfo.setIsConfiged(true);
+                break;
+            }
+        }
+        return farm;
     }
 
 
