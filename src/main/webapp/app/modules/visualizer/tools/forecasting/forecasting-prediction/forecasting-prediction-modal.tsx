@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { getInference, setForecastingInference, setPredModalOpen, setSelectedModel } from 'app/modules/store/forecastingSlice';
+import { getAthenaInference, getInference, setForecastingInference, setPredModalOpen, setSelectedModel } from 'app/modules/store/forecastingSlice';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import React, { useState } from 'react';
 import { Typography } from '@mui/material';
@@ -47,8 +47,12 @@ const ForecastingPredModal = () => {
   };
 
   const handleClick = () => {
-    dispatch(getInference({ timestamp: userDate, model_name: selectedModel }));
+    dispatch(getInference({ timestamp: userDate, model_name: selectedModel, kind: "bebeze" }));
   };
+
+  const handleAthenaForecasting = () => {
+    dispatch(getAthenaInference({ timestamp: userDate, model_name: selectedModel }))
+  }
 
   const getDateValue = date => {
     return date === null ? date : date + new Date(date).getTimezoneOffset() * 60000;
@@ -105,7 +109,7 @@ const ForecastingPredModal = () => {
                 }}
                 inputFormat="dd/MM/yyyy hh:mm a"
               />
-              <Button variant="contained" onClick={handleClick}>
+              <Button variant="contained" onClick={selectedModel === "syn_forecasting1" ? handleAthenaForecasting : handleClick}>
                 proceed
               </Button>
             </Grid>

@@ -134,10 +134,10 @@ export const HomeLeftMenu = () => {
             <DashboardRoundedIcon fontSize="medium" sx={{ color: grey[800], mr: 1 }} />
             Dashboard
           </Button> */}
-          <Button sx={menuButtonStyle} variant="outlined" onClick={handleEditButton}>
-            <EditIcon fontSize="medium" sx={{ color: grey[800], mr: 1 }} />
-            Edit
-          </Button>
+        {/* <Button sx={menuButtonStyle} variant="outlined" onClick={handleEditButton}>
+          <EditIcon fontSize="medium" sx={{ color: grey[800], mr: 1 }} />
+          Edit
+        </Button> */}
         </Grid>
         <Grid>
           <List sx={{ width: '100%', overflow: 'hiden', height: 280 }} dense>

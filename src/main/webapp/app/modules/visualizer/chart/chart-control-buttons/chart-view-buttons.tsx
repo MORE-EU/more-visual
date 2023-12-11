@@ -7,14 +7,14 @@ import React from 'react';
 const ChartView = () => {
 
     const dispatch = useAppDispatch();
-    const {changeChart} = useAppSelector(state => state.visualizer);
+    const {changeChart, data} = useAppSelector(state => state.visualizer);
     
     return (
         <Grid item sx={{alignSelf: "center"}}>
-        <Button variant="text" size="small" onClick={() => {
+        <Button variant="text" size="small" disabled={data === null} onClick={() => {
           dispatch(updateChangeChart(false))
         }} sx={{mr: 1, color: changeChart ? "text.primary" : "primary"}}>Overlay</Button>
-        <Button variant="text" size='small' onClick={() => {
+        <Button variant="text" size='small' disabled={data === null} onClick={() => {
           dispatch(updateChangeChart(true))
         }} sx={{mr: 1, color: !changeChart ? "text.primary" : "primary"}}>Stacked</Button>
       </Grid>

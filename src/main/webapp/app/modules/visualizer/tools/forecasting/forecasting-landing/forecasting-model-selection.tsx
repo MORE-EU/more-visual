@@ -19,6 +19,10 @@ import { useAppDispatch } from 'app/modules/store/storeConfig';
 import { deleteModelByName, setPredModalOpen, setSelectedModel } from 'app/modules/store/forecastingSlice';
 import ForecastingPredModal from '../forecasting-prediction/forecasting-prediction-modal';
 import grey from '@mui/material/colors/grey';
+import TableFooter from '@mui/material/TableFooter';
+import Chip from '@mui/material/Chip';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 
 const ForecastingModelSelection = props => {
   const { setNewTrain, savedModels } = props;
@@ -39,77 +43,92 @@ const ForecastingModelSelection = props => {
 
   return (
     <>
-    <ForecastingPredModal />
-    <Grid sx={{ height: '100%', width: '100%', scroll: 'auto', display: 'flex', flexDirection: 'column', rowGap: 2, fontSize:'2em'}}>
-      <Grid sx={{ width: '80%', height: '20%', borderBottom: '1px solid rgba(0,0,0,0.3)', display:'flex', alignItems:'end',textAlign: 'left', m: 'auto' }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, display: 'block', width: '100%', color: grey[800], alignSelf:'end' }}>
-          Saved Models
-        </Typography>
-      </Grid>
-      <Grid
-        sx={{
-          width: '80%',
-          height: '80%',
-          textAlign: 'center',
-          m: 'auto',
-          rowGap: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          pb: 4,
-          pr: 1,
-          pl : 1,
-          overflowY: 'auto',
-        }}
-      >
-        <TableContainer sx={{ maxheight: '80%' }} component={Paper}>
-          <Table stickyHeader aria-label="caption table" >
-            <caption style={{ padding: 0 }}>
-              <Button
-                variant="text"
-                onClick={handleNewTrain}
-              >
-                <AddIcon sx={{ fontSize: 16 }} />
-                <Typography variant="subtitle1" fontSize={12}>
-                  Train a new model
-                </Typography>
-              </Button>
-            </caption>
-            <TableHead>
-              <TableRow>
-                <TableCell>Model Name</TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {savedModels.map(model => (
-                <TableRow key={model.model_name}>
-                  <TableCell component="th" scope="row">
-                    {model.model_name}
-                  </TableCell>
-                  <TableCell align="right">
-                    <Tooltip title="Retrain Model">
-                      <IconButton>
-                        <ModelTrainingIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Predict">
-                      <IconButton onClick={handleInference(model.model_name)}>
-                        <QueryStatsIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                      <IconButton onClick={handleDelete(model.model_name)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
+      <ForecastingPredModal />
+      <Grid sx={{ height: '100%', width: '100%', scroll: 'auto', display: 'flex', flexDirection: 'column', rowGap: 2, fontSize: '2em' }}>
+        <Grid
+          sx={{
+            width: '80%',
+            height: '20%',
+            borderBottom: '1px solid rgba(0,0,0,0.3)',
+            display: 'flex',
+            alignItems: 'end',
+            textAlign: 'left',
+            m: 'auto',
+            pb: 1,
+          }}
+        >
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, display: 'block', width: '100%', color: grey[800], alignSelf: 'end' }}>
+            Saved Models
+          </Typography>
+          <Box sx={{ display: 'flex', columnGap: 0.3 }}>
+            <Chip
+              size="small"
+              label="Train a new model"
+              onClick={handleNewTrain}
+              sx={{ bgcolor: grey[800], color: grey[50], p: 1, '&:hover': { color: grey[900], fontWeight: 500 } }}
+            />
+            <Chip
+              size="small"
+              label="Athena Forecasting"
+              onClick={handleInference("syn_forecasting1")}
+              sx={{ bgcolor: grey[800], color: grey[50], p: 1, '&:hover': { color: grey[900], fontWeight: 500 } }}
+            />
+            <Chip
+              size="small"
+              label="IBM Forecasting"
+              onClick={handleNewTrain}
+              sx={{ bgcolor: grey[800], color: grey[50], p: 1, '&:hover': { color: grey[900], fontWeight: 500 } }}
+            />
+          </Box>
+        </Grid>
+        <Grid
+          sx={{
+            width: '80%',
+            height: '80%',
+            textAlign: 'center',
+            m: 'auto',
+            rowGap: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            pb: 4,
+            pr: 1,
+            pl: 1,
+            overflowY: 'auto',
+          }}
+        >
+          <TableContainer sx={{ maxheight: '80%' }} component={Paper}>
+            <Table stickyHeader aria-label="caption table" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Model Name</TableCell>
+                  <TableCell align="right">Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {savedModels.map(model => (
+                  <TableRow key={model.model_name}>
+                    <TableCell component="th" scope="row">
+                      {model.model_name}
+                    </TableCell>
+                    <TableCell align="right">
+                      <Tooltip title="Predict">
+                        <IconButton onClick={handleInference(model.model_name)}>
+                          <QueryStatsIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <IconButton onClick={handleDelete(model.model_name)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
       </Grid>
-    </Grid>
     </>
   );
 };

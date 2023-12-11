@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.more2020.visual.domain.Forecasting.DBs.Meta;
 import eu.more2020.visual.domain.Forecasting.Grpc.AllResultsRes;
+import eu.more2020.visual.domain.Forecasting.Grpc.HandleDataReq;
+import eu.more2020.visual.domain.Forecasting.Grpc.HandleDataRes;
 import eu.more2020.visual.domain.Forecasting.Grpc.InferenceRes;
 import eu.more2020.visual.domain.Forecasting.Grpc.JobIdReq;
 import eu.more2020.visual.domain.Forecasting.Grpc.ModelInfoReq;
@@ -27,6 +29,7 @@ import eu.more2020.visual.domain.Forecasting.Grpc.TargetReq;
 import eu.more2020.visual.domain.Forecasting.Grpc.TimestampReq;
 import eu.more2020.visual.domain.Forecasting.Grpc.TrainingInfoReq;
 import eu.more2020.visual.repository.MetaRepository;
+import eu.more2020.visual.service.forecasting.ForecastingAthenaImpl;
 import eu.more2020.visual.service.forecasting.ForecastingCallsImpl;
 import eu.more2020.visual.service.forecasting.ForecastingUtils;
 
@@ -35,13 +38,15 @@ import eu.more2020.visual.service.forecasting.ForecastingUtils;
 public class ForecastingResource {
     private final Logger log = LoggerFactory.getLogger(ForecastingResource.class);
     private final ForecastingCallsImpl forecastingCallsImpl;
+    private final ForecastingAthenaImpl forecastingAthenaImpl;
     private final ForecastingUtils forecastingUtils; 
     @Autowired
     private MetaRepository metaRepository;
 
-    public ForecastingResource(ForecastingCallsImpl forecastingCallsImpl, ForecastingUtils forecastingUtils) {
+    public ForecastingResource(ForecastingCallsImpl forecastingCallsImpl, ForecastingUtils forecastingUtils, ForecastingAthenaImpl forecastingAthenaImpl) {
         this.forecastingCallsImpl = forecastingCallsImpl;
         this.forecastingUtils = forecastingUtils;
+        this.forecastingAthenaImpl = forecastingAthenaImpl;
     }
 
     @PostMapping("/forecasting/train")
@@ -74,6 +79,12 @@ public class ForecastingResource {
         return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingInference(timestamp));
     }
     
+    @PostMapping("/forecasting/Athenainference")
+    public ResponseEntity<HandleDataRes> GetAthenaInference(@RequestBody HandleDataReq req) throws IOException {
+        log.debug("REST request to get Athena inference of dataset: {}", req.getData_id());
+        return ResponseEntity.ok().body(forecastingAthenaImpl.ForecastingAthenaInference(req));
+    }
+    
     @PostMapping("/forecasting/save")
     public ResponseEntity<List<Meta>> SaveModel(@RequestBody ModelInfoReq modelInfo) throws IOException {
         log.debug("REST request to get all results for job with model name: ", modelInfo.getModel_name());
@@ -81,7 +92,7 @@ public class ForecastingResource {
     }
     
     @GetMapping("/forecasting/models")
-    public ResponseEntity<List<Meta>> GetSavedModels() throws IOException {
+    public ResponseEntity<List<Meta>> GetSavedModels() {
         log.debug("REST request to get all mongo meta files: ");
         return ResponseEntity.ok().body(metaRepository.findAll());
     }

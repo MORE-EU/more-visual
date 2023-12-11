@@ -6,7 +6,7 @@ import Grid from '@mui/material/Grid';
 import ChartToolsWindow from './chart-tools-window';
 
 export const ChartContainer = () => {
-  const { activeTool } = useAppSelector(state => state.visualizer);
+  const { activeTool, farmMeta, dataset } = useAppSelector(state => state.visualizer);
 
   return (
     <Grid sx={{ display: 'flex', flexDirection: 'column', height: "100%" }}>

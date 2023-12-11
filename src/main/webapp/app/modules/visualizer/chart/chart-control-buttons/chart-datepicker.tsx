@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 const ChartDatePicker = () => {
   const dispatch = useAppDispatch();
 
-  const { chartRef, folder, dataset, from, to, resampleFreq, selectedMeasures, queryResults } = useAppSelector(state => state.visualizer);
+  const { chartRef, folder, dataset, from, to, data, selectedMeasures, queryResults } = useAppSelector(state => state.visualizer);
 
   const handleOnAccept = (e, category) => {
     if (category === 'from') {
@@ -32,6 +32,7 @@ const ChartDatePicker = () => {
           renderInput={p => <TextField size="small" {...p} />}
           label="From"
           value={from ? from : null}
+          disabled={data === null}
           minDateTime={queryResults ? queryResults.timeRange[0] : null}
           maxDateTime={queryResults ? queryResults.timeRange[1] : null}
           onAccept={e => {
@@ -47,6 +48,7 @@ const ChartDatePicker = () => {
           renderInput={p => <TextField size="small" {...p} />}
           label="To"
           value={to ? to : null}
+          disabled={data === null}
           minDateTime={queryResults ? queryResults.timeRange[0] : null}
           maxDateTime={queryResults ? queryResults.timeRange[1] : null}
           onAccept={e => {

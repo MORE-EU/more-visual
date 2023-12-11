@@ -47,6 +47,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoClient;
 
 import eu.more2020.visual.domain.Forecasting.DBs.Bebeze;
+import eu.more2020.visual.domain.Forecasting.DBs.Beico;
 import eu.more2020.visual.domain.Forecasting.DBs.DataBasesConfig;
 import eu.more2020.visual.domain.Forecasting.DBs.Meta;
 import eu.more2020.visual.repository.MetaRepository;
@@ -127,6 +128,54 @@ public class ForecastingUtils {
         executorService.submit(() -> influxInit(dbConfig));
         return "done";
     }
+
+    // public List<Point> getPoints() {
+    //     log.debug("Parsing CSV file...");
+    //     long startTime = System.currentTimeMillis();
+    //     Path pathInput = Paths.get(workspacePath + "/beico/beico11.csv");
+    //     List<Point> list = List.of(); // Default to empty list.
+    //     try {
+    //         int initialCapacity = (int) Files.lines(pathInput).count();
+    //         list = new ArrayList<>(initialCapacity);
+
+    //         BufferedReader reader = Files.newBufferedReader(pathInput);
+    //         Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
+    //         for (CSVRecord record : records) {
+    //             String format = "yyyy-MM-dd HH:mm:ss";
+    //             SimpleDateFormat sdf = new SimpleDateFormat(format);
+    //             String dt = record.get("datetime");
+    //             Date date = sdf.parse(dt);
+    //             Instant datetime = date.toInstant();
+    //             list.add(new Beico(
+    //                 datetime,
+    //                 Double.parseDouble(record.get("Grd_Prod_Pwr_avg")),
+    //                 Double.parseDouble(record.get("Amb_Temp_avg")),
+    //                 Double.parseDouble(record.get("Amb_WindSpeed_avg")),
+    //                 Double.parseDouble(record.get("Grd_Prod_Pwr_min")),
+    //                 Double.parseDouble(record.get("Amb_Temp_min")),
+    //                 Double.parseDouble(record.get("Amb_WindSpeed_min")),
+    //                 Double.parseDouble(record.get("Grd_Prod_Pwr_max")),
+    //                 Double.parseDouble(record.get("Amb_Temp_max")),
+    //                 Double.parseDouble(record.get("Amb_WindSpeed_max")),
+    //                 Double.parseDouble(record.get("Grd_Prod_Pwr_std")),
+    //                 Double.parseDouble(record.get("Amb_WindSpeed_std")),
+    //                 Double.parseDouble(record.get("Amb_WindDir_Abs_avg")),
+    //                 Double.parseDouble(record.get("label")),
+    //                 Double.parseDouble(record.get("MeanWindSpeedUID_10.0m")),
+    //                 Double.parseDouble(record.get("DirectionUID_10.0m")),
+    //                 Double.parseDouble(record.get("MeanWindSpeedUID_100.0m")),
+    //                 Double.parseDouble(record.get("DirectionUID_100.0m"))
+    //             ).toPoint());
+    //         }
+    //     } catch (IOException | ParseException e) {
+    //         e.printStackTrace();
+    //     }
+    //     long endTime = System.currentTimeMillis();
+    //     double elapsedTimeSeconds = (endTime - startTime) / 1000.0;
+    //     log.debug("CSV parsing took: " + elapsedTimeSeconds + " seconds");
+
+    //     return list;
+    // }
 
     public List<Point> getPoints() {
         log.debug("Parsing CSV file...");

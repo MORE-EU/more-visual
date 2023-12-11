@@ -22,6 +22,7 @@ export const VisMeasuresList = (props: IVisMeasuresListProps) => {
       blurOnSelect={true}
       sx={{ width: width }}
       onChange={onChange}
+      size="small"
       renderInput={params => <TextField {...params} label={'Add Measure'} />}
     />
   );

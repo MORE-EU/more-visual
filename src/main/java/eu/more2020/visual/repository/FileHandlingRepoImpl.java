@@ -1,7 +1,5 @@
 package eu.more2020.visual.repository;
 
-import com.fasterxml.jackson.core.exc.StreamWriteException;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import eu.more2020.visual.config.ApplicationProperties;
@@ -48,7 +46,7 @@ public class FileHandlingRepoImpl implements FileHandlingRepository {
     }
   }
 
-  public void saveFarm(FarmMeta metaInfo, MultipartFile[] files) throws StreamWriteException, DatabindException, IOException {
+  public void saveFarm(FarmMeta metaInfo, MultipartFile[] files) throws IOException {
     Path rootLocation = Paths.get(applicationProperties.getWorkspacePath());
     File dir = new File(rootLocation + "/" + metaInfo.getName());
     if (!dir.exists()) {
@@ -71,7 +69,7 @@ public class FileHandlingRepoImpl implements FileHandlingRepository {
     }
   }
 
-  public void uploadDataset(FarmInfo metaInfo, MultipartFile file, String farmName) throws StreamWriteException, DatabindException, IOException {
+  public void uploadDataset(FarmInfo metaInfo, MultipartFile file, String farmName) throws IOException {
     Path rootLocation = Paths.get(applicationProperties.getWorkspacePath());
     File metaFile = new File(rootLocation + "/" + farmName + "/" + farmName + ".meta.json");
     ObjectMapper obm = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);

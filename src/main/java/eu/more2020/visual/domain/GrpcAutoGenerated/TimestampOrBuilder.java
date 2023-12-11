@@ -24,4 +24,16 @@ public interface TimestampOrBuilder extends
    */
   com.google.protobuf.ByteString
       getModelNameBytes();
+
+  /**
+   * <code>string kind = 3;</code>
+   * @return The kind.
+   */
+  java.lang.String getKind();
+  /**
+   * <code>string kind = 3;</code>
+   * @return The bytes for kind.
+   */
+  com.google.protobuf.ByteString
+      getKindBytes();
 }

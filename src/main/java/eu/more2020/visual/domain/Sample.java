@@ -186,6 +186,13 @@ public class Sample {
         this.ComDate = ComDate;
     }
 
+    @Override
+    public String toString() {
+        return "Sample [continent=" + continent + ", country=" + country + ", area=" + area + ", city=" + city
+                + ", name=" + name + ", lat=" + lat + ", lng=" + lng + ", manufacturer=" + manufacturer + ", turbine="
+                + turbine + ", hubHeight=" + hubHeight + ", noOfTurbines=" + noOfTurbines + ", power=" + power
+                + ", dev=" + dev + ", operator=" + operator + ", owner=" + owner + ", ComDate=" + ComDate + "]";
+    }
 
     @Override
     public boolean equals(Object o) {

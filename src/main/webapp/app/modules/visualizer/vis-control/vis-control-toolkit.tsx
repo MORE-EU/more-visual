@@ -15,10 +15,11 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import {YawMisalignment} from "app/modules/visualizer/tools/yaw-misalignment/yaw-misalignment";
 import ListItem from '@mui/material/ListItem';
+import { Skeleton } from '@mui/material';
 
 const VisToolkit = () => {
 
-  const {farmMeta, dataset} = useAppSelector(state => state.visualizer);
+  const {farmMeta, dataset, data} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const handleToolClick = key => e => {
@@ -30,38 +31,38 @@ const VisToolkit = () => {
           <Typography variant="h6" gutterBottom>
           Tools
           </Typography>
-          <List>
-            {dataset.id == "eugene" && <ListItemButton key={0} onClick={handleToolClick("Pattern Extraction")} disabled={true}>
+          {farmMeta && dataset ? <List>
+            <ListItemButton key={0} onClick={handleToolClick("Pattern Extraction")} disabled={dataset.id !== "eugene" || data === null}>
               <ListItemIcon>
                 <PatternIcon/>
               </ListItemIcon>
               <ListItemText primary={"Pattern Extraction"}/>
-            </ListItemButton>}
-            {farmMeta.resType === 0 && <><ListItemButton key={1} onClick={handleToolClick("Soiling Detection")}>
+            </ListItemButton>
+            <ListItemButton key={1} onClick={handleToolClick("Soiling Detection")} disabled={farmMeta.resType !== 0 || data === null}>
               <ListItemIcon>
                 <ManageSearchIcon/>
               </ListItemIcon>
               <ListItemText primary={"Soiling Detection"}/>
-            </ListItemButton></>}
-            {dataset.id === "BEZ2" && <><ListItemButton key={2} onClick={handleToolClick("Yaw Misalignment Detection")}>
+            </ListItemButton>
+            <ListItemButton key={2} onClick={handleToolClick("Yaw Misalignment Detection")} disabled={dataset.id !== "BEZ2" || data === null}>
                 <ListItemIcon>
                   <ManageSearchIcon/>
                 </ListItemIcon>
                 <ListItemText primary={"Yaw Misalignment Detection"}/>
-            </ListItemButton></>}
-            <ListItemButton key={3} onClick={handleToolClick("Forecasting")} disabled={dataset.id !== "bbz1big"}>
+            </ListItemButton>
+            <ListItemButton key={3} onClick={handleToolClick("Forecasting")} disabled={dataset.id !== "bbz1big" || data === null}>
               <ListItemIcon>
                 <TimelineIcon/>
               </ListItemIcon>
               <ListItemText primary={"Forecasting"}/>
             </ListItemButton>
-            <ListItemButton key={4} onClick={handleToolClick("Filtering")}>
+            <ListItemButton key={4} onClick={handleToolClick("Filtering")} disabled={data === null}>
               <ListItemIcon>
                 <FilterAltIcon/>
               </ListItemIcon>
               <ListItemText primary={"Filtering"}/>
             </ListItemButton>
-          </List>
+          </List> : <Skeleton variant='rounded' height="90%" width="100%" />}
         </Grid>
   );
 }

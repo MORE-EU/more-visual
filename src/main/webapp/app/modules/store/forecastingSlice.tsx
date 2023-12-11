@@ -74,8 +74,14 @@ export const deleteModelByName = createAsyncThunk('deleteModelByName', async (mo
   return response;
 });
 
-export const getInference = createAsyncThunk('getInference', async (info: { timestamp: number; model_name: string }) => {
+export const getInference = createAsyncThunk('getInference', async (info: { timestamp: number; model_name: string; kind: string }) => {
   const response = await axios.post(`api/forecasting/inference`, info).then(res => res.data);
+  return response;
+});
+
+export const getAthenaInference = createAsyncThunk('getAthenaInference', async (info: { timestamp: number; model_name: string }) => {
+  const infoList = {data_id: info.model_name, start_date: new Date(info.timestamp).toISOString(), end_date: new Date(info.timestamp + 7200), use_case_id: "forecasting" }
+  const response = await axios.post(`api/forecasting/Athenainference`, infoList).then(res => res.data);
   return response;
 });
 
@@ -117,6 +123,10 @@ const forecasting = createSlice({
     },
   },
   extraReducers(builder) {
+    builder.addCase(getAthenaInference.fulfilled, (state, action) => {
+      state.forecastingLoading = false;
+      state.forecastingInference = action.payload.results;
+    });
     builder.addCase(getInference.fulfilled, (state, action) => {
       state.forecastingLoading = false;
       state.forecastingInference = action.payload.predictions;
@@ -148,7 +158,8 @@ const forecasting = createSlice({
         getTarget.pending,
         getInitialSeries.pending,
         saveModel.pending,
-        getInference.pending
+        getInference.pending,
+        getAthenaInference.pending
       ),
       state => {
         state.forecastingLoading = true;
@@ -162,7 +173,8 @@ const forecasting = createSlice({
         getTarget.rejected,
         getInitialSeries.rejected,
         saveModel.rejected,
-        getInference.rejected
+        getInference.rejected,
+        getAthenaInference.rejected
       ),
       (state, action) => {
         state.forecastingError = action.payload;

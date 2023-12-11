@@ -42,7 +42,6 @@ export const HomeMap = () => {
 
   return (
     <div>
-      {console.log(farmMeta)}
       <MapContainer center={[51.505, -0.09]} zoom={13} className="farmMap" zoomControl={false}>
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -54,7 +53,7 @@ export const HomeMap = () => {
           (
             <MarkerClusterGroup showCoverageOnHover={true} key={itemIdx}>
               {item.farmInfo.map((info, locIdx) => {
-                const rand = Math.floor((Math.random() * (farmMeta.data.length - 1)) + 0);
+                // const rand = Math.floor((Math.random() * (farmMeta.data.length - 1)) + 0);
                 let count = 0;
                 const count1 = [];
                 selected.map(sele => {

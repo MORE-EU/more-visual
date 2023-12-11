@@ -66,6 +66,7 @@ export const ChartCompare = () => {
 
   return (
     <>
+    {console.log(datasets)}
       <Tooltip title="Compare Charts">
         <IconButton
           aria-label="more"
@@ -74,6 +75,7 @@ export const ChartCompare = () => {
           aria-expanded={open ? 'true' : undefined}
           aria-haspopup="true"
           onClick={handleOpen}
+          disabled={datasets.loading}
         >
           {datasets.loading ? <CircularProgress size={20} /> : <AddchartIcon />}
         </IconButton>
@@ -119,7 +121,7 @@ export const ChartCompare = () => {
             p: 1,
           }}
         >
-          {datasets.data.length !== 0 &&
+          {datasets.data.length !== 0 && dataset &&
             datasets.data.map(
               (dat, idx) =>
                 dat.id !== dataset.id && (

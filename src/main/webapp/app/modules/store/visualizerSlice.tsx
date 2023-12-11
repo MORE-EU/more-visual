@@ -482,6 +482,9 @@ const visualizer = createSlice({
     toggleCustomChangepoints(state, action) {
       state.customChangepointsEnabled = action.payload;
     },
+    resetFarmMeta(state) {
+      state.farmMeta = null;
+    },
     resetForecastingState(state) {
       // remove plotlines from chart when you disable forecasting
       state.chartRef.xAxis[0].removePlotLine('start');
@@ -599,7 +602,7 @@ const visualizer = createSlice({
       isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected),
       (state, action) => {
         state.loading = false;
-        state.errorMessage = action.payload;
+        state.errorMessage = "unable to reach server";
       }
     );
     builder.addMatcher(isAnyOf(checkConnection.rejected), (state, action) => {
@@ -631,7 +634,7 @@ const visualizer = createSlice({
 
 export const {
   resetChartValues,resetFetchData,updateSelectedMeasures,updateCustomSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
-  updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef, updateDetectedChangepoints,
+  updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef, updateDetectedChangepoints, resetFarmMeta,
   updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks, setCompareData, updateSoilingType,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
   setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,

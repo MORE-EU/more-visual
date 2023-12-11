@@ -29,7 +29,7 @@ const style = {
 };
 
 export const ChartAlerting = () => {
-  const { alertResults, chartRef, alerts } = useAppSelector(state => state.visualizer);
+  const { alertResults, chartRef, alerts, dataset } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
@@ -95,6 +95,7 @@ export const ChartAlerting = () => {
             aria-expanded={open ? 'true' : undefined}
             aria-haspopup="true"
             onClick={handleModal}
+            disabled={dataset === null}
           >
             <NotificationsIcon />
           </IconButton>

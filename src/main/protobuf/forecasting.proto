@@ -28,6 +28,24 @@ service RouteGuide {
   // Save the desired model given the algorithm and the target
   // Return: If information was saved successfully
   rpc SaveModel(ModelInfo) returns (Status) {}
+
+  // Empty request
+  // Return: list of strings with the names of the saved models
+  rpc GetModels(EmptyRequest) returns (Models);
+
+  // Perform a deletion of a saved model based on the model name
+  // Return List of available models after deletion
+  rpc DeleteModel(ModelName) returns (Models);
+}
+
+message EmptyRequest {}
+
+message Models {
+  repeated string models = 1;
+}
+
+message ModelName {
+  string modelName = 1;
 }
 
 message TrainingInfo {
@@ -52,6 +70,7 @@ message JobID {
 message Timestamp {
   int64 timestamp = 1;
   string model_name = 2;
+  string kind = 3;
 }
 
 message Progress {

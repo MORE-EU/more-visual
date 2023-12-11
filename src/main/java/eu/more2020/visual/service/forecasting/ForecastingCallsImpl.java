@@ -1,6 +1,13 @@
 package eu.more2020.visual.service.forecasting;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -177,6 +184,7 @@ public class ForecastingCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
         Timestamp request = Timestamp.newBuilder()
                 .setTimestamp(timestamp.getTimestamp())
                 .setModelName(timestamp.getModel_name())
+                .setKind(timestamp.getKind())
                 .build();
 
         // Create a channel to connect to the target gRPC server

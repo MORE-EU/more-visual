@@ -12,6 +12,9 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { Link } from 'react-router-dom';
 import VisControlDatasetUpload from './vis-control-dataset-upload';
+import SimpleBar from "simplebar-react";
+import grey from '@mui/material/colors/grey';
+import { Skeleton } from '@mui/material';
 
 const VisControlDatasets = () => {
   const { folder, dataset, compare, resampleFreq, datasetChoice, farmMeta } = useAppSelector(state => state.visualizer);
@@ -50,9 +53,10 @@ const VisControlDatasets = () => {
       {farmMeta && (
         <>
           <Typography variant="h6" gutterBottom>
-            {farmMeta.name}
+            {farmMeta ? farmMeta.name : <Skeleton />}
           </Typography>
-          <List disablePadding dense>
+          {farmMeta ? <List disablePadding dense sx={{maxHeight: "84%", border: `1px solid ${grey[300]}`, borderRadius: 2, overflowY: "auto"}}>
+          <SimpleBar key="SimpleBarDatasets" style={{height: "100%"}}>
             {farmMeta.data.map((file, idx) => (
               <ListItemButton
                 key={idx}
@@ -79,7 +83,8 @@ const VisControlDatasets = () => {
               <ListItemText primary={`new dataset`} sx={{ pl: 4 }} />
               <ControlPointIcon />
             </ListItemButton>
-          </List>
+            </SimpleBar>
+          </List> : <Skeleton variant="rectangular" height="84%" width="100%" />}
         </>
       )}
     </Grid>

@@ -331,8 +331,8 @@ public class ToolsServiceImpl extends RouteGuideGrpc.RouteGuideImplBase implemen
             // Invoke the remote method on the target server
             DataServiceGrpc.DataServiceBlockingStub stub = DataServiceGrpc.newBlockingStub(channel);
             EstimateYawMisalignmentResponse response = stub.estimateYawMisalignment(request);
-//
-//            // Convert the response to JSON string
+
+            // Convert the response to JSON string
             String json = response.getResult();
             // Create an ObjectMapper
             ObjectMapper objectMapper = new ObjectMapper();
