@@ -1,9 +1,10 @@
 import React from 'react';
-import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import CandlestickChartIcon from '@mui/icons-material/CandlestickChart';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import {setChartType} from "app/modules/store/visualizerSlice";
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
 
 
 export const ChartType = () => {

@@ -13,6 +13,7 @@ import VisMeasuresList from 'app/modules/visualizer/vis-control/measures/vis-mea
 import Box from '@mui/material/Box';
 import SimpleBar from 'simplebar-react';
 import { Autocomplete, Skeleton } from '@mui/material';
+import grey from '@mui/material/colors/grey';
 
 export const VisMeasures = () => {
   const { dataset, selectedMeasures, customSelectedMeasures, measureColors, compare } = useAppSelector(state => state.visualizer);
@@ -34,6 +35,7 @@ export const VisMeasures = () => {
     if (selectedMeasures.length + customSelectedMeasures.length === 1) return;
     let newSelectedMeasures = [...selectedMeasures];
     newSelectedMeasures.splice(newSelectedMeasures.indexOf(col), 1);
+    setShownMeasures(state => dataset.header.filter((val, idx) => state.includes(val) || idx === col))
     dispatch(updateSelectedMeasures(newSelectedMeasures));
   };
 
@@ -51,6 +53,7 @@ export const VisMeasures = () => {
     if (id !== -1) {
       let newSelectedMeasures = [...selectedMeasures];
       newSelectedMeasures.push(id);
+      setShownMeasures(state => state.filter(s => s !== value))
       dispatch(updateSelectedMeasures(newSelectedMeasures));
     }
   };
@@ -116,9 +119,9 @@ export const VisMeasures = () => {
           )}
         </Box>
       </Box>
-      <Box sx={{ overflowY: 'auto', height: '60%' }}>
-        {dataset ? (
-          <SimpleBar key="SimpleBarMeasures" style={{ height: '100%' }}>
+      {dataset ? (  <SimpleBar key="SimpleBarMeasures" style={{ maxHeight: '60%', border: `1px solid ${grey[300]}`, borderRadius: 10 }}>
+      <Box sx={{ overflowY: 'auto' }}>
+        
             <List dense sx={{ width: '100%', maxWidth: 360, mb: 3 }}>
               {selectedMeasures
                 .map(col => {
@@ -159,12 +162,12 @@ export const VisMeasures = () => {
                     );
                   })
                 )}
-            </List>
-          </SimpleBar>
-        ) : (
-          <Skeleton variant="rounded" height="100%" width="100%" />
-        )}
+            </List>          
+         
       </Box>
+      </SimpleBar>) : (
+          <Skeleton variant="rounded" sx={{height: "60%"}} width="100%" />
+        )}
     </Grid>
   );
 };

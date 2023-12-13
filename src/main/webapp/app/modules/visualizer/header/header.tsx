@@ -26,11 +26,10 @@ const Header = props => {
         bgcolor: grey[200],
       }}
     >
-      {console.log(params)}
       <Breadcrumbs aria-label="breadcrumb">
         <Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href="/">
         <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
-          <HomeIcon sx={{ mr: 0.5 }} fontSize='medium' />
+          <HomeIcon sx={{ mr: 0.5, mb: 0.5 }} fontSize='medium' />
           Home
           </Typography>
         </Link>

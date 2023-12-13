@@ -156,6 +156,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
         <Typography variant="body1" gutterBottom sx={{fontWeight:600}}>
           Filter (%)
         </Typography>
+        <Box sx={{px: 3}}>
         <Slider
           size="small"
           disabled={!changepointDetectionEnabled}
@@ -166,6 +167,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
           aria-label="Small"
           valueLabelDisplay="auto"
         />
+        </Box>
       </Box>
     </Box>
   );

@@ -66,7 +66,6 @@ export const Visualizer = () => {
 
   return (
     <div>
-      {console.log(errorMessage)}
       <ThemeProvider theme={mdTheme}>
         <Grid sx={{ height: '100%', width: '100%' }}>
           {errorMessage &&

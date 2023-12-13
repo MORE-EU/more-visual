@@ -14,11 +14,11 @@ const ChartDatePicker = () => {
 
   const handleOnAccept = (e, category) => {
     if (category === 'from') {
-      chartRef.xAxis[0].setExtremes(e.getTime() + 200, to - 200);
-      dispatch(updateQueryResults({ folder, id: dataset.id, from: e.getTime(), to, selectedMeasures, filter: null }));
+      chartRef.xAxis[0].setExtremes(e.getTime(), to);
+      dispatch(updateQueryResults({ folder, id: dataset.id, from: e.getTime(), to, selectedMeasures, filter: {} }));
     } else {
-      chartRef.xAxis[0].setExtremes(from + 200, e.getTime() - 200);
-      dispatch(updateQueryResults({ folder, id: dataset.id, from, to: e.getTime(), selectedMeasures, filter: null }));
+      chartRef.xAxis[0].setExtremes(from, e.getTime());
+      dispatch(updateQueryResults({ folder, id: dataset.id, from, to: e.getTime(), selectedMeasures, filter: {} }));
     }
   };
 
@@ -29,12 +29,14 @@ const ChartDatePicker = () => {
       </Typography>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DateTimePicker
+          readOnly
           renderInput={p => <TextField size="small" {...p} />}
           label="From"
           value={from ? from : null}
           disabled={data === null}
-          minDateTime={queryResults ? queryResults.timeRange[0] : null}
-          maxDateTime={queryResults ? queryResults.timeRange[1] : null}
+          // minDateTime={dataset ? dataset.timeRange.from : null}
+          // maxDateTime={to ? to : null}
+          disableOpenPicker
           onAccept={e => {
             handleOnAccept(e, 'from');
           }}
@@ -45,12 +47,14 @@ const ChartDatePicker = () => {
           {' - '}
         </Typography>
         <DateTimePicker
+          readOnly
+          disableOpenPicker
           renderInput={p => <TextField size="small" {...p} />}
           label="To"
           value={to ? to : null}
           disabled={data === null}
-          minDateTime={queryResults ? queryResults.timeRange[0] : null}
-          maxDateTime={queryResults ? queryResults.timeRange[1] : null}
+          // minDateTime={from ? from : null}
+          // maxDateTime={dataset ? dataset.timeRange.to : null}
           onAccept={e => {
             handleOnAccept(e, 'to');
           }}

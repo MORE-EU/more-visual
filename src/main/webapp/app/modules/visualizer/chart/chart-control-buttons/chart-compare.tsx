@@ -66,7 +66,6 @@ export const ChartCompare = () => {
 
   return (
     <>
-    {console.log(datasets)}
       <Tooltip title="Compare Charts">
         <IconButton
           aria-label="more"

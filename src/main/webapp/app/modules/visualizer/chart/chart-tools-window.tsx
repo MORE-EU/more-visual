@@ -9,11 +9,11 @@ import PatternExtraction from '../tools/pattern-extraction/pattern-extraction';
 import SoilingDetection from '../tools/soiling-detection/soiling-detection';
 import { YawMisalignment } from '../tools/yaw-misalignment/yaw-misalignment';
 import Box from '@mui/material/Box';
-import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { resetForecastingState, updateActiveTool } from 'app/modules/store/visualizerSlice';
 import grey from '@mui/material/colors/grey';
 import red from '@mui/material/colors/red';
+import IconButton from '@mui/material/IconButton';
 
 const ChartToolsWindow = () => {
   const { activeTool } = useAppSelector(state => state.visualizer);

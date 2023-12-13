@@ -3,9 +3,9 @@ import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import { getDirectories, setSelectedConnection } from '../store/visualizerSlice';
 import Button from '@mui/material/Button';
-import { Typography } from '@mui/material';
 import grey from '@mui/material/colors/grey';
 import { Link } from 'react-router-dom';
+import Typography from '@mui/material/Typography';
 
 const ConnectorFarmSelection = (props) => {
     const {selectedItem} = props;

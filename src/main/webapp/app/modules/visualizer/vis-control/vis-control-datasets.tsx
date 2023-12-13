@@ -55,8 +55,8 @@ const VisControlDatasets = () => {
           <Typography variant="h6" gutterBottom>
             {farmMeta ? farmMeta.name : <Skeleton />}
           </Typography>
-          {farmMeta ? <List disablePadding dense sx={{maxHeight: "84%", border: `1px solid ${grey[300]}`, borderRadius: 2, overflowY: "auto"}}>
-          <SimpleBar key="SimpleBarDatasets" style={{height: "100%"}}>
+          {farmMeta ? <SimpleBar key="SimpleBarDatasets" style={{maxHeight: "84%", border: `1px solid ${grey[300]}`, borderRadius: 10, }}>
+            <List disablePadding dense sx={{overflowY: "auto"}}>
             {farmMeta.data.map((file, idx) => (
               <ListItemButton
                 key={idx}
@@ -83,8 +83,8 @@ const VisControlDatasets = () => {
               <ListItemText primary={`new dataset`} sx={{ pl: 4 }} />
               <ControlPointIcon />
             </ListItemButton>
-            </SimpleBar>
-          </List> : <Skeleton variant="rectangular" height="84%" width="100%" />}
+            </List>
+            </SimpleBar> : <Skeleton variant="rectangular" height="84%" width="100%" />}
         </>
       )}
     </Grid>

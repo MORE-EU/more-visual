@@ -711,45 +711,10 @@ export const Chart = () => {
           options={{
             title: null,
             plotOptions: {
-              arearange: {
+              line: {
                 dataGrouping: {
-                  approximation(_: any, groupData: string | any) {
-                    const asc = (arr: any[]) => arr.sort((a: number, b: number) => a - b);
-                    return [asc(groupData)[0], asc(groupData)[groupData.length - 1]];
-                  },
-                },
-              },
-              boxplot: {
-                dataGrouping: {
-                  approximation(_: any, groupData: string | any[]) {
-                    // sort array ascending
-                    const asc = (arr: any) => arr.sort((a: number, b: number) => a - b);
-                    const sum = (arr: any[]) => arr.reduce((a: any, b: any) => a + b, 0);
-                    const mean = (arr: string | any) => sum(arr) / arr.length;
-                    const std = (arr: any[]) => {
-                      const mu = mean(arr);
-                      const diffArr = arr.map((a: number) => (a - mu) ** 2);
-                      return Math.sqrt(sum(diffArr) / (arr.length - 1));
-                    };
-                    const quantile = (arr: any, q: number) => {
-                      const sorted = asc(arr);
-                      const pos = (sorted.length - 1) * q;
-                      const base = Math.floor(pos);
-                      const rest = pos - base;
-                      if (sorted[base + 1] !== undefined) {
-                        return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
-                      } else {
-                        return sorted[base];
-                      }
-                    };
-
-                    const q25 = (arr: any) => quantile(arr, 0.25);
-                    const q50 = (arr: any) => quantile(arr, 0.5);
-                    const q75 = (arr: any) => quantile(arr, 0.75);
-                    const median = (arr: any) => q50(arr);
-                    return [asc(groupData)[0], q25(groupData), q50(groupData), q75(groupData), asc(groupData)[groupData.length - 1]];
-                  },
-                },
+                  enabled: true
+                }
               },
               series: {
                 connectNulls: false,
@@ -811,11 +776,6 @@ export const Chart = () => {
             rangeSelector: {
               enabled: false,
             },
-            // subtitle: {
-            //   text: `Frequency: ${resampleFreq}`,
-            //   align: 'right',
-            //   x: 0,
-            // },
             navigator: {
               enabled: false,
               adaptToUpdatedData: false,

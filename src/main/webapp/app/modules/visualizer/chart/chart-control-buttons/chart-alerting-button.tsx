@@ -14,7 +14,7 @@ import Badge from '@mui/material/Badge';
 import AlertsTable from '../chart-alerting/chart-alerting-table';
 import AlertAddEdit from '../chart-alerting/chart-alerting-add-edit';
 import AlertingInfo from '../chart-alerting/chart-alerting-info';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 
 const style = {
   position: 'absolute',
