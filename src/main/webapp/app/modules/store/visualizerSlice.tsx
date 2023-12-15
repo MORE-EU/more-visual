@@ -56,13 +56,6 @@ const forecastingInitialState = {
   forecastingDataSplit: [60, 20, 20],
 };
 
-const checkConnectionInitialState = {
-  checkConnectionResponse: null,
-  checkConnectionLoading: false,
-  checkConnectionError: false,
-  selectedConnection: "CSV"
-}
-
 const initialState = {
   loading: true,
   errorMessage: null,
@@ -122,18 +115,7 @@ const initialState = {
   alertResults: {} as {[key: string]: IAlertResults},
   alertingPlotMode: false,
   ...forecastingInitialState,
-  ...checkConnectionInitialState
 };
-
-export const checkConnection = createAsyncThunk('checkConnection', async (bdConfig: { url: string; port: string }) => {
-  try {
-  const response = await axios.post(`api/datasets/checkConnection`, bdConfig).then(res => res);
-  return response;
-} catch (error) {
-  // Use the response data (error.response.data) as the error message
-  throw new Error(error.response.data);
-}
-});
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
   const { folder, id } = data;
@@ -444,14 +426,8 @@ const visualizer = createSlice({
     setChartType(state, action) {
       state.chartType = action.payload;
     },
-    setCheckConnectionResponse(state, action) {
-      state.checkConnectionResponse = action.payload;
-    },
     setCompareData(state, action) {
       state.compareData = action.payload;
-    },
-    setSelectedConnection(state, action) {
-      state.selectedConnection = action.payload;
     },
     setAutoMLStartDate(state, action) {
       state.forecastingStartDate = action.payload;
@@ -510,11 +486,6 @@ const visualizer = createSlice({
       state.measureColors = [...state.dataset.header.map(() => generateColor())];
       state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
       state.selectedMeasures = [action.payload.data.measures[0]];
-    });
-    builder.addCase(checkConnection.fulfilled, (state, action) => {
-      state.checkConnectionLoading = false;
-      state.checkConnectionResponse = action.payload.data;
-      state.checkConnectionError = false;
     });
     builder.addCase(getFarmMeta.fulfilled, (state, action) => {
       state.loading = false;
@@ -588,9 +559,6 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending, applyDeviationDetection.pending), state => {
       state.queryResultsLoading = true;
     });
-    builder.addMatcher(isAnyOf(checkConnection.pending), state => {
-      state.checkConnectionLoading = true;
-    });
     builder.addMatcher(isAnyOf(liveDataImplementation.pending), state => {
       state.liveDataImplLoading = true;
       state.queryResultsLoading = true;
@@ -605,11 +573,6 @@ const visualizer = createSlice({
         state.errorMessage = "unable to reach server";
       }
     );
-    builder.addMatcher(isAnyOf(checkConnection.rejected), (state, action) => {
-      state.checkConnectionLoading = false;
-      state.checkConnectionResponse = action.error.message;
-      state.checkConnectionError = true;
-    });
     builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected, applyDeviationDetection.rejected), (state, action) => {
       state.queryResultsLoading = false;
     });
@@ -638,6 +601,6 @@ export const {
   updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks, setCompareData, updateSoilingType,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
   setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
-  setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,setCheckConnectionResponse, setSelectedConnection
+  setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,
 } = visualizer.actions;
 export default visualizer.reducer;

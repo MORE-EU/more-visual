@@ -6,7 +6,6 @@ import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
 import PageNotFound from 'app/shared/error/page-not-found';
 import Visualizer from "app/modules/visualizer/visualizer";
 import Upload from './modules/upload/upload-farm';
-import Dashboard from './modules/dashboard/farm-dashboard';
 import Connector from './modules/connector/connector';
 
 
@@ -15,7 +14,6 @@ const Routes = () => (
     <Switch>
       <ErrorBoundaryRoute path="/" exact component={Home}/>
       <ErrorBoundaryRoute path="/upload" exact component={Upload}/>
-      <ErrorBoundaryRoute path="/dashboard/:id" exact component={Dashboard}/>
       <ErrorBoundaryRoute path="/visualize" exact component={Connector}/>
       <ErrorBoundaryRoute exact path={"/visualize/:folder/:id?"} component={Visualizer}/>
       <ErrorBoundaryRoute component={PageNotFound}/>

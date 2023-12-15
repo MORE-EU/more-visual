@@ -43,9 +43,6 @@ const Header = props => {
           {farmMeta.data[datasetChoice].name}
         </Typography> : <Skeleton variant='text' width={50}/>}
       </Breadcrumbs>
-      {/* <Chip label={getSelectedConnection()}
-            color="primary" sx={{ width: '6rem' }}
-      /> */}
     </Grid>
   );
 };

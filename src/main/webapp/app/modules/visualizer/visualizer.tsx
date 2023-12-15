@@ -17,7 +17,7 @@ const mdTheme = createTheme();
 type TransitionProps = Omit<SlideProps, 'direction'>;
 
 export const Visualizer = () => {
-  const { farmMeta, dataset, datasetChoice, selectedConnection, alerts, errorMessage } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, datasetChoice, alerts, errorMessage } = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const dispatch = useAppDispatch();
@@ -76,7 +76,7 @@ export const Visualizer = () => {
               {errorMessage + " try another dataset"}
             </Alert>
           </Snackbar>}
-          <Header farmMeta={farmMeta} datasetChoice={datasetChoice} selectedConnection={selectedConnection} />
+          <Header farmMeta={farmMeta} datasetChoice={datasetChoice} />
           <Divider />
           <Grid
             sx={{
