@@ -67,7 +67,7 @@
         <frontend-maven-plugin.version>1.10.0</frontend-maven-plugin.version>
         <git-commit-id-plugin.version>4.0.0</git-commit-id-plugin.version>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
-        <jib-maven-plugin.version>2.4.0</jib-maven-plugin.version>
+        <jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
         <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
         <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
         <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
@@ -608,35 +608,17 @@
                     <version>${jib-maven-plugin.version}</version>
                     <configuration>
                         <from>
-                            <image>adoptopenjdk:11-jre-hotspot</image>
+                            <image>openjdk:11-jre-slim</image>
                         </from>
                         <to>
                             <image>morevis:latest</image>
                         </to>
                         <container>
-                            <entrypoint>
-                                <shell>bash</shell>
-                                <option>-c</option>
-                                <arg>/entrypoint.sh</arg>
-                            </entrypoint>
                             <ports>
-                                <port>8080</port>
+                                <port>8090</port>
                             </ports>
-                            <environment>
-                                <SPRING_OUTPUT_ANSI_ENABLED>ALWAYS</SPRING_OUTPUT_ANSI_ENABLED>
-                                <JHIPSTER_SLEEP>0</JHIPSTER_SLEEP>
-                            </environment>
-                            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                            <creationTime>USE_CURRENT_TIMESTAMP</creationTime> 
                         </container>
-                        <extraDirectories>
-                            <paths>src/main/jib</paths>
-                            <permissions>
-                                <permission>
-                                    <file>/entrypoint.sh</file>
-                                    <mode>755</mode>
-                                </permission>
-                            </permissions>
-                        </extraDirectories>
                     </configuration>
                 </plugin>
                 <plugin>
