@@ -55,29 +55,44 @@ const VisToolkit = () => {
                     ? dataset.id === 'eugene' || dataset.id === 'cocoa'
                       ? ''
                       : 'This tool is unavailable for this dataset'
-                    : 'This tool is available for solar farms only'
+                    : 'This tool is unavailable for this type of RES.'
                 }
               >
-                <ListItemButton key={1} onClick={handleToolClick('Soiling Detection')} disabled={farmMeta.resType !== 0 || data === null}>
+                <span>
+                <ListItemButton key={1} onClick={handleToolClick('Soiling Detection')} disabled={farmMeta.resType !== 0 || data === null || (dataset.id !== "eugene" && dataset.id !== "cocoa")}>
                   <ListItemIcon>
                     <ManageSearchIcon />
                   </ListItemIcon>
                   <ListItemText primary={'Soiling Detection'} />
                 </ListItemButton>
+                </span>
               </Tooltip>
               <Divider />
+              <Tooltip
+                placement="right"
+                title={
+                  farmMeta.resType === 1
+                    ? dataset.id === 'BEZ2'
+                      ? ''
+                      : 'This tool is unavailable for this dataset.'
+                    : 'This tool is unavailable for this type of RES.'
+                }
+              >
+                <span>
               <ListItemButton
                 key={2}
                 onClick={handleToolClick('Yaw Misalignment Detection')}
                 disabled={dataset.id !== 'BEZ2' || data === null}
-              >
+              >              
                 <ListItemIcon>
                   <ManageSearchIcon />
-                </ListItemIcon>
+                </ListItemIcon> 
                 <ListItemText primary={'Yaw Misalignment Detection'} />
               </ListItemButton>
+              </span>
+              </Tooltip>
               <Divider />
-              <ListItemButton key={3} onClick={handleToolClick('Forecasting')} disabled={dataset.id !== 'bbz1big' || data === null}>
+              <ListItemButton key={3} onClick={handleToolClick('Forecasting')} disabled={data === null}>
                 <ListItemIcon>
                   <TimelineIcon />
                 </ListItemIcon>

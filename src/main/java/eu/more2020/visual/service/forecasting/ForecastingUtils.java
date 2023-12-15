@@ -46,8 +46,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoClient;
 
-import eu.more2020.visual.domain.Forecasting.DBs.Bebeze;
-import eu.more2020.visual.domain.Forecasting.DBs.Beico;
+import eu.more2020.visual.domain.Forecasting.DBs.BEZ2;
 import eu.more2020.visual.domain.Forecasting.DBs.DataBasesConfig;
 import eu.more2020.visual.domain.Forecasting.DBs.Meta;
 import eu.more2020.visual.repository.MetaRepository;
@@ -180,7 +179,7 @@ public class ForecastingUtils {
     public List<Point> getPoints() {
         log.debug("Parsing CSV file...");
         long startTime = System.currentTimeMillis();
-        Path pathInput = Paths.get(workspacePath + "/bbz/bbz1big.csv");
+        Path pathInput = Paths.get(workspacePath + "/wind/BEZ2.csv");
         List<Point> list = List.of(); // Default to empty list.
         try {
             int initialCapacity = (int) Files.lines(pathInput).count();
@@ -194,21 +193,21 @@ public class ForecastingUtils {
                 String dt = record.get("datetime");
                 Date date = sdf.parse(dt);
                 Instant datetime = date.toInstant();
-                Double active_power = Double.parseDouble(record.get("active_power"));
-                Double roto_speed = Double.parseDouble(record.get("roto_speed"));
                 Double wind_speed = Double.parseDouble(record.get("wind_speed"));
-                Double cos_nacelle_dir = Double.parseDouble(record.get("cos_nacelle_dir"));
                 Double pitch_angle = Double.parseDouble(record.get("pitch_angle"));
+                Double rotor_speed = Double.parseDouble(record.get("rotor_speed"));
+                Double active_power = Double.parseDouble(record.get("active_power"));
+                Double cos_nacelle_dir = Double.parseDouble(record.get("cos_nacelle_dir"));
                 Double sin_nacelle_dir = Double.parseDouble(record.get("sin_nacelle_dir"));
                 Double cos_wind_dir = Double.parseDouble(record.get("cos_wind_dir"));
                 Double sin_wind_dir = Double.parseDouble(record.get("sin_wind_dir"));
-                Double nacelle_direction = Double.parseDouble(record.get("nacelle_direction"));
-                Double wind_direction = Double.parseDouble(record.get("wind_direction"));
+                Double cor_nacelle_direction = Double.parseDouble(record.get("cor_nacelle_direction"));
+                Double cor_wind_direction = Double.parseDouble(record.get("cor_wind_direction"));
 
-                Point point = new Bebeze(datetime, active_power, roto_speed, wind_speed,
-                        cos_nacelle_dir, pitch_angle,
-                        sin_nacelle_dir, cos_wind_dir, sin_wind_dir, nacelle_direction,
-                        wind_direction).toPoint();
+                Point point = new BEZ2(datetime, wind_speed, pitch_angle, rotor_speed,
+                active_power, cos_nacelle_dir, sin_nacelle_dir,
+                cos_wind_dir, sin_wind_dir, cor_nacelle_direction,
+                cor_wind_direction).toPoint();
                 list.add(point);
             }
         } catch (IOException | ParseException e) {

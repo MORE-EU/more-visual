@@ -15,17 +15,17 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useAppDispatch } from 'app/modules/store/storeConfig';
+import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { deleteModelByName, setPredModalOpen, setSelectedModel } from 'app/modules/store/forecastingSlice';
 import ForecastingPredModal from '../forecasting-prediction/forecasting-prediction-modal';
 import grey from '@mui/material/colors/grey';
-import TableFooter from '@mui/material/TableFooter';
 import Chip from '@mui/material/Chip';
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
+import CircleIcon from '@mui/icons-material/Circle';
 
 const ForecastingModelSelection = props => {
   const { setNewTrain, savedModels } = props;
+  const {dataset} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const handleNewTrain = () => {
@@ -69,13 +69,7 @@ const ForecastingModelSelection = props => {
             />
             <Chip
               size="small"
-              label="Athena Forecasting"
-              onClick={handleInference("syn_forecasting1")}
-              sx={{ bgcolor: grey[800], color: grey[50], p: 1, '&:hover': { color: grey[900], fontWeight: 500 } }}
-            />
-            <Chip
-              size="small"
-              label="IBM Forecasting"
+              label="Preconfigured Models"
               onClick={handleNewTrain}
               sx={{ bgcolor: grey[800], color: grey[50], p: 1, '&:hover': { color: grey[900], fontWeight: 500 } }}
             />
@@ -124,6 +118,25 @@ const ForecastingModelSelection = props => {
                     </TableCell>
                   </TableRow>
                 ))}
+                <TableRow key={"min_power_forecasting"}>
+                    <TableCell component="th" scope="row" sx={{fontWeight: 600}}>
+                      min power forecasting
+                    </TableCell>
+                    <TableCell align="right">
+                      <Tooltip title={!dataset.id.includes("beico") ? "Not available for this dataset" : "Predict"}>
+                        <span>
+                        <IconButton onClick={handleInference("min_power")} disabled={!dataset.id.includes("beico")}>
+                          <QueryStatsIcon />
+                        </IconButton>
+                        </span>
+                      </Tooltip>
+                      {/* <Tooltip title="Delete">
+                        <IconButton onClick={handleDelete(model.model_name)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip> */}
+                    </TableCell>
+                  </TableRow>
               </TableBody>
             </Table>
           </TableContainer>

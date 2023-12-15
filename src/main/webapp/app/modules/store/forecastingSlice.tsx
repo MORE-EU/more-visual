@@ -3,6 +3,7 @@ import { IForecastingForm } from 'app/shared/model/forecasting.model';
 import { IForecastingData, IForecastingDataDefault, IForecastingResults } from 'app/shared/model/forecastingData.model';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
 
 const initialState = {
   forecastingLoading: false,
@@ -80,7 +81,7 @@ export const getInference = createAsyncThunk('getInference', async (info: { time
 });
 
 export const getAthenaInference = createAsyncThunk('getAthenaInference', async (info: { timestamp: number; model_name: string }) => {
-  const infoList = {data_id: info.model_name, start_date: new Date(info.timestamp).toISOString(), end_date: new Date(info.timestamp + 7200), use_case_id: "forecasting" }
+  const infoList = {data_id: info.model_name, start_date: moment(info.timestamp).format('YYYY-MM-DD HH:mm:ss'), end_date: moment(info.timestamp).format('YYYY-MM-DD HH:mm:ss'), use_case_id: "forecasting" }
   const response = await axios.post(`api/forecasting/Athenainference`, infoList).then(res => res.data);
   return response;
 });

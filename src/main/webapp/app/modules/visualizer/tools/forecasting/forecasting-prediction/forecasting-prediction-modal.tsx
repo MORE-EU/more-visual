@@ -47,11 +47,11 @@ const ForecastingPredModal = () => {
   };
 
   const handleClick = () => {
-    dispatch(getInference({ timestamp: userDate, model_name: selectedModel, kind: "bebeze" }));
+    dispatch(getInference({ timestamp: userDate, model_name: selectedModel, kind: dataset.id }));
   };
 
   const handleAthenaForecasting = () => {
-    dispatch(getAthenaInference({ timestamp: userDate, model_name: selectedModel }))
+    dispatch(getAthenaInference({ timestamp: userDate, model_name: dataset.id }))
   }
 
   const getDateValue = date => {
@@ -61,7 +61,7 @@ const ForecastingPredModal = () => {
   const generateChart = () => {
     return [
       {
-        name: 'Inference',
+        name: selectedModel === "min_power" ? "minimun power" : "Predicted Values",
         opposite: false,
         data: Object.entries(forecastingInference).map(([key, value]) => [parseInt(key) * 1000, value]),
         offset: 0,
@@ -109,7 +109,7 @@ const ForecastingPredModal = () => {
                 }}
                 inputFormat="dd/MM/yyyy hh:mm a"
               />
-              <Button variant="contained" onClick={selectedModel === "syn_forecasting1" ? handleAthenaForecasting : handleClick}>
+              <Button variant="contained" onClick={selectedModel === "min_power" ? handleAthenaForecasting : handleClick}>
                 proceed
               </Button>
             </Grid>
