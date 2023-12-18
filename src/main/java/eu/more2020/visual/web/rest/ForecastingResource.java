@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import eu.more2020.visual.domain.Forecasting.DBs.Meta;
 import eu.more2020.visual.domain.Forecasting.Grpc.AllResultsRes;
 import eu.more2020.visual.domain.Forecasting.Grpc.HandleDataReq;
@@ -22,6 +25,7 @@ import eu.more2020.visual.domain.Forecasting.Grpc.HandleDataRes;
 import eu.more2020.visual.domain.Forecasting.Grpc.InferenceRes;
 import eu.more2020.visual.domain.Forecasting.Grpc.JobIdReq;
 import eu.more2020.visual.domain.Forecasting.Grpc.ModelInfoReq;
+import eu.more2020.visual.domain.Forecasting.Grpc.ModelsRes;
 import eu.more2020.visual.domain.Forecasting.Grpc.ProgressRes;
 import eu.more2020.visual.domain.Forecasting.Grpc.ResultsRes;
 import eu.more2020.visual.domain.Forecasting.Grpc.StatusRes;
@@ -87,7 +91,7 @@ public class ForecastingResource {
     
     @PostMapping("/forecasting/save")
     public ResponseEntity<List<Meta>> SaveModel(@RequestBody ModelInfoReq modelInfo) throws IOException {
-        log.debug("REST request to get all results for job with model name: ", modelInfo.getModel_name());
+        log.debug("REST request to get save model with name: ", modelInfo.getModel_name());
         return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingSaveModel(modelInfo));
     }
     
@@ -108,4 +112,43 @@ public class ForecastingResource {
         log.debug("REST request to initialize DBs");
         return ResponseEntity.ok().body(forecastingUtils.dbsInitialization());
     }
+
+    /* IBM CASE */
+
+    @PostMapping("/forecasting/ibm/train")
+    public ResponseEntity<StatusRes> StartTrainingIbm(@RequestBody TrainingInfoReq info) throws IOException {
+        log.debug("REST request to start training");
+        return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingStartTrainingIbm(info));
+    }
+
+    @PostMapping("/forecasting/ibm/progress")
+    public ResponseEntity<ProgressRes> GetProgressIbm(@RequestBody JobIdReq jobid) throws IOException {
+        log.debug("REST request to get progress of job with id: ", jobid.getId());
+        return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingGetProgressIbm(jobid));
+    }
+
+    @PostMapping("/forecasting/ibm/target")
+    public ResponseEntity<ResultsRes> GetTargetResultIbm(@RequestBody TargetReq target) throws IOException {
+        log.debug("REST request to get results of job with id: ", target.getId());
+        return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingSpecificResultsIbm(target));
+    }
+
+    @PostMapping("/forecasting/ibm/save")
+    public ResponseEntity<StatusRes> SaveModelIbm(@RequestBody ModelInfoReq modelInfo) throws IOException {
+        log.debug("REST request to save model with name: ", modelInfo.getModel_name());
+        return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingSaveModelIbm(modelInfo));
+    }
+
+    @GetMapping("/forecasting/ibm/models")
+    public ResponseEntity<ModelsRes> GetSavedModelsIbm() throws IOException {
+        log.debug("REST request to get all mongo meta files: ");
+        return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingGetSavedModelsIbm());
+    }
+
+    @DeleteMapping("/forecasting/ibm/models/{modelName}")
+    public ResponseEntity<ModelsRes> deleteModelByNameIbm(@PathVariable String modelName) throws IOException {
+        log.debug("REST request to delete mongo meta file : " + modelName);
+        return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingDeleteModelByNameIbm(modelName));
+    }
+    
 }

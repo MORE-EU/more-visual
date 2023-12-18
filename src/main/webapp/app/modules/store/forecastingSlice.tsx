@@ -4,6 +4,7 @@ import { IForecastingData, IForecastingDataDefault, IForecastingResults } from '
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
+import { IForecastingFormIbm } from 'app/shared/model/forecasting-ibm.model';
 
 const initialState = {
   forecastingLoading: false,
@@ -27,6 +28,61 @@ const requestTargetsData = (response, getState, dispatch) => {
     }
   });
 };
+
+const requestTargetsDataIbm = (response, getState, dispatch) => {
+  Object.keys(response.data).forEach(key => {
+    if (response.data[key] === 'done') {
+      dispatch(getTargetIbm(key));
+    }
+  });
+};
+
+export const startTrainingIbm = createAsyncThunk('startTrainingIbm', async (config: IForecastingFormIbm, { getState, dispatch }) => {
+  const state: any = getState();
+  const id = uuidv4();
+  localStorage.setItem('id', id);
+  dispatch(setForecastingData({ ...state.forecasting.forecastingData, id: id }));
+  const response = await axios
+    .post(`api/forecasting/ibm/train`, {
+      id,
+      config: JSON.stringify(config),
+    })
+    .then(res => res);
+  dispatch(getProgress());
+  return response.data;
+});
+
+export const getProgressIbm = createAsyncThunk('getProgressIbm', async (_, { getState, dispatch }) => {
+  const id = localStorage.getItem('id');
+  const response = await axios
+    .post(`api/forecasting/ibm/progress`, {
+      id,
+    })
+    .then(res => res);
+  requestTargetsDataIbm(response.data, getState, dispatch);
+  return response.data;
+});
+
+export const getTargetIbm = createAsyncThunk('getTargetIbm', async (name: string) => {
+  const target = { name, id: localStorage.getItem('id') };
+  const response = await axios.post(`api/forecasting/ibm/target`, target).then(res => res.data as IForecastingResults);
+  return response;
+});
+
+export const saveModelIbm = createAsyncThunk('saveModelIbm', async (modelInfo: { model_type; model_name; target }) => {
+  const response = await axios.post(`api/forecasting/Ibm/save`, modelInfo).then(res => res.data);
+  return response;
+});
+
+export const getSavedModelsIbm = createAsyncThunk('getSavedModelsIbm', async () => {
+  const response = await axios.get(`api/forecasting/ibm/models`).then(res => res.data);
+  return response;
+});
+
+export const deleteModelByNameIbm = createAsyncThunk('deleteModelByNameIbm', async (modelName: String) => {
+  const response = await axios.delete(`api/forecasting/ibm/models/${modelName}`).then(res => res.data);
+  return response;
+});
 
 export const startTraining = createAsyncThunk('startTraining', async (config: IForecastingForm, { getState, dispatch }) => {
   const state: any = getState();
@@ -135,6 +191,9 @@ const forecasting = createSlice({
     builder.addCase(startTraining.fulfilled, (state, action) => {
       state.forecastingLoading = false;
     });
+    builder.addCase(startTrainingIbm.fulfilled, (state, action) => {
+      state.forecastingLoading = false;
+    });
     builder.addCase(getInitialSeries.fulfilled, (state, action) => {
       state.forecastingLoading = false;
       state.forecastingInitialSeries = action.payload.data;
@@ -143,11 +202,23 @@ const forecasting = createSlice({
       state.forecastingLoading = false;
       state.forecastingData = { ...state.forecastingData, status: action.payload.data };
     });
+    builder.addCase(getProgressIbm.fulfilled, (state, action) => {
+      state.forecastingLoading = false;
+      state.forecastingData = { ...state.forecastingData, status: action.payload.data };
+    });
     builder.addCase(getTarget.fulfilled, (state, action) => {
       state.forecastingLoading = false;
       state.forecastingData.results = resultsMaker(state.forecastingData.results, action.payload);
     });
+    builder.addCase(getTargetIbm.fulfilled, (state, action) => {
+      state.forecastingLoading = false;
+      state.forecastingData.results = resultsMaker(state.forecastingData.results, action.payload);
+    });
     builder.addMatcher(isAnyOf(saveModel.fulfilled, getSavedModels.fulfilled, deleteModelByName.fulfilled), (state, action) => {
+      state.forecastingLoading = false;
+      state.savedModels = action.payload;
+    });
+    builder.addMatcher(isAnyOf(saveModelIbm.fulfilled, getSavedModelsIbm.fulfilled, deleteModelByNameIbm.fulfilled), (state, action) => {
       state.forecastingLoading = false;
       state.savedModels = action.payload;
     });
@@ -160,7 +231,11 @@ const forecasting = createSlice({
         getInitialSeries.pending,
         saveModel.pending,
         getInference.pending,
-        getAthenaInference.pending
+        getAthenaInference.pending,
+        startTrainingIbm.pending,
+        getProgressIbm.pending,
+        getTargetIbm.pending,
+        saveModelIbm.pending,
       ),
       state => {
         state.forecastingLoading = true;
@@ -175,7 +250,11 @@ const forecasting = createSlice({
         getInitialSeries.rejected,
         saveModel.rejected,
         getInference.rejected,
-        getAthenaInference.rejected
+        getAthenaInference.rejected,
+        startTrainingIbm.rejected,
+        getProgressIbm.rejected,
+        getTargetIbm.rejected,
+        saveModelIbm.rejected
       ),
       (state, action) => {
         state.forecastingError = action.payload;

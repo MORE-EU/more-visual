@@ -29,7 +29,11 @@ const ForecastingModelSelection = props => {
   const dispatch = useAppDispatch();
 
   const handleNewTrain = () => {
-    setNewTrain(true);
+    setNewTrain("forecasting");
+  };
+  
+  const handleNewTrainIbm = () => {
+    setNewTrain("forecasting-ibm");
   };
 
   const handleDelete = modelName => e => {
@@ -65,13 +69,13 @@ const ForecastingModelSelection = props => {
               size="small"
               label="Train a new model"
               onClick={handleNewTrain}
-              sx={{ bgcolor: grey[800], color: grey[50], p: 1, '&:hover': { color: grey[900], fontWeight: 500 } }}
+              sx={{ bgcolor: "primary.main", color: grey[50], p: 1, '&:hover': { bgcolor: grey[700], color: grey[50] } }}
             />
             <Chip
               size="small"
               label="Preconfigured Models"
-              onClick={handleNewTrain}
-              sx={{ bgcolor: grey[800], color: grey[50], p: 1, '&:hover': { color: grey[900], fontWeight: 500 } }}
+              onClick={handleNewTrainIbm}
+              sx={{ bgcolor: "primary.main", color: grey[50], p: 1, '&:hover': { bgcolor: grey[700], color: grey[50] } }}
             />
           </Box>
         </Grid>
