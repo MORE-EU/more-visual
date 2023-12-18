@@ -1,8 +1,12 @@
 import React from "react";
+import { useState } from "react";
 
 import Box from "@mui/material/Box";
-import Typography from '@mui/material/Typography';
 import TextField from "@mui/material/TextField";
+import IconButton from '@mui/material/IconButton';
+import { InputAdornment } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import { VisibilityOff } from "@mui/icons-material";
 
 type DBFormPropsType = {
     label: string;
@@ -14,14 +18,41 @@ type DBFormPropsType = {
 
 
 const DBFormInput = ({label, name, value, type, handleChange}: DBFormPropsType ) => {
+    const [showPassword, setShowPassword] = useState(false);
+    const handleClickShowPassword = () => setShowPassword(!showPassword);
+
     return (
-    <Box sx={{ display: 'flex',flexDirection: 'column' ,alignItems: 'center', columnGap: 1, width: '100%' }}>
-        <Typography variant="subtitle1">
-            {`${label}:`}
-        </Typography>
+    <Box sx={{ display: 'flex',flexDirection: 'column' ,alignItems: 'center', columnGap: 4, width: '100%',  }}>
+        { name === 'password' ? (
+            <TextField 
+            variant="outlined"
+            required
+            label={label}
+            size="small" 
+            fullWidth 
+            value={value} 
+            name={name} 
+            onChange={handleChange}
+            type={showPassword ? "text" : "password"}
+            InputProps={{ sx: {borderRadius: 2}, endAdornment: (
+                <InputAdornment position="end">
+                <IconButton
+                    tabIndex={-1}
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                >
+                  {showPassword ? <Visibility /> : <VisibilityOff />}
+                </IconButton>
+              </InputAdornment>
+            )        
+            }}
+            />
+        ) :
+        (
         <TextField 
             variant="outlined"
             required
+            label={label}
             hiddenLabel 
             size="small" 
             fullWidth 
@@ -29,7 +60,9 @@ const DBFormInput = ({label, name, value, type, handleChange}: DBFormPropsType )
             name={name} 
             onChange={handleChange}
             type={type}
+            InputProps={{ sx: {borderRadius: 2}}}
         />
+        )}
     </Box>
     )
 

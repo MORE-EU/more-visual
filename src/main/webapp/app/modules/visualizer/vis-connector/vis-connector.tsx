@@ -7,12 +7,14 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Box from "@mui/material/Box";
 import { styled } from '@mui/material/styles';
 import grey from '@mui/material/colors/grey';
-import { Typography } from "@mui/material";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import CloseIcon from '@mui/icons-material/Close';
+import { Typography, Grid } from "@mui/material";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import VisConnectorDBConfig from "./vis-connector-db-config";
+import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
+import { getConnection, connector, getDbMetadata, deleteConnection } from "app/modules/store/visualizerSlice";
+import { IConnection } from "app/shared/model/connection.model";
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -26,44 +28,66 @@ const VisuallyHiddenInput = styled('input')({
     width: 1,
 });
 
+const mdTheme = createTheme();
+
 const VisConnector = () => {
-    const [ step, setStep ] = useState(0);
-    const [dbSystem, setDbSystem] = useState('');
+    const [ step, setStep ] = useState(false);
+    const { connections, connected } = useAppSelector(state => state.visualizer);
+    const [connectionInfo, setConnectionInfo] = useState<IConnection>(null);
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(getConnection(null));
+    },[]);
+
+    useEffect(() => {
+        if(connected && connectionInfo)
+            dispatch(getDbMetadata({database: connectionInfo.type, farmName: connectionInfo.database}));
+    },[connected])
 
     const closeHandler = () => {
-        setDbSystem('');
-        setStep(0);
+        setStep(false);
     }
 
     return (
         <>
-        {step === 0 && (
+        {!step && (
             <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1 }}>
-                <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
-                    Connect to Data Source
+                {connections.length !== 0 && (
+                    <Typography variant="subtitle1" fontSize={20} sx={{ borderBottom: `2px solid ${grey[400]}`}}>
+                        Available Data Sources
+                    </Typography>
+                )}
+                {connections.map(connection => 
+                    ( <Grid container key={connection.name} sx={{display: 'flex', flexDirection: 'row', [mdTheme.breakpoints.down('lg')]: {flexDirection: 'column'}}}>
+                        <Grid item xs={6}>
+                            <Button variant="text" component="label"  sx={{borderRadius: 2}} onClick={() => {
+                                setConnectionInfo(connection);
+                                dispatch(connector(connection));                
+                            }}>{connection.name}</Button>
+                        </Grid>
+                        <Grid item>
+                            <Button startIcon={<DeleteIcon />} onClick={() => {
+                                dispatch(deleteConnection(connection.name));
+                            }} ></Button>
+                        </Grid>
+                    </Grid>
+                    )
+                )}
+                <Typography variant="subtitle1" fontSize={20} sx={{ borderBottom: `2px solid ${grey[400]}`}}>
+                    New Data Source
                 </Typography>
-                <Button variant="contained" component="label" sx={{borderRadius: 8}} startIcon={<StorageIcon />} onClick={() => {setStep(1);}}>Database</Button>
-                    <Button component="label" variant="contained" sx={{borderRadius: 8}} startIcon={<UploadFileIcon/>}>
-                        Filesystem
-                        <VisuallyHiddenInput type="file" />
-                    </Button>
+                <Button variant="contained" component="label"  sx={{borderRadius: 2,}} startIcon={<StorageIcon />} onClick={() => {setStep(true);}}>
+                    Database
+                </Button>
+                <Button disabled component="label" variant="contained"  sx={{borderRadius: 2,}} startIcon={<UploadFileIcon/>}>
+                    Filesystem
+                    <VisuallyHiddenInput type="file" />
+                </Button>
             </Box>
         )}
-        { step === 1 && (
-            <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1 }}>
-                <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
-                    Select DB System
-                </Typography>
-                    <Select name="dbSystem" size="small" value={dbSystem} onChange={(e) => setDbSystem(e.target.value)}>
-                        <MenuItem value='postgres'>postgres</MenuItem>
-                        <MenuItem value='influxDB'>influx</MenuItem>
-                    </Select>
-                    <Button variant="contained" type='submit' onClick={() => { if(dbSystem) setStep(2); }}>Continue</Button>
-                <Button variant="text" startIcon={<CloseIcon />} onClick={closeHandler}>Close</Button>
-            </Box>
-        )}
-        { step === 2 && (
-            <VisConnectorDBConfig closeHandler={closeHandler} dbSystem={dbSystem} />
+        { step && (
+            <VisConnectorDBConfig closeHandler={closeHandler} />
         )}
         </>
     );

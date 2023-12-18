@@ -4,6 +4,7 @@ import eu.more2020.visual.domain.*;
 import eu.more2020.visual.middleware.datasource.QueryExecutor.QueryExecutor;
 import eu.more2020.visual.middleware.domain.*;
 import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
+import eu.more2020.visual.middleware.domain.InfluxDB.InfluxDBConnection;
 import eu.more2020.visual.middleware.domain.PostgreSQL.JDBCConnection;
 import eu.more2020.visual.middleware.domain.Dataset.AbstractDataset;
 import eu.more2020.visual.middleware.domain.Query.Query;
@@ -254,16 +255,17 @@ public class DatasetResource {
     @PostMapping("/database/connect") 
     public ResponseEntity<Boolean> connector(@RequestBody DbConnector dbConnector) throws SQLException, InfluxException {
         log.debug("Rest request to connect to db");
+        log.debug(dbConnector.toString());
         String url = null;
-        switch (dbConnector.getDbSystem()) {
+        switch (dbConnector.getType()) {
             case "postgres":
                 url = "jdbc:postgresql://" + dbConnector.getHost() + ":" + dbConnector.getPort() + "/" + dbConnector.getDatabase();
                 databaseConnection = new JDBCConnection(url, dbConnector.getUsername(), dbConnector.getPassword());
                 break;
-            // case "influxDB":
-            //     url = "http://" + dbConnector.getHost() + ":" + dbConnector.getPort();
-            //     databaseConnection = new InfluxDBConnection(url, dbConnector.getUsername(), dbConnector.getPassword(), dbConnector.getDatabase());
-            //     break;
+            case "influx":
+                url = "http://" + dbConnector.getHost() + ":" + dbConnector.getPort();
+                databaseConnection = new InfluxDBConnection(url, dbConnector.getUsername(), dbConnector.getPassword(), dbConnector.getDatabase());
+                break;
             default:
                 break;
         }
@@ -303,12 +305,12 @@ public class DatasetResource {
     }
 
     @PutMapping("/datasets/metadata/columns/{tableName}")
-    public ResponseEntity<FarmMeta> updateFarmInfoColumnNames( @PathVariable String tableName,@Valid @RequestBody DbColumns dbColumns) {
+    public ResponseEntity<FarmInfo> updateFarmInfoColumnNames( @PathVariable String tableName,@Valid @RequestBody DbColumns dbColumns) {
         log.debug("Rest request to update columns of farmInfo with id {} with columns {}", tableName, dbColumns.toString());
         if (tableName == null) {
             throw new BadRequestAlertException("Invalid tableName", ENTITY_NAME, "tableNamenull");
         }
-        FarmMeta result = datasetRepository.updateFarmInfoColumns(tableName, dbColumns);
+        FarmInfo result = datasetRepository.updateFarmInfoColumns(tableName, dbColumns);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.toString()))
             .body(result);
@@ -318,16 +320,11 @@ public class DatasetResource {
     @PostMapping("/database/disconnect")
     public ResponseEntity<Boolean> disconnector() throws SQLException {
         log.debug("Rest request to close db connection");
-        try {
             if (datasetRepository.getFarmType() != null) {
                 datasetRepository.deleteAll();
                 if (datasetRepository.getFarmType() != "csv")
                     databaseConnection.closeConnection();
-
             }
             return new ResponseEntity<Boolean>(true, HttpStatus.OK);
-        } catch(Exception e) {
-            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
-        }
     }
 }

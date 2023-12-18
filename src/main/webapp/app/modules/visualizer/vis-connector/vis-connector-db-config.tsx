@@ -8,26 +8,19 @@ import CloseIcon from '@mui/icons-material/Close';
 import grey from '@mui/material/colors/grey';
 import LoginIcon from '@mui/icons-material/Login';
 import CircularProgress from '@mui/material/CircularProgress';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+import Select from "@mui/material/Select";
+import { MenuItem, InputLabel, FormControl } from "@mui/material";
 
 import DBFormInput from "./db-form-input";
 
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import { disconnector, getDbMetadata, setErrorMessage } from '../../store/visualizerSlice';
+import { getDbMetadata, saveConnection } from '../../store/visualizerSlice';
 import { connector } from '../../store/visualizerSlice';
+import { IConnection } from "app/shared/model/connection.model";
 
-interface IDBForm  {
-    dbSystem: string;
-    host: string;
-    port: string;
-    username: string;
-    password: string;
-    database: string;
-}
-
-const defaultForm: IDBForm = {
-    dbSystem: '',
+const defaultForm: IConnection = {
+    name: '',
+    type: '',
     host: '',
     port: '',
     username: '',
@@ -35,36 +28,28 @@ const defaultForm: IDBForm = {
     database: '',
 }
 
-const VisConnectorDBConfig = ({closeHandler, dbSystem}) => {
+const VisConnectorDBConfig = ({closeHandler}) => {
     const { connected, errorMessage } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
-    const [dbForm, setDbForm] = useState<IDBForm>(defaultForm);
-    const { host, port, username, password, database } = dbForm;
-    const [openSnack, setOpenSnack] = useState(false);
+    const [dbForm, setDbForm] = useState<IConnection>(defaultForm);
+    const { name, type, host, port, username, password, database } = dbForm;
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        setDbForm((prevDbForm) => {
-            return {...prevDbForm, dbSystem: dbSystem};
-        })
-    },[]);
-
-    useEffect(() => {
         if (connected) {
-            dispatch(getDbMetadata({database:dbForm.dbSystem, farmName:dbForm.database}));
+            dispatch(getDbMetadata({database:dbForm.type, farmName:dbForm.database}));
+            dispatch(saveConnection(dbForm));
         }
     }, [connected]);
 
     useEffect(() => {
         setLoading(false);
-        if(errorMessage) 
-            setOpenSnack(true);
     }, [errorMessage]);
 
     
 
     const handleTextFields = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = event.currentTarget;
+        const {name, value} = event.target;
         setDbForm(prevDbForm => (
             {...prevDbForm, [name]: value}
         ));
@@ -75,41 +60,39 @@ const VisConnectorDBConfig = ({closeHandler, dbSystem}) => {
         setLoading(true);
         dispatch(connector(dbForm));
     }
-
-    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        dispatch(setErrorMessage(null));
-        if (connected) dispatch(disconnector()); //get metadata causes the error here
-        setOpenSnack(false);
-    };
     
     return (
-        <>
-            <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1, }}>
-                <Snackbar open={openSnack} autoHideDuration={2000} onClose={handleClose}>
-                    <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-                        <>{errorMessage}</>
-                    </Alert>
-                </Snackbar>
-                <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`,}}>
-                    DB Configuration
-                </Typography>
-                <form onSubmit={handleSubmit} autoComplete="off">
-                    <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1, }}>
-                        <DBFormInput label='host' name="host" type='text' value={host} handleChange={handleTextFields} />
-                        <DBFormInput label='port' name="port" type='text' value={port} handleChange={handleTextFields} />
-                        <DBFormInput label='username' name="username" type='text' value={username} handleChange={handleTextFields} />
-                        <DBFormInput label='password' name="password" type='password' value={password} handleChange={handleTextFields} />
-                        <DBFormInput label='database' name="database" type="database" value={database} handleChange={handleTextFields} />
-                        { loading ? <CircularProgress /> : <Button variant="contained" startIcon={<LoginIcon />} type="submit" >Connect </Button> }
-                    </Box>
-                </form> 
-                { !loading && (<Button variant="text" startIcon={<CloseIcon />} onClick={closeHandler}>Close</Button>) }
-            </Box>
-        </>
-    )
+        <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1, }}>
+            <Typography variant="subtitle1" fontSize={20} sx={{borderBottom: `2px solid ${grey[400]}`}}>
+                DB Configuration
+            </Typography>
+            <form onSubmit={handleSubmit} autoComplete="off">
+                <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1, }}>
+                    <FormControl size="small" fullWidth>
+                        <InputLabel id="typeInput">DB system * </InputLabel>
+                        <Select required labelId="typeInput" id="typeSelectInput" name="type" label="type" value={type} onChange={handleTextFields} sx={{borderRadius: 2,}}>
+                            <MenuItem value='postgres'>postgres</MenuItem>
+                            <MenuItem value='influx'>influx</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <DBFormInput label="Connection Name" name="name" type="text" value={name} handleChange={handleTextFields} />
+                    <DBFormInput label='Host' name="host" type='text' value={host} handleChange={handleTextFields} />
+                    <DBFormInput label='Port' name="port" type='text' value={port} handleChange={handleTextFields} />
+                    {type === "influx" ?  <DBFormInput label='Org' name="username" type='text' value={username} handleChange={handleTextFields} />
+                        : <DBFormInput label='Username' name="username" type='text' value={username} handleChange={handleTextFields} />
+                    }
+                    {type === "influx" ? <DBFormInput label='Token' name="password" type='password' value={password} handleChange={handleTextFields} />
+                        : <DBFormInput label='Password' name="password" type='password' value={password} handleChange={handleTextFields} />
+                    }
+                    {type === "influx" ? <DBFormInput label='Bucket' name="database" type="text" value={database} handleChange={handleTextFields} />
+                        : <DBFormInput label='Database' name="database" type="text" value={database} handleChange={handleTextFields} />
+                    }
+                    { loading ? <CircularProgress /> : <Button variant="contained" startIcon={<LoginIcon />} type="submit" sx={{borderRadius: 2,}}>Connect </Button> }
+                </Box>
+            </form> 
+            { !loading && (<Button variant="text" startIcon={<CloseIcon />} onClick={closeHandler}>Close</Button>) }
+        </Box>
+    );
 }
 
 export default VisConnectorDBConfig;

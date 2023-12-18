@@ -43,7 +43,9 @@ const Header = props => {
     const type = farmMeta.type;
     switch (type){
       case "postgres":
-        return "POSTGRES";
+        return "POSTGRES"
+      case "influx":
+        return "INFLUX"
       case "csv":
         return "CSV"
       default:

@@ -243,7 +243,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     @Override
     public void deleteAll() {
         datasets.clear();
-        farm.getData().clear();
+        if (farm.getData() != null) farm.getData().clear();
         farm.setType(null); //remove
     }
 
@@ -278,9 +278,11 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 farmInfo.setSchema(tableInfo.getSchema());
                 farmInfo.setName(tableInfo.getTable());
                 farmInfo.setType(database);
-                farmInfo.setIsConfiged(false);
+                if (database.equals("influx")) farmInfo.setIsConfiged(true);
+                else farmInfo.setIsConfiged(false);
                 farmInfos.add(farmInfo);
             }
+            if (tableInfoArray.isEmpty()) throw new SQLException();
             farm.setData(farmInfos);
             return farm;
         } catch (Exception e) {
@@ -289,7 +291,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public FarmMeta updateFarmInfoColumns(String id, DbColumns columns) {
+    public FarmInfo updateFarmInfoColumns(String id, DbColumns columns) {
         Assert.notNull(id, "FarmInfo must not be null");
         for (FarmInfo farmInfo : farm.getData()) {
             if (farmInfo.getId().equals(id)) {
@@ -297,10 +299,10 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 farmInfo.setIdCol(columns.getIdCol());
                 farmInfo.setValueCol(columns.getValueCol());
                 farmInfo.setIsConfiged(true);
-                break;
+                return farmInfo;
             }
         }
-        return farm;
+        return null;
     }
 
 
@@ -319,12 +321,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                                                 farmInfo.getTimeCol(), farmInfo.getIdCol(), farmInfo.getValueCol());
                 break;
             case "influx":
-                String url = "http://leviathan.imsi.athenarc.gr:8086";
-                String token = "jGlRrSisGuDn6MEyIcJMMoiqirFXwbdNnKPtoZAasaRSQZJ0iTRx8FQrQ-zob5j_UlUBuGzq_mYdf1LNWtSbqg==";
-                String org = "ATHENA";
-                InfluxDBConnection influxDBConnection = new InfluxDBConnection(url, org, token);
-                InfluxDBQueryExecutor influxDBQueryExecutor = influxDBConnection.getSqlQueryExecutor();
-                dataset = new InfluxDBDataset(influxDBQueryExecutor, farmInfo.getId(), org, farmInfo.getSchema(), farmInfo.getId(), timeFormat, farmInfo.getTimeCol());
+                InfluxDBQueryExecutor influxDBQueryExecutor = (InfluxDBQueryExecutor) queryExecutor;
+                dataset = new InfluxDBDataset(influxDBQueryExecutor, farmInfo.getId(), farmInfo.getSchema(), farmInfo.getId(), timeFormat, farmInfo.getTimeCol());
                 break;
             default:
                 break;

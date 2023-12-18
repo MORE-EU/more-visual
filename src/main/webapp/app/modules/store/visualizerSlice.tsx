@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { IAlerts } from 'app/shared/model/alert.model';
 import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
+import { IConnection } from 'app/shared/model/connection.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
 import { IFarmMeta } from 'app/shared/model/farmMeta.model';
 import { IQueryResults } from 'app/shared/model/query-results.model';
@@ -119,9 +120,11 @@ const initialState = {
   connected: false,
   columnNames: [],
   datasetIsConfiged: false,
+  connections: [] as IConnection[],
+  connectionLoading: false,
 };
 
-export const connector = createAsyncThunk('connector', async (dbConnector: {dbSystem: string, host: string, port: string, username: string, password: string, database: string}) => {
+export const connector = createAsyncThunk('connector', async (dbConnector: {name: string, type: string, host: string, port: string, username: string, password: string, database: string}) => {
   try {
     const response = await axios.post(`api/database/connect`, dbConnector).then(res => res);
     return response;
@@ -131,12 +134,8 @@ export const connector = createAsyncThunk('connector', async (dbConnector: {dbSy
 });
 
 export const disconnector = createAsyncThunk('disconnector', async () => {
-  try {
     const response = await axios.post(`api/database/disconnect`).then(res => res);
     return response;
-  } catch (error) {
-    throw new Error("Disconnect Error");
-  }
 });
 
 export const getDbMetadata = createAsyncThunk('getDbMetadata', async (data: { database: string; farmName: string; }) => {
@@ -176,8 +175,12 @@ export const checkConnection = createAsyncThunk('checkConnection', async (bdConf
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
   const { folder, id } = data;
-  const response = await axios.get(`api/datasets/${folder}/${id}`).then(res => res);
-  return response;
+  try {
+    const response = await axios.get(`api/datasets/${folder}/${id}`).then(res => res);
+    return response;  
+  } catch (error) {
+    throw new Error("Error retrieving data.Please try again.");
+  }
 });
 
 export const getFarmMeta = createAsyncThunk('getFarmMeta', async (folder: string) => {
@@ -214,6 +217,22 @@ export const deleteAlert = createAsyncThunk('deleteAlert', async (alertName: Str
   const response = await axios.post(`api/alerts/remove/${alertName}`).then(res => res);
   return response;
 });
+
+export const saveConnection = createAsyncThunk('saveConnection', async(connectionInfo: IConnection) => {
+  const response = await axios.post(`api/connector/add`, connectionInfo).then(res => res);
+  return response;
+});
+
+export const getConnection = createAsyncThunk('getConnection', async(connectionName: string) => {
+  const response = await axios.get(`api/connector/get/${connectionName}`).then(res => res);
+  return response;
+});
+
+export const deleteConnection = createAsyncThunk('deleteConnection', async(connectionName: String) => {
+  const response = await axios.post(`api/connector/remove/${connectionName}`).then(res => res);
+  return response;
+});
+
 
 export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
@@ -526,6 +545,9 @@ const visualizer = createSlice({
     resetColumnNames(state) {
       state.columnNames = [];
     },
+    resetDataset(state) {
+      state.dataset = null;
+    },
   },
   extraReducers: function (builder) {
     builder.addCase(getDataset.fulfilled, (state, action) => {
@@ -555,7 +577,7 @@ const visualizer = createSlice({
     });
     builder.addCase(updateFarmInfoColumnNames.fulfilled, (state, action) => {
       state.loading = false;
-      state.farmMeta = action.payload.data;
+      state.farmMeta.data[state.datasetChoice] = action.payload.data;
     });
 
     builder.addCase(getDBColumnNames.fulfilled, (state, action) => {
@@ -592,6 +614,19 @@ const visualizer = createSlice({
       state.alertsLoading = false;
       state.alerts = action.payload.data;
     });
+    builder.addCase(saveConnection.fulfilled, (state, action) => {
+      state.checkConnectionLoading = false;
+      state.connections = action.payload.data;
+    });
+    builder.addCase(getConnection.fulfilled, (state, action) => {
+      state.checkConnectionLoading = false;
+      state.connections = action.payload.data;
+    });
+    builder.addCase(deleteConnection.fulfilled, (state, action) => {
+      state.checkConnectionLoading = false;
+      state.connections = action.payload.data;
+    });
+
     builder.addCase(updateQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;
       state.queryResults = action.payload;
@@ -633,21 +668,31 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(saveAlert.pending, deleteAlert.pending, getAlerts.pending, editAlert.pending), state => {
       state.alertsLoading = true;
     });
+    builder.addMatcher(isAnyOf(saveConnection.pending,getConnection.pending, deleteConnection.pending), state => {
+      state.connectionLoading = true;
+    });
     builder.addMatcher(
-      isAnyOf(getDataset.rejected, getFarmMeta.rejected, getDirectories.pending, getSampleFile.rejected, getDBColumnNames.rejected),
+      isAnyOf( getFarmMeta.rejected, getDirectories.rejected, getSampleFile.rejected, getDBColumnNames.rejected, disconnector.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.payload;
       }
     );
     builder.addMatcher(
-      isAnyOf( getDbMetadata.rejected,updateFarmInfoColumnNames.rejected, connector.rejected, disconnector.rejected),
+      isAnyOf(getDbMetadata.rejected,updateFarmInfoColumnNames.rejected, connector.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.error.message;
       }
     );
-    builder.addMatcher(isAnyOf(checkConnection.rejected, disconnector.rejected), (state, action) => {
+    builder.addMatcher(isAnyOf(getDataset.rejected), 
+      (state, action) => {
+        state.loading = false;
+        state.errorMessage = action.error.message;
+        state.farmMeta.data[state.datasetChoice].isConfiged = false;
+      }
+    );
+    builder.addMatcher(isAnyOf(checkConnection.rejected), (state, action) => {
       state.checkConnectionLoading = false;
       state.checkConnectionResponse = action.error.message;
       state.checkConnectionError = true;
@@ -661,6 +706,9 @@ const visualizer = createSlice({
     });
     builder.addMatcher(isAnyOf(saveAlert.rejected, deleteAlert.rejected, getAlerts.rejected, editAlert.rejected), (state, action) => {
       state.alertsLoading = false;
+    });
+    builder.addMatcher(isAnyOf(saveConnection.rejected, getConnection.rejected, deleteConnection.rejected), state => {
+      state.connectionLoading = false;
     });
     builder.addMatcher(isAnyOf(applyChangepointDetection.fulfilled), (state, action) => {
       state.detectedChangepoints = action.payload.length === 0 ? null : action.payload;
@@ -682,6 +730,6 @@ export const {
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
   setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
   setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,setCheckConnectionResponse, setSelectedConnection,
-  setErrorMessage,setDatasetIsConfiged,resetSampleFile,resetColumnNames, setConnented
+  setErrorMessage,setDatasetIsConfiged,resetSampleFile,resetColumnNames, setConnented, resetDataset
 } = visualizer.actions;
 export default visualizer.reducer;

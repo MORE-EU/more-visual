@@ -1,15 +1,21 @@
 package eu.more2020.visual.domain;
 
 public class DbConnector {
-    String dbSystem;
+
+    String name;
+    String type;
     String host;
     String port;
     String username;
     String password;
     String database;
     
-    public String getDbSystem() {
-        return this.dbSystem;
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return this.type;
     }
 
     public String getHost() {
@@ -32,8 +38,9 @@ public class DbConnector {
 
     public DbConnector() {}
 
-    public DbConnector(String dbSystem, String host, String port, String username, String password, String database) {
-        this.dbSystem = dbSystem;
+    public DbConnector(String name,String type, String host, String port, String username, String password, String database) {
+        this.name = name;
+        this.type = type;
         this.host = host;
         this.port = port;
         this.username = username;

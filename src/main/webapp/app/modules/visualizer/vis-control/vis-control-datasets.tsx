@@ -7,7 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getDataset, updateDatasetChoice, disconnector, resetFetchData, setDatasetIsConfiged, setConnented } from 'app/modules/store/visualizerSlice';
+import { getDataset, updateDatasetChoice, resetFetchData, setDatasetIsConfiged, setConnented, resetDataset } from 'app/modules/store/visualizerSlice';
 import React, { useState, useEffect } from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
@@ -31,11 +31,15 @@ const VisControlDatasets = () => {
   const handleDataset = (idx, file) => {
     if (datasetChoice !== idx) {
       dispatch(updateDatasetChoice(idx));
-      if (farmMeta.data[idx].isConfiged ) {
-        dispatch(getDataset({ folder, id: file.id }))
-        dispatch(setDatasetIsConfiged(true));
+      if (farmMeta.data[idx].isConfiged || farmMeta.type === "csv") {
+        dispatch(getDataset({ folder, id: file.id }));
+        history.push(`/visualize/${folder}/${file.id}`);
       }
-      else dispatch(setDatasetIsConfiged(false));
+      else {
+        dispatch(setDatasetIsConfiged(false));
+        dispatch(resetDataset());
+        history.push('/visualize');
+      }
     }
   };
 
@@ -66,8 +70,6 @@ const VisControlDatasets = () => {
               <ListItemButton
                 key={idx}
                 selected={datasetChoice === idx}
-                component={Link}
-                to={`/visualize/${folder}/${file.id}`}
                 onClick={() => {
                   handleDataset(idx, file);
                 }}

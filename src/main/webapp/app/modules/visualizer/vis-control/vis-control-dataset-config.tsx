@@ -7,7 +7,7 @@ import SimpleBar from 'simplebar-react';
 import { Grid, Typography, Button, FormControl, InputLabel, Select, MenuItem, TableContainer, Box, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
 import grey from '@mui/material/colors/grey';
 import blue from '@mui/material/colors/blue';
-import { getDBColumnNames, updateFarmInfoColumnNames, setDatasetIsConfiged, getSampleFile, resetSampleFile, resetColumnNames } from "app/modules/store/visualizerSlice";
+import { getDBColumnNames, updateFarmInfoColumnNames, setDatasetIsConfiged, getSampleFile, resetSampleFile, resetColumnNames, resetDataset } from "app/modules/store/visualizerSlice";
 
 
 interface IConfigForm  {
@@ -34,6 +34,7 @@ const VisControlDatasetConfig = () => {
     useEffect(() => {
         dispatch(resetSampleFile());
         dispatch(resetColumnNames());
+        dispatch(resetDataset());
         farmMeta && dispatch(getDBColumnNames({tableName: farmMeta.data[datasetChoice].id }));
         farmMeta && dispatch(getSampleFile(farmMeta.data[datasetChoice].id));
     },[datasetChoice]);
@@ -59,7 +60,7 @@ const VisControlDatasetConfig = () => {
     }
 
     return (
-        <Grid container sx={{height: '100%'}} spacing={1}>
+        <Grid container sx={{height: '100%'}} spacing={1} >
             <Grid item xs={12} sx={{ height: '40%' }}>
                 <Grid item sx={{height: '20%'}}>
                     <Typography variant="subtitle1" fontSize={25} sx={{ color: grey[700], mb: 2 }}>Dataset Sample</Typography>
@@ -116,25 +117,25 @@ const VisControlDatasetConfig = () => {
                                 {farmMeta.data[datasetChoice].id}
                             </Typography>
                         </Grid>
-                        <Grid container spacing={2} sx={{ bgcolor: grey[50]}}>
-                            <Grid item container direction="row"   justifyContent="center" alignItems="center"> 
+                        <Grid container spacing={1} sx={{ bgcolor: grey[50]}}>
+                            <Grid item container direction="row"   justifyContent="center" alignItems="center" spacing={1}> 
                                 <Grid item>
-                                    <Button variant={selectedItem === 'Denormalized' ? 'contained' : 'outlined'} onClick={handleButton('Denormalized')}>
+                                    <Button variant={selectedItem === 'Denormalized' ? 'contained' : 'outlined'} onClick={handleButton('Denormalized')} sx={{ borderRadius: 2,}}>
                                         Denormalized Data
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant={selectedItem === 'Normalized' ? 'contained' : 'outlined'} onClick={handleButton('Normalized')}>
+                                    <Button disabled variant={selectedItem === 'Normalized' ? 'contained' : 'outlined'} onClick={handleButton('Normalized')} sx={{ borderRadius: 2,}}>
                                         Normalized Data
                                     </Button>
                                 </Grid>
                             </Grid>
-                            <Grid container item justifyContent="center" alignItems="center" sx={{ display: 'flex' }} component={'form'} onSubmit={handleSubmit}>
+                            <Grid container item justifyContent="center" alignItems="center" spacing={1} sx={{mb: 1, display: 'flex' }} component={'form'} onSubmit={handleSubmit}>
                                 {selectedItem && (
-                                    <Grid item>
-                                        <FormControl sx={{ m: 1, width: '30ch' }} size="small">
+                                    <Grid item >
+                                        <FormControl sx={{ width: '25ch' }} size="small">
                                             <InputLabel id="timeColInput">Time Column</InputLabel>
-                                            <Select name="timeCol" id="TimeColInput" value={timeCol} label="timeCol" onChange={onSelectChange} required>
+                                            <Select name="timeCol" labelId="TimeColInput" id="TimeColSelectInput" value={timeCol} label="timeCol" onChange={onSelectChange} required sx={{ borderRadius: 2,}}>
                                                 {columnNames.map((col,index) => {
                                                     return (<MenuItem key={index} value={col}>{col}</MenuItem>);
                                                 })}
@@ -143,10 +144,10 @@ const VisControlDatasetConfig = () => {
                                     </Grid>
                                 )}
                                 {selectedItem === 'Denormalized' && (
-                                    <Grid item>
-                                        <FormControl sx={{ m: 1, width: '30ch' }} size="small">
+                                    <Grid item >
+                                        <FormControl sx={{ width: '25ch' }} size="small">
                                         <InputLabel id="idColInput">Id Column</InputLabel>
-                                        <Select name="idCol"id="idColInput" value={idCol} label="idCol" onChange={onSelectChange} required>
+                                        <Select name="idCol"labelId="idColInput" id="idColSelectInput" value={idCol} label="idCol" onChange={onSelectChange} required sx={{ borderRadius: 2,}}>
                                             {columnNames.map((col,index) => {
                                                 return (<MenuItem key={index} value={col}>{col}</MenuItem>);
                                             })}
@@ -154,11 +155,11 @@ const VisControlDatasetConfig = () => {
                                         </FormControl>
                                     </Grid>
                                 )}
-                                {selectedItem === 'Denormalized' && (
+                                {selectedItem === 'Denormalized' &&  (
                                     <Grid item>
-                                        <FormControl sx={{ m: 1, width: '30ch' }} size="small">
+                                        <FormControl sx={{ width: '25ch' }} size="small">
                                         <InputLabel id="valueColInput">Value Column</InputLabel>
-                                        <Select name="valueCol" id="valueColInput" value={valueCol} label="valueCol" onChange={onSelectChange} required>
+                                        <Select name="valueCol" labelId="valueColInput" id="valueColSelectInput" value={valueCol} label="valueCol" onChange={onSelectChange} required sx={{ borderRadius: 2,}}>
                                             {columnNames.map((col,index) => {
                                                 return (<MenuItem key={index} value={col}>{col}</MenuItem>);
                                             })}
@@ -167,8 +168,8 @@ const VisControlDatasetConfig = () => {
                                     </Grid>
                                 )}
                                 {selectedItem && (
-                                    <Grid>
-                                        <Button variant="contained" type="submit">Confirm</Button>
+                                    <Grid item>
+                                        <Button variant="contained" type="submit" sx={{ borderRadius: 2,}}>Confirm</Button>
                                     </Grid>
                                 )}                                
                             </Grid>

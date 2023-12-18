@@ -22,10 +22,10 @@ export const VisControl = () => {
         <VisControlDatasets />
       </Grid>
       <Grid sx={{ height: '40%', width: '100%' }}>
-        { dataset && farmMeta.data[datasetChoice].isConfiged && <VisToolkit /> }
+        { dataset && <VisToolkit /> }
       </Grid>
       <Grid sx={{ height: '30%', width: '100%' }}>
-      { dataset && farmMeta.data[datasetChoice].isConfiged && <VisMeasures /> }
+      { dataset && <VisMeasures /> }
       </Grid>
     </Grid>
   );
