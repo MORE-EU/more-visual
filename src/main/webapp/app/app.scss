@@ -322,7 +322,7 @@ strong {
 }*/
 
 html {
-  overflow-y: scroll;
+  overflow-y: auto;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
 }
@@ -655,7 +655,7 @@ textarea {
 
   .view-container {
     width: 100%;
-    height: calc(100% - 40px);
+    height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
 

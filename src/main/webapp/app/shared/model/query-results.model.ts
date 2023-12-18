@@ -1,9 +1,15 @@
 import { IDataPoint } from './data-point.model';
+import { IQueryTimeRange } from './query-time-range';
 
 export interface IQueryResults {
-  data?: IDataPoint[];
-  measureStats?: any;
-  timeRange?: number[];
+  aggFactor: number;
+  error: string | null;
+  flag: boolean;
+  groupByResults: string | null;
+  ioCount: number;
+  data: IDataPoint[];
+  measureStats: any;
+  progressiveQueryTime: number;
+  queryTime: number;
+  timeRange: IQueryTimeRange;
 }
-
-export const defaultValue: Readonly<IQueryResults> = { data: [] };

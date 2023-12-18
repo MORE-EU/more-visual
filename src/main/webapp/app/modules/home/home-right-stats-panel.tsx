@@ -1,13 +1,18 @@
-import React, {useEffect} from 'react';
-import {Box, FormControl, MenuItem, Paper, Select, Typography} from '@mui/material';
+import React, { useEffect } from 'react';
 import Highcharts from 'highcharts';
 import Heatmap from 'highcharts/modules/heatmap.js';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import { setStatCateg, setStatSelect } from '../store/homeSlice';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import grey from '@mui/material/colors/grey';
 Heatmap(Highcharts);
 
 export const HomeRightStatsPanel = () => {
-
   const { filSamples, selected, statSelect, statCateg } = useAppSelector(state => state.home);
   const dispatch = useAppDispatch();
 
@@ -78,55 +83,63 @@ export const HomeRightStatsPanel = () => {
 
   return (
     <>
-      <Paper elevation={3}
-             sx={{position: 'fixed', bottom: 320, right: 10, width: '400px', height: 'auto', zIndex: 999}}>
-        <Paper sx={{textAlign: 'center'}}>
-          <Box sx={{textAlign: 'center', alignItems: 'center', display: 'flex'}}>
-            <Typography textAlign="center" variant="h6" sx={{fontSize: 16, flex: 1}}>
-              Statistics for Field:
-            </Typography>
-            <FormControl variant="standard" sx={{m: 1, minWidth: 120, flex: 1}}>
-              <Select value={statSelect} onChange={handleChange} displayEmpty
-                      inputProps={{'aria-label': 'Without label'}}>
-                {statCateg.map(categ => {
-                  return (
-                    <MenuItem key={categ} value={categ}>
-                      {categ}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </Box>
-          <Box sx={{display: 'flex', width: '100%'}}>
-            <Typography variant="overline" sx={{fontSize: 12, flex: 1}}>
-              <br/>
-              {handleStatsPanel('min')} <br/>
-              min <br/>
-            </Typography>
-            <Typography variant="overline" sx={{fontSize: 12, flex: 1}}>
-              <br/>
-              {handleStatsPanel('max')}
-              <br/>
-              max <br/>
-            </Typography>
-            <Typography variant="overline" sx={{fontSize: 12, flex: 1}}>
-              <br/>
-              {handleStatsPanel('mean')} <br/>
-              mean <br/>
-            </Typography>
-            <Typography variant="overline" sx={{fontSize: 12, flex: 1}}>
-              <br/>
-              {handleStatsPanel('SD')} <br/>
-              SD <br/>
-            </Typography>
-            <Typography variant="overline" sx={{fontSize: 12, flex: 1}}>
-              <br/>
-              {handleStatsPanel('VAR')} <br/>
-              VAR <br/>
-            </Typography>
-          </Box>
-        </Paper>
+      <Paper
+        elevation={3}
+        sx={{
+          position: 'fixed',
+          bottom: 335,
+          right: 10,
+          width: '400px',
+          height: 'auto',
+          zIndex: 401,
+          textAlign: 'center',
+          backgroundColor: grey[300],
+        }}
+      >
+        <Grid sx={{ textAlign: 'center', alignItems: 'center', display: 'flex' }}>
+          <Typography textAlign="center" variant="subtitle1" color={grey[700]} sx={{ fontSize: 16, flex: 1 }}>
+            Statistics for Field:
+          </Typography>
+          <FormControl variant="standard" sx={{ m: 1, minWidth: 120, flex: 1 }}>
+            <Select value={statSelect} onChange={handleChange} displayEmpty inputProps={{ 'aria-label': 'Without label'  }} sx={{color: grey[700]}}>
+              {statCateg.map(categ => {
+                return (
+                  <MenuItem key={categ} value={categ}>
+                    {categ}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid sx={{ display: 'flex', width: '100%' }}>
+          <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
+            <br />
+            {handleStatsPanel('min')} <br />
+            min <br />
+          </Typography>
+          <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
+            <br />
+            {handleStatsPanel('max')}
+            <br />
+            max <br />
+          </Typography>
+          <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
+            <br />
+            {handleStatsPanel('mean')} <br />
+            mean <br />
+          </Typography>
+          <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
+            <br />
+            {handleStatsPanel('SD')} <br />
+            SD <br />
+          </Typography>
+          <Typography variant="overline" sx={{ fontSize: 12, flex: 1 }}>
+            <br />
+            {handleStatsPanel('VAR')} <br />
+            VAR <br />
+          </Typography>
+        </Grid>
       </Paper>
     </>
   );

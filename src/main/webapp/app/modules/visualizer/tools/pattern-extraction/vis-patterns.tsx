@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Highcharts from 'highcharts/highstock';
-import {Box, Button, TextField} from '@mui/material';
+import {Box, Button, Divider, List, ListItem, Paper, TableCell, TableContainer, TextField} from '@mui/material';
 import DimensionSelector from "app/shared/layout/DimensionSelector";
-import PatternResults from "app/modules/visualizer/tools/pattern-extraction/pattern-results";
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getPatterns, updatePatterns, updateSelectedMeasures } from 'app/modules/store/visualizerSlice';
+import {
+  toggleCustomChangepoints,
+} from 'app/modules/store/visualizerSlice';
+import PatternCard from "app/modules/visualizer/tools/pattern-extraction/pattern-card";
+import {
+  AddCustomChangepoint,
+} from "app/modules/visualizer/tools/changepoint-detection/add-custom-changepoint";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import {applySearchPatterns, removePattern} from "app/modules/store/patternExtractionSlice";
 
 Highcharts.setOptions({
   time: {
@@ -13,92 +22,90 @@ Highcharts.setOptions({
 });
 
 export const VisPatterns = () => {
+  const { dataset,
+    customChangepointsEnabled, customChangepoints} = useAppSelector(state => state.visualizer);
+  const {patterns} = useAppSelector(state => state.patternExtraction);
 
-  const {selectedMeasures, resampleFreq, data, patterns, dataset} = useAppSelector(state => state.visualizer);
+  const [searchPatterns, setSearchPatterns] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Function to simulate a loading delay
+  const simulateLoading = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000); // Simulate a 2-second delay
+  };
+
+  useEffect(() => {
+    const idsToKeep = new Set(customChangepoints.map(item => item.id));
+    const filteredSearchPatterns = searchPatterns.filter(item => idsToKeep.has(item.id));
+    if(patterns !== null && filteredSearchPatterns.length !== searchPatterns.length)
+      dispatch(removePattern(searchPatterns.filter(item => !idsToKeep.has(item.id))[0]));
+    setSearchPatterns(filteredSearchPatterns);
+  }, [customChangepoints]);
+
+
+  // Function to handle checkbox click
+  const handleCheckboxClick = (value) => {
+    if (searchPatterns.includes(value)) {
+      // If the checkbox is already checked, remove it from the list
+      setSearchPatterns(searchPatterns.filter((item) => item !== value));
+    } else {
+      // If the checkbox is not checked, add it to the list
+      setSearchPatterns([...searchPatterns, value]);
+    }
+  };
+
   const dispatch = useAppDispatch();
 
-  const [dimensions, setDimensions] = useState(selectedMeasures);
-  const [patternLength, setPatternLength] = useState(10);
-  const [minNeighbors, setMinNeighbors] = useState(1);
-  const [maxNeighbors, setMaxNeighbors] = useState(4);
-
-  const changeComputedPatternLength = (e) => {
-    const val = parseInt(e.target.value, 10);
-    // TODO: Change to real data
-    dispatch(getPatterns({data, val, resampleFreq}));
+  const handleNewPatternChange = () => {
+    dispatch(toggleCustomChangepoints(!customChangepointsEnabled));
   }
 
-  const clearPatterns = (e) => {
-    // TODO: Change to real data
-    dispatch(updatePatterns(null));
-  }
+  const handleToggleSearchPatterns = async () => {
+    setLoading(true); // Set loading to true before dispatching
+    try {
+      await dispatch(applySearchPatterns({ dataset, searchPatterns }));
+      // If the dispatch is successful, you can access the result here if needed
+    } catch (error) {
+      // Handle any errors that occur during dispatch here
+    } finally {
+      setLoading(false); // Set loading to false whether dispatch succeeds or fails
+    }
+  };
 
-
-  function handleFindPatterns(e: React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>) {
-    // TODO: Change to real data
-    dispatch(getPatterns({data, val: patternLength, resampleFreq}));
-    dispatch(updateSelectedMeasures(dimensions));
-  }
 
   return (
-    <Box sx={{display: 'flex', flexDirection: 'column'}}>
-      <Box>
-        <Box>Dimensions</Box>
-        <DimensionSelector
-          disabled={patterns !== null}
-          dimensions={dimensions}
-          setDimensions={setDimensions}
-          measures={dataset.measures}
-          header={dataset.header}/>
-      </Box>
-      <Box sx={{pb: 2}}>
-        <Box>Pattern Length</Box>
-        <TextField
-          disabled={patterns !== null}
-          value={patternLength}
-          onChange={(e) => setPatternLength(parseInt(e.target.value, 10))}
-          sx={{width: "100%"}}
-          type="number"
-          inputProps={{inputMode: 'numeric', pattern: '[0-9]*'}}
-        />
-      </Box>
-      <Box sx={{pb: 2, display: 'flex', flexDirection: 'column'}}>
-        <Box>Number of Neighbors</Box>
-        <Box sx={{display: 'flex', flexDirection: 'row'}}>
-          <TextField
-            disabled={patterns !== null}
-            value={minNeighbors}
-            label="Min."
-            onChange={(e) => setMinNeighbors(parseInt(e.target.value, 10))}
-            sx={{flexBasis: "50%", pr: 1}}
-            type="number"
-            inputProps={{inputMode: 'numeric', pattern: '[0-9]*', max: maxNeighbors}}
-          />
-          <TextField sx={{flexBasis: "50%", pl: 1}}
-                     disabled={patterns !== null}
-                     value={maxNeighbors}
-                     label="Max."
-                     onChange={(e) => setMaxNeighbors(parseInt(e.target.value, 10))}
-                     type="number"
-                     inputProps={{inputMode: 'numeric', pattern: '[0-9]*', min: minNeighbors}}
-          />
-        </Box>
-      </Box>
-      <Box sx={{display: 'flex', flexDirection: 'row'}}>
+    <Box sx={{display: 'flex', flexDirection: 'column', height: '90%', fontSize:'2em'}}>
+      <AddCustomChangepoint name="Highlight" handleFunction={handleNewPatternChange} check={customChangepointsEnabled}/>
+      <Box sx={{width:"100%",textAlign:"right"}}>
         <Button
-          disabled={patterns !== null}
-          sx={{flexBasis: "50%", mr: 1}}
-          onClick={e => handleFindPatterns(e)}
-          variant="contained">Find</Button>
-        <Button
-          disabled={patterns === null}
-          sx={{flexBasis: "50%", ml: 1}}
-          onClick={e => clearPatterns(e)}
-          variant="contained">Clear</Button>
+          sx={{width:"20%"}}
+          onClick={handleToggleSearchPatterns}
+          disabled={loading || searchPatterns.length === 0}
+        >
+          {loading ? 'Loading...' : 'Search'}
+        </Button>
       </Box>
-      {patterns &&
-        <PatternResults dimensions={dimensions} />
-      }
+      <TableContainer component={Paper} style={{ overflowY: 'auto'}}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">PATTERN</TableCell>
+              <TableCell align="center">RANGE</TableCell>
+              <TableCell align="center"></TableCell>
+              <TableCell align="center"></TableCell>
+              <TableCell align="center"></TableCell>
+            </TableRow>
+            {customChangepoints.map((item, index) => (
+                <PatternCard value={item.id} changepoint={item} key={index}
+                             isChecked={searchPatterns.includes(item)}
+                onCheckboxChange = {() => handleCheckboxClick(item)}/>
+              ))}
+          </TableHead>
+        </Table>
+      </TableContainer>
 
     </Box>
   )

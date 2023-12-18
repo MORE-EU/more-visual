@@ -1,14 +1,24 @@
-import {Box} from '@mui/material';
 import React from 'react';
 import Chart from './chart';
-import {ChartControl} from './chart-control';
+import { ChartControl } from './chart-control';
+import { useAppSelector } from 'app/modules/store/storeConfig';
+import Grid from '@mui/material/Grid';
+import ChartToolsWindow from './chart-tools-window';
 
 export const ChartContainer = () => {
-  
+  const { activeTool, farmMeta, dataset } = useAppSelector(state => state.visualizer);
+
   return (
-    <Box sx={{display: 'flex', flexDirection: "column"}}>
+    <Grid sx={{ display: 'flex', flexDirection: 'column', height: "100%" }}>
+      <Grid sx={{height: "50px", width: "100%"}}>
       <ChartControl />
+      </Grid>
+      <Grid sx={{height: "calc(100% - 50px)", width: "100%"}}>
       <Chart />
-    </Box>
+      {activeTool && (
+        <ChartToolsWindow />
+      )}
+      </Grid>
+    </Grid>
   );
-}
+};

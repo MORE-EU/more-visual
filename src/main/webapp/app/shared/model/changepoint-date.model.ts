@@ -1,9 +1,11 @@
 import { ITimeRange } from 'app/shared/model/time-range.model';
 
-export interface IChangePointDate {
+export interface IChangepointDate {
   range: ITimeRange;
-  id: number;
+  measure: number;
+  measureChartId: number;
   score: number;
+  id: number;
 }
 
-export const defaultValue: Readonly<IChangePointDate> = { range: null, id: null, score: null };
+export const defaultValue: Readonly<IChangepointDate> = { range: null, id: null, measure: null, measureChartId: null, score: null };

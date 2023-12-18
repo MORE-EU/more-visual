@@ -5,6 +5,7 @@ const initialState = {
     fly: new LatLng(51.505, -0.09),
     bounds: {_southWest: {lat: 0, lng: 0}, _northEast: {lat: 0, lng: 0}},
     filSamples: [],
+    openHomeModal: false,
     allFilters: [],
     items: [],
     selected: [],
@@ -96,12 +97,15 @@ const home = createSlice({
         setOption4(state, action) {
             state.option4 = action.payload;
         },
+        setOpenHomeModal(state, action) {
+            state.openHomeModal = action.payload;
+        },
     }
 });
 
-export const {setFly, setBounds, setAllFilters, setFilSamples, 
-setItems, setSelected, setSelectedDir, setAnchorEl, setInputValue, 
+export const {setFly, setBounds, setAllFilters, setFilSamples,
+setItems, setSelected, setSelectedDir, setAnchorEl, setInputValue,
 setSearch, setSearchResults, setSelectedAcc, setStatCateg, setStatSelect,
 setChartCateg, setChartCategYaxis, setChartData, setChartType, setOption1,
-setOption2, setOption3, setOption4 } = home.actions;
+setOption2, setOption3, setOption4, setOpenHomeModal } = home.actions;
 export default home.reducer;

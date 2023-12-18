@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { enableMapSet } from 'immer';
 import visualizer from "./visualizerSlice";
 import { TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 import applicationProfile from 'app/shared/reducers/application-profile';
@@ -8,6 +9,12 @@ import promiseMiddleware from 'redux-promise-middleware';
 import errorMiddleware from 'app/config/error-middleware';
 import loggerMiddleware from 'app/config/logger-middleware';
 import home from "./homeSlice";
+import fileManagement from "./fileManagementSlice"
+import uploadFarm from "./uploadFarmSlice";
+import patternExtraction from "./patternExtractionSlice";
+import forecasting from "./forecastingSlice";
+
+enableMapSet();
 
 export const store = configureStore({
     reducer: {
@@ -15,6 +22,10 @@ export const store = configureStore({
         applicationProfile,
         visualizer,
         home,
+        fileManagement,
+        uploadFarm,
+        forecasting,
+        patternExtraction,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false

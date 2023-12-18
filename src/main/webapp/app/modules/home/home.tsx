@@ -1,33 +1,38 @@
 import './home.scss';
-import React, {useEffect} from 'react';
-import {FarmMap} from './map/farm-map';
-import {HomeLeftMenu} from './home-left-menu';
-import {HomeRightStatsPanel} from './home-right-stats-panel';
-import {HomeRightChartPanel} from './home-right-chart-panel';
+import React, { useEffect } from 'react';
+import { HomeMap } from './home-map';
+import { HomeLeftMenu } from './home-left-menu';
+import { HomeRightStatsPanel } from './home-right-stats-panel';
+import { HomeRightChartPanel } from './home-right-chart-panel';
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { getDirectories, getSampleFile, getWdFiles } from '../store/visualizerSlice';
+import { getDirectories, getSampleFile, getFarmMeta, resetFarmMeta } from '../store/visualizerSlice';
 import { setAllFilters, setFilSamples, setItems, setSelectedDir } from '../store/homeSlice';
+import 'simplebar-react/dist/simplebar.min.css';
+import HomeEditFarmModal from './home-edit-modal';
 
 export const Home = () => {
-
   const { directories, sampleFile } = useAppSelector(state => state.visualizer);
   const { selectedDir, bounds, items } = useAppSelector(state => state.home);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(getWdFiles('bbz'));
     dispatch(getDirectories());
+    return () => {
+      dispatch(resetFarmMeta());
+    };
   }, []);
 
   useEffect(() => {
     if (directories.length !== 0) {
+      dispatch(getFarmMeta(directories[0]));
       dispatch(setSelectedDir(directories[0]));
     }
-  }, [directories])
+  }, [directories]);
 
   useEffect(() => {
-    selectedDir.length !== 0 && dispatch(getSampleFile(selectedDir))
-  }, [selectedDir])
+    selectedDir.length !== 0 && dispatch(getSampleFile(selectedDir));
+    selectedDir.length !== 0 && dispatch(getFarmMeta(selectedDir));
+  }, [selectedDir]);
 
   useEffect(() => {
     // Map Markers Creation
@@ -38,12 +43,14 @@ export const Home = () => {
       latlngs.push([sampleFile[i].lat, sampleFile[i].lng]);
       info.push(sampleFile[i]);
       (i + 1) % 10 === 0 &&
-      (farms.push({
-        name: `${info[0].country}`,
-        fly: latlngs[0],
-        locations: latlngs,
-        farmInfo: info
-      }), (latlngs = []), (info = []));
+        (farms.push({
+          name: `${info[0].country}`,
+          fly: latlngs[0],
+          locations: latlngs,
+          farmInfo: info,
+        }),
+        (latlngs = []),
+        (info = []));
     }
     dispatch(setItems(farms));
 
@@ -52,7 +59,7 @@ export const Home = () => {
       const filters = [];
       const nofilters = ['lat', 'lng', 'capturedExceptions'];
       Object.getOwnPropertyNames(sampleFile[0]).forEach(
-        prop => !nofilters.includes(`${[prop]}`) && filters.push({category: `${prop}`, values: []})
+        prop => !nofilters.includes(`${[prop]}`) && filters.push({ category: `${prop}`, values: [] })
       );
       filters.map(filter => {
         sampleFile.map(sample => {
@@ -101,7 +108,8 @@ export const Home = () => {
         <HomeLeftMenu />
         <HomeRightStatsPanel />
         <HomeRightChartPanel />
-        <FarmMap />
+        {/* <HomeEditFarmModal /> */}
+        <HomeMap />
       </div>
     )
   );

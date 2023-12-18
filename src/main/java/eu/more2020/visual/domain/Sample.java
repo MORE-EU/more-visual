@@ -1,14 +1,13 @@
 package eu.more2020.visual.domain;
 
 import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvToBean;
 
 import java.util.Objects;
 
 /**
  * A Dataset.
  */
-public class Sample extends CsvToBean {
+public class Sample {
 
     @CsvBindByName(column = "Continent")
     private String continent;
@@ -187,6 +186,13 @@ public class Sample extends CsvToBean {
         this.ComDate = ComDate;
     }
 
+    @Override
+    public String toString() {
+        return "Sample [continent=" + continent + ", country=" + country + ", area=" + area + ", city=" + city
+                + ", name=" + name + ", lat=" + lat + ", lng=" + lng + ", manufacturer=" + manufacturer + ", turbine="
+                + turbine + ", hubHeight=" + hubHeight + ", noOfTurbines=" + noOfTurbines + ", power=" + power
+                + ", dev=" + dev + ", operator=" + operator + ", owner=" + owner + ", ComDate=" + ComDate + "]";
+    }
 
     @Override
     public boolean equals(Object o) {

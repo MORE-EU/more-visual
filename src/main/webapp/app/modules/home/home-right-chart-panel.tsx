@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {Box, Button, FormControl, MenuItem, Paper, Select, Tooltip} from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import Heatmap from 'highcharts/modules/heatmap.js';
@@ -9,6 +8,16 @@ import TableChart from '@mui/icons-material/TableChart';
 import ShowChart from '@mui/icons-material/ShowChart';
 import { useAppSelector, useAppDispatch } from '../store/storeConfig';
 import { setChartCateg, setChartCategYaxis, setChartData, setChartType, setOption1, setOption2, setOption3, setOption4 } from '../store/homeSlice';
+import { grey } from '@mui/material/colors';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import Tooltip from '@mui/material/Tooltip';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 Heatmap(Highcharts);
 
@@ -41,8 +50,8 @@ export const HomeRightChartPanel = () => {
     },
     colorAxis: {
       min: 0,
-      minColor: chartType === 'heatmap' ? '#FFFFFF' : '#2185d0',
-      maxColor: '#2185d0',
+      minColor: chartType === 'heatmap' ? '#FFFFFF' : 'cadetblue',
+      maxColor: 'cadetblue',
     },
     stockTools: {
       gui: {
@@ -58,6 +67,7 @@ export const HomeRightChartPanel = () => {
     chart: {
       height: 200,
       type: chartType,
+      backgroundColor: grey[300],
     },
   };
 
@@ -84,8 +94,6 @@ export const HomeRightChartPanel = () => {
         xCateg[`${item}`] = xCateg[item].length;
       });
     }
-    // dispatch(setChartCateg([]));
-    // dispatch(setChartData([]));
     const chartCategValues = [];
     const chartDataValues = [];
     for (const [key, value] of Object.entries(xCateg)) {
@@ -155,55 +163,50 @@ export const HomeRightChartPanel = () => {
     handleBoundStats(option1, xCateg, yCateg);
   }, [option1, option2, option3, option4, filSamples, selected]);
 
+  const handleChartTypeChange = (e, newVal) => {
+    dispatch(setChartType(newVal));
+    newVal === "heatmap" ? dispatch(setOption4('continent')) : dispatch(setOption4(''))
+  }
+
   return (
     <div>
-      <Paper elevation={3} sx={{position: 'fixed', bottom: 10, right: 10, width: '400px', height: 'auto', zIndex: 999}}>
-        <Box sx={{textAlign: 'center', mt: 1, mb: 1}}>
-          <Tooltip title="Bar Chart">
-            <Button
-              onClick={() => {
-                dispatch(setChartType('column'));
-                dispatch(setOption4(''));
-              }}
-            >
-              <BarChart/>
-            </Button>
-          </Tooltip>
-          <Tooltip title="Line Chart">
-            <Button
-              onClick={() => {
-                dispatch(setChartType('line'));
-                dispatch(setOption4(''));
-              }}
-            >
-              <ShowChart/>
-            </Button>
-          </Tooltip>
-          <Tooltip title="Area Chart">
-            <Button
-              onClick={() => {
-                dispatch(setChartType('area'));
-                dispatch(setOption4(''));
-              }}
-            >
-              <TableChart/>
-            </Button>
-          </Tooltip>
-          <Tooltip title="Heatmap">
-            <Button
-              onClick={() => {
-                dispatch(setChartType('heatmap'));
-                dispatch(setOption4('continent'));
-              }}
-            >
-              <GridViewIcon/>
-            </Button>
-          </Tooltip>
+      <Paper elevation={3} sx={{position: 'fixed', bottom: 10, right: 10, width: '400px', height: 'auto', zIndex: 401, bgcolor: grey[300]}}>
+        <Box sx={{textAlign: 'center', p: 1, ml: 1, mr: 1, mb: 1, borderBottom: "3px solid", borderBottomColor: grey[700], display: "flex"}}>
+          <Typography variant='subtitle1' sx={{alignSelf: "center", flex: 1, color: grey[700]}}>Chart type</Typography>
+        <ToggleButtonGroup
+      value={{type: "column", option4: ""}}
+      exclusive
+      aria-label="text alignment"
+      size="small"
+      onChange={handleChartTypeChange}
+      sx={{mr: 4}}
+    >
+      <ToggleButton value="column" aria-label="left aligned">
+      <Tooltip title="Bar Chart" placement='top'>
+      <BarChart/>
+      </Tooltip>
+      </ToggleButton>
+      <ToggleButton value="line" aria-label="centered">
+      <Tooltip title="Line Chart" placement='top'>
+      <ShowChart/>
+      </Tooltip>
+      </ToggleButton>
+      <ToggleButton value="area" aria-label="right aligned">
+      <Tooltip title="Area Chart" placement='top'>
+      <TableChart/>
+      </Tooltip>
+      </ToggleButton>
+      <ToggleButton value="heatmap" aria-label="justified" >
+      <Tooltip title="Heatmap" placement='top'>
+      <GridViewIcon/>
+      </Tooltip>
+      </ToggleButton>
+    </ToggleButtonGroup>
         </Box>
         <HighchartsReact highcharts={Highcharts} constructorType={'chart'} options={options}/>
         <Box
-          sx={{textAlign: 'center', alignItems: 'center', display: 'flex', mt: 1, mb: 1, mr: 1, ml: 1, fontSize: 16}}>
-          {`Find `}
+          sx={{textAlign: 'center', alignItems: 'center', display: 'flex', m: 1, pr: 1, pl: 1, fontSize: 16}}>
+          <Typography variant="subtitle1" color={grey[700]}>{"Find "}</Typography>
           <FormControl variant="standard" sx={{flex: 1}}>
             <Select
               value={option1}
@@ -228,7 +231,7 @@ export const HomeRightChartPanel = () => {
               </MenuItem>
             </Select>
           </FormControl>
-          {`of `}
+          <Typography variant="subtitle1" color={grey[700]}>{"of "}</Typography>
           <FormControl variant="standard" sx={{flex: 1}}>
             <Select
               value={option2}
@@ -244,7 +247,7 @@ export const HomeRightChartPanel = () => {
               </MenuItem>
             </Select>
           </FormControl>
-          {`per `}
+          <Typography variant="subtitle1" color={grey[700]}>{"per "}</Typography>
           <FormControl variant="standard" sx={{flex: 1}}>
             <Select
               value={option3}

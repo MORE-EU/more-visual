@@ -11,6 +11,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import javax.annotation.PostConstruct;
 import java.net.InetAddress;
@@ -20,11 +21,11 @@ import java.util.Collection;
 
 @SpringBootApplication
 @EnableConfigurationProperties({ApplicationProperties.class})
-
+@EnableMongoRepositories
 public class MoreVisApp {
 
     private static final Logger log = LoggerFactory.getLogger(MoreVisApp.class);
-
+    private static final Logger logger = LoggerFactory.getLogger("org.mongodb.driver");
     private final Environment env;
 
     public MoreVisApp(Environment env) {
@@ -60,6 +61,13 @@ public class MoreVisApp {
         SpringApplication app = new SpringApplication(MoreVisApp.class);
         DefaultProfileUtil.addDefaultProfile(app);
         Environment env = app.run(args).getEnvironment();
+        //TODO: check if this is required for silencing the mongo-driver
+        // Set the log level for the MongoDB driver to ERROR
+        ch.qos.logback.classic.Logger mongoLogger = (ch.qos.logback.classic.Logger) logger;
+        mongoLogger.setLevel(ch.qos.logback.classic.Level.ERROR);
+
+        // Set the MongoDB driver's log level to ERROR using the System Property
+        System.setProperty("org.slf4j.simpleLogger.log.org.mongodb.driver", "ERROR");
         logApplicationStartup(env);
     }
 

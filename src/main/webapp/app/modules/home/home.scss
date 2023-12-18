@@ -1,6 +1,13 @@
 /* ==========================================================================
 Main page styles
 ========================================================================== */
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 .hipster {
   display: inline-block;
   width: 100%;
@@ -10,4 +17,14 @@ Main page styles
 
 .popper-filter {
   z-index: 999;
+}
+
+.farmMap {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.leaflet-touch .leaflet-bar a {
+  background-color: cadetblue;
+  color: black;
 }

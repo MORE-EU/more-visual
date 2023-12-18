@@ -65,4 +65,3 @@ In the case where the RES data are stored in CSV datafiles. The user must place 
 
 On initialization, the application, copies a directory that contains dummy data that belong to an RES farm.
 These data are accessed through the map exploration mechanism, or directly via URL (e.g. http://localhost:8090/visualize/{folder_relative_path}, where {folder_relative_path} is the relative path of the data folder inside the workspace.
- 

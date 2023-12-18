@@ -1,84 +1,78 @@
 package eu.more2020.visual.service;
 
-import eu.more2020.visual.config.ApplicationProperties;
-import eu.more2020.visual.domain.Dataset;
-import eu.more2020.visual.domain.Query;
-import eu.more2020.visual.domain.QueryResults;
-import eu.more2020.visual.index.TimeseriesTreeIndex;
-import org.apache.commons.collections.map.MultiKeyMap;
+import eu.more2020.visual.middleware.domain.Query.Query;
+import eu.more2020.visual.middleware.domain.QueryResults;
+import eu.more2020.visual.middleware.domain.TimeRange;
+import eu.more2020.visual.middleware.domain.Dataset.CsvDataset;
+import eu.more2020.visual.middleware.index.csv.CsvTTI;
+import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.DoubleSummaryStatistics;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CsvDataService {
+    private static final org.apache.logging.log4j.Logger LOG = LogManager.getLogger(CsvDataService.class);
 
     private final Logger log = LoggerFactory.getLogger(CsvDataService.class);
-    private final ApplicationProperties applicationProperties;
-    private MultiKeyMap indexes = new MultiKeyMap();
+    private HashMap<String, CsvTTI> indexes = new HashMap<>();
 
-    public CsvDataService(ApplicationProperties applicationProperties) {
-        this.applicationProperties = applicationProperties;
+
+    public void removeIndex(String id, String farmName) {
+        indexes.remove(id, farmName);
     }
 
-    public void removeIndex(String id, String folder) {
-        indexes.remove(id, folder);
+    private synchronized List<CsvTTI> getIndexes(CsvDataset dataset, Query query) throws IOException {
+        List<CsvTTI> ttis = dataset.getFileInfoList().stream().filter(dataFileInfo ->
+                dataFileInfo.getTimeRange().intersects(query))
+            .map(dataFileInfo -> {
+                CsvTTI tti = indexes.get(dataFileInfo.getFilePath());
+                if (tti == null) {
+                    tti = new CsvTTI(dataFileInfo.getFilePath(), dataset);
+                    this.indexes.put(dataFileInfo.getFilePath(), tti);
+                }
+                return tti;
+            }).collect(Collectors.toList());
+        return ttis;
     }
 
-    public synchronized TimeseriesTreeIndex getIndex(String folder, Dataset dataset) throws IOException {
-        TimeseriesTreeIndex index = (TimeseriesTreeIndex) indexes.get(dataset.getId(), folder);
-        if (index != null) {
-            return index;
-        }
-        index = new TimeseriesTreeIndex(applicationProperties.getWorkspacePath() + "/" + folder + "/" + dataset.getName(), dataset);
-        this.indexes.put(dataset.getId(), folder, index);
-        return index;
-    }
+    public QueryResults executeQuery(CsvDataset dataset, Query query) {
+//        log.debug(query.toString());
+        QueryResults queryResults = new QueryResults();
+        queryResults.setData(new HashMap<>());
+        queryResults.setTimeRange(new TimeRange(query.getFrom(), query.getTo()));
+        queryResults.setMeasureStats(new HashMap<>());
 
-    public QueryResults executeQuery(String folder, Dataset dataset, Query query) {
-        log.debug(query.toString());
         try {
-            TimeseriesTreeIndex index = this.getIndex(folder, dataset);
-            return index.executeQuery(query);
+            List<CsvTTI> ttis = this.getIndexes(dataset, query);
+            for (CsvTTI tti : ttis) {
+                QueryResults partialResults = tti.executeQuery(query);
+//                LOG.debug("{}", partialResults);
+//                queryResults.getData().addAll(partialResults.getData());
+                partialResults.getData().forEach((key, list2) -> queryResults.getData().merge(key, list2, (list1, listToAdd) -> {
+                    list1.addAll(listToAdd);
+                    return list1;
+                }));
+                partialResults.getMeasureStats().forEach((measure, statistics) -> {
+                    DoubleSummaryStatistics currentStatistics = queryResults.getMeasureStats().get(measure);
+                    if (currentStatistics == null) {
+                        queryResults.getMeasureStats().put(measure, statistics);
+                    } else {
+                        currentStatistics.combine(statistics);
+                    }
+                });
+            }
+            // queryResults.getMeasureStats().forEach((integer, doubleSummaryStatistics) -> log.debug(doubleSummaryStatistics.toString()));
+            return queryResults;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
-
-/*    public QueryResults executeQuery(String folder, Dataset dataset, Query query) {
-        log.debug(query.toString());
-        CsvParserSettings parserSettings = new CsvParserSettings();
-        parserSettings.getFormat().setDelimiter(',');
-        parserSettings.getFormat().setQuote('"');
-        parserSettings.setIgnoreLeadingWhitespaces(false);
-        parserSettings.setIgnoreTrailingWhitespaces(false);
-        parserSettings.setSkipEmptyLines(true);
-        parserSettings.setHeaderExtractionEnabled(dataset.getHasHeader());
-        CsvParser parser = new CsvParser(parserSettings);
-        parser.beginParsing(new File(applicationProperties.getWorkspacePath() + "/" + folder, dataset.getName()), Charset.forName("US-ASCII"));
-        String[] row;
-        QueryResults results = new QueryResults();
-        List<String[]> data = new ArrayList<>();
-        results.setData(data);
-        Map<Integer, StatsAccumulator> statsMap = new HashMap<>();
-        for (Integer measureIndex : dataset.getMeasures()) {
-            statsMap.put(measureIndex, new StatsAccumulator());
-        }
-
-        while ((row = parser.parseNext()) != null) {
-            // LocalDateTime time = LocalDateTime.parse(row[dataset.getTimeCol()]);
-            data.add(row);
-            for (Integer measureIndex : dataset.getMeasures()) {
-                statsMap.get(measureIndex).add(Double.parseDouble(row[measureIndex]));
-            }
-        }
-        parser.stopParsing();
-        Map<Integer, MeasureStats> measureStats = statsMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-            e -> new MeasureStats(e.getValue().mean(), e.getValue().min(), e.getValue().max())));
-        results.setMeasureStats(measureStats);
-        return results;
-    }*/
 }
