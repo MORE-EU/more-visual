@@ -60,8 +60,18 @@ public class ConnectionRepositoryImpl implements ConnectionRepository {
         File connectionFile = new File(applicationProperties.getWorkspacePath(), "connection.json");
         FileReader fr = new FileReader(connectionFile);
         List<Connection> connections = mapper.readValue(fr, new TypeReference<ArrayList<Connection>>() {});
-        if(connectionName.equals(null))
-            connections.removeIf(al -> !al.getName().equals(connectionName));
+        connections.removeIf(al -> !al.getName().equals(connectionName));
+        fr.close();
+        return connections;
+    }
+
+    @Override
+    public List<Connection> getAllConnections() throws Exception {
+        ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        mapper.findAndRegisterModules();
+        File connectionFile = new File(applicationProperties.getWorkspacePath(), "connection.json");
+        FileReader fr = new FileReader(connectionFile);
+        List<Connection> connections = mapper.readValue(fr, new TypeReference<ArrayList<Connection>>() {});
         fr.close();
         return connections;
     }

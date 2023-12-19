@@ -14,7 +14,6 @@ import eu.more2020.visual.middleware.datasource.QueryExecutor.SQLQueryExecutor;
 import eu.more2020.visual.middleware.domain.TableInfo;
 import eu.more2020.visual.middleware.domain.DataFileInfo;
 import eu.more2020.visual.middleware.domain.Dataset.*;
-import eu.more2020.visual.middleware.domain.InfluxDB.InfluxDBConnection;
 import eu.more2020.visual.middleware.domain.TimeRange;
 import eu.more2020.visual.middleware.util.DateTimeUtil;
 import org.apache.commons.io.input.ReversedLinesFileReader;
@@ -282,7 +281,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 else farmInfo.setIsConfiged(false);
                 farmInfos.add(farmInfo);
             }
-            if (tableInfoArray.isEmpty()) throw new SQLException();
+            if (tableInfoArray.isEmpty()) throw new SQLException("No available data.");
             farm.setData(farmInfos);
             return farm;
         } catch (Exception e) {

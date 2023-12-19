@@ -8,12 +8,12 @@ import Box from "@mui/material/Box";
 import { styled } from '@mui/material/styles';
 import grey from '@mui/material/colors/grey';
 import { Typography, Grid } from "@mui/material";
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import VisConnectorDBConfig from "./vis-connector-db-config";
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import { getConnection, connector, getDbMetadata, deleteConnection } from "app/modules/store/visualizerSlice";
+import { connector, getDbMetadata, deleteConnection, getAllConnections } from "app/modules/store/visualizerSlice";
 import { IConnection } from "app/shared/model/connection.model";
 
 const VisuallyHiddenInput = styled('input')({
@@ -37,7 +37,7 @@ const VisConnector = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(getConnection(null));
+        dispatch(getAllConnections());
     },[]);
 
     useEffect(() => {

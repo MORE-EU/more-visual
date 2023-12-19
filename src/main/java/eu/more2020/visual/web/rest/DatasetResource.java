@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.influxdb.exceptions.InfluxException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
@@ -133,7 +132,7 @@ public class DatasetResource {
         if (datasetRepository.getFarmType() == "csv" || datasetRepository.getFarmType() == null) //null case to be removed
             dataset = datasetRepository.findById(id, farmName);
         else{
-            QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+            QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
             dataset = datasetRepository.findDBDatasetById(id, queryExecutor);
         }
         log.debug(dataset.toString());
@@ -152,7 +151,7 @@ public class DatasetResource {
         if (datasetRepository.getFarmType() == "csv")
             return datasetRepository.findSample(farmName); // remove sample type
         else {
-            QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+            QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
             return datasetRepository.findDbSample(farmName, queryExecutor);
         }
     }
@@ -189,9 +188,9 @@ public class DatasetResource {
                         return csvDataService.executeQuery((CsvDataset) dataset, query);
                     });
         else {
-            QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+            QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
             queryResultsOptional =  datasetRepository.findDBDatasetById(id, queryExecutor).map(dataset -> {
-                return dataService.executeQuery(databaseConnection.getSqlQueryExecutor(dataset), dataset, query);
+                return dataService.executeQuery(databaseConnection.getQueryExecutor(dataset), dataset, query);
             });
         }
 
@@ -253,7 +252,7 @@ public class DatasetResource {
     }
 
     @PostMapping("/database/connect") 
-    public ResponseEntity<Boolean> connector(@RequestBody DbConnector dbConnector) throws SQLException, InfluxException {
+    public ResponseEntity<Boolean> connector(@RequestBody DbConnector dbConnector) throws SQLException {
         log.debug("Rest request to connect to db");
         log.debug(dbConnector.toString());
         String url = null;
@@ -283,7 +282,7 @@ public class DatasetResource {
         log.debug("Rest request to get db metadata from {} database with name {}", database, farmName);
         FarmMeta farmMeta = new FarmMeta();
         try {
-            QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+            QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
             farmMeta = datasetRepository.getDBMetadata(database, farmName, queryExecutor);
             return new ResponseEntity<FarmMeta>(farmMeta, HttpStatus.OK);
         } catch (Exception e) {
@@ -296,7 +295,7 @@ public class DatasetResource {
         log.debug("Rest request to get column names form table {}", tableName);
         List<String> columnNames = new ArrayList<>();
         try {
-            QueryExecutor queryExecutor = databaseConnection.getSqlQueryExecutor();
+            QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
             columnNames = queryExecutor.getColumns(tableName);
             return new ResponseEntity<List<String>>(columnNames, HttpStatus.OK);
         } catch (Exception e) {

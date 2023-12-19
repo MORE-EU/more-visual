@@ -106,9 +106,15 @@ public class ToolsResource {
     }
 
     @GetMapping("/connector/get/{connectionName}")
-    public List<Connection> getConnections(@PathVariable String connectionName) throws Exception {
+    public List<Connection> getConnection(@PathVariable String connectionName) throws Exception {
         log.debug("REST request to get connection with name: {}", connectionName);
         return connectionRepository.getConnection(connectionName);
+    }
+
+    @GetMapping("/connector/get")
+    public List<Connection> getAllConnections() throws Exception {
+        log.debug("REST request to get connections");
+        return connectionRepository.getAllConnections();
     }
 
     @PostMapping("/connector/remove/{connectionName}")

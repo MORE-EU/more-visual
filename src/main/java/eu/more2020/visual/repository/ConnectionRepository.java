@@ -22,5 +22,7 @@ public interface ConnectionRepository {
     
     List<Connection> getConnection(String connectionName) throws Exception;
 
+    List<Connection> getAllConnections() throws Exception;
+
     List<Connection> deleteConnection(String connectionName) throws Exception;
 }

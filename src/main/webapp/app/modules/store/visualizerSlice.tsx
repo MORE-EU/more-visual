@@ -228,6 +228,11 @@ export const getConnection = createAsyncThunk('getConnection', async(connectionN
   return response;
 });
 
+export const getAllConnections = createAsyncThunk('getAllConnections', async() => {
+  const response = await axios.get(`api/connector/get`).then(res => res);
+  return response;
+})
+
 export const deleteConnection = createAsyncThunk('deleteConnection', async(connectionName: String) => {
   const response = await axios.post(`api/connector/remove/${connectionName}`).then(res => res);
   return response;
@@ -622,6 +627,10 @@ const visualizer = createSlice({
       state.checkConnectionLoading = false;
       state.connections = action.payload.data;
     });
+    builder.addCase(getAllConnections.fulfilled, (state, action) => {
+      state.checkConnectionLoading = false;
+      state.connections = action.payload.data;
+    });
     builder.addCase(deleteConnection.fulfilled, (state, action) => {
       state.checkConnectionLoading = false;
       state.connections = action.payload.data;
@@ -668,7 +677,7 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(saveAlert.pending, deleteAlert.pending, getAlerts.pending, editAlert.pending), state => {
       state.alertsLoading = true;
     });
-    builder.addMatcher(isAnyOf(saveConnection.pending,getConnection.pending, deleteConnection.pending), state => {
+    builder.addMatcher(isAnyOf(saveConnection.pending,getConnection.pending,getAllConnections.pending, deleteConnection.pending), state => {
       state.connectionLoading = true;
     });
     builder.addMatcher(
@@ -707,7 +716,7 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(saveAlert.rejected, deleteAlert.rejected, getAlerts.rejected, editAlert.rejected), (state, action) => {
       state.alertsLoading = false;
     });
-    builder.addMatcher(isAnyOf(saveConnection.rejected, getConnection.rejected, deleteConnection.rejected), state => {
+    builder.addMatcher(isAnyOf(saveConnection.rejected, getConnection.rejected, getAllConnections.rejected, deleteConnection.rejected), state => {
       state.connectionLoading = false;
     });
     builder.addMatcher(isAnyOf(applyChangepointDetection.fulfilled), (state, action) => {
