@@ -44,7 +44,7 @@ export const Visualizer = () => {
     if (params.id !== undefined) {
       dispatch(setFolder(params.folder));
       dispatch(getDataset({ folder: params.folder, id: params.id }));
-      farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
+      farmMeta !== null && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
     }
   }, [params.id]);
 
@@ -57,7 +57,7 @@ export const Visualizer = () => {
   }, [dataset]);
 
   useEffect(() => {
-    params.id === undefined && farmMeta && history.push(`${params.folder}/${farmMeta.data[0].id}`);
+    params.id === undefined && farmMeta && history.replace(`${params.folder}/${farmMeta.data[0].id}`);
   }, [farmMeta]);
 
   useEffect(() => {
@@ -66,6 +66,7 @@ export const Visualizer = () => {
 
   return (
     <div>
+      {console.log(dataset)}
       <ThemeProvider theme={mdTheme}>
         <Grid sx={{ height: '100%', width: '100%' }}>
           {errorMessage &&

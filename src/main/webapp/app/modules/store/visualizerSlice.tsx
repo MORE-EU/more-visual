@@ -79,7 +79,7 @@ const initialState = {
   filter: {},
   patterns: null,
   changeChart: true,
-  datasetChoice: 0,
+  datasetChoice: null,
   patternNav: '0',
   folder: '',
   graphZoom: null,
@@ -460,6 +460,7 @@ const visualizer = createSlice({
     },
     resetFarmMeta(state) {
       state.farmMeta = null;
+      state.chartRef = null;
     },
     resetForecastingState(state) {
       // remove plotlines from chart when you disable forecasting
@@ -482,7 +483,6 @@ const visualizer = createSlice({
     builder.addCase(getDataset.fulfilled, (state, action) => {
       state.loading = false;
       state.dataset = action.payload.data;
-      state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
       state.measureColors = [...state.dataset.header.map(() => generateColor())];
       state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
       state.selectedMeasures = [action.payload.data.measures[0]];
@@ -490,7 +490,7 @@ const visualizer = createSlice({
     builder.addCase(getFarmMeta.fulfilled, (state, action) => {
       state.loading = false;
       state.farmMeta = action.payload.data;
-      state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
+      state.datasetChoice = 0;
     })
     builder.addCase(getDatasets.fulfilled, (state, action) => {
       state.datasets = {data: action.payload.data, loading: false, error: null};
