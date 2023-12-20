@@ -5,7 +5,6 @@ import Button from "@mui/material/Button";
 import StorageIcon from '@mui/icons-material/Storage';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Box from "@mui/material/Box";
-import { styled } from '@mui/material/styles';
 import grey from '@mui/material/colors/grey';
 import { Typography, Grid } from "@mui/material";
 import { createTheme } from '@mui/material/styles';
@@ -15,18 +14,6 @@ import VisConnectorDBConfig from "./vis-connector-db-config";
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
 import { connector, getDbMetadata, deleteConnection, getAllConnections } from "app/modules/store/visualizerSlice";
 import { IConnection } from "app/shared/model/connection.model";
-
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-});
 
 const mdTheme = createTheme();
 
@@ -59,8 +46,8 @@ const VisConnector = () => {
                     </Typography>
                 )}
                 {connections.map(connection => 
-                    ( <Grid container key={connection.name} sx={{display: 'flex', flexDirection: 'row', [mdTheme.breakpoints.down('lg')]: {flexDirection: 'column'}}}>
-                        <Grid item xs={6}>
+                    ( <Grid container key={connection.name} sx={{display: 'flex', flexDirection: 'row', [mdTheme.breakpoints.down('sm')]: {flexDirection: 'column'}}}>
+                        <Grid item sm={8}>
                             <Button variant="text" component="label"  sx={{borderRadius: 2}} onClick={() => {
                                 setConnectionInfo(connection);
                                 dispatch(connector(connection));                
@@ -77,12 +64,11 @@ const VisConnector = () => {
                 <Typography variant="subtitle1" fontSize={20} sx={{ borderBottom: `2px solid ${grey[400]}`}}>
                     New Data Source
                 </Typography>
-                <Button variant="contained" component="label"  sx={{borderRadius: 2,}} startIcon={<StorageIcon />} onClick={() => {setStep(true);}}>
+                <Button variant="contained"  sx={{borderRadius: 2,}} startIcon={<StorageIcon />} onClick={() => {setStep(true);}}>
                     Database
                 </Button>
-                <Button disabled component="label" variant="contained"  sx={{borderRadius: 2,}} startIcon={<UploadFileIcon/>}>
+                <Button disabled variant="contained"  sx={{borderRadius: 2,}} startIcon={<UploadFileIcon/>}>
                     Filesystem
-                    <VisuallyHiddenInput type="file" />
                 </Button>
             </Box>
         )}

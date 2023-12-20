@@ -78,7 +78,7 @@ const VisConnectorDBConfig = ({closeHandler}) => {
                     <DBFormInput label="Connection Name" name="name" type="text" value={name} handleChange={handleTextFields} />
                     <DBFormInput label='Host' name="host" type='text' value={host} handleChange={handleTextFields} />
                     <DBFormInput label='Port' name="port" type='text' value={port} handleChange={handleTextFields} />
-                    {type === "influx" ?  <DBFormInput label='Org' name="username" type='text' value={username} handleChange={handleTextFields} />
+                    {type === "influx" ?  <DBFormInput label='Organization' name="username" type='text' value={username} handleChange={handleTextFields} />
                         : <DBFormInput label='Username' name="username" type='text' value={username} handleChange={handleTextFields} />
                     }
                     {type === "influx" ? <DBFormInput label='Token' name="password" type='password' value={password} handleChange={handleTextFields} />

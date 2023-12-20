@@ -8,7 +8,7 @@ import { Divider, Grid, Snackbar, Alert  } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { setDatasetIsConfiged, disconnector, setErrorMessage, getDataset } from '../store/visualizerSlice';
+import { setDatasetIsConfiged, disconnector, setErrorMessage, getDataset, setFolder } from '../store/visualizerSlice';
 import Header from './header/header';
 import VisConnector from './vis-connector/vis-connector';
 import VisControlDatasetConfig from './vis-control/vis-control-dataset-config';
@@ -35,6 +35,7 @@ export const EmptyVisualizer = () => {
             history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[0].id}`);
         }
         if (farmMeta && datasetIsConfiged) {
+            dispatch(setFolder(farmMeta.name));
             dispatch(getDataset({folder: farmMeta.name, id: farmMeta.data[datasetChoice].id}));
         }
     }, [farmMeta]);

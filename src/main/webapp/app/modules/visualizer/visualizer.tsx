@@ -30,9 +30,11 @@ export const Visualizer = () => {
 
   useEffect(() => {
       if (params.id !== undefined) {
-        dispatch(setFolder(params.folder));
-        dispatch(getDataset({ folder: params.folder, id: params.id }));
-        farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
+        if (!connected || (farmMeta && (farmMeta.type === "csv" || farmMeta.type === "influx"))) {
+          dispatch(setFolder(params.folder));
+          dispatch(getDataset({ folder: params.folder, id: params.id }));
+          farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ;
+        }
     }
   }, [params.id]);
 
