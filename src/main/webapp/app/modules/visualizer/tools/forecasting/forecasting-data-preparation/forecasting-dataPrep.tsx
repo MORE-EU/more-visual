@@ -100,11 +100,12 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
             </Typography>
             <DateTimePicker
               label={forecastingForm.startDate ? null : 'Start Date'}
-              minDateTime={dataset.timeRange.from}
-              maxDateTime={forecastingForm.endDate ? forecastingForm.endDate : dataset.timeRange.to}
+              minDateTime={new Date(dataset.timeRange.from)}
+              maxDateTime={forecastingForm.endDate ? forecastingForm.endDate : new Date(dataset.timeRange.to)}
               renderInput={props => <TextField size="small" {...props} />}
               value={getDateValue(forecastingForm.startDate)}
               onChange={e => {}}
+              views={['year','month','day','hours']}
               onAccept={handleDates('start')}
               inputFormat="dd/MM/yyyy hh:mm a"
             />
@@ -113,11 +114,12 @@ const ForecastingDataPrep = (props: IForecastingDataPrep) => {
             </Typography>
             <DateTimePicker
               label={forecastingForm.endDate ? null : 'End Date'}
-              minDateTime={forecastingForm.startDate ? forecastingForm.startDate : dataset.timeRange.from}
-              maxDateTime={dataset.timeRange.to}
+              minDateTime={forecastingForm.startDate ? forecastingForm.startDate : new Date(dataset.timeRange.from)}
+              maxDateTime={new Date(dataset.timeRange.to)}
               renderInput={props => <TextField size="small" {...props} />}
               value={getDateValue(forecastingForm.endDate)}
               onChange={e => {}}
+              views={['year','month','day','hours']}
               onAccept={handleDates('end')}
               inputFormat="dd/MM/yyyy hh:mm a"
             />

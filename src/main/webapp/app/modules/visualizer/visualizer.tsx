@@ -58,6 +58,7 @@ export const Visualizer = () => {
 
   useEffect(() => {
     params.id === undefined && farmMeta && history.replace(`${params.folder}/${farmMeta.data[0].id}`);
+    params.id !== undefined && farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
   }, [farmMeta]);
 
   useEffect(() => {
@@ -66,7 +67,6 @@ export const Visualizer = () => {
 
   return (
     <div>
-      {console.log(dataset)}
       <ThemeProvider theme={mdTheme}>
         <Grid sx={{ height: '100%', width: '100%' }}>
           {errorMessage &&

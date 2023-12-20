@@ -41,9 +41,14 @@ const ForecastingPredModal = () => {
   };
 
   const handleDateChange = value => {
+    // if(selectedModel === "min_power"){
+    //   const date = new Date(value).getTime();
+    // setUserDate(date);
+    // }else{
     const userTimezoneOffset = value.getTimezoneOffset() * 60000;
-    const date = new Date(value).getTime();
+    const date = new Date(value).getTime() + userTimezoneOffset;
     setUserDate(date);
+    // }
   };
 
   const handleClick = () => {
@@ -55,7 +60,7 @@ const ForecastingPredModal = () => {
   }
 
   const getDateValue = date => {
-    return date === null ? date : date + new Date(date).getTimezoneOffset() * 60000;
+      return date ? date - new Date(date).getTimezoneOffset() * 60000 : null
   };
 
   const generateChart = () => {
@@ -103,6 +108,7 @@ const ForecastingPredModal = () => {
                 maxDateTime={dataset.timeRange.to}
                 renderInput={props => <TextField size="small" {...props} />}
                 value={getDateValue(userDate)}
+                views={['year','month','day','hours']}
                 onChange={e => {}}
                 onAccept={val => {
                   handleDateChange(val);

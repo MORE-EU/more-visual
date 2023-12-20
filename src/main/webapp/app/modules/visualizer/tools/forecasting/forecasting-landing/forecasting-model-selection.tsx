@@ -105,10 +105,12 @@ const ForecastingModelSelection = props => {
                       {model.model_name}
                     </TableCell>
                     <TableCell align="right">
-                      <Tooltip title="Predict">
-                        <IconButton onClick={handleInference(model.model_name)}>
+                      <Tooltip title={model.kind === dataset.id ? "Predict" : `This model was trained for ${model.kind} dataset`}>
+                        <span>
+                        <IconButton onClick={handleInference(model.model_name)} disabled={model.kind !== dataset.id}>
                           <QueryStatsIcon />
                         </IconButton>
+                        </span>
                       </Tooltip>
                       <Tooltip title="Delete">
                         <IconButton onClick={handleDelete(model.model_name)}>

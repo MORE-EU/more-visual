@@ -14,12 +14,21 @@ public class Meta<T> {
     private String model_path;
     private String target;
     private String time_interval;
+    private String kind;
     private T features;
     private T scaler;
     private T target_scaler;
     private String[] feature_names;
 
     // Add getters and setters for all the fields
+    
+    public String getKind() {
+        return kind;
+    }
+
+    public void setKind(String kind) {
+        this.kind = kind;
+    }
 
     public ObjectId get_id() {
         return _id;
