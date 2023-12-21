@@ -2,11 +2,8 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
-import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
-import AddIcon from '@mui/icons-material/Add';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -21,7 +18,6 @@ import ForecastingPredModal from '../forecasting-prediction/forecasting-predicti
 import grey from '@mui/material/colors/grey';
 import Chip from '@mui/material/Chip';
 import Box from '@mui/material/Box';
-import CircleIcon from '@mui/icons-material/Circle';
 
 const ForecastingModelSelection = props => {
   const { setNewTrain, savedModels } = props;
@@ -64,12 +60,6 @@ const ForecastingModelSelection = props => {
             <Chip
               size="small"
               label="Train a new model"
-              onClick={handleNewTrain}
-              sx={{ bgcolor: grey[800], color: grey[50], p: 1, '&:hover': { color: grey[900], fontWeight: 500 } }}
-            />
-            <Chip
-              size="small"
-              label="Preconfigured Models"
               onClick={handleNewTrain}
               sx={{ bgcolor: grey[800], color: grey[50], p: 1, '&:hover': { color: grey[900], fontWeight: 500 } }}
             />
@@ -132,11 +122,6 @@ const ForecastingModelSelection = props => {
                         </IconButton>
                         </span>
                       </Tooltip>
-                      {/* <Tooltip title="Delete">
-                        <IconButton onClick={handleDelete(model.model_name)}>
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip> */}
                     </TableCell>
                   </TableRow>
               </TableBody>
