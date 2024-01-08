@@ -269,6 +269,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         List<TableInfo> tableInfoArray = new ArrayList<TableInfo>();
         farm.setName(farmName);
         farm.setType(database);
+        if(database.equals("influx")) farm.setIsTimeSeries(true);
+        else farm.setIsTimeSeries(false);
         try {
             tableInfoArray = queryExecutor.getTableInfo();
             for (TableInfo tableInfo : tableInfoArray) {

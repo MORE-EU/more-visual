@@ -12,6 +12,7 @@ public class FarmMeta implements Serializable {
     private List<FarmInfo> data;
     private Float latitude;
     private Float longitude;
+    private Boolean isTimeSeries;
 
 
     public FarmMeta () {
@@ -83,6 +84,15 @@ public class FarmMeta implements Serializable {
     public void setResType(Integer resType) {
         this.resType = resType;
     }
+
+    public Boolean getIsTimeSeries() {
+        return isTimeSeries;
+    }
+
+    public void setIsTimeSeries(Boolean isTimeSeries) {
+        this.isTimeSeries = isTimeSeries;
+    }
+
 
     @Override
     public String toString() {

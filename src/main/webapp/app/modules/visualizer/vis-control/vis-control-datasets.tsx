@@ -8,7 +8,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { getDataset, updateDatasetChoice, resetFetchData, setDatasetIsConfiged, setConnented, resetDataset } from 'app/modules/store/visualizerSlice';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { Link, useHistory } from 'react-router-dom';
@@ -21,25 +21,10 @@ const VisControlDatasets = () => {
   const [uploadFile, setUploadFile] = useState(null);
   const history = useHistory();
   
-  useEffect(() => {
-    if(farmMeta.type !== 'csv' && !connected) {
-      dispatch(resetFetchData());
-      history.push('/visualize');
-    }
-  },[connected]);
-
-  const handleDataset = (idx, file) => {
+  const handleDataset = dataset => {
+    const idx = farmMeta.data.findIndex(file => file.schema === dataset.schema && file.id === dataset.id);
     if (datasetChoice !== idx) {
       dispatch(updateDatasetChoice(idx));
-      if (farmMeta.data[idx].isConfiged || farmMeta.type === "csv") {
-        dispatch(getDataset({ folder, id: file.id }));
-        history.push(`/visualize/${folder}/${file.id}`);
-      }
-      else {
-        dispatch(setDatasetIsConfiged(false));
-        dispatch(resetDataset());
-        history.push('/visualize');
-      }
     }
   };
 
@@ -47,6 +32,13 @@ const VisControlDatasets = () => {
     setUploadModalOpen(prev => !prev);
     setUploadFile(e.target.files);
   };
+
+  const handleDBUpoladChange = e => {
+    dispatch(updateDatasetChoice(farmMeta.data.findIndex(file => !file.isConfiged)));
+    dispatch(setDatasetIsConfiged(false));
+    dispatch(resetDataset());
+    history.push('/visualize');
+  }
 
   return (
     <Grid sx={{width: "100%", height: "100%"}}>
@@ -66,12 +58,14 @@ const VisControlDatasets = () => {
             </Typography>)
           }
           <List disablePadding dense>
-            {farmMeta.data.map((file, idx) => (
+            {farmMeta.data.filter( file => file.isConfiged).map((file, idx) => (
               <ListItemButton
                 key={idx}
                 selected={datasetChoice === idx}
+                component={Link}
+                to={`/visualize/${folder}/${file.id}`}
                 onClick={() => {
-                  handleDataset(idx, file);
+                  handleDataset(file), dispatch(getDataset({ folder, id: file.id }));
                 }}
                 divider
               >
@@ -85,20 +79,28 @@ const VisControlDatasets = () => {
                 )}
               </ListItemButton>
             ))}
-            { farmMeta.type === "csv" ? (
+            { farmMeta.type === "csv" && (
               <ListItemButton key={'new-dataset-list-button-sd'} component="label">
                 <input hidden type="file" accept=".csv" onChange={handleUploadChange} />
                 <ListItemText  primary={`new dataset`} sx={ {display: { xs: 'none', md: 'block' }}} />
                 <ControlPointIcon />
               </ListItemButton>
-            ) :  (
-                <ListItemButton key={'new-dataset-list-button-sd'} component="label" onClick={() => { 
-                  dispatch(setConnented(false));
-                }}>
-                  <ListItemText primary={`close connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
-                  <LogoutIcon />
-              </ListItemButton>
             )}
+            {farmMeta.type !== "csv" && !farmMeta.isTimeSeries && (
+              <ListItemButton key={'new-db-dataset-list-button-sd'} component="label" onClick={handleDBUpoladChange}>
+                <ListItemText  primary={`new dataset`} sx={ {display: { xs: 'none', md: 'block' }}} />
+                <ControlPointIcon />
+              </ListItemButton>
+            
+            )}
+            <ListItemButton key={'close-connection-list-button-sd'} component="label" onClick={() => { 
+              dispatch(setConnented(false));
+              dispatch(resetFetchData());
+              history.push('/visualize');        
+            }}>
+                <ListItemText primary={`close connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
+                <LogoutIcon />
+            </ListItemButton>
           </List>
         </>
       )}

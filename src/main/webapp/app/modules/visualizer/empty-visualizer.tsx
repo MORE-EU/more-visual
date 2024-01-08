@@ -12,6 +12,7 @@ import { setDatasetIsConfiged, disconnector, setErrorMessage, getDataset, setFol
 import Header from './header/header';
 import VisConnector from './vis-connector/vis-connector';
 import VisControlDatasetConfig from './vis-control/vis-control-dataset-config';
+import VisControlDatasetSelection from './vis-control/vis-control-dataset-selection';
 
 const mdTheme = createTheme();
 
@@ -31,19 +32,12 @@ export const EmptyVisualizer = () => {
             dispatch(setDatasetIsConfiged(false));
             dispatch(disconnector());
         }
-        if (farmMeta && farmMeta.type === "influx") {
+        if (farmMeta && farmMeta.isTimeSeries) {
             history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[0].id}`);
         }
-        if (farmMeta && datasetIsConfiged) {
-            dispatch(setFolder(farmMeta.name));
-            dispatch(getDataset({folder: farmMeta.name, id: farmMeta.data[datasetChoice].id}));
-        }
-    }, [farmMeta]);
-
-    useEffect(() => {
-        if (farmMeta && dataset)
+        if (farmMeta && datasetIsConfiged) 
             history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[datasetChoice].id}`);
-    }, [dataset]);
+    }, [farmMeta]);
 
     useEffect(() => {
         if(errorMessage) {
@@ -82,7 +76,7 @@ export const EmptyVisualizer = () => {
                     >
                         <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
                             <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
-                                {isBusy ?  farmMeta ? <VisControl /> : <CircularProgress /> : <VisConnector />}
+                                {isBusy ?  farmMeta ? <VisControlDatasetSelection /> : <CircularProgress /> : <VisConnector />}
                             </Paper>
                         </Grid>
                         <Grid sx={{ width: '80%', p: 1, flexGrow: 1, height: 'calc(100% - 30px)' }}>

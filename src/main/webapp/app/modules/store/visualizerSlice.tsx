@@ -122,6 +122,7 @@ const initialState = {
   datasetIsConfiged: false,
   connections: [] as IConnection[],
   connectionLoading: false,
+  uploadDatasetError: false,
 };
 
 export const connector = createAsyncThunk('connector', async (dbConnector: {name: string, type: string, host: string, port: string, username: string, password: string, database: string}) => {
@@ -553,6 +554,9 @@ const visualizer = createSlice({
     resetDataset(state) {
       state.dataset = null;
     },
+    resetUploadDatasetError(state) {
+      state.uploadDatasetError = false;
+    }
   },
   extraReducers: function (builder) {
     builder.addCase(getDataset.fulfilled, (state, action) => {
@@ -664,7 +668,6 @@ const visualizer = createSlice({
     });
     builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending,updateFarmInfoColumnNames.pending,getDBColumnNames.pending, connector.pending, disconnector.pending), 
     state => {
-      state.errorMessage = null;
       state.loading = true;
     });
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
@@ -698,6 +701,7 @@ const visualizer = createSlice({
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.error.message;
+        state.uploadDatasetError = true;
         state.farmMeta.data[state.datasetChoice].isConfiged = false;
       }
     );
@@ -739,6 +743,6 @@ export const {
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
   setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
   setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,setCheckConnectionResponse, setSelectedConnection,
-  setErrorMessage,setDatasetIsConfiged,resetSampleFile,resetColumnNames, setConnented, resetDataset
+  setErrorMessage,setDatasetIsConfiged,resetSampleFile,resetColumnNames, setConnented, resetDataset, resetUploadDatasetError,
 } = visualizer.actions;
 export default visualizer.reducer;

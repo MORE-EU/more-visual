@@ -89,7 +89,7 @@ export const ChartCompare = () => {
             p: 1,
           }}
         >
-          {farmMeta.data.map(
+          {farmMeta.data.filter(file => file.isConfiged).map(
             (file, idx) =>
               file.id !== dataset.id && (
                 <MenuItem key={`${file.id}-${idx}`} selected={compare.includes(file.id)} onClick={handleOnClick(file.id)}>

@@ -6,7 +6,7 @@ import StorageIcon from '@mui/icons-material/Storage';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Box from "@mui/material/Box";
 import grey from '@mui/material/colors/grey';
-import { Typography, Grid } from "@mui/material";
+import { Typography, Grid, Tooltip } from "@mui/material";
 import { createTheme } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -54,9 +54,11 @@ const VisConnector = () => {
                             }}>{connection.name}</Button>
                         </Grid>
                         <Grid item>
-                            <Button startIcon={<DeleteIcon />} onClick={() => {
-                                dispatch(deleteConnection(connection.name));
-                            }} ></Button>
+                            <Tooltip title="delete" disableInteractive> 
+                                <Button startIcon={<DeleteIcon />} onClick={() => {
+                                    dispatch(deleteConnection(connection.name));
+                                }} ></Button>
+                            </Tooltip>
                         </Grid>
                     </Grid>
                     )
@@ -64,11 +66,11 @@ const VisConnector = () => {
                 <Typography variant="subtitle1" fontSize={20} sx={{ borderBottom: `2px solid ${grey[400]}`}}>
                     New Data Source
                 </Typography>
-                <Button variant="contained"  sx={{borderRadius: 2,}} startIcon={<StorageIcon />} onClick={() => {setStep(true);}}>
-                    Database
+                <Button variant="contained" sx={{borderRadius: 2, }} startIcon={<StorageIcon />} onClick={() => {setStep(true);}}>
+                    <Typography sx={{[mdTheme.breakpoints.down('md')]: {display: 'none'},}} > Database </Typography>
                 </Button>
                 <Button disabled variant="contained"  sx={{borderRadius: 2,}} startIcon={<UploadFileIcon/>}>
-                    Filesystem
+                    <Typography sx={{[mdTheme.breakpoints.down('md')]: {display: 'none'},}} > FileSystem </Typography>
                 </Button>
             </Box>
         )}

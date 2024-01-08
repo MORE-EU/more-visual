@@ -5,16 +5,16 @@ import Paper from '@mui/material/Paper';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
-import { Divider, Grid  } from '@mui/material';
+import { CircularProgress, Divider, Grid  } from '@mui/material';
 
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice, setDatasetIsConfiged } from '../store/visualizerSlice';
 import Header from './header/header';
 
 const mdTheme = createTheme();
 
 export const Visualizer = () => {
-  const { farmMeta, dataset, datasetChoice, selectedConnection, connected } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, datasetChoice, selectedConnection, connected, uploadDatasetError } = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
   const dispatch = useAppDispatch();
   const params: any = useParams();
@@ -30,11 +30,9 @@ export const Visualizer = () => {
 
   useEffect(() => {
       if (params.id !== undefined) {
-        if (!connected || (farmMeta && (farmMeta.type === "csv" || farmMeta.type === "influx"))) {
           dispatch(setFolder(params.folder));
           dispatch(getDataset({ folder: params.folder, id: params.id }));
           farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ;
-        }
     }
   }, [params.id]);
 
@@ -46,9 +44,17 @@ export const Visualizer = () => {
       params.id === undefined && farmMeta && history.push(`${params.folder}/${farmMeta.data[0].id}`);
   }, [farmMeta]);
 
+  // useEffect(() => {
+  //   !loadingButton && farmMeta && dispatch(getFarmMeta(params.folder));
+  // }, [loadingButton]);
+
   useEffect(() => {
-    !loadingButton && farmMeta && dispatch(getFarmMeta(params.folder));
-  }, [loadingButton]);
+    if (uploadDatasetError)
+      if (connected && farmMeta && !farmMeta.isTimeSeries) {
+        dispatch(setDatasetIsConfiged(false));
+        history.push('/visualize');
+      }
+  }, [uploadDatasetError]);
 
   return (
       <div>
@@ -79,7 +85,7 @@ export const Visualizer = () => {
                     height: '100%',
                   }}
                 >
-                  {farmMeta && dataset && <ChartContainer /> }
+                  {farmMeta && dataset ? <ChartContainer /> : <CircularProgress sx={{margin: 'auto'}}/> }
                 </Paper>
               </Grid>
             </Grid>
