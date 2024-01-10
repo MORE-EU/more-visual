@@ -109,8 +109,8 @@ jhipster:
 
 application:
   name: 'More2020'
-  workspacePath: /opt/more-new-workspace
-  dbSettings: /opt/more-new-workspace/config/settings.cfg
+  workspacePath: /opt/more-workspace
+  dbSettings: /opt/more-workspace/config/settings.cfg
   timeFormat: 'yyyy-MM-dd[ HH:mm:ss]'
   delimiter: ','
   toolHost: 83.212.75.52

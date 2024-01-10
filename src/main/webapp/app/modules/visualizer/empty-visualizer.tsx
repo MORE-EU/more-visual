@@ -3,12 +3,11 @@ import { useEffect, useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import { useHistory } from 'react-router-dom';
-import VisControl from 'app/modules/visualizer/vis-control/vis-control';
 import { Divider, Grid, Snackbar, Alert  } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { setDatasetIsConfiged, disconnector, setErrorMessage, getDataset, setFolder } from '../store/visualizerSlice';
+import { setDatasetIsConfiged, disconnector, setErrorMessage } from '../store/visualizerSlice';
 import Header from './header/header';
 import VisConnector from './vis-connector/vis-connector';
 import VisControlDatasetConfig from './vis-control/vis-control-dataset-config';
@@ -19,7 +18,7 @@ const mdTheme = createTheme();
 export const EmptyVisualizer = () => {
     const [isBusy, setIsBusy] = useState(true);
     const [openSnack, setOpenSnack] = useState(false);
-    const { farmMeta, dataset, datasetChoice, selectedConnection, connected, datasetIsConfiged, errorMessage } = useAppSelector(state => state.visualizer);
+    const { farmMeta, datasetChoice, selectedConnection, connected, datasetIsConfiged, errorMessage } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const history = useHistory();
 
@@ -32,8 +31,9 @@ export const EmptyVisualizer = () => {
             dispatch(setDatasetIsConfiged(false));
             dispatch(disconnector());
         }
+        
         if (farmMeta && farmMeta.isTimeSeries) {
-            history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[0].id}`);
+            history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[datasetChoice].id}`);
         }
         if (farmMeta && datasetIsConfiged) 
             history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[datasetChoice].id}`);
@@ -88,7 +88,7 @@ export const EmptyVisualizer = () => {
                                     height: '100%',
                                 }}
                             >
-                                {farmMeta && (datasetIsConfiged? <CircularProgress sx={{margin: 'auto'}}/> : <VisControlDatasetConfig /> )}
+                                {farmMeta && !farmMeta.isTimeSeries && <VisControlDatasetConfig /> }
                             </Paper>
                         </Grid>
                     </Grid>

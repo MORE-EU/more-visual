@@ -69,8 +69,8 @@ const VisControlDatasets = () => {
                 }}
                 divider
               >
-                <ListItemText primary={`${file.id}`} />
-                {compare.includes(file.id) && (
+              <ListItemText primary={`${file.id}`} sx={{ pl: 4 }} />
+                {Object.hasOwn(compare, file.id) && (
                   <Tooltip title="Currently comparing this file">
                     <ListItemIcon>
                       <CompareArrowsIcon />

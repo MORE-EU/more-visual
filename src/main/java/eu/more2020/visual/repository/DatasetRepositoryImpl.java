@@ -15,6 +15,9 @@ import eu.more2020.visual.middleware.domain.DataFileInfo;
 import eu.more2020.visual.middleware.domain.Dataset.*;
 import eu.more2020.visual.middleware.domain.TimeRange;
 import eu.more2020.visual.middleware.util.DateTimeUtil;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,20 +87,24 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     @Override
     public Optional<AbstractDataset> findById(String id, String farmName) throws IOException, SQLException {
         Assert.notNull(id, "Id must not be null!");
+        ObjectMapper mapper = new ObjectMapper();
         AbstractDataset dataset = null;
-        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName, farmName + ".meta.json");
+        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName,
+                farmName + ".meta.json");
         ObjectMapper objectMapper = new ObjectMapper();
-        if(datasets.containsKey(id)) dataset = datasets.get(id);
-        else{
-            if (metadataFile.exists()) {
-                JsonNode jsonNode = objectMapper.readTree(metadataFile);
-                FarmMeta farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
-                String type = farm.getType();
 
-                for (JsonNode datasetNode : jsonNode.get("data")) {
-                    String datasetId = datasetNode.get("id").asText();
-                    if(!datasetId.equals(id)) continue;
-                    // Extract data from JSON node and create the desired subclass of AbstractDataset
+        if (metadataFile.exists()) {
+            JsonNode jsonNode = objectMapper.readTree(metadataFile);
+            FarmMeta farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
+            String type = farm.getType();
+
+            for (JsonNode datasetNode : jsonNode.get("data")) {
+                String datasetId = datasetNode.get("id").asText();
+                if (!datasetId.equals(id))
+                    continue;
+                // Extract data from JSON node and create the desired subclass of
+                // AbstractDataset
+                if (type.equals("csv")) {
                     String name = datasetNode.get("name").asText();
                     String path = datasetNode.get("path").asText();
                     String timeCol = datasetNode.get("timeCol").asText();
@@ -143,8 +150,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                     String timeCol = datasetNode.get("timeCol").asText();
                     String valueCol = datasetNode.get("valueCol").asText();
                     String idCol = datasetNode.get("idCol").asText();
-                    dataset = createDBDataset(datasetId, farm.getType(), schema, name, timeCol, valueCol, idCol,
-                            config);
+                    // dataset = createDBDataset(datasetId, farm.getType(), schema, name, timeCol, valueCol, idCol,
+                    //         config);
                 }
                 dataset.setType(type);
             }
@@ -152,6 +159,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         }
         return Optional.ofNullable(dataset);
     }
+
 
     private void fillDataFileInfo(CsvDataset dataset, DataFileInfo dataFileInfo) throws IOException {
         CsvParserSettings parserSettings = new CsvParserSettings();
@@ -189,11 +197,38 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public List<Sample> findSample(String farmName) throws IOException {
-        File f = new File(applicationProperties.getWorkspacePath() + "/" + farmName);
-        File[] matchingFiles = f.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.contains("sample") && name.endsWith("csv");
+    public List<Sample> findSample (String farmName) throws IOException {
+        Path f = Paths.get(applicationProperties.getWorkspacePath() + "/" + farmName + "/" + farmName + ".sample.csv");
+        System.out.println(f.toString());
+        List<Sample> list = List.of(); // Default to empty list.
+        try {
+
+            int initialCapacity = (int) Files.lines(f).count();
+            list = new ArrayList<>(initialCapacity);
+
+            BufferedReader reader = Files.newBufferedReader(f);
+            Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
+
+            for (CSVRecord record : records) {
+                Sample sample = new Sample();
+                sample.setContinent(record.get("Continent"));
+                sample.setCountry(record.get("Country"));
+                sample.setArea(record.get("Area"));
+                sample.setCity(record.get("City"));
+                sample.setName(record.get("Name"));
+                sample.setLat(record.get("Latitude"));
+                sample.setLng(record.get("Longitude"));
+                sample.setManufacturer(record.get("Manufacturer"));
+                sample.setTurbine(record.get("Turbine"));
+                sample.setHubHeight(record.get("Hub height"));
+                sample.setNoOfTurbines(record.get("Number of turbines"));
+                sample.setPower(record.get("Total power"));
+                sample.setDev(record.get("Developer"));
+                sample.setOperator(record.get("Operator"));
+                sample.setOwner(record.get("Owner"));
+                sample.setComDate(record.get("Commissioning date"));
+
+                list.add(sample);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -224,7 +259,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         String[] names = file.list();
         List<String> dirs = new ArrayList<>();
         for (String name : names) {
-            if (new File(applicationProperties.getWorkspacePath() + "/" + name).isDirectory() && !name.equals("config")) {
+            if (new File(applicationProperties.getWorkspacePath() + "/" + name).isDirectory()
+                    && !name.equals("config")) {
                 dirs.add(name);
             }
         }

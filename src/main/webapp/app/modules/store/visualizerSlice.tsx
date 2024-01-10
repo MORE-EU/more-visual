@@ -13,6 +13,7 @@ import moment, { Moment } from 'moment';
 import { IDatasets, defaultDatasets } from 'app/shared/model/datasets.model';
 import { RootState } from './storeConfig';
 import { IDataset } from 'app/shared/model/dataset.model';
+import { IAlertResults } from 'app/shared/model/alert-results.model';
 
 
 const seedrandom = require('seedrandom');
@@ -37,19 +38,6 @@ const generateColor = () => {
   return rgb;
 };
 
-const calculateFreqFromDiff = (timeRange: any) => {
-  const diff = moment.duration(moment(timeRange.to).diff(moment(timeRange.from))).humanize();
-  if (diff.includes('month') || diff.includes('day')) {
-    return 'hour';
-  } else if (diff.includes('hour')) {
-    return 'minute';
-  } else if (diff.includes('minute') || diff.includes('second')) {
-    return 'second';
-  }
-  return 'hour';
-};
-
-
 const forecastingInitialState = {
   forecastingStartDate: null,
   forecastingEndDate: null,
@@ -68,12 +56,6 @@ const calculateFreqFromDiff = (timeRange: any) => {
   return 'hour';
 };
 
-
-const forecastingInitialState = {
-  forecastingStartDate: null,
-  forecastingEndDate: null,
-  forecastingDataSplit: [60, 20, 20],
-};
 
 const checkConnectionInitialState = {
   checkConnectionResponse: null,
@@ -138,7 +120,6 @@ const initialState = {
   alerts: [] as IAlerts[],
   alertsLoading: false,
   alertingPreview: false,
-  alertResults: {},
   alertingPlotMode: false,
   ...forecastingInitialState,
   ...checkConnectionInitialState,
@@ -151,6 +132,18 @@ const initialState = {
   uploadDatasetError: false,
   
 };
+
+const concatenateAndSortDistinctArrays = (array1: number[], array2: number[]) => {
+  // Concatenate the two arrays
+  const combinedArray = array1.concat(array2);
+  // Create a new Set to store only distinct values
+  const uniqueValues = new Set<number>(combinedArray);
+  // Convert the Set back to an array
+  const distinctArray = Array.from(uniqueValues);
+  // Sort the distinct array numerically
+  distinctArray.sort((a, b) => a - b);
+  return distinctArray;
+}
 
 export const connector = createAsyncThunk('connector', async (dbConnector: {name: string, type: string, host: string, port: string, username: string, password: string, database: string}) => {
   try {
@@ -246,10 +239,12 @@ export const editAlert = createAsyncThunk('editAlert', async (alertInfo: IAlerts
   return response;
 });
 
-export const deleteAlert = createAsyncThunk('deleteAlert', async (alertName: String) => {
-  const response = await axios.post(`api/alerts/remove/${alertName}`).then(res => res);
+export const deleteAlert = createAsyncThunk('deleteAlert', async (info: {alertName: String, datasetId: String}) => {
+  const {alertName, datasetId} = info;
+  const response = await axios.post(`api/alerts/remove/${datasetId}/${alertName}`).then(res => res);
   return response;
 });
+
 
 export const saveConnection = createAsyncThunk('saveConnection', async(connectionInfo: IConnection) => {
   const response = await axios.post(`api/connector/add`, connectionInfo).then(res => res);
@@ -488,6 +483,9 @@ const visualizer = createSlice({
     setShowChangepointFunction(state, action) {
       state.showChangepointFunction = action.payload;
     },
+    setCompareData(state, action) {
+      state.compareData = action.payload;
+    },
     setComparePopover(state, action) {
       state.comparePopover = action.payload;
     },
@@ -524,12 +522,8 @@ const visualizer = createSlice({
     setErrorMessage(state, action) {
       state.errorMessage = action.payload;
     },
-
     setSelectedConnection(state, action) {
       state.selectedConnection = action.payload;
-    },
-    setDetectedChangepointFilter(state, action) {
-      state.detectedChangepointFilter = action.payload;
     },
     setAutoMLStartDate(state, action) {
       state.forecastingStartDate = action.payload;
@@ -565,6 +559,10 @@ const visualizer = createSlice({
     },
     toggleCustomChangepoints(state, action) {
       state.customChangepointsEnabled = action.payload;
+    },
+    resetFarmMeta(state) {
+      state.farmMeta = null;
+      state.chartRef = null;
     },
     resetForecastingState(state) {
       // remove plotlines from chart when you disable forecasting
@@ -620,6 +618,7 @@ const visualizer = createSlice({
     builder.addCase(getDbMetadata.fulfilled, (state, action) => {
       state.loading = false;
       state.farmMeta = action.payload.data;
+      state.datasetChoice = 0;
     });
     builder.addCase(updateFarmInfoColumnNames.fulfilled, (state, action) => {
       state.loading = false;
@@ -635,10 +634,6 @@ const visualizer = createSlice({
       state.loading = false;
       state.farmMeta = action.payload.data;
       state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
-    builder.addCase(getFarmMeta.fulfilled, (state, action) => {
-      state.loading = false;
-      state.farmMeta = action.payload.data;
-      state.datasetChoice = 0;
     })
     builder.addCase(getDatasets.fulfilled, (state, action) => {
       state.datasets = {data: action.payload.data, loading: false, error: null};
@@ -684,6 +679,7 @@ const visualizer = createSlice({
     });
     builder.addCase(updateQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;
+      state.queryResults = action.payload.response;
       state.data = action.payload.response.data;
       state.from = action.payload.response.data[Object.keys(action.payload.response.data)[0]][0].timestamp;
       state.to = action.payload.response.data[Object.keys(action.payload.response.data)[0]][action.payload.response.data[Object.keys(action.payload.response.data)[0]].length - 1].timestamp;
@@ -713,8 +709,7 @@ const visualizer = createSlice({
     builder.addCase(getDatasets.rejected, (state, action) => {
       state.datasets = {...state.datasets, loading: false, error: "there was an error loading the data"}
     });
-    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending), state => {
-      state.errorMessage = null;
+    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending,updateFarmInfoColumnNames.pending,getDBColumnNames.pending, connector.pending, disconnector.pending), state => {
       state.loading = true;
     });
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending, applyDeviationDetection.pending), state => {
@@ -783,13 +778,13 @@ const visualizer = createSlice({
 });
 
 export const {
-  resetChartValues,resetFetchData,updateSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
-  updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef,
+  resetChartValues,resetFetchData,updateSelectedMeasures,updateCustomSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
+  updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef, updateDetectedChangepoints,
   updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks,
   updateSoilingType,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
   toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
-  setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
+  setCompareData, setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
   setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,setCheckConnectionResponse, setSelectedConnection,
-  setErrorMessage,setDatasetIsConfiged,resetSampleFile,resetColumnNames, setConnented, resetDataset, resetUploadDatasetError,
+  setErrorMessage,setDatasetIsConfiged,resetSampleFile,resetColumnNames, setConnented, resetDataset, resetUploadDatasetError, resetFarmMeta,
 } = visualizer.actions;
 export default visualizer.reducer;
