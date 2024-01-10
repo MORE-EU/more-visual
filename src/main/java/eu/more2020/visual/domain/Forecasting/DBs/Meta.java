@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("meta")
-public class Meta {
+public class Meta<T> {
 
     @Id
     private ObjectId _id;
@@ -14,12 +14,21 @@ public class Meta {
     private String model_path;
     private String target;
     private String time_interval;
-    private Features features;
-    private Scaler scaler;
-    private Scaler target_scaler;
+    private String kind;
+    private T features;
+    private T scaler;
+    private T target_scaler;
     private String[] feature_names;
 
     // Add getters and setters for all the fields
+    
+    public String getKind() {
+        return kind;
+    }
+
+    public void setKind(String kind) {
+        this.kind = kind;
+    }
 
     public ObjectId get_id() {
         return _id;
@@ -69,27 +78,27 @@ public class Meta {
         this.time_interval = time_interval;
     }
 
-    public Features getFeatures() {
+    public T getFeatures() {
         return features;
     }
 
-    public void setFeatures(Features features) {
+    public void setFeatures(T features) {
         this.features = features;
     }
 
-    public Scaler getScaler() {
+    public T getScaler() {
         return scaler;
     }
 
-    public void setScaler(Scaler scaler) {
+    public void setScaler(T scaler) {
         this.scaler = scaler;
     }
 
-    public Scaler getTarget_scaler() {
+    public T getTarget_scaler() {
         return target_scaler;
     }
 
-    public void setTarget_scaler(Scaler target_scaler) {
+    public void setTarget_scaler(T target_scaler) {
         this.target_scaler = target_scaler;
     }
 

@@ -23,7 +23,8 @@ export const ChartPlotBands = (props: IChartPlotBandsProps) => {
 
   const {manualChangepoints, manualChangepointsEnabled,
     detectedChangepoints, changepointDetectionEnabled,
-    customChangepointsEnabled, detectedChangepointFilter, anchorEl} = useAppSelector(state => state.visualizer);
+    yawMisalignmentEnabled, customChangepointsEnabled,
+    detectedChangepointFilter, anchorEl} = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
 
@@ -52,8 +53,7 @@ export const ChartPlotBands = (props: IChartPlotBandsProps) => {
 
   // Color Bands for Detected Changepoints
   useEffect(() => {
-    let newPlotBands =  (detectedChangepoints !== null && changepointDetectionEnabled) ? [].concat(...detectedChangepoints.map((date, idx) => {
-
+    let newPlotBands =  (detectedChangepoints !== null && (changepointDetectionEnabled || yawMisalignmentEnabled)) ? [].concat(...detectedChangepoints.map((date, idx) => {
       return {
         color: '#0479cc',
         from: date.range.from,
@@ -73,7 +73,6 @@ export const ChartPlotBands = (props: IChartPlotBandsProps) => {
       };
     })) : [];
     newPlotBands = filterChangepoints(newPlotBands, detectedChangepointFilter);
-    // newPlotBands.filter(plotBand.score )
     props.setDetectedPlotBands(newPlotBands);
   }, [detectedChangepoints, detectedChangepointFilter]);
 

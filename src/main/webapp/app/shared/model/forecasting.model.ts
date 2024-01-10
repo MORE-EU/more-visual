@@ -9,6 +9,7 @@ export interface IForecastingForm {
   cleanData: boolean;
   dataSplit: number[];
   features: IFeatures;
+  kind: string;
   algorithms: IAlgorigths;
 }
 
@@ -78,6 +79,7 @@ export const IForecastingDefault: Readonly<IForecastingForm> = {
   cleanData: true,
   algorithms: {},
   dataSplit: [60, 20, 20],
+  kind: '',
   features: { columnFeatures: [], optionalFeatures: {} },
 };
 

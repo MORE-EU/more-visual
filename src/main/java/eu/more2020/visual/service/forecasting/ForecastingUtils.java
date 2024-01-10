@@ -46,7 +46,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoClient;
 
-import eu.more2020.visual.domain.Forecasting.DBs.Bebeze;
+import eu.more2020.visual.domain.Forecasting.DBs.BEZ2;
 import eu.more2020.visual.domain.Forecasting.DBs.DataBasesConfig;
 import eu.more2020.visual.domain.Forecasting.DBs.Meta;
 import eu.more2020.visual.repository.MetaRepository;
@@ -110,6 +110,7 @@ public class ForecastingUtils {
             FileInputStream inputStream = new FileInputStream(dbSettings);
             properties.load(inputStream);
             dbConfig.setBucket(properties.getProperty("bucket"));
+            dbConfig.setKind(properties.getProperty("kind"));
             dbConfig.setOrg(properties.getProperty("org"));
             dbConfig.setToken(properties.getProperty("token"));
             dbConfig.setMongo_uri(properties.getProperty("mongo_uri"));
@@ -127,10 +128,58 @@ public class ForecastingUtils {
         return "done";
     }
 
+    // public List<Point> getPoints() {
+    //     log.debug("Parsing CSV file...");
+    //     long startTime = System.currentTimeMillis();
+    //     Path pathInput = Paths.get(workspacePath + "/beico/beico11.csv");
+    //     List<Point> list = List.of(); // Default to empty list.
+    //     try {
+    //         int initialCapacity = (int) Files.lines(pathInput).count();
+    //         list = new ArrayList<>(initialCapacity);
+
+    //         BufferedReader reader = Files.newBufferedReader(pathInput);
+    //         Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
+    //         for (CSVRecord record : records) {
+    //             String format = "yyyy-MM-dd HH:mm:ss";
+    //             SimpleDateFormat sdf = new SimpleDateFormat(format);
+    //             String dt = record.get("datetime");
+    //             Date date = sdf.parse(dt);
+    //             Instant datetime = date.toInstant();
+    //             list.add(new Beico(
+    //                 datetime,
+    //                 Double.parseDouble(record.get("Grd_Prod_Pwr_avg")),
+    //                 Double.parseDouble(record.get("Amb_Temp_avg")),
+    //                 Double.parseDouble(record.get("Amb_WindSpeed_avg")),
+    //                 Double.parseDouble(record.get("Grd_Prod_Pwr_min")),
+    //                 Double.parseDouble(record.get("Amb_Temp_min")),
+    //                 Double.parseDouble(record.get("Amb_WindSpeed_min")),
+    //                 Double.parseDouble(record.get("Grd_Prod_Pwr_max")),
+    //                 Double.parseDouble(record.get("Amb_Temp_max")),
+    //                 Double.parseDouble(record.get("Amb_WindSpeed_max")),
+    //                 Double.parseDouble(record.get("Grd_Prod_Pwr_std")),
+    //                 Double.parseDouble(record.get("Amb_WindSpeed_std")),
+    //                 Double.parseDouble(record.get("Amb_WindDir_Abs_avg")),
+    //                 Double.parseDouble(record.get("label")),
+    //                 Double.parseDouble(record.get("MeanWindSpeedUID_10.0m")),
+    //                 Double.parseDouble(record.get("DirectionUID_10.0m")),
+    //                 Double.parseDouble(record.get("MeanWindSpeedUID_100.0m")),
+    //                 Double.parseDouble(record.get("DirectionUID_100.0m"))
+    //             ).toPoint());
+    //         }
+    //     } catch (IOException | ParseException e) {
+    //         e.printStackTrace();
+    //     }
+    //     long endTime = System.currentTimeMillis();
+    //     double elapsedTimeSeconds = (endTime - startTime) / 1000.0;
+    //     log.debug("CSV parsing took: " + elapsedTimeSeconds + " seconds");
+
+    //     return list;
+    // }
+
     public List<Point> getPoints() {
         log.debug("Parsing CSV file...");
         long startTime = System.currentTimeMillis();
-        Path pathInput = Paths.get(workspacePath + "/bbz/bbz1big.csv");
+        Path pathInput = Paths.get(workspacePath + "/wind/BEZ2.csv");
         List<Point> list = List.of(); // Default to empty list.
         try {
             int initialCapacity = (int) Files.lines(pathInput).count();
@@ -139,28 +188,26 @@ public class ForecastingUtils {
             BufferedReader reader = Files.newBufferedReader(pathInput);
             Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
             for (CSVRecord record : records) {
-
                 String format = "yyyy-MM-dd HH:mm:ss";
                 SimpleDateFormat sdf = new SimpleDateFormat(format);
                 String dt = record.get("datetime");
                 Date date = sdf.parse(dt);
                 Instant datetime = date.toInstant();
-
-                Double active_power = Double.parseDouble(record.get("active_power"));
-                Double roto_speed = Double.parseDouble(record.get("roto_speed"));
                 Double wind_speed = Double.parseDouble(record.get("wind_speed"));
-                Double cos_nacelle_dir = Double.parseDouble(record.get("cos_nacelle_dir"));
                 Double pitch_angle = Double.parseDouble(record.get("pitch_angle"));
+                Double rotor_speed = Double.parseDouble(record.get("rotor_speed"));
+                Double active_power = Double.parseDouble(record.get("active_power"));
+                Double cos_nacelle_dir = Double.parseDouble(record.get("cos_nacelle_dir"));
                 Double sin_nacelle_dir = Double.parseDouble(record.get("sin_nacelle_dir"));
                 Double cos_wind_dir = Double.parseDouble(record.get("cos_wind_dir"));
                 Double sin_wind_dir = Double.parseDouble(record.get("sin_wind_dir"));
-                Double nacelle_direction = Double.parseDouble(record.get("nacelle_direction"));
-                Double wind_direction = Double.parseDouble(record.get("wind_direction"));
+                Double cor_nacelle_direction = Double.parseDouble(record.get("cor_nacelle_direction"));
+                Double cor_wind_direction = Double.parseDouble(record.get("cor_wind_direction"));
 
-                Point point = new Bebeze(datetime, active_power, roto_speed, wind_speed,
-                        cos_nacelle_dir, pitch_angle,
-                        sin_nacelle_dir, cos_wind_dir, sin_wind_dir, nacelle_direction,
-                        wind_direction).toPoint();
+                Point point = new BEZ2(datetime, wind_speed, pitch_angle, rotor_speed,
+                active_power, cos_nacelle_dir, sin_nacelle_dir,
+                cos_wind_dir, sin_wind_dir, cor_nacelle_direction,
+                cor_wind_direction).toPoint();
                 list.add(point);
             }
         } catch (IOException | ParseException e) {
@@ -188,7 +235,7 @@ public class ForecastingUtils {
 
         String query = String.format(
                 "from(bucket:\"%s\") |> range(start: 0) |> filter(fn: (r) => r._measurement == \"%s\") |> limit(n: 1)",
-                dbCon.getBucket(), "bebeze");
+                dbCon.getBucket(), dbCon.getKind());
 
         List<FluxTable> tables = queryApi.query(query);
         if (tables.isEmpty()) {

@@ -77,12 +77,12 @@ const SubPatternCard = (props: IPatternCardProps) => {
         <TableCell align="center"></TableCell>
         <TableCell align="center">{getDateFormatted(new Date(pattern.range.from))}</TableCell>
         <TableCell align="center">{getDateFormatted(new Date(pattern.range.to))}</TableCell>
-        <TableCell align="center">
-          <div className={classes.container}>
-            <div className={classes.circle}></div>
-             <Typography>{getIndex(0.9, 1, pattern.range)}</Typography>
-          </div>
-        </TableCell>
+        {/*<TableCell align="center">*/}
+        {/*  <div className={classes.container}>*/}
+        {/*    <div className={classes.circle}></div>*/}
+        {/*     <Typography>{getIndex(0.9, 1, pattern.range)}</Typography>*/}
+        {/*  </div>*/}
+        {/*</TableCell>*/}
         <TableCell align="center">
           <Checkbox checked={isChecked} onChange={onCheckboxChange} />
         </TableCell>

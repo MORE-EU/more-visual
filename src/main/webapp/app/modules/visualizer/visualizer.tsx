@@ -12,10 +12,12 @@ import { getAlerts, getDataset, getFarmMeta, setFolder, updateDatasetChoice, set
 import Header from './header/header';
 
 const mdTheme = createTheme();
+type TransitionProps = Omit<SlideProps, 'direction'>;
 
 export const Visualizer = () => {
-  const { farmMeta, dataset, datasetChoice, selectedConnection, connected, uploadDatasetError } = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, datasetChoice, selectedConnection, connected, uploadDatasetError, errorMessage } = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const dispatch = useAppDispatch();
   const params: any = useParams();
   const history = useHistory();
@@ -27,14 +29,34 @@ export const Visualizer = () => {
       }
     }
   }, []);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ;
+  const handleSnackClose = () => {
+    setOpenSnackbar(false);
+  }
+
+  function TransitionLeft(props: TransitionProps) {
+    return <Slide {...props} direction="left" />;
+  }
 
   useEffect(() => {
-      if (params.id !== undefined) {
-          dispatch(setFolder(params.folder));
-          dispatch(getDataset({ folder: params.folder, id: params.id }));
-          farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ;
+    dispatch(getFarmMeta(params.folder));
+    dispatch(getDatasets(params.folder));
+    return () => {
+      dispatch(resetFarmMeta());
+    };
+  }, []);
+
+  useEffect(() => {
+    if (params.id !== undefined) {
+      dispatch(setFolder(params.folder));
+      dispatch(getDataset({ folder: params.folder, id: params.id }));
+      farmMeta !== null && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
     }
   }, [params.id]);
+
+  useEffect(() => {
+    errorMessage !== null && setOpenSnackbar(true)
+  }, [errorMessage])
 
   useEffect(() => {
     dataset && dispatch(getAlerts(dataset.id));

@@ -1,10 +1,11 @@
-package eu.more2020.visual.repository;
+package eu.more2020.visual.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.protobuf.InvalidProtocolBufferException;
 import eu.more2020.visual.domain.*;
 import eu.more2020.visual.domain.Detection.ChangepointDetection;
 import eu.more2020.visual.domain.Detection.DeviationDetection;
+import eu.more2020.visual.domain.Detection.PatternDetection;
 import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.middleware.domain.ImmutableDataPoint;
 
@@ -15,7 +16,7 @@ import java.util.List;
  * Repository for the Dataset entity.
  */
 @SuppressWarnings("unused")
-public interface ToolsRepository {
+public interface ToolsService {
 
     List<Changepoint> getManualChangepoints(String id) throws InvalidProtocolBufferException, JsonProcessingException;
 
@@ -27,6 +28,6 @@ public interface ToolsRepository {
 
     List<ImmutableDataPoint> yawMisalignmentDetection(RangeDetection rangeDetection);
 
-    // List<Changepoint> patternDetection(PatternDetection patternDetection);
+    List<Changepoint> patternDetection(PatternDetection patternDetection);
 
 }

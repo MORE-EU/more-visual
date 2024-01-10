@@ -109,13 +109,10 @@ jhipster:
 
 application:
   name: 'More2020'
-  workspacePath: C:\Users\30694\Desktop\more-workspace
-  dbSettings: C:\Users\30694\Desktop\more-workspace\config\settings.cfg
+  workspacePath: /opt/more-new-workspace
+  dbSettings: /opt/more-new-workspace/config/settings.cfg
   timeFormat: 'yyyy-MM-dd[ HH:mm:ss]'
   delimiter: ','
-  #  toolHost: 83.212.75.52
-  toolHost: localhost
-  toolPort: 50052
-  modelardb:
-    url: leviathan.imsi.athenarc.gr
-    port: 9999
+  toolHost: 83.212.75.52
+  #  toolHost: localhost
+  toolPort: 50053

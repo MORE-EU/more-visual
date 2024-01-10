@@ -32,7 +32,7 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
   const [alertName, setAlertName] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.name : '');
   const [measureSel, setMeasureSel] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.measure : null);
   const [operationSel, setOperationSel] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.operation : 'over');
-  const [duration, setDuration] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.duration : 10);
+  const [duration, setDuration] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.duration : {number: 10, unit: "hour"});
   const [values, setValues] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.values : { value1: '', value2: '' });
   const [color, setColor] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.color : '#333333');
   const [severity, setSeverity] = useState(props.action === 'edit' && props.alertInfo ? props.alertInfo.severity : 1);
@@ -45,7 +45,7 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
     setMeasureSel(null);
     setValues({ value1: '', value2: '' });
     setOperationSel('over');
-    setDuration(10);
+    setDuration({number: 10, unit: "hour"});
   };
 
   // useEffect(() => {
@@ -142,8 +142,15 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
     setValues({ value1: '', value2: '' });
   };
 
-  const handleDuration = e => {
-    setDuration(e.target.value);
+  const handleDuration = valType => e => {
+    switch(valType){
+      case "number":
+        setDuration(prev => ({...prev, number: parseFloat(e.target.value)}))
+        break;
+      case "unit":
+        setDuration(prev => ({...prev, unit: e.target.value}))
+        break;
+    }
   };
 
   const handleValues = e => {
@@ -161,7 +168,8 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
       },
       operation: operationSel,
       duration,
-      dateCreated: props.action === 'edit' && props.alertInfo ? props.alertInfo.dateCreated : data[data.length - 1].timestamp,
+      dateCreated: new Date().getTime(),
+      // dateCreated: props.action === 'edit' && props.alertInfo ? props.alertInfo.dateCreated : data[measureIndex][data[measureIndex].length - 1].timestamp,
       datasetId: dataset.id,
       color,
       severity,
@@ -248,21 +256,35 @@ const AlertAddEdit = (props: IAlertAddEditProps) => {
                 Evaluate every
               </Typography>
             </Box>
+            <TextField
+                id="evaluate_number"
+                label="Number"
+                type="number"
+                size="small"
+                value={duration.value}
+                sx={{ mr: 1, backgroundColor: '#f5f5f5', width: 100 }}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                onChange={handleDuration("number")}
+              />
             <FormControl size="small">
-              <InputLabel id="demo-simple-select-label">Duration</InputLabel>
+              <InputLabel id="demo-simple-select-label">Unit</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={duration}
-                label="Duration"
+                value={duration.unit}
+                label="Unit"
                 variant="outlined"
-                sx={{ backgroundColor: '#f5f5f5' }}
-                onChange={handleDuration}
+                sx={{ backgroundColor: '#f5f5f5', width: 100 }}
+                onChange={handleDuration("unit")}
               >
-                <MenuItem value={10}>10s</MenuItem>
-                <MenuItem value={20}>20s</MenuItem>
-                <MenuItem value={30}>30s</MenuItem>
-                <MenuItem value={60}>1m</MenuItem>
+                <MenuItem value={"second"}>second</MenuItem>
+                <MenuItem value={"minute"}>minute</MenuItem>
+                <MenuItem value={"hour"}>hour</MenuItem>
+                <MenuItem value={"day"}>day</MenuItem>
+                <MenuItem value={"month"}>month</MenuItem>
+                <MenuItem value={"year"}>year</MenuItem>
               </Select>
             </FormControl>
           </Grid>

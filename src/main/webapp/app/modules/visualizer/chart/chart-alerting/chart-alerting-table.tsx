@@ -82,7 +82,7 @@ const AlertsTable = props => {
                   </div>
                 </TableCell>
                 <TableCell align="right" sx={{ color: disabledRow ? grey[400] : grey[900] }}>
-                  {row.duration}
+                  {`${row.duration.number} ${row.duration.unit}`}
                 </TableCell>
                 <TableCell align="right" sx={{ color: disabledRow ? grey[400] : grey[900] }}>
                   {row.measure}
@@ -131,7 +131,7 @@ const AlertsTable = props => {
                               aria-controls={open ? 'long-menu' : undefined}
                               aria-expanded={open ? 'true' : undefined}
                               aria-haspopup="true"
-                              disabled={disabledRow}
+                              disabled={disabledRow || !row.active}
                               onClick={() => {
                                 props.setAlertPreviewName(row.name);
                                 props.setValue(2);
@@ -150,7 +150,7 @@ const AlertsTable = props => {
                           aria-expanded={open ? 'true' : undefined}
                           aria-haspopup="true"
                           onClick={() => {
-                            dispatch(deleteAlert(row.name));
+                            dispatch(deleteAlert({alertName: row.name, datasetId: dataset.id}));
                           }}
                         >
                           <DeleteIcon />

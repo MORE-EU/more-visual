@@ -3,6 +3,7 @@ import { IForecastingForm } from 'app/shared/model/forecasting.model';
 import { IForecastingData, IForecastingDataDefault, IForecastingResults } from 'app/shared/model/forecastingData.model';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
 
 const initialState = {
   forecastingLoading: false,
@@ -74,8 +75,14 @@ export const deleteModelByName = createAsyncThunk('deleteModelByName', async (mo
   return response;
 });
 
-export const getInference = createAsyncThunk('getInference', async (info: { timestamp: number; model_name: string }) => {
+export const getInference = createAsyncThunk('getInference', async (info: { timestamp: number; model_name: string; kind: string }) => {
   const response = await axios.post(`api/forecasting/inference`, info).then(res => res.data);
+  return response;
+});
+
+export const getAthenaInference = createAsyncThunk('getAthenaInference', async (info: { timestamp: number; model_name: string }) => {
+  const infoList = {data_id: info.model_name, start_date: moment(info.timestamp).format('YYYY-MM-DD HH:mm:ss'), end_date: moment(info.timestamp).format('YYYY-MM-DD HH:mm:ss'), use_case_id: "forecasting" }
+  const response = await axios.post(`api/forecasting/Athenainference`, infoList).then(res => res.data);
   return response;
 });
 
@@ -85,10 +92,11 @@ export const getInitialSeries = createAsyncThunk(
     const { from, to, folder, id, measure } = data;
     const state: any = getState();
     const query = {
-      range: { from, to },
-      frequency: 'MINUTE',
+      from,
+      to,
+      viewPort: {width: 1000, height: 600},
       measures: [state.visualizer.dataset.header.indexOf(measure)],
-      filter: null,
+      filter: {},
     };
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
     return response.data;
@@ -116,6 +124,10 @@ const forecasting = createSlice({
     },
   },
   extraReducers(builder) {
+    builder.addCase(getAthenaInference.fulfilled, (state, action) => {
+      state.forecastingLoading = false;
+      state.forecastingInference = action.payload.results;
+    });
     builder.addCase(getInference.fulfilled, (state, action) => {
       state.forecastingLoading = false;
       state.forecastingInference = action.payload.predictions;
@@ -147,7 +159,8 @@ const forecasting = createSlice({
         getTarget.pending,
         getInitialSeries.pending,
         saveModel.pending,
-        getInference.pending
+        getInference.pending,
+        getAthenaInference.pending
       ),
       state => {
         state.forecastingLoading = true;
@@ -161,7 +174,8 @@ const forecasting = createSlice({
         getTarget.rejected,
         getInitialSeries.rejected,
         saveModel.rejected,
-        getInference.rejected
+        getInference.rejected,
+        getAthenaInference.rejected
       ),
       (state, action) => {
         state.forecastingError = action.payload;

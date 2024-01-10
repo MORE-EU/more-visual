@@ -1,5 +1,5 @@
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "app/modules/store/storeConfig";
 import {
   getManualChangepoints,
@@ -31,6 +31,16 @@ export const filterChangepoints = (changepoints, filter) => {
   return changepoints.slice(0, ( changepoints.length - (changepoints.length * filter / 100)))
 }
 
+const ValueLabelComponent = (props) => {
+  const { children, open, value } = props;
+
+  return (
+    <Tooltip open={open} enterTouchDelay={0} placement="top" title={`Top ${value}%`} >
+      {children}
+    </Tooltip>
+  );
+}
+
 export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   const { dataset, from, to, soilingType, soilingWeeks,
     manualChangepoints,
@@ -40,12 +50,26 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
   } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
+  const [sliderValue, setSliderValue] = useState(0);
+
   const {changepointsName, manualChangepointsName, potentialChangepointsName,
   shownMeasures} = props;
 
   useEffect(()=>{
+    setSliderValue(90);
     dispatch(getManualChangepoints(dataset.id));
+
+    return () => {
+      dispatch(toggleSoilingDetection(false));
+      dispatch(toggleChangepointDetection(false));
+      dispatch(toggleManualChangepoints(false))
+      dispatch(setDetectedChangepointFilter(null));
+    }
   }, []);
+
+  const handleSliderValueChange = (e, val) => {
+    setSliderValue(val)
+  }
 
   const handleManualChangepointsChange = () => {
     const action = !manualChangepointsEnabled;
@@ -63,6 +87,7 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
     dispatch(updateSelectedMeasures(shownMeasures));
     dispatch(toggleSoilingDetection(true));
     if(action) {
+      dispatch(setDetectedChangepointFilter(sliderValue));
       dispatch(applyChangepointDetection({id: dataset.id, from, to})).then(res => {
         dispatch(applyDeviationDetection({id: dataset.id,
           from, to,
@@ -77,8 +102,8 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
     }
   }
 
-  const handleChangepointsChange = (e) => {
-    dispatch(setDetectedChangepointFilter(e.target.value));
+  const handleChangepointsChange = (e, val) => {
+    dispatch(setDetectedChangepointFilter(val));
   }
 
   return (
@@ -131,15 +156,18 @@ export const ChangepointDetection = (props: IChangepointDetectionProps) => {
         <Typography variant="body1" gutterBottom sx={{fontWeight:600}}>
           Filter (%)
         </Typography>
+        <Box sx={{px: 3}}>
         <Slider
           size="small"
           disabled={!changepointDetectionEnabled}
-          onChange= {(e) => handleChangepointsChange(e)}
-          defaultValue={detectedChangepointFilter}
-          getAriaValueText = {(val) => ("Top" + val.toString() + "%")}
+          onChangeCommitted= {handleChangepointsChange}
+          onChange={handleSliderValueChange}
+          value={sliderValue}
+          components={{ValueLabel: ValueLabelComponent}}
           aria-label="Small"
           valueLabelDisplay="auto"
         />
+        </Box>
       </Box>
     </Box>
   );

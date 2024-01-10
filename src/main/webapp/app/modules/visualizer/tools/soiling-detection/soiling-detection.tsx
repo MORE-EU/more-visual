@@ -25,8 +25,9 @@ export const SoilingDetection = () => {
   const dispatch = useAppDispatch();
 
 
+
   useEffect(() => {
-      dispatch(applyDeviationDetection({id: dataset.id,
+     detectedChangepointFilter && dispatch(applyDeviationDetection({id: dataset.id,
         from, to,
         weeks : soilingWeeks,
         type: soilingType,
@@ -60,8 +61,8 @@ export const SoilingDetection = () => {
   }
 
   return (
-    <Box sx = {{width:'100%',}}>
-      <Box sx={{display: 'flex', margin: 'auto', overflowY: 'scroll', flexDirection: 'column', width:'80%', height: '90%', fontSize:'2em', overflow: 'auto'}}>
+    <Box sx = {{width:'100%', height: "100%"}}>
+      <Box sx={{display: 'flex', margin: 'auto', overflowY: 'auto', flexDirection: 'column', width:'80%', height: '90%', fontSize:'2em'}}>
         <ChangepointDetection
           changepointsName={"Washing Events"} manualChangepointsName={"Manual Washes"} potentialChangepointsName={"Rains"}
           shownMeasures={[dataset.header.indexOf("power"), dataset.header.indexOf("precipitation")]} />

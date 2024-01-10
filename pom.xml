@@ -67,7 +67,7 @@
         <frontend-maven-plugin.version>1.10.0</frontend-maven-plugin.version>
         <git-commit-id-plugin.version>4.0.0</git-commit-id-plugin.version>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
-        <jib-maven-plugin.version>2.4.0</jib-maven-plugin.version>
+        <jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
         <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
         <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
         <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
@@ -77,24 +77,12 @@
         <jacoco.itReportFile>${jacoco.itReportFolder}/integrationTest.exec</jacoco.itReportFile>
         <junit.utReportFolder>${project.testresult.directory}/test</junit.utReportFolder>
         <junit.itReportFolder>${project.testresult.directory}/integrationTest</junit.itReportFolder>
-        <grpc.version>1.42.1</grpc.version>
+        <grpc.version>1.58.0</grpc.version>
         <protobuf-plugin.version>0.6.1</protobuf-plugin.version>
         <protobuf.version>3.19.1</protobuf.version>
         <!-- jhipster-needle-maven-property -->
     </properties>
 
-<!--    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.github.jhipster</groupId>
-                <artifactId>jhipster-dependencies</artifactId>
-                <version>${jhipster-dependencies.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            &lt;!&ndash; jhipster-needle-maven-add-dependency-management &ndash;&gt;
-        </dependencies>
-    </dependencyManagement>-->
     <dependencyManagement>
     <dependencies>
     <dependency>
@@ -109,19 +97,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.arrow</groupId>
-            <artifactId>flight-core</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.github.jhipster</groupId>
             <artifactId>jhipster-framework</artifactId>
             <version>3.9.1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
@@ -155,23 +133,6 @@
             <artifactId>ehcache</artifactId>
             <version>3.9.9</version>
         </dependency>
-
-<!--        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jaxb-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-hppc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-bean-validators</artifactId>
-        </dependency>-->
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
@@ -203,10 +164,6 @@
             <artifactId>spring-boot-starter-logging</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
-        <!--        <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-security</artifactId>
-                </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
@@ -281,32 +238,42 @@
             <artifactId>univocity-parsers</artifactId>
             <version>2.9.1</version>
         </dependency>
-
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <version>2.0.1.Final</version>
         </dependency>
         <dependency>
-            <groupId>eu.more2020.grpc</groupId>
-            <artifactId>grpc-files</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
-            <version>3.21.5</version>
+            <version>${protobuf.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.devh</groupId>
-            <artifactId>grpc-server-spring-boot-starter</artifactId>
-            <version>2.13.1.RELEASE</version>
-            <!-- <exclusions>
-            <exclusion>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-netty-shaded</artifactId>
-            </exclusion>
-        </exclusions> -->
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.101.Final</version>
+        </dependency>
+        <dependency>
+            <!-- Java 9+ compatibility - Do NOT update to 2.0.0 -->
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>1.3.5</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
     		<groupId>org.springframework.boot</groupId>
@@ -324,10 +291,9 @@
             <version>2.0</version>
         </dependency>
         <dependency>
-            <groupId>it.unimi.dsi</groupId>
-            <artifactId>fastutil</artifactId>
-            <version>8.5.12</version> <!-- Use the appropriate version -->
-            <scope>runtime</scope>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
         </dependency>
     </dependencies>
     <build>
@@ -340,6 +306,54 @@
         </extensions>
         <defaultGoal>spring-boot:run</defaultGoal>
         <plugins>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>${protobuf-plugin.version}</version>
+                <configuration>
+                    <protoSourceRoot>src/main/protobuf</protoSourceRoot>
+                    <outputDirectory>src/main/java</outputDirectory>
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+                    <pluginId>grpc-java</pluginId>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+                    <clearOutputDirectory>false</clearOutputDirectory>
+                </configuration>
+                <executions>
+                  <execution>
+                    <goals>
+                    <goal>compile</goal>
+                    <goal>compile-custom</goal>
+                    </goals>
+                </execution>
+               </executions>
+            </plugin>
+           <!-- <plugin>
+				<groupId>com.github.os72</groupId>
+				<artifactId>protoc-jar-maven-plugin</artifactId>
+				<version>3.11.4</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+						   <includeMavenTypes>direct</includeMavenTypes>
+							<outputTargets>
+								<outputTarget>
+									<type>java</type>
+									<outputDirectory>src/main/java</outputDirectory>
+								</outputTarget>
+								<outputTarget>
+									<type>grpc-java</type>
+									<pluginArtifact>io.grpc:protoc-gen-grpc-java:1.15.0</pluginArtifact>
+									<outputDirectory>src/main/java</outputDirectory>
+								</outputTarget>
+							</outputTargets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin> -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -594,35 +608,17 @@
                     <version>${jib-maven-plugin.version}</version>
                     <configuration>
                         <from>
-                            <image>adoptopenjdk:11-jre-hotspot</image>
+                            <image>openjdk:11-jre-slim</image>
                         </from>
                         <to>
                             <image>morevis:latest</image>
                         </to>
                         <container>
-                            <entrypoint>
-                                <shell>bash</shell>
-                                <option>-c</option>
-                                <arg>/entrypoint.sh</arg>
-                            </entrypoint>
                             <ports>
-                                <port>8080</port>
+                                <port>8090</port>
                             </ports>
-                            <environment>
-                                <SPRING_OUTPUT_ANSI_ENABLED>ALWAYS</SPRING_OUTPUT_ANSI_ENABLED>
-                                <JHIPSTER_SLEEP>0</JHIPSTER_SLEEP>
-                            </environment>
-                            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                            <creationTime>USE_CURRENT_TIMESTAMP</creationTime> 
                         </container>
-                        <extraDirectories>
-                            <paths>src/main/jib</paths>
-                            <permissions>
-                                <permission>
-                                    <file>/entrypoint.sh</file>
-                                    <mode>755</mode>
-                                </permission>
-                            </permissions>
-                        </extraDirectories>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -829,12 +825,12 @@
                                     <npmVersion>${npm.version}</npmVersion>
                                 </configuration>
                             </execution>
-                            <execution>
+                            <!-- <execution>
                                 <id>npm install</id>
                                 <goals>
                                     <goal>npm</goal>
                                 </goals>
-                            </execution>
+                            </execution> -->
                             <execution>
                                 <id>webpack build dev</id>
                                 <goals>

@@ -14,13 +14,13 @@ import Badge from '@mui/material/Badge';
 import AlertsTable from '../chart-alerting/chart-alerting-table';
 import AlertAddEdit from '../chart-alerting/chart-alerting-add-edit';
 import AlertingInfo from '../chart-alerting/chart-alerting-info';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 
 const style = {
   position: 'absolute',
   top: '40%',
   left: '50%',
-  transform: 'translate(-50%, -50%)',
+  transform: 'translate(-50%, -40%)',
   bgcolor: 'background.paper',
   borderRadius: '10px',
   boxShadow: 10,
@@ -29,7 +29,7 @@ const style = {
 };
 
 export const ChartAlerting = () => {
-  const { alertResults, chartRef, alerts } = useAppSelector(state => state.visualizer);
+  const { alertResults, chartRef, alerts, dataset } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
@@ -95,6 +95,7 @@ export const ChartAlerting = () => {
             aria-expanded={open ? 'true' : undefined}
             aria-haspopup="true"
             onClick={handleModal}
+            disabled={dataset === null}
           >
             <NotificationsIcon />
           </IconButton>

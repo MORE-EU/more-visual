@@ -6,29 +6,29 @@ They can select an RES to visualize and analyze, its data is parsed and indexed 
 “crude” initial version of our index. The user, then, performs visual operations, which are translated to queries evaluated over the index.
 Based on the user interaction, the index is adapted incrementally, adjusting its structure and updating statistics.
 
-- Online Tool Demo: [[Link]](http://leviathan.imsi.athenarc.gr:8090)
+- Online Tool Demo: [[Link]](http://83.212.75.52:8090/)
 
 <br/>
 <br/>
 
 ## Building MORE VA module
 
+Navigate to the [More visual cache](https://github.com/MORE-EU/more-vis-index) clone and install the java package:
+
+```
+./mvnw clean install
+```
+
 To build the MORE VA JAR file run:
 
 ```
-
 ./mvnw -Pprod clean verify
-
-
 ```
 
 To start the application, run the single executable JAR file that starts an embedded Apache Tomcat:
 
 ```
-
 java -jar target/*.jar
-
-
 ```
 
 Then navigate to [http://localhost:8090](http://localhost:8090) in your browser.
@@ -65,4 +65,3 @@ In the case where the RES data are stored in CSV datafiles. The user must place 
 
 On initialization, the application, copies a directory that contains dummy data that belong to an RES farm.
 These data are accessed through the map exploration mechanism, or directly via URL (e.g. http://localhost:8090/visualize/{folder_relative_path}, where {folder_relative_path} is the relative path of the data folder inside the workspace.
- 

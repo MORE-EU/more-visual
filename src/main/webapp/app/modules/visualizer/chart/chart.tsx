@@ -6,24 +6,22 @@ import HighchartsMore from 'highcharts/highcharts-more';
 import annotationsAdvanced from 'highcharts/modules/annotations-advanced';
 import { useScrollBlock } from 'app/shared/util/useScrollBlock';
 import { ITimeRange } from 'app/shared/model/time-range.model';
-import moment from 'moment';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import {
+  applyChangepointDetection,
+  applyDeviationDetection,
+  applyYawMisalignmentDetection,
+  toggleChangepointDetection,
+  toggleCustomChangepoints,
+  toggleSoilingDetection,
+  toggleYawMisalignmentDetection,
+  updateAlertResults,
   updateChartRef,
   updateCompareQueryResults,
+  updateCustomChangepoints,
   updateFrom,
   updateQueryResults,
-  updateResampleFreq,
   updateTo,
-  applyChangepointDetection,
-  toggleCustomChangepoints,
-  applyDeviationDetection,
-  liveDataImplementation,
-  applyYawMisalignmentDetection,
-  updateAlertResults,
-  setAlertingPreview,
-  setAlertingPlotMode,
-  updateCustomChangepoints
 } from 'app/modules/store/visualizerSlice';
 import { ChartPlotBands } from 'app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands';
 import chartAlertingChecker, { alertingPlotBandsCreator } from './chart-alerting/chart-alerting-functions';
@@ -36,10 +34,45 @@ HighchartsMore(Highcharts);
 annotationsAdvanced(Highcharts);
 
 export const Chart = () => {
-  const {chartRef,folder,dataset,from,to,resampleFreq,selectedMeasures,measureColors,queryResultsLoading,filter, customChangepoints,
-    queryResults,changeChart,compare,changepointDetectionEnabled,detectedChangepointFilter,customChangepointsEnabled,data,compareData,
-    forecastData,soilingEnabled,soilingType,alertingPlotMode,alertResults,forecastingDataSplit,soilingWeeks,yawMisalignmentEnabled,secondaryData,chartType,
-    liveDataImplLoading,alerts,alertingPreview,activeTool,forecastingStartDate,forecastingEndDate, farmMeta, datasetChoice} = useAppSelector(state => state.visualizer);
+  const {
+    chartRef,
+    folder,
+    dataset,
+    from,
+    to,
+    resampleFreq,
+    selectedMeasures,
+    customSelectedMeasures,
+    measureColors,
+    queryResultsLoading,
+    filter,
+    queryResults,
+    changeChart,
+    compare,
+    changepointDetectionEnabled,
+    detectedChangepointFilter,
+    customChangepointsEnabled,
+    data,
+    compareData,
+    errorMessage,
+    forecastData,
+    soilingEnabled,
+    soilingType,
+    alertingPlotMode,
+    alertResults,
+    forecastingDataSplit,
+    soilingWeeks,
+    yawMisalignmentEnabled,
+    secondaryData,
+    chartType,
+    liveDataImplLoading,
+    alerts,
+    alertingPreview,
+    activeTool,
+    forecastingStartDate,
+    forecastingEndDate,
+    datasets,
+  } = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
 
@@ -52,11 +85,9 @@ export const Chart = () => {
   const [detectedPlotBands, setDetectedPlotBands] = useState([]);
   const [changepointHighlight, setChangepointHighlight] = useState(false);
   //Refs
-  const latestFrequency = useRef(resampleFreq);
-  const latestLeftSide = useRef(null);
+  const fetchDataRef = useRef({ isScrolling: false, scrollTimeout: null });
   const chart = useRef(chartRef);
   const timeRange = useRef(null);
-  const latestRightSide = useRef(null);
   const latestFolder = useRef(null);
   const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
@@ -69,32 +100,16 @@ export const Chart = () => {
   const isYawMisalignmentEnabled = useRef(yawMisalignmentEnabled);
   const isChangepointDetectionEnabled = useRef(changepointDetectionEnabled);
 
-  // Color Zones For Patterns
-  // useEffect(() => {
-  //   const newZones =
-  //     patterns !== null &&
-  //     []
-  //       .concat(
-  //         ...patterns.patternGroups.map(patternGroup => {
-  //           return [].concat(
-  //             ...patternGroup.patterns.map(pattern => {
-  //               return [{ value: pattern.start }, { value: pattern.end, color: patternGroup.color }];
-  //             })
-  //           );
-  //         })
-  //       )
-  //       .sort((a, b) => a.value.getTime() - b.value.getTime());
-  //   setZones(newZones);
-  // }, [patterns]);
-
   //change zones if forecasting is activated and both start & end date is set
   const getZones = color => {
     if (forecastingStartDate !== null && forecastingEndDate !== null) {
       return [
         { value: forecastingStartDate, color },
-        { value: forecastingStartDate + (forecastingEndDate - forecastingStartDate) * (forecastingDataSplit [0] / 100), color: '#00FF00' },
+        { value: forecastingStartDate + (forecastingEndDate - forecastingStartDate) * (forecastingDataSplit[0] / 100), color: '#00FF00' },
         {
-          value: forecastingStartDate + (forecastingEndDate - forecastingStartDate) * ((forecastingDataSplit [0] + forecastingDataSplit [1]) / 100),
+          value:
+            forecastingStartDate +
+            (forecastingEndDate - forecastingStartDate) * ((forecastingDataSplit[0] + forecastingDataSplit[1]) / 100),
           color: '#ff0000',
         },
         { value: forecastingEndDate, color: '#00FFFF' },
@@ -108,12 +123,26 @@ export const Chart = () => {
   // add plotlines for start & end date if forecasting is enabled
   useEffect(() => {
     if (forecastingStartDate !== null && forecastingEndDate !== null) {
-      if(chartRef.xAxis[0].plotLinesAndBands.length > 0){
-        chartRef.xAxis[0].removePlotLine("start")
-        chartRef.xAxis[0].removePlotLine("end")
+      if (chartRef.xAxis[0].plotLinesAndBands.length > 0) {
+        chartRef.xAxis[0].removePlotLine('start');
+        chartRef.xAxis[0].removePlotLine('end');
       }
-      chartRef.xAxis[0].addPlotLine({id: "start", color: grey[500], value: forecastingStartDate, width: 2, zIndex: 3, label: { text: 'Start Date', verticalAlign: 'center', textAlign: 'left' }})
-      chartRef.xAxis[0].addPlotLine({id: "end",color: grey[500], value: forecastingEndDate, width: 2, zIndex: 3, label: { text: 'End Date', verticalAlign: 'center', textAlign: 'left' }})
+      chartRef.xAxis[0].addPlotLine({
+        id: 'start',
+        color: grey[500],
+        value: forecastingStartDate,
+        width: 2,
+        zIndex: 3,
+        label: { text: 'Start Date', verticalAlign: 'center', textAlign: 'left' },
+      });
+      chartRef.xAxis[0].addPlotLine({
+        id: 'end',
+        color: grey[500],
+        value: forecastingEndDate,
+        width: 2,
+        zIndex: 3,
+        label: { text: 'End Date', verticalAlign: 'center', textAlign: 'left' },
+      });
     }
   }, [forecastingStartDate, forecastingEndDate]);
 
@@ -131,12 +160,16 @@ export const Chart = () => {
   }, [soilingEnabled]);
 
   useEffect(() => {
-    !liveDataImplLoading && data && alerts && dispatch(updateAlertResults(chartAlertingChecker(data, alerts, dataset, selectedMeasures)));
-  }, [liveDataImplLoading, selectedMeasures, alerts]);
+    data && alerts && dispatch(updateAlertResults(chartAlertingChecker(data, alerts, dataset, selectedMeasures, alertResults)));
+  }, [selectedMeasures, data, alerts]);
+
+  // useEffect(() => {
+  //   !liveDataImplLoading && data && alerts && dispatch(updateAlertResults(chartAlertingChecker(data, alerts, dataset, selectedMeasures, alertResults)));
+  // }, [liveDataImplLoading, selectedMeasures, alerts]);
 
   useEffect(() => {
-    alertingPlotMode && data && Object.keys(alertResults).length > 0 && setAlertingPlotBands(alertingPlotBandsCreator(alertResults));
-  }, [alertingPlotMode, selectedMeasures, alertResults]);
+    Object.keys(alertResults).length > 0 && setAlertingPlotBands(alertingPlotBandsCreator(alertResults, alerts));
+  }, [alertResults, alerts]);
 
   useEffect(() => {
     isYawMisalignmentEnabled.current = yawMisalignmentEnabled;
@@ -153,22 +186,35 @@ export const Chart = () => {
   }, [queryResultsLoading]);
 
   useEffect(() => {
-    if (compare.length !== 0) {
-      dispatch(updateCompareQueryResults({ folder, id: compare, from, to, selectedMeasures, filter }));
+    if (Object.keys(compare).length !== 0) {
+      dispatch(updateCompareQueryResults({ folder, compare, from, to, filter }));
     }
   }, [compare]);
 
   useEffect(() => {
-    latestMeasures.current = selectedMeasures;
-    dispatch(
-      updateQueryResults({ folder, id: dataset.id,
-        from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
-        to: to ? to : dataset.timeRange.to, selectedMeasures, filter })
-    );
-    if (compare.length !== 0) {
-      dispatch(updateCompareQueryResults({ folder, id: compare, from, to, selectedMeasures, filter }));
+    if (dataset) {
+      latestMeasures.current = selectedMeasures;
+      dispatch(
+        updateQueryResults({
+          folder,
+          id: dataset.id,
+          from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
+          to: to ? to : dataset.timeRange.to,
+          selectedMeasures,
+          filter,
+        })
+      );
+      if (Object.keys(compare).length !== 0) {
+        dispatch(updateCompareQueryResults({ folder, compare, from, to, filter }));
+      }
+      if (
+        selectedMeasures.length +
+          customSelectedMeasures.length +
+          Object.values(compare).reduce((acc: number, arr: number[]) => acc + arr.length, 0) ===
+        6
+      )
+        toast('Maximum number of measures reached');
     }
-    if (selectedMeasures.length === 6) toast('Maximum number of measures reached');
   }, [dataset, selectedMeasures]);
 
   useEffect(() => {
@@ -178,7 +224,6 @@ export const Chart = () => {
   useEffect(() => {
     latestSoilingWeeks.current = soilingWeeks;
   }, [soilingWeeks]);
-
 
   useEffect(() => {
     if (!changepointDetectionEnabled) setDetectedPlotBands([]);
@@ -222,17 +267,18 @@ export const Chart = () => {
   };
 
   const getChangepointData = (start, end, series) => {
-    return series.map((s, idx) => {
-      const newCustomChangepoint = {
+    return series
+      .map((s, idx) => {
+        return {
           range: { from: start, to: end } as ITimeRange,
           measure: dataset.header.indexOf(s.userOptions.name),
           measureChartId: s.userOptions.index,
-          id: latestCustomChangepoints.current.reduce((max, obj) => obj.id > max ? obj.id : max, 0) + 1,
+          id: latestCustomChangepoints.current.reduce((max, obj) => (obj.id > max ? obj.id : max), 0) + 1,
           custom: true,
         };
-      return newCustomChangepoint;
-    })
-  }
+      })
+      .filter(c => c.measure !== -1);
+  };
 
   const customChangepointSelection = event => {
     event.preventDefault();
@@ -245,7 +291,6 @@ export const Chart = () => {
   const setCustomChangepoints = newCustomChangepoints => {
     latestCustomChangepoints.current = newCustomChangepoints;
     dispatch(updateCustomChangepoints(latestCustomChangepoints.current));
-
   };
 
   const chartFunctions = (e: { target: any }) => {
@@ -260,121 +305,94 @@ export const Chart = () => {
       Highcharts.removeEvent(chart.current.container, 'click');
     });
 
-    const fetchData = (leftSide: number, rightSide: number) => {
+    const fetchData = () => {
+      const { max, min } = chart.current.xAxis[0].getExtremes();
       chart.current.showLoading();
       dispatch(
         updateQueryResults({
           folder: latestFolder.current,
           id: latestDatasetId.current,
-          from: leftSide,
-          to: rightSide,
+          from: min,
+          to: max,
           selectedMeasures: latestMeasures.current,
           filter: latestFilter.current,
         })
       );
-      dispatch(updateFrom(leftSide));
-      dispatch(updateTo(rightSide));
-      if (latestCompare.current.length !== 0)
+      dispatch(updateFrom(min));
+      dispatch(updateTo(max));
+      if (Object.keys(latestCompare.current).length !== 0)
         dispatch(
           updateCompareQueryResults({
             folder: latestFolder.current,
-            id: latestCompare.current,
-            from: leftSide,
-            to: rightSide,
-            selectedMeasures: latestMeasures.current,
+            compare: latestCompare.current,
+            from: min,
+            to: max,
             filter: latestFilter.current,
           })
         );
-      latestLeftSide.current = leftSide;
-      latestRightSide.current = rightSide;
       if (isChangepointDetectionEnabled.current)
-        dispatch(applyChangepointDetection({ id: latestDatasetId.current, from: leftSide, to: rightSide })).then(res => {
+        dispatch(applyChangepointDetection({ id: latestDatasetId.current, from: min, to: max })).then(res => {
           if (isSoilingEnabled.current)
             dispatch(
               applyDeviationDetection({
                 id: latestDatasetId.current,
                 weeks: latestSoilingWeeks.current,
-                from: leftSide,
-                to: rightSide,
+                from: min,
+                to: max,
                 type: soilingType,
                 changepoints: filterChangepoints(res.payload, detectedChangepointFilter),
               })
             );
         });
-      if (isYawMisalignmentEnabled.current)
-        dispatch(applyYawMisalignmentDetection({ id: latestDatasetId.current, from: leftSide, to: rightSide }));
+      if (isYawMisalignmentEnabled.current) dispatch(applyYawMisalignmentDetection({ id: latestDatasetId.current, from: min, to: max }));
     };
 
-    const checkForData = (min: number, max: number) => {
-      const leftSide = min;
-      const rightSide = max;
-      latestLeftSide.current = latestLeftSide.current === null ? leftSide - 1 : latestLeftSide.current;
-      latestRightSide.current = latestRightSide.current === null ? rightSide - 1 : latestRightSide.current;
-      if (leftSide !== latestLeftSide.current || rightSide !== latestRightSide.current) {
-        fetchData(leftSide, rightSide);
+    const handleEventTimeout = event => {
+      if (fetchDataRef.current.scrollTimeout) {
+        clearTimeout(fetchDataRef.current.scrollTimeout);
       }
+
+      fetchDataRef.current = { ...fetchDataRef.current, isScrolling: true };
+
+      fetchDataRef.current = {
+        ...fetchDataRef.current,
+        scrollTimeout: setTimeout(() => {
+          fetchDataRef.current = { ...fetchDataRef.current, isScrolling: false };
+          fetchData();
+        }, 500),
+      };
     };
-
-
-    const checkForDataOnPan = () => {
-      const { max, min } = chart.current.xAxis[0].getExtremes();
-      checkForData(min, max);
-    };
-
-    const checkForDataOnZoom = () => {
-      const { max, min } = chart.current.xAxis[0].getExtremes();
-      checkForData(min, max);
-    };
-
 
     // CHART: ZOOM FUNCTION
     Highcharts.addEvent(chart.current.container, 'wheel', (event: WheelEvent) => {
       const p = chart.current.xAxis[0].toValue(chart.current.pointer.normalize(event).chartX);
-      const { min, max } = chart.current.xAxis[0].getExtremes();
+      const { min, max, dataMax, dataMin } = chart.current.xAxis[0].getExtremes();
       const stepleft = (p - min) * 0.25;
       const stepright = (max - p) * 0.25;
       if (!chart.current.loadingShown) {
         if (event.deltaY < 0 && max - min > 10000) {
           // in, 10000 is the max range on a zoom level
-          chart.current.xAxis[0].setExtremes(min + stepleft, max - stepright, true, true);
-        } else if (event.deltaY > 0) {
+          chart.current.xAxis[0].setExtremes(min + stepleft, max - stepright, true, false);
+          handleEventTimeout(event);
+        } else if (event.deltaY > 0 && max - min < dataset.timeRange.to - dataset.timeRange.from) {
           // out
           chart.current.xAxis[0].setExtremes(
             Math.max(min - stepleft, dataset.timeRange.from),
             Math.min(max + stepright, dataset.timeRange.to),
             true,
-            true
+            false
           );
+          handleEventTimeout(event);
         }
-        checkForDataOnZoom();
       }
     });
 
-    const renderLabelForLiveData = () => {
-      const { max } = chart.current.xAxis[0].getExtremes();
-      if (max >= data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp) {
-        toast('Live Data Mode');
-      }
-    };
-
     // CHART: PAN FUNCTION
-    Highcharts.wrap(Highcharts.Chart.prototype, 'pan', function (proceed, ...args) {
-      const event = args[0];
-      console.log(args[1])
-      const xAxis = chart.current.xAxis[0];
-      const axisRange = xAxis.max - xAxis.min;
-      const movementX = event.movementX;
-      const percent = (movementX / 2) * Math.min(60, Math.sqrt(movementX ** 2 + 1));
-      const deltaX = (axisRange) * percent / 100000;
-      xAxis.setExtremes(
-        Math.max(xAxis.min - deltaX, dataset.timeRange.from),
-        Math.min(xAxis.max - deltaX, dataset.timeRange.to),
-        true,
-        true
-      );
-      checkForDataOnPan();
-      renderLabelForLiveData();
-    })
+    Highcharts.addEvent(chart.current.container, 'mouseup', (event: MouseEvent) => {
+      if (!chart.current.loadingShown) {
+        handleEventTimeout(event);
+      }
+    });
 
     // LIVE DATA IMPLEMENTATION
     // setInterval(() => {
@@ -396,74 +414,185 @@ export const Chart = () => {
     //   }
     // }, 500);
 
-
     // Set initial extremes
-    chart.current.xAxis[0].setExtremes(data[selectedMeasures[0]][2].timestamp, data[selectedMeasures[0]][data[selectedMeasures[0]].length - 2].timestamp);
-
+    chart.current.xAxis[0].setExtremes(
+      data[selectedMeasures[0]][2].timestamp,
+      data[selectedMeasures[0]][data[selectedMeasures[0]].length - 2].timestamp
+    );
   };
 
   const getSecondaryText = () => {
     if (isYawMisalignmentEnabled.current) return 'Yaw Angle';
     if (isSoilingEnabled.current) {
-      switch (soilingType){
-        case "soilingRatio":
-          return "Soiling Ratio"
-        case "powerLoss":
-          return "Power Loss"
+      switch (soilingType) {
+        case 'soilingRatio':
+          return 'Soiling Ratio';
+        case 'powerLoss':
+          return 'Power Loss';
         default:
-          return "Soiling Ratio"
+          return 'Soiling Ratio';
       }
     }
   };
 
+  // Required for pan to work
+  const dummyPointCreator = (text, top, height) => ({
+    title: {
+      enabled: false,
+      text,
+    },
+    opposite: false,
+    top,
+    height,
+    lineWidth: 2,
+    offset: 10,
+  });
+
+  // Required for pan to work
+  const dummySeriesCreator = (name, x, idx) => ({
+    type: 'line',
+    data: [
+      {
+        x,
+        y: 0,
+      },
+    ],
+    name,
+    color: 'transparent',
+    yAxis: 0,
+    // yAxis: changeChart ? selectedMeasures.length + customSelectedMeasures.length + Object.values(compare).reduce((acc: number, arr: number[]) => acc + arr.length, 0) + idx : 0,
+    // TODO: fix this
+    zoneAxis: 'x',
+    enableMouseTracking: false,
+    showInLegend: false,
+  });
+
+  function normalizeData(array) {
+    const max = Math.max(...array.map(item => item.value));
+    return array.map(item => ({ timestamp: item.timestamp, value: item.value / max }));
+  }
+
+  // used for custom measure creation
+  const combineData = (data1, data2) => {
+    // Normalize both arrays
+    const normalizedData1 = normalizeData(data1);
+    const normalizedData2 = normalizeData(data2);
+    return normalizedData1.map((item, index) => [item.timestamp, item.value / normalizedData2[index].value]);
+  };
   const computeChartData = () => {
     let chartData =
       data !== null
-        ? selectedMeasures.map((measure, index) => ({
-            data: data[measure] ? data[measure].map(d => {
-              const val = d.value;
-              return [d.timestamp, isNaN(val) ? null : val]
-            }) : [],
-            name: dataset.header[measure],
-            yAxis: changeChart ? index : 0,
-            color: measureColors[measure],
-            zoneAxis: 'x',
-            zones: getZones(measureColors[measure]),
-          }))
+        ? selectedMeasures
+            .map((measure, index) => ({
+              data: data[measure]
+                ? data[measure].map(d => {
+                    const val = d.value;
+                    return [d.timestamp, isNaN(val) ? null : val];
+                  })
+                : [],
+              name: dataset.header[measure],
+              color: measureColors[measure],
+              yAxis: changeChart ? index : 0,
+              zoneAxis: 'x',
+              zones: getZones(measureColors[measure]),
+              showInLegend: true,
+              enableMouseTracking: true,
+            }))
+            .concat(
+              customSelectedMeasures.map((customMeasure, index) => ({
+                data:
+                  data[customMeasure.measure1] && data[customMeasure.measure2]
+                    ? combineData(data[customMeasure.measure1], data[customMeasure.measure2])
+                    : [],
+                name: dataset.header[customMeasure.measure1] + '/' + dataset.header[customMeasure.measure2],
+                color: measureColors[customMeasure.measure1],
+                yAxis: changeChart ? index + selectedMeasures.length : 0,
+                zoneAxis: 'x',
+                zones: getZones(measureColors[customMeasure.measure1]),
+                showInLegend: true,
+                enableMouseTracking: true,
+              }))
+            )
         : [];
     if (secondaryData) {
-      const sz = chartData !== null ? chartData.length : 0;
+      const sz =
+        chartData !== null ? chartData.length + Object.values(compare).reduce((acc: number, arr: number[]) => acc + arr.length, 0) : 0;
       const sData = secondaryData.map(d => {
         const val = d.values[0];
         return { x: d.timestamp, y: isNaN(val) ? null : val, tt: d.values[1] ? 'Est. Power Loss: ' + d.values[1].toFixed(2) : null };
-      });// @ts-ignore
-      chartData = [...chartData, { data: sData, yAxis: sz, name: getSecondaryText() }];
+      }); // @ts-ignore
+      chartData = [...chartData, { data: sData, yAxis: sz, color: 'blue', enableMouseTracking: true, name: getSecondaryText() }];
     }
     return chartData;
   };
 
   const computeYAxisData = () => {
-    let yAxisData = changeChart
-      ? selectedMeasures.map((measure, idx) => ({
+    const allMeasuresLength =
+      selectedMeasures.length +
+      customSelectedMeasures.length +
+      Object.values(compare).reduce((acc: number, arr: number[]) => acc + arr.length, 0);
+    let counter = 0;
+    let yAxisData = selectedMeasures
+      .map((measure, idx) => ({
+        title: {
+          enabled: changeChart ? true : false,
+          text: dataset.header[measure],
+        },
+        opposite: false,
+        top: changeChart ? `${(100 / allMeasuresLength) * idx}%` : '0%',
+        height: changeChart ? `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%` : '100%',
+        lineWidth: 2,
+        offset: 10,
+      }))
+      .concat(
+        customSelectedMeasures.map((customMeasure, idx) => ({
           title: {
-            enabled: true,
-            text: dataset.header[measure],
+            enabled: changeChart ? true : false,
+            text: dataset.header[customMeasure.measure1] + '/' + dataset.header[customMeasure.measure2],
           },
           opposite: false,
-          top: `${(100 / selectedMeasures.length) * idx}%`,
-          height: `${selectedMeasures.length > 1 ? 100 / selectedMeasures.length - 5 : 100}%`,
-          offset: 0,
+          top: changeChart ? `${(100 / allMeasuresLength) * (idx + selectedMeasures.length)}%` : '0%',
+          height: changeChart ? `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%` : '100%',
+          lineWidth: 2,
+          offset: 10,
         }))
-      : selectedMeasures.map((measure, idx) => ({
-          title: {
-            enabled: false,
-            text: dataset.header[measure],
-          },
-          opposite: false,
-          top: '0%',
-          height: '100%',
-          offset: undefined,
-        }));
+      )
+      .concat(
+        Object.keys(compare).reduce((acc, curval) => {
+          return [
+            ...acc,
+            ...compare[curval].map(measureVal => {
+              const returnVal = {
+                title: {
+                  enabled: changeChart ? true : false,
+                  text: curval + ': ' + datasets.data.find(d => d.id === curval).header[measureVal],
+                },
+                opposite: false,
+                top: changeChart
+                  ? `${(100 / allMeasuresLength) * (counter + (selectedMeasures.length + customSelectedMeasures.length))}%`
+                  : '0%',
+                height: changeChart ? `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%` : '100%',
+                lineWidth: 2,
+                offset: 10,
+              };
+              counter++;
+              return returnVal;
+            }),
+          ];
+        }, [])
+      );
+    // .concat(...[dummyPointCreator("minPoint", "0px", "0px"), dummyPointCreator("maxPoint", "0px", "0px")])
+    // changeChart ?
+    // : selectedMeasures.map((measure, idx) => ({
+    //     title: {
+    //       enabled: false,
+    //       text: dataset.header[measure],
+    //     },
+    //     opposite: false,
+    //     top: '0%',
+    //     height: '100%',
+    //     offset: undefined,
+    //   }))
     if (secondaryData) {
       const sz = yAxisData.length;
       const percent = Math.floor(90 / sz);
@@ -475,7 +604,8 @@ export const Chart = () => {
         opposite: false,
         top: `0%`,
         height: `10%`,
-        offset: 0,
+        lineWidth: 2,
+        offset: 10,
         plotBands: [],
       };
       yAxisData = changeChart
@@ -491,6 +621,7 @@ export const Chart = () => {
           }));
       yAxisData.push(newAxis);
     }
+    yAxisData = yAxisData.concat(...[dummyPointCreator('minPoint', '-10px', '0px'), dummyPointCreator('maxPoint', '-10px', '0px')]);
     return yAxisData;
   };
 
@@ -504,29 +635,41 @@ export const Chart = () => {
           name: 'Forecasted ' + dataset.header[measure],
           yAxis: changeChart ? index : 0,
           zoneAxis: 'x',
+          color: 'black',
+          showInLegend: true,
+          enableMouseTracking: true,
           zones,
         }))
       : [];
 
-  const compareChartData =
-    compareData !== null && compare.length !== 0
-      ?
-      [
-        ...[].concat(
-          ...compareData.map((compData, idx) =>
-            selectedMeasures.map((measure, index) => ({
-                data: compData[measure] ? compData[measure].map(d => {
-                  const val = d.value;
-                  return [d.timestamp, isNaN(val) ? null : val]
-                }) : [],
-                name: dataset.header[measure] + ' ' + compare[idx],
-                yAxis: changeChart ? index : 0,
-                zoneAxis: 'x',
-                zones,
-              }))
-          )
-      ),]
-      : [];
+  const compareChartData = () => {
+    const allMeasuresLength = selectedMeasures.length + customSelectedMeasures.length;
+    let counter = 0;
+    return compareData.reduce((acc, curval, idx) => {
+      return [
+        ...acc,
+        ...Object.keys(curval.data).map((index, indx) => {
+          const returnVal = {
+            data:
+              compareData.length > 0
+                ? Object.hasOwn(curval.data, index)
+                  ? curval.data[index].map(obj => [obj.timestamp, obj.value])
+                  : []
+                : [],
+            name: curval.name + ' ' + datasets.data.find(obj => obj.id === curval.name).header[index],
+            yAxis: changeChart ? allMeasuresLength + counter : 0,
+            color: 'black',
+            showInLegend: true,
+            enableMouseTracking: true,
+            zoneAxis: 'x',
+            zones,
+          };
+          counter++;
+          return returnVal;
+        }),
+      ];
+    }, []);
+  };
 
   const handleMouseOverChart = () => {
     blockScroll();
@@ -541,11 +684,21 @@ export const Chart = () => {
 
   return (
     <Grid
-      sx={{ border: '1px solid rgba(0, 0, 0, .1)', height: activeTool ? '40%' : '70%', position: 'relative' }}
-      onMouseOver={() => data ? handleMouseOverChart() : null}
-      onMouseLeave={() => data ? handleMouseLeaveChart() : null}
+      sx={{
+        border: '1px solid rgba(0, 0, 0, .1)',
+        height: activeTool ? (activeTool === 'Yaw Misalignment Detection' ? '70%' : '40%') : '70%',
+        position: 'relative',
+      }}
+      onMouseOver={() => (data ? handleMouseOverChart() : null)}
+      onMouseLeave={() => (data ? handleMouseLeaveChart() : null)}
     >
-      {!data ? <LinearProgress /> : <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />}
+      {!data && errorMessage === null ? (
+        <LinearProgress />
+      ) : !data && errorMessage !== null ? (
+        <LinearProgress variant="determinate" color="error" value={100} className={'linear-prog-hide'} />
+      ) : (
+        <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />
+      )}
       {data && (
         <HighchartsReact
           highcharts={Highcharts}
@@ -558,45 +711,10 @@ export const Chart = () => {
           options={{
             title: null,
             plotOptions: {
-              arearange: {
+              line: {
                 dataGrouping: {
-                  approximation(_: any, groupData: string | any) {
-                    const asc = (arr: any[]) => arr.sort((a: number, b: number) => a - b);
-                    return [asc(groupData)[0], asc(groupData)[groupData.length - 1]];
-                  },
-                },
-              },
-              boxplot: {
-                dataGrouping: {
-                  approximation(_: any, groupData: string | any[]) {
-                    // sort array ascending
-                    const asc = (arr: any) => arr.sort((a: number, b: number) => a - b);
-                    const sum = (arr: any[]) => arr.reduce((a: any, b: any) => a + b, 0);
-                    const mean = (arr: string | any) => sum(arr) / arr.length;
-                    const std = (arr: any[]) => {
-                      const mu = mean(arr);
-                      const diffArr = arr.map((a: number) => (a - mu) ** 2);
-                      return Math.sqrt(sum(diffArr) / (arr.length - 1));
-                    };
-                    const quantile = (arr: any, q: number) => {
-                      const sorted = asc(arr);
-                      const pos = (sorted.length - 1) * q;
-                      const base = Math.floor(pos);
-                      const rest = pos - base;
-                      if (sorted[base + 1] !== undefined) {
-                        return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
-                      } else {
-                        return sorted[base];
-                      }
-                    };
-
-                    const q25 = (arr: any) => quantile(arr, 0.25);
-                    const q50 = (arr: any) => quantile(arr, 0.5);
-                    const q75 = (arr: any) => quantile(arr, 0.75);
-                    const median = (arr: any) => q50(arr);
-                    return [asc(groupData)[0], q25(groupData), q50(groupData), q75(groupData), asc(groupData)[groupData.length - 1]];
-                  },
-                },
+                  enabled: true
+                }
               },
               series: {
                 connectNulls: false,
@@ -615,7 +733,9 @@ export const Chart = () => {
                 return ['<b>' + new Date(this.x) + '</b>'].concat(
                   this.points
                     ? this.points.map(function (point) {
-                        let ss = `<span style="color:${point.color}">•</span> ${point.series.name}: ${point.y.toFixed(2)}`;
+                        let ss = `<div><span style="color: ${point.color}; font-size: 12px; margin-right:5px;">●</span>  ${
+                          point.series.name
+                        }: ${point.y.toFixed(2)}</div>`;
                         ss += point.point.tt ? `<br>${point.point.tt}</br>` : '';
                         return ss;
                       })
@@ -624,13 +744,23 @@ export const Chart = () => {
               },
               split: true,
             },
-            series: [...computeChartData(), ...forecastChartData, ...compareChartData],
+            series: [
+              ...computeChartData(),
+              ...forecastChartData,
+              ...compareChartData(),
+              dummySeriesCreator('minPoint', dataset.timeRange.from, 0),
+              dummySeriesCreator('maxPoint', dataset.timeRange.to, 1),
+            ],
             chart: {
               type: chartType,
               marginTop: 10,
               plotBorderWidth: 0,
               backgroundColor: !activeTool ? null : 'rgba(0,0,0, 0.05)',
               zoomType: customChangepointsEnabled ? 'x' : false,
+              panning: {
+                enabled: true,
+                type: 'x',
+              },
               events: {
                 plotBackgroundColor: 'rgba(10,0,0,0)', // dummy color, to create an element
                 load: chartFunctions,
@@ -646,11 +776,6 @@ export const Chart = () => {
             rangeSelector: {
               enabled: false,
             },
-            // subtitle: {
-            //   text: `Frequency: ${resampleFreq}`,
-            //   align: 'right',
-            //   x: 0,
-            // },
             navigator: {
               enabled: false,
               adaptToUpdatedData: false,

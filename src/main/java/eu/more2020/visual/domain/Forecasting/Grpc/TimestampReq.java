@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class TimestampReq implements Serializable {
     private Long timestamp;
     private String model_name;
+    private String kind;
 
     public Long getTimestamp() {
         return timestamp;
@@ -22,12 +23,21 @@ public class TimestampReq implements Serializable {
         this.model_name = model_name;
     }
 
-    public TimestampReq(Long timestamp, String model_name) {
+    public TimestampReq(Long timestamp, String model_name, String kind) {
         this.timestamp = timestamp;
         this.model_name = model_name;
+        this.kind = kind;
     }
 
     public TimestampReq() {
+    }
+
+    public String getKind() {
+        return kind;
+    }
+
+    public void setKind(String kind) {
+        this.kind = kind;
     }
 
 }

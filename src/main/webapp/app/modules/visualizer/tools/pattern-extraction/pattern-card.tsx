@@ -33,9 +33,9 @@ const PatternCard = (props: IPatternCardProps) => {
   };
 
   const getData = (from, to) => {
-    return data[changepoint.measure].filter((d) =>
+    return data[changepoint.measure] ? data[changepoint.measure].filter((d) =>
       (d.timestamp >= from)  && (d.timestamp <= to)
-    ).map((d) => d.value);
+    ).map((d) => d.value) : [];
   }
 
 
@@ -93,7 +93,6 @@ const PatternCard = (props: IPatternCardProps) => {
         <TableCell>
           <SmallTimeSeriesChart data={getData(changepoint.range.from, changepoint.range.to)} />
         </TableCell>
-        <TableCell align="center">{dataset.header[changepoint.measure]}</TableCell>
         <TableCell align="center">
           <span style={{ textAlign: "center" }}>{getDateFormatted(new Date(changepoint.range.from))}<br />
           -<br />
@@ -106,13 +105,6 @@ const PatternCard = (props: IPatternCardProps) => {
                     onChange={onCheckboxChange} />
           {checkForPatterns()  &&
             <>
-              <IconButton
-                sx={{ width: '20%' }}
-                onClick={() => handleResetSearchPattern()}
-                disabled={!checkForPatterns()} // Disable when search is not applied for this pattern
-              >
-              <RefreshIcon />
-            </IconButton>
             <IconButton
               sx={{ width: '20%' }}
               onClick={() => handleSavePattern()}
@@ -134,7 +126,7 @@ const PatternCard = (props: IPatternCardProps) => {
               <TableCell align="center"></TableCell>
               <TableCell align="center">FROM</TableCell>
               <TableCell align="center">TO</TableCell>
-              <TableCell align="center">{farmMeta.resType == 0 ? "SOILING RATIO" : "YAW ANGLE   "}</TableCell>
+              {/*<TableCell align="center">{farmMeta.resType == 0 ? "SOILING RATIO" : "YAW ANGLE   "}</TableCell>*/}
               <TableCell align="center">SHOW</TableCell>
               <TableCell align="center"></TableCell>
         </TableRow>

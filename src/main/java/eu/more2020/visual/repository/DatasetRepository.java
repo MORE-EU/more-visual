@@ -43,11 +43,9 @@ public interface DatasetRepository {
 
     FarmMeta getDBMetadata (String database, String farmName, QueryExecutor queryExecutor) throws SQLException;
 
-    String getFarmType();
 
     FarmInfo updateFarmInfoColumns(String id, DbColumns columns);
 
     void deleteById(String id);
 
     void deleteAll();
-}

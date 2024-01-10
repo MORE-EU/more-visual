@@ -1,9 +1,7 @@
-import {IPatterns} from "app/shared/model/patterns.model";
 import {createAsyncThunk, createSlice, isAnyOf} from "@reduxjs/toolkit";
 import {IPattern} from "app/shared/model/pattern.model";
 import axios from "axios";
 import {IPatternGroup} from "app/shared/model/pattern-group.model";
-import {IDataset} from "app/shared/model/dataset.model";
 
 const initialState = {
   patterns: null as IPatternGroup[],
@@ -57,7 +55,7 @@ export const applySearchPatterns = createAsyncThunk(
   'applySearchPatterns',
   async (data: { dataset, searchPatterns: IPattern[]}) => {
     const { dataset, searchPatterns} = data;
-    const response = Promise.all(
+    return Promise.all(
       searchPatterns.map(p => {
         const pattern = {
           id: p.id,
@@ -68,8 +66,6 @@ export const applySearchPatterns = createAsyncThunk(
         return axios.post(`api/tools/pattern`, pattern).then(res => res.data);
       })
     ).then(res => res.map(r => r.data));
-    // return response;
-    return fetchPatternGroups(searchPatterns);
   }
 );
 

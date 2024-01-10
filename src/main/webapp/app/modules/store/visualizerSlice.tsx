@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { IAlerts } from 'app/shared/model/alert.model';
 import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
 import { IConnection } from 'app/shared/model/connection.model';
@@ -6,9 +6,13 @@ import { IDataPoint } from 'app/shared/model/data-point.model';
 import { IFarmMeta } from 'app/shared/model/farmMeta.model';
 import { IQueryResults } from 'app/shared/model/query-results.model';
 import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
+import {ICustomMeasure} from "app/shared/model/custom-measures.model";
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import axios from 'axios';
 import moment, { Moment } from 'moment';
+import { IDatasets, defaultDatasets } from 'app/shared/model/datasets.model';
+import { RootState } from './storeConfig';
+import { IDataset } from 'app/shared/model/dataset.model';
 
 
 const seedrandom = require('seedrandom');
@@ -52,6 +56,25 @@ const forecastingInitialState = {
   forecastingDataSplit: [60, 20, 20],
 };
 
+const calculateFreqFromDiff = (timeRange: any) => {
+  const diff = moment.duration(moment(timeRange.to).diff(moment(timeRange.from))).humanize();
+  if (diff.includes('month') || diff.includes('day')) {
+    return 'hour';
+  } else if (diff.includes('hour')) {
+    return 'minute';
+  } else if (diff.includes('minute') || diff.includes('second')) {
+    return 'second';
+  }
+  return 'hour';
+};
+
+
+const forecastingInitialState = {
+  forecastingStartDate: null,
+  forecastingEndDate: null,
+  forecastingDataSplit: [60, 20, 20],
+};
+
 const checkConnectionInitialState = {
   checkConnectionResponse: null,
   checkConnectionLoading: false,
@@ -63,13 +86,15 @@ const initialState = {
   loading: false,
   errorMessage: null,
   dataset: null,
-  chartType: 'line',
+  datasets: defaultDatasets as IDatasets,
+  chartType: 'line' as String,
   queryResults: null as IQueryResults,
   data: null as any,
-  compareData: null,
+  compareData: [],
   liveDataImplLoading: false,
-  queryResultsLoading: true,
+  queryResultsLoading: true as boolean,
   selectedMeasures: [],
+  customSelectedMeasures: [] as ICustomMeasure[],
   measureColors: [],
   from: null as number,
   to: null as number,
@@ -80,12 +105,12 @@ const initialState = {
   filter: {},
   patterns: null,
   changeChart: true,
-  datasetChoice: 0,
+  datasetChoice: null,
   patternNav: '0',
   folder: '',
   graphZoom: null,
   activeTool: null as null | string,
-  compare: [],
+  compare: {} as {[key: string]: number[]},
   chartRef: null,
   showDatePick: false,
   showChangepointFunction: false,
@@ -105,7 +130,7 @@ const initialState = {
   changepointDetectionEnabled: false,
   manualChangepointsEnabled: false,
   customChangepointsEnabled: false,
-  detectedChangepointFilter: 90,
+  detectedChangepointFilter: null,
   forecasting: false,
   soilingEnabled: false,
   yawMisalignmentEnabled: false,
@@ -117,12 +142,14 @@ const initialState = {
   alertingPlotMode: false,
   ...forecastingInitialState,
   ...checkConnectionInitialState,
+  alertResults: {} as {[key: string]: IAlertResults},
   connected: false,
   columnNames: [],
   datasetIsConfiged: false,
   connections: [] as IConnection[],
   connectionLoading: false,
   uploadDatasetError: false,
+  
 };
 
 export const connector = createAsyncThunk('connector', async (dbConnector: {name: string, type: string, host: string, port: string, username: string, password: string, database: string}) => {
@@ -182,6 +209,11 @@ export const getDataset = createAsyncThunk('getDataset', async (data: { folder: 
   } catch (error) {
     throw new Error("Error retrieving data.Please try again.");
   }
+});
+
+export const getDatasets = createAsyncThunk('getDatasets', async (folder: string) => {
+  const response = await axios.get(`api/datasets/all/${folder}`).then(res => res);
+  return response;
 });
 
 export const getFarmMeta = createAsyncThunk('getFarmMeta', async (folder: string) => {
@@ -244,25 +276,31 @@ export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
   async (data: {
     folder: string;
-    id: string[];
+    id: string;
     from: number;
     to: number;
     selectedMeasures: any[];
     filter?: {};
-  }) => {
+  }, {getState}) => {
     const { folder, id, from, to, selectedMeasures, filter } = data;
     let query;
+    const {visualizer} = getState() as RootState;
+    const customSelectedMeasures = [];
+    visualizer.customSelectedMeasures
+      .forEach(customMeasure => customSelectedMeasures.push(customMeasure.measure1, customMeasure.measure2));
+    let measures = concatenateAndSortDistinctArrays(selectedMeasures, customSelectedMeasures);
     from !== null && to !== null
       ? (query = {
           from,
           to,
           viewPort: {width: 1000, height: 600},
-          measures: selectedMeasures,
+          measures,
           filter: filter ? filter : null,
         } as IQuery)
-      : (query = {range: null});
+      : (query = {});
+
     const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
-    return response.data;
+    return {id, response: response.data};
   }
 );
 
@@ -294,24 +332,16 @@ export const liveDataImplementation = createAsyncThunk(
 
 export const updateCompareQueryResults = createAsyncThunk(
   'updateCompareQueryResults',
-  async (data: { folder: string; id: string[]; from: number; to: number; selectedMeasures: any[]; filter: {} }) => {
-    const { folder, id, from, to, selectedMeasures, filter } = data;
-    let query;
-    from !== null && to !== null
-      ? (query = {
-          from,
-          to,
-          viewPort: {width: 1000, height: 600},
-          measures: selectedMeasures,
-          filter,
-        } as IQuery)
-      : (query = { range: null,
-      });
-    const response = Promise.all(
-      id.map(name => {
-        return axios.post(`api/datasets/${folder}/${name}/query`, query).then(res => res.data);
-      })
-    ).then(res => res.map(r => r.data));
+  async (data: { folder: string, compare: {[key: number]: any[]}; from: number; to: number; filter: {} }, {getState}) => {
+    const {visualizer} = getState() as RootState;
+    const { compare, from, to, filter, folder } = data;
+    const response = await Promise.all(
+      Object.keys(compare).map(
+      key => {
+        const query = from !== null && to !== null ? {from,to,viewPort: {width: 1000, height: 600}, measures: compare[key], filter} : {range: null}
+        return axios.post(`api/datasets/${folder}/${key}/query`, query).then(res => ({name: key, data: res.data.data}))
+      }
+    )).then(res => res.map(r => r));
     return response;
   }
 );
@@ -386,6 +416,9 @@ const visualizer = createSlice({
     updateSelectedMeasures(state, action) {
       state.selectedMeasures = action.payload.sort((a, b) => a - b);
     },
+    updateCustomSelectedMeasures(state, action) {
+      state.customSelectedMeasures = action.payload;
+    },
     updateFrom(state, action) {
       state.from = action.payload;
     },
@@ -423,9 +456,7 @@ const visualizer = createSlice({
       state.activeTool = action.payload;
     },
     updateCompare(state, action) {
-      state.compare = !state.compare.includes(action.payload)
-        ? [...state.compare, action.payload]
-        : state.compare.filter(comp => comp !== action.payload);
+      state.compare = action.payload
     },
     updateData(state, action) {
       state.data = [...state.data, action.payload];
@@ -441,6 +472,12 @@ const visualizer = createSlice({
     },
     updateSoilingType(state, action) {
       state.soilingType = action.payload;
+    },
+    updateDetectedChangepoints(state, action) {
+      state.detectedChangepoints  = action.payload;
+    },
+    setDetectedChangepointFilter(state, action) {
+      state.detectedChangepointFilter = action.payload;
     },
     updateAlertResults(state, action) {
       state.alertResults = { ...action.payload };
@@ -598,6 +635,13 @@ const visualizer = createSlice({
       state.loading = false;
       state.farmMeta = action.payload.data;
       state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
+    builder.addCase(getFarmMeta.fulfilled, (state, action) => {
+      state.loading = false;
+      state.farmMeta = action.payload.data;
+      state.datasetChoice = 0;
+    })
+    builder.addCase(getDatasets.fulfilled, (state, action) => {
+      state.datasets = {data: action.payload.data, loading: false, error: null};
     })
     builder.addCase(getDirectories.fulfilled, (state, action) => {
       state.loading = false;
@@ -625,7 +669,6 @@ const visualizer = createSlice({
     });
     builder.addCase(saveConnection.fulfilled, (state, action) => {
       state.checkConnectionLoading = false;
-      state.connections = action.payload.data;
     });
     builder.addCase(getConnection.fulfilled, (state, action) => {
       state.checkConnectionLoading = false;
@@ -639,16 +682,13 @@ const visualizer = createSlice({
       state.checkConnectionLoading = false;
       state.connections = action.payload.data;
     });
-
     builder.addCase(updateQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;
-      state.queryResults = action.payload;
-      state.data = action.payload.data;
-      state.from = action.payload.data[state.selectedMeasures[0]][0].timestamp;
-      state.to = action.payload.data[state.selectedMeasures[0]][action.payload.data[state.selectedMeasures[0]].length - 1].timestamp;
+      state.data = action.payload.response.data;
+      state.from = action.payload.response.data[Object.keys(action.payload.response.data)[0]][0].timestamp;
+      state.to = action.payload.response.data[Object.keys(action.payload.response.data)[0]][action.payload.response.data[Object.keys(action.payload.response.data)[0]].length - 1].timestamp;
     });
     builder.addCase(updateCompareQueryResults.fulfilled, (state, action) => {
-      state.queryResultsLoading = false;
       state.compareData = action.payload;
     });
     // builder.addCase(liveDataImplementation.fulfilled, (state, action) => {
@@ -656,21 +696,28 @@ const visualizer = createSlice({
     //   state.queryResultsLoading = false;
     //   state.data = action.payload.data.length !== 0 ? [...state.data, ...action.payload.data.slice(0)] : state.data;
     // });
-    builder.addCase(liveDataImplementation.fulfilled, (state, action) => {
+    builder.addCase(liveDataImplementation.fulfilled, (state, action) =>
+    {
       state.liveDataImplLoading = false;
       state.queryResultsLoading = false;
-      state.data = action.payload.data[state.selectedMeasures[0]].length !== 0 ?
+      state.data = action.payload.data[Object.keys(action.payload.data)[0]].length !== 0 ?
         state.selectedMeasures.map(m => {
           const d = action.payload.data[m];
           return [...state.data[m], ...d.slice(0)];
         })
         : state.data;
     });
-    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending,updateFarmInfoColumnNames.pending,getDBColumnNames.pending, connector.pending, disconnector.pending), 
-    state => {
+    builder.addCase(getDatasets.pending, state => {
+      state.datasets = {data: [], loading: true, error: null}
+    });
+    builder.addCase(getDatasets.rejected, (state, action) => {
+      state.datasets = {...state.datasets, loading: false, error: "there was an error loading the data"}
+    });
+    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending), state => {
+      state.errorMessage = null;
       state.loading = true;
     });
-    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
+    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending, applyDeviationDetection.pending), state => {
       state.queryResultsLoading = true;
     });
     builder.addMatcher(isAnyOf(liveDataImplementation.pending), state => {
@@ -687,7 +734,7 @@ const visualizer = createSlice({
       isAnyOf( getFarmMeta.rejected, getDirectories.rejected, getSampleFile.rejected, getDBColumnNames.rejected, disconnector.rejected),
       (state, action) => {
         state.loading = false;
-        state.errorMessage = action.payload;
+        state.errorMessage = "unable to reach server";
       }
     );
     builder.addMatcher(

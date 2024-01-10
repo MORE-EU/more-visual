@@ -15,7 +15,7 @@ public class DeviationDetection extends ChangepointDetection {
     public DeviationDetection() {
     }
 
-    public DeviationDetection(TimeRange range, List<Changepoint> changepoints, Integer weeks, String typ) {
+    public DeviationDetection(TimeRange range, List<Changepoint> changepoints, Integer weeks, String type) {
         this.range = range;
         this.type = type;
         this.changepoints = changepoints;

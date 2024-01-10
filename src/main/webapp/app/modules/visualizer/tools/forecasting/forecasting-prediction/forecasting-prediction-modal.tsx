@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { getInference, setForecastingInference, setPredModalOpen, setSelectedModel } from 'app/modules/store/forecastingSlice';
+import { getAthenaInference, getInference, setForecastingInference, setPredModalOpen, setSelectedModel } from 'app/modules/store/forecastingSlice';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import React, { useState } from 'react';
 import { Typography } from '@mui/material';
@@ -41,23 +41,32 @@ const ForecastingPredModal = () => {
   };
 
   const handleDateChange = value => {
+    // if(selectedModel === "min_power"){
+    //   const date = new Date(value).getTime();
+    // setUserDate(date);
+    // }else{
     const userTimezoneOffset = value.getTimezoneOffset() * 60000;
-    const date = new Date(value).getTime();
+    const date = new Date(value).getTime() + userTimezoneOffset;
     setUserDate(date);
+    // }
   };
 
   const handleClick = () => {
-    dispatch(getInference({ timestamp: userDate, model_name: selectedModel }));
+    dispatch(getInference({ timestamp: userDate, model_name: selectedModel, kind: dataset.id }));
   };
 
+  const handleAthenaForecasting = () => {
+    dispatch(getAthenaInference({ timestamp: userDate, model_name: dataset.id }))
+  }
+
   const getDateValue = date => {
-    return date === null ? date : date + new Date(date).getTimezoneOffset() * 60000;
+      return date ? date - new Date(date).getTimezoneOffset() * 60000 : null
   };
 
   const generateChart = () => {
     return [
       {
-        name: 'Inference',
+        name: selectedModel === "min_power" ? "minimun power" : "Predicted Values",
         opposite: false,
         data: Object.entries(forecastingInference).map(([key, value]) => [parseInt(key) * 1000, value]),
         offset: 0,
@@ -99,13 +108,14 @@ const ForecastingPredModal = () => {
                 maxDateTime={dataset.timeRange.to}
                 renderInput={props => <TextField size="small" {...props} />}
                 value={getDateValue(userDate)}
+                views={['year','month','day','hours']}
                 onChange={e => {}}
                 onAccept={val => {
                   handleDateChange(val);
                 }}
                 inputFormat="dd/MM/yyyy hh:mm a"
               />
-              <Button variant="contained" onClick={handleClick}>
+              <Button variant="contained" onClick={selectedModel === "min_power" ? handleAthenaForecasting : handleClick}>
                 proceed
               </Button>
             </Grid>

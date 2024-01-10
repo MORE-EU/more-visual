@@ -3,7 +3,7 @@ export interface IAlerts {
   measure: string;
   values: { value1?: string; value2?: string };
   operation: string;
-  duration: number;
+  duration: { number: number; unit: moment.DurationInputArg2 };
   dateCreated: number;
   datasetId: string;
   color: string;
@@ -16,7 +16,7 @@ export const defaultValue: Readonly<IAlerts> = {
   measure: '',
   values: {},
   operation: '',
-  duration: null,
+  duration: { number: 10, unit: 'hour' },
   dateCreated: null,
   datasetId: null,
   color: '#333333',

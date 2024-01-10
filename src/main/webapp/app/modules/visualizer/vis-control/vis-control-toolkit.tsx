@@ -13,58 +13,106 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import {YawMisalignment} from "app/modules/visualizer/tools/yaw-misalignment/yaw-misalignment";
+import { YawMisalignment } from 'app/modules/visualizer/tools/yaw-misalignment/yaw-misalignment';
+import ListItem from '@mui/material/ListItem';
+import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
+import SimpleBar from 'simplebar-react';
+import Divider from '@mui/material/Divider';
+import grey from '@mui/material/colors/grey';
+import Tooltip from '@mui/material/Tooltip';
 
 const VisToolkit = () => {
-
-  const {farmMeta, openToolkit, activeTool} = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, data } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const handleToolClick = key => e => {
     dispatch(setOpenToolkit(true));
     dispatch(updateActiveTool(key));
-  }
+  };
   return (
-        <Grid sx={{height: "100%", width: "100%"}}>
-          <Typography variant="h6" gutterBottom>
+    <Grid sx={{ height: '100%', width: '100%' }}>
+      <Box sx={{ height: '10%' }}>
+        <Typography variant="h6" gutterBottom>
           Tools
-          </Typography>
-          <List>
-            <ListItemButton key={0} onClick={handleToolClick("Pattern Extraction")}>
+        </Typography>
+      </Box>
+      {farmMeta && dataset ? (
+        <SimpleBar key="SimpleBarTools" style={{ maxHeight: '90%', border: `1px solid ${grey[300]}`, borderRadius: 10 }}>
+          <Box sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
+            <List disablePadding>
+              {/* <ListItemButton key={0} onClick={handleToolClick("Pattern Extraction")} disabled={dataset.id !== "eugene" || data === null}>
               <ListItemIcon>
                 <PatternIcon/>
               </ListItemIcon>
-              <ListItemText primary={"Pattern Extraction"} sx={ {display: { xs: 'none', md: 'block' }}}/>
+              <ListItemText primary={"Pattern Extraction"}/>
             </ListItemButton>
-            {farmMeta.resType === 0 && <><ListItemButton key={1} onClick={handleToolClick("Soiling Detection")}>
-              <ListItemIcon>
-                <ManageSearchIcon/>
-              </ListItemIcon>
-              <ListItemText primary={"Soiling Detection"} sx={ {display: { xs: 'none', md: 'block' }}}/>
-            </ListItemButton></>}
-            {farmMeta.resType === 1 && <>
-              <ListItemButton key={2}>
+            <Divider /> */}
+              <Tooltip
+                placement="right"
+                title={
+                  farmMeta.resType === 0
+                    ? dataset.id === 'eugene' || dataset.id === 'cocoa'
+                      ? ''
+                      : 'This tool is unavailable for this dataset'
+                    : 'This tool is unavailable for this type of RES.'
+                }
+              >
+                <span>
+                <ListItemButton key={1} onClick={handleToolClick('Soiling Detection')} disabled={farmMeta.resType !== 0 || data === null || (dataset.id !== "eugene" && dataset.id !== "cocoa")}>
+                  <ListItemIcon>
+                    <ManageSearchIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={'Soiling Detection'} />
+                </ListItemButton>
+                </span>
+              </Tooltip>
+              <Divider />
+              <Tooltip
+                placement="right"
+                title={
+                  farmMeta.resType === 1
+                    ? dataset.id === 'BEZ2'
+                      ? ''
+                      : 'This tool is unavailable for this dataset.'
+                    : 'This tool is unavailable for this type of RES.'
+                }
+              >
+                <span>
+              <ListItemButton
+                key={2}
+                onClick={handleToolClick('Yaw Misalignment Detection')}
+                disabled={dataset.id !== 'BEZ2' || data === null}
+              >              
                 <ListItemIcon>
-                  <ManageSearchIcon/>
+                  <ManageSearchIcon />
+                </ListItemIcon> 
+                <ListItemText primary={'Yaw Misalignment Detection'} />
+              </ListItemButton>
+              </span>
+              </Tooltip>
+              <Divider />
+              <ListItemButton key={3} onClick={handleToolClick('Forecasting')} disabled={data === null}>
+                <ListItemIcon>
+                  <TimelineIcon />
                 </ListItemIcon>
-                <ListItemText primary={"Yaw Misalignment Detection"} sx={ {display: { xs: 'none', md: 'block' }}}/>
-                <YawMisalignment />
-            </ListItemButton></>}
-            <ListItemButton key={3} onClick={handleToolClick("Forecasting")}>
-              <ListItemIcon>
-                <TimelineIcon/>
-              </ListItemIcon>
-              <ListItemText primary={"Forecasting"} sx={ {display: { xs: 'none', md: 'block' }}}/>
-            </ListItemButton>
-            <ListItemButton key={4} onClick={handleToolClick("Filtering")}>
-              <ListItemIcon>
-                <FilterAltIcon/>
-              </ListItemIcon>
-              <ListItemText primary={"Filtering"} sx={ {display: { xs: 'none', md: 'block' }}}/>
-            </ListItemButton>
-          </List>
-        </Grid>
+                <ListItemText primary={'Forecasting'} />
+              </ListItemButton>
+              <Divider />
+              <ListItemButton key={4} onClick={handleToolClick('Filtering')} disabled={data === null}>
+                <ListItemIcon>
+                  <FilterAltIcon />
+                </ListItemIcon>
+                <ListItemText primary={'Filtering'} />
+              </ListItemButton>
+            </List>
+          </Box>
+        </SimpleBar>
+      ) : (
+        <Skeleton variant="rounded" height="90%" width="100%" />
+      )}
+    </Grid>
   );
-}
+};
 
 export default VisToolkit;

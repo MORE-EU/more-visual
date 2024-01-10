@@ -15,7 +15,7 @@ public interface AlertRepository {
 
     List<Alert> saveAlert(Alert alert) throws IOException;
 
-    List<Alert> deleteAlert(String alertName) throws IOException;
+    List<Alert> deleteAlert(String alertName, String datasetId) throws IOException;
     
     List<Alert> getAlerts(String datasetId) throws IOException;
     

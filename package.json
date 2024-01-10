@@ -167,7 +167,8 @@
     "webpack:prod": "npm run cleanup && npm run webpack:prod:main",
     "webpack:test": "npm run test",
     "webpack-dev-server": "node --max_old_space_size=4096 node_modules/webpack-dev-server/bin/webpack-dev-server.js",
-    "webpack": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js"
+    "webpack": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js",
+    "docker": "mvnw -ntp verify -DskipTests -Pprod jib:dockerBuild && docker-compose -f docker.yml up -d"
   },
   "jestSonar": {
     "reportPath": "target/test-results/jest",

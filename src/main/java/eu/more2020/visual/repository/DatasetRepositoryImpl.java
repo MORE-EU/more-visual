@@ -2,7 +2,6 @@ package eu.more2020.visual.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opencsv.bean.CsvToBeanBuilder;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.config.ApplicationProperties;
@@ -60,7 +59,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         ObjectMapper mapper = new ObjectMapper();
         List<AbstractDataset> datasets = new ArrayList<>();
         List<File> metadataFiles = Files.list(Paths.get(applicationProperties.getWorkspacePath()))
-            .filter(path -> path.toString().endsWith(".meta.json")).map(Path::toFile).collect(Collectors.toList());
+                .filter(path -> path.toString().endsWith(".meta.json")).map(Path::toFile).collect(Collectors.toList());
         for (File metadataFile : metadataFiles) {
             FileReader reader = new FileReader(metadataFile);
             datasets.add(mapper.readValue(reader, AbstractDataset.class));
@@ -112,34 +111,44 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                         fillDataFileInfo((CsvDataset) dataset, dataFileInfo);
                         dataset.getFileInfoList().add(dataFileInfo);
                     } else {
-                        List<DataFileInfo> fileInfoList = Arrays.stream(file.listFiles(f -> !f.isDirectory() && f.getName().endsWith(".csv"))).map(f -> {
-                            DataFileInfo dataFileInfo = new DataFileInfo(f.getAbsolutePath());
-                            try {
-                                fillDataFileInfo(finalDataset, dataFileInfo);
-                            } catch (IOException e) {
-                                new RuntimeException(e);
-                            }
-                            return dataFileInfo;
-                        }).collect(Collectors.toList());
+                        List<DataFileInfo> fileInfoList = Arrays
+                                .stream(file.listFiles(f -> !f.isDirectory() && f.getName().endsWith(".csv")))
+                                .map(f -> {
+                                    DataFileInfo dataFileInfo = new DataFileInfo(f.getAbsolutePath());
+                                    try {
+                                        fillDataFileInfo(finalDataset, dataFileInfo);
+                                    } catch (IOException e) {
+                                        new RuntimeException(e);
+                                    }
+                                    return dataFileInfo;
+                                }).collect(Collectors.toList());
                         // sort csv files by their time ranges ascending
                         fileInfoList.sort(Comparator.comparing(i -> i.getTimeRange().getFrom()));
                         dataset.setFileInfoList(fileInfoList);
                     }
-                    List<Integer> measures =  IntStream.rangeClosed(0, dataset.getHeader().length - 1)
-                        .boxed()
-                        .filter(i -> i != finalDataset.getMeasureIndex(finalDataset.getTimeCol()))
-                        .collect(Collectors.toList());
+                    List<Integer> measures = IntStream.rangeClosed(0, dataset.getHeader().length - 1)
+                            .boxed()
+                            .filter(i -> i != finalDataset.getMeasureIndex(finalDataset.getTimeCol()))
+                            .collect(Collectors.toList());
                     finalDataset.setMeasures(measures);
                     if (dataset.getTimeRange() == null) {
                         dataset.setTimeRange(dataset.getFileInfoList().get(0).getTimeRange());
                     }
                     dataset.setTimeRange(dataset.getFileInfoList().stream().map(DataFileInfo::getTimeRange)
-                        .reduce(dataset.getTimeRange(), TimeRange::span));
-                    dataset.setType(type);
+                            .reduce(dataset.getTimeRange(), TimeRange::span));
+                } else {
+                    String config = jsonNode.get("config").asText();
+                    String schema = datasetNode.get("schema").asText();
+                    String name = datasetNode.get("name").asText();
+                    String timeCol = datasetNode.get("timeCol").asText();
+                    String valueCol = datasetNode.get("valueCol").asText();
+                    String idCol = datasetNode.get("idCol").asText();
+                    dataset = createDBDataset(datasetId, farm.getType(), schema, name, timeCol, valueCol, idCol,
+                            config);
                 }
-                log.info(String.valueOf(dataset));
-                datasets.put(id, dataset);
+                dataset.setType(type);
             }
+            log.info(String.valueOf(dataset));
         }
         return Optional.ofNullable(dataset);
     }
@@ -153,7 +162,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         CsvParser parser = new CsvParser(parserSettings);
         parser.beginParsing(new File(dataFileInfo.getFilePath()), Charset.forName("US-ASCII"));
         if (dataset.getHasHeader()) {
-            parser.parseNext();  //skip header row
+            parser.parseNext(); // skip header row
             dataset.setHeader(parser.getContext().parsedHeaders());
         }
         int timeColId = dataset.getMeasureIndex(dataset.getTimeCol());
@@ -161,7 +170,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         long from = DateTimeUtil.parseDateTimeString(parser.parseNext()[timeColId], dataset.getTimeFormat());
         parser.stopParsing();
 
-        ReversedLinesFileReader reversedLinesFileReader = new ReversedLinesFileReader(new File(dataFileInfo.getFilePath()), StandardCharsets.US_ASCII);
+        ReversedLinesFileReader reversedLinesFileReader = new ReversedLinesFileReader(
+                new File(dataFileInfo.getFilePath()), StandardCharsets.US_ASCII);
         String lastRow = reversedLinesFileReader.readLine();
         reversedLinesFileReader.close();
         long to = DateTimeUtil.parseDateTimeString(parser.parseLine(lastRow)[timeColId], dataset.getTimeFormat());
@@ -185,10 +195,10 @@ public class DatasetRepositoryImpl implements DatasetRepository {
             public boolean accept(File dir, String name) {
                 return name.contains("sample") && name.endsWith("csv");
             }
-        });
-        List<Sample> beans = new CsvToBeanBuilder(new FileReader(matchingFiles[0]))
-            .withType(Sample.class).build().parse();
-        return beans;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     @Override

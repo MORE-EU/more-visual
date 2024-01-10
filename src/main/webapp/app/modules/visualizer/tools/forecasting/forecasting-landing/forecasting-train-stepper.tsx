@@ -33,6 +33,7 @@ const ForecastingTrainStepper = props => {
     const selMeasures = selectedMeasures.map(mez => dataset.header[mez]);
     setForecastingForm(state => ({
       ...state,
+      kind: dataset.id,
       targetColumn: selectedMeasures.map(mez => dataset.header[mez]),
       features: {
         ...state.features,

@@ -53,7 +53,7 @@ export const HomeMap = () => {
           (
             <MarkerClusterGroup showCoverageOnHover={true} key={itemIdx}>
               {item.farmInfo.map((info, locIdx) => {
-                const rand = Math.floor((Math.random() * (farmMeta.data.length - 1)) + 0);
+                // const rand = Math.floor((Math.random() * (farmMeta.data.length - 1)) + 0);
                 let count = 0;
                 const count1 = [];
                 selected.map(sele => {

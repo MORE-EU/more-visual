@@ -17,7 +17,7 @@ export const ChartControl = () => {
     <Grid container direction="row">
       <Grid item alignItems="center" sx={{display: "flex", flex: 1, flexDirection: "row", justifyContent: "flex-start", columnGap: 2}}>
           <ChartDatePicker />
-          <ChartType />
+          {/* <ChartType /> */}
           <ChartCompare />
           <ChartAlerting />
       </Grid>

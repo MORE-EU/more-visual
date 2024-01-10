@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -44,11 +46,11 @@ public class AlertRepositoryImpl implements AlertRepository {
             mapper.writeValue(fw, json);
             fr.close();
         }
-        return json;
+        return json.stream().filter(al -> al.getDatasetId().equals(alert.getDatasetId())).collect(Collectors.toList());
     }
     
     @Override
-    public List<Alert> deleteAlert(String alertName) throws IOException{
+    public List<Alert> deleteAlert(String alertName, String datasetId) throws IOException{
         ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         mapper.findAndRegisterModules();
         File alertFile = new File(applicationProperties.getWorkspacePath(), "alerts.json");
@@ -60,6 +62,7 @@ public class AlertRepositoryImpl implements AlertRepository {
             mapper.writeValue(fw, alerts);
             fr.close();
             fw.close();
+            alerts.removeIf(al -> !al.getDatasetId().equals(datasetId));
         return alerts;
     }
     
@@ -83,6 +86,7 @@ public class AlertRepositoryImpl implements AlertRepository {
             mapper.writeValue(fw, alerts);
             fr.close();
             fw.close();
+            alerts.removeIf(al -> !al.getDatasetId().equals(editedAlert.getDatasetId()));
         return alerts;
     }
    
