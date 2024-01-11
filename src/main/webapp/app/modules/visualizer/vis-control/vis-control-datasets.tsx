@@ -15,7 +15,7 @@ import { Link, useHistory } from 'react-router-dom';
 import VisControlDatasetUpload from './vis-control-dataset-upload';
 
 const VisControlDatasets = () => {
-  const { folder, dataset, compare, resampleFreq, datasetChoice, farmMeta, connected } = useAppSelector(state => state.visualizer);
+  const { folder, dataset, compare, datasetChoice, farmMeta } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
@@ -69,7 +69,7 @@ const VisControlDatasets = () => {
                 }}
                 divider
               >
-              <ListItemText primary={`${file.id}`} sx={{ pl: 4 }} />
+              <ListItemText primary={`${file.id}`} />
                 {Object.hasOwn(compare, file.id) && (
                   <Tooltip title="Currently comparing this file">
                     <ListItemIcon>

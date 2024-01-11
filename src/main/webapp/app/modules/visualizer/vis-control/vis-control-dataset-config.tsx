@@ -4,7 +4,21 @@ import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
 
 import SimpleBar from 'simplebar-react';
-import { Grid, Typography, Button, FormControl, InputLabel, Select, MenuItem, TableContainer, Box, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import TableContainer from "@mui/material/TableContainer";
+import Box from '@mui/material/Box';
+import Table from '@mui/material/Table';
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+
 import grey from '@mui/material/colors/grey';
 import blue from '@mui/material/colors/blue';
 import { getDBColumnNames, updateFarmInfoColumnNames, setDatasetIsConfiged, getSampleFile, resetSampleFile, resetColumnNames, resetDataset, resetUploadDatasetError } from "app/modules/store/visualizerSlice";

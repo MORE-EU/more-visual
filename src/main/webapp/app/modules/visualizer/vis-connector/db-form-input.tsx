@@ -4,9 +4,9 @@ import { useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import IconButton from '@mui/material/IconButton';
-import { InputAdornment } from "@mui/material";
+import  InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
-import { VisibilityOff } from "@mui/icons-material";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 type DBFormPropsType = {
     label: string;

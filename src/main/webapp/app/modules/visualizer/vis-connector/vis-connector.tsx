@@ -6,7 +6,9 @@ import StorageIcon from '@mui/icons-material/Storage';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Box from "@mui/material/Box";
 import grey from '@mui/material/colors/grey';
-import { Typography, Grid, Tooltip } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
 import { createTheme } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 

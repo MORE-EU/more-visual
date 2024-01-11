@@ -3,8 +3,12 @@ import { useEffect, useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import { useHistory } from 'react-router-dom';
-import { Divider, Grid, Snackbar, Alert  } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import Snackbar from '@mui/material/Snackbar';
 import CircularProgress from '@mui/material/CircularProgress';
+import Slide, { SlideProps } from '@mui/material/Slide';
 
 import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 import { setDatasetIsConfiged, disconnector, setErrorMessage } from '../store/visualizerSlice';
@@ -14,6 +18,7 @@ import VisControlDatasetConfig from './vis-control/vis-control-dataset-config';
 import VisControlDatasetSelection from './vis-control/vis-control-dataset-selection';
 
 const mdTheme = createTheme();
+type TransitionProps = Omit<SlideProps, 'direction'>;
 
 export const EmptyVisualizer = () => {
     const [isBusy, setIsBusy] = useState(true);
@@ -21,6 +26,11 @@ export const EmptyVisualizer = () => {
     const { farmMeta, datasetChoice, selectedConnection, connected, datasetIsConfiged, errorMessage } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const history = useHistory();
+
+    function TransitionLeft(props: TransitionProps) {
+        return <Slide {...props} direction="left" />;
+    }
+    
 
     useEffect(() => {
         if (farmMeta) {
@@ -47,8 +57,6 @@ export const EmptyVisualizer = () => {
     }, [errorMessage]);
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-        if (reason === 'clickaway')
-            return;
         if (!farmMeta && connected) dispatch(disconnector());
         dispatch(setErrorMessage(null));
         setOpenSnack(false);
@@ -57,8 +65,10 @@ export const EmptyVisualizer = () => {
     return (
         <div>
             <ThemeProvider theme={mdTheme}>
-                <Snackbar open={openSnack} autoHideDuration={2000} onClose={handleClose}>
-                    <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+                <Snackbar open={openSnack} autoHideDuration={6000} onClose={handleClose} 
+                TransitionComponent={TransitionLeft}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+                    <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }} variant='filled'>
                         <>{errorMessage}</>
                     </Alert>
                 </Snackbar>
