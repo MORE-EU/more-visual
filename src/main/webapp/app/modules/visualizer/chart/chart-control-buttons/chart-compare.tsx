@@ -67,17 +67,19 @@ export const ChartCompare = () => {
   return (
     <>
       <Tooltip title="Compare Charts">
-        <IconButton
-          aria-label="more"
-          id="long-button"
-          aria-controls={open ? 'long-menu' : undefined}
-          aria-expanded={open ? 'true' : undefined}
-          aria-haspopup="true"
-          onClick={handleOpen}
-          disabled={datasets.loading}
-        >
-          {datasets.loading ? <CircularProgress size={20} /> : <AddchartIcon />}
-        </IconButton>
+        <>
+          <IconButton
+            aria-label="more"
+            id="long-button"
+            aria-controls={open ? 'long-menu' : undefined}
+            aria-expanded={open ? 'true' : undefined}
+            aria-haspopup="true"
+            onClick={handleOpen}
+            disabled={datasets.loading}
+          >
+            {datasets.loading ? <CircularProgress size={20} /> : <AddchartIcon />}
+          </IconButton>
+        </>
       </Tooltip>
       <Popover
         id="long-menu"

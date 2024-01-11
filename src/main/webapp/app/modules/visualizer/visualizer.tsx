@@ -63,6 +63,7 @@ export const Visualizer = () => {
 
   useEffect(() => {
     dataset && dispatch(getAlerts(dataset.id));
+    dataset && dispatch(getDatasets());
   }, [dataset]);
 
   useEffect(() => {

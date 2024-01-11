@@ -113,8 +113,8 @@ public class DatasetResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of datasets in body.
      */
-    @GetMapping("/datasets")
-    public List<AbstractDataset> getAllDatasets() throws IOException {
+    @GetMapping("/datasets/all")
+    public List<AbstractDataset> getAllDatasets() {
         log.debug("REST request to get all Datasets");
         return datasetRepository.findAll();
     }

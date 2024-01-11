@@ -204,8 +204,8 @@ export const getDataset = createAsyncThunk('getDataset', async (data: { folder: 
   }
 });
 
-export const getDatasets = createAsyncThunk('getDatasets', async (folder: string) => {
-  const response = await axios.get(`api/datasets/all/${folder}`).then(res => res);
+export const getDatasets = createAsyncThunk('getDatasets', async () => {
+  const response = await axios.get(`api/datasets/all`).then(res => res);
   return response;
 });
 

@@ -24,7 +24,7 @@ public interface DatasetRepository {
 
     ResponseEntity<String> checkConnection(String url, String port) throws IOException;
 
-    List<AbstractDataset> findAll() throws IOException;
+    List<AbstractDataset> findAll();
 
     List<Sample> findSample(String farmName) throws IOException;
 

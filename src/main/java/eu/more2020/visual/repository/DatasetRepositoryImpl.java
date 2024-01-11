@@ -57,17 +57,11 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         this.applicationProperties = applicationProperties;
     }
 
-    @Override
-    public List<AbstractDataset> findAll() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        List<AbstractDataset> datasets = new ArrayList<>();
-        List<File> metadataFiles = Files.list(Paths.get(applicationProperties.getWorkspacePath()))
-                .filter(path -> path.toString().endsWith(".meta.json")).map(Path::toFile).collect(Collectors.toList());
-        for (File metadataFile : metadataFiles) {
-            FileReader reader = new FileReader(metadataFile);
-            datasets.add(mapper.readValue(reader, AbstractDataset.class));
-        }
-        return datasets;
+    @Override 
+    public List<AbstractDataset> findAll() {
+        List<AbstractDataset> allDatasets = new ArrayList<AbstractDataset>(datasets.values());
+        log.debug(allDatasets.toString());
+        return allDatasets;
     }
 
     @Override
