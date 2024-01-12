@@ -130,7 +130,6 @@ const initialState = {
   connections: [] as IConnection[],
   connectionLoading: false,
   uploadDatasetError: false,
-  
 };
 
 const concatenateAndSortDistinctArrays = (array1: number[], array2: number[]) => {
@@ -205,7 +204,7 @@ export const getDataset = createAsyncThunk('getDataset', async (data: { folder: 
 });
 
 export const getDatasets = createAsyncThunk('getDatasets', async () => {
-  const response = await axios.get(`api/datasets/all`).then(res => res);
+  const response = await axios.get(`api/datasets`).then(res => res);
   return response;
 });
 
@@ -686,6 +685,7 @@ const visualizer = createSlice({
     });
     builder.addCase(updateCompareQueryResults.fulfilled, (state, action) => {
       state.compareData = action.payload;
+      state.queryResultsLoading = false;
     });
     // builder.addCase(liveDataImplementation.fulfilled, (state, action) => {
     //   state.liveDataImplLoading = false;
@@ -714,6 +714,7 @@ const visualizer = createSlice({
     });
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending, applyDeviationDetection.pending), state => {
       state.queryResultsLoading = true;
+      state.errorMessage = null;
     });
     builder.addMatcher(isAnyOf(liveDataImplementation.pending), state => {
       state.liveDataImplLoading = true;
@@ -754,6 +755,7 @@ const visualizer = createSlice({
     });
     builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected), (state, action) => {
       state.queryResultsLoading = false;
+      state.errorMessage = action.error.message;
     });
     builder.addMatcher(isAnyOf(liveDataImplementation.rejected), (state, action) => {
       state.liveDataImplLoading = false;

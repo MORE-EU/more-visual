@@ -21,7 +21,7 @@ import TableBody from "@mui/material/TableBody";
 
 import grey from '@mui/material/colors/grey';
 import blue from '@mui/material/colors/blue';
-import { getDBColumnNames, updateFarmInfoColumnNames, setDatasetIsConfiged, getSampleFile, resetSampleFile, resetColumnNames, resetDataset, resetUploadDatasetError } from "app/modules/store/visualizerSlice";
+import { getDBColumnNames, updateFarmInfoColumnNames, setDatasetIsConfiged, getSampleFile, resetSampleFile, resetColumnNames, resetUploadDatasetError } from "app/modules/store/visualizerSlice";
 
 
 interface IConfigForm  {
@@ -48,7 +48,6 @@ const VisControlDatasetConfig = () => {
     useEffect(() => {
         dispatch(resetSampleFile());
         dispatch(resetColumnNames());
-        dispatch(resetDataset());
         dispatch(resetUploadDatasetError());
         farmMeta && dispatch(getDBColumnNames({tableName: farmMeta.data[datasetChoice].id }));
         farmMeta && dispatch(getSampleFile(farmMeta.data[datasetChoice].id));

@@ -52,7 +52,7 @@ const VisControlDatasetSelection = () => {
         }
     },[selectedDataset.table]);
 
-    const schemaSelectCHange = (event: SelectChangeEvent) => {
+    const schemaSelectChange = (event: SelectChangeEvent) => {
         const {name, value} = event.target;
         setSelectedDataset(prevDataset => (
             {...prevDataset, [name]: value}                                                                                                                                                                                                                                                       
@@ -83,7 +83,7 @@ const VisControlDatasetSelection = () => {
                         <InputLabel id="schemaInput">
                             Schema
                         </InputLabel>
-                        <Select labelId="schemaInput" id="schemaSelectInput" name="schema" label="schema" value={selectedDataset.schema} onChange={schemaSelectCHange}>
+                        <Select labelId="schemaInput" id="schemaSelectInput" name="schema" label="schema" value={selectedDataset.schema} onChange={schemaSelectChange}>
                             {farmMeta.data.map(file => file.schema).filter(
                             (schema, idx, curr_schema) => curr_schema.indexOf(schema) === idx).map(schema => 
                             (<MenuItem key={schema} value={schema}>{schema}</MenuItem>)

@@ -299,11 +299,11 @@ export const Chart = () => {
     latestDatasetId.current = dataset.id;
     latestFolder.current = folder;
     // CHART: INSTRUCTIONS
-    chart.current.showLoading('Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear');
-    Highcharts.addEvent(chart.current.container, 'click', (event: MouseEvent) => {
-      chart.current.hideLoading();
-      Highcharts.removeEvent(chart.current.container, 'click');
-    });
+    // chart.current.showLoading('Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear');
+    // Highcharts.addEvent(chart.current.container, 'click', (event: MouseEvent) => {
+    //   chart.current.hideLoading();
+    //   Highcharts.removeEvent(chart.current.container, 'click');
+    // });
 
     const fetchData = () => {
       const { max, min } = chart.current.xAxis[0].getExtremes();
@@ -692,9 +692,9 @@ export const Chart = () => {
       onMouseOver={() => (data ? handleMouseOverChart() : null)}
       onMouseLeave={() => (data ? handleMouseLeaveChart() : null)}
     >
-      {!data && errorMessage === null ? (
+      {queryResultsLoading && errorMessage === null ? (
         <LinearProgress />
-      ) : !data && errorMessage !== null ? (
+      ) : !queryResultsLoading && errorMessage !== null ? (
         <LinearProgress variant="determinate" color="error" value={100} className={'linear-prog-hide'} />
       ) : (
         <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />

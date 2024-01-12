@@ -66,6 +66,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
     @Override
     public Optional<FarmMeta> findFarm(String farmName) throws IOException {
+        if (farm.getType() != null && farm.getName().equals(farmName)) return Optional.ofNullable(farm);
         FarmMeta farm = null;
         ObjectMapper mapper = new ObjectMapper();
         File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName, farmName + ".meta.json");
@@ -86,70 +87,73 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName,
                 farmName + ".meta.json");
         ObjectMapper objectMapper = new ObjectMapper();
-
-        if (metadataFile.exists()) {
-            JsonNode jsonNode = objectMapper.readTree(metadataFile);
-            FarmMeta farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
-            String type = farm.getType();
-
-            for (JsonNode datasetNode : jsonNode.get("data")) {
-                String datasetId = datasetNode.get("id").asText();
-                if (!datasetId.equals(id))
-                    continue;
-                // Extract data from JSON node and create the desired subclass of
-                // AbstractDataset
-                if (type.equals("csv")) {
-                    String name = datasetNode.get("name").asText();
-                    String path = datasetNode.get("path").asText();
-                    String timeCol = datasetNode.get("timeCol").asText();
-                    String delimiter = datasetNode.get("delimiter").asText();
-                    boolean hasHeader = datasetNode.get("hasHeader").asBoolean();
-                    File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, id + ".csv");
-                    dataset = new CsvDataset(path, id, name, timeCol, timeFormat, delimiter, hasHeader);
-                    CsvDataset finalDataset = (CsvDataset) dataset;
-                    if (!file.isDirectory()) {
-                        DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
-                        fillDataFileInfo((CsvDataset) dataset, dataFileInfo);
-                        dataset.getFileInfoList().add(dataFileInfo);
+        if(datasets.containsKey(id)) dataset = datasets.get(id);
+        else {
+            if (metadataFile.exists()) {
+                JsonNode jsonNode = objectMapper.readTree(metadataFile);
+                FarmMeta farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
+                String type = farm.getType();
+                for (JsonNode datasetNode : jsonNode.get("data")) {
+                    String datasetId = datasetNode.get("id").asText();
+                    if (!datasetId.equals(id))
+                        continue;
+                    // Extract data from JSON node and create the desired subclass of
+                    // AbstractDataset
+                    if (type.equals("csv")) {
+                        String name = datasetNode.get("name").asText();
+                        String path = datasetNode.get("path").asText();
+                        String timeCol = datasetNode.get("timeCol").asText();
+                        String delimiter = datasetNode.get("delimiter").asText();
+                        boolean hasHeader = datasetNode.get("hasHeader").asBoolean();
+                        File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, id + ".csv");
+                        dataset = new CsvDataset(path, id, name, timeCol, timeFormat, delimiter, hasHeader);
+                        CsvDataset finalDataset = (CsvDataset) dataset;
+                        if (!file.isDirectory()) {
+                            DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
+                            fillDataFileInfo((CsvDataset) dataset, dataFileInfo);
+                            dataset.getFileInfoList().add(dataFileInfo);
+                        } else {
+                            List<DataFileInfo> fileInfoList = Arrays
+                                    .stream(file.listFiles(f -> !f.isDirectory() && f.getName().endsWith(".csv")))
+                                    .map(f -> {
+                                        DataFileInfo dataFileInfo = new DataFileInfo(f.getAbsolutePath());
+                                        try {
+                                            fillDataFileInfo(finalDataset, dataFileInfo);
+                                        } catch (IOException e) {
+                                            new RuntimeException(e);
+                                        }
+                                        return dataFileInfo;
+                                    }).collect(Collectors.toList());
+                            // sort csv files by their time ranges ascending
+                            fileInfoList.sort(Comparator.comparing(i -> i.getTimeRange().getFrom()));
+                            dataset.setFileInfoList(fileInfoList);
+                        }
+                        List<Integer> measures = IntStream.rangeClosed(0, dataset.getHeader().length - 1)
+                                .boxed()
+                                .filter(i -> i != finalDataset.getMeasureIndex(finalDataset.getTimeCol()))
+                                .collect(Collectors.toList());
+                        finalDataset.setMeasures(measures);
+                        if (dataset.getTimeRange() == null) {
+                            dataset.setTimeRange(dataset.getFileInfoList().get(0).getTimeRange());
+                        }
+                        dataset.setTimeRange(dataset.getFileInfoList().stream().map(DataFileInfo::getTimeRange)
+                                .reduce(dataset.getTimeRange(), TimeRange::span));
+                        dataset.setType(type);
+                        datasets.put(name,dataset);
                     } else {
-                        List<DataFileInfo> fileInfoList = Arrays
-                                .stream(file.listFiles(f -> !f.isDirectory() && f.getName().endsWith(".csv")))
-                                .map(f -> {
-                                    DataFileInfo dataFileInfo = new DataFileInfo(f.getAbsolutePath());
-                                    try {
-                                        fillDataFileInfo(finalDataset, dataFileInfo);
-                                    } catch (IOException e) {
-                                        new RuntimeException(e);
-                                    }
-                                    return dataFileInfo;
-                                }).collect(Collectors.toList());
-                        // sort csv files by their time ranges ascending
-                        fileInfoList.sort(Comparator.comparing(i -> i.getTimeRange().getFrom()));
-                        dataset.setFileInfoList(fileInfoList);
+                        String config = jsonNode.get("config").asText();
+                        String schema = datasetNode.get("schema").asText();
+                        String name = datasetNode.get("name").asText();
+                        String timeCol = datasetNode.get("timeCol").asText();
+                        String valueCol = datasetNode.get("valueCol").asText();
+                        String idCol = datasetNode.get("idCol").asText();
+                        
+                        // dataset = createDBDataset(datasetId, farm.getType(), schema, name, timeCol, valueCol, idCol,
+                        //         config);
                     }
-                    List<Integer> measures = IntStream.rangeClosed(0, dataset.getHeader().length - 1)
-                            .boxed()
-                            .filter(i -> i != finalDataset.getMeasureIndex(finalDataset.getTimeCol()))
-                            .collect(Collectors.toList());
-                    finalDataset.setMeasures(measures);
-                    if (dataset.getTimeRange() == null) {
-                        dataset.setTimeRange(dataset.getFileInfoList().get(0).getTimeRange());
-                    }
-                    dataset.setTimeRange(dataset.getFileInfoList().stream().map(DataFileInfo::getTimeRange)
-                            .reduce(dataset.getTimeRange(), TimeRange::span));
-                } else {
-                    String config = jsonNode.get("config").asText();
-                    String schema = datasetNode.get("schema").asText();
-                    String name = datasetNode.get("name").asText();
-                    String timeCol = datasetNode.get("timeCol").asText();
-                    String valueCol = datasetNode.get("valueCol").asText();
-                    String idCol = datasetNode.get("idCol").asText();
-                    // dataset = createDBDataset(datasetId, farm.getType(), schema, name, timeCol, valueCol, idCol,
-                    //         config);
                 }
-                dataset.setType(type);
+                log.info(String.valueOf(dataset));
             }
-            log.info(String.valueOf(dataset));
         }
         return Optional.ofNullable(dataset);
     }
@@ -281,9 +285,11 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
     @Override
     public void deleteAll() {
-        datasets.clear();
-        if (farm.getData() != null) farm.getData().clear();
-        farm.setType(null); //remove
+        if(!datasets.isEmpty()) datasets.clear();
+        if (farm != null) {
+            if (farm.getData() != null) farm.getData().clear();
+            farm.setType(null);
+        }
     }
 
     @Override

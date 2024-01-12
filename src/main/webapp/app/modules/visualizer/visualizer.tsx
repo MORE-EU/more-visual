@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
-import { getAlerts, getDataset, getDatasets, getFarmMeta, resetFarmMeta, setDatasetIsConfiged, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getDatasets, getFarmMeta, setDatasetIsConfiged, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
 import CircularProgress  from '@mui/material/CircularProgress';
 import Header from './header/header';
 import React, { useEffect, useState } from 'react';
@@ -25,11 +25,7 @@ export const Visualizer = () => {
   const history = useHistory();
 
   useEffect(() => {
-    if (params.folder !== undefined) {
-      if (!connected) {
-        dispatch(getFarmMeta(params.folder));
-      }
-    }
+    dispatch(getFarmMeta(params.folder));
   }, []);
 
 
@@ -116,7 +112,7 @@ export const Visualizer = () => {
                   height: '100%',
                 }}
               >
-                {farmMeta && dataset ? <ChartContainer /> : <CircularProgress sx={{margin: 'auto'}}/> }
+                {farmMeta && dataset ? <ChartContainer /> : (errorMessage == null && <CircularProgress sx={{margin: 'auto'}}/>)}
               </Paper>
             </Grid>
           </Grid>

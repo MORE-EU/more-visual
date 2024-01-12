@@ -22,7 +22,7 @@ export const VisControl = () => {
         <VisControlDatasets />
       </Grid>
       <Grid sx={{ height: '40%', width: '100%' }}>
-        { dataset && <VisToolkit /> }
+        <VisToolkit />
       </Grid>
       <Grid sx={{ height: '30%', width: '100%' }}>
         { dataset && <VisMeasures /> }

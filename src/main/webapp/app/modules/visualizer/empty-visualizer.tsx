@@ -65,13 +65,15 @@ export const EmptyVisualizer = () => {
     return (
         <div>
             <ThemeProvider theme={mdTheme}>
-                <Snackbar open={openSnack} autoHideDuration={6000} onClose={handleClose} 
-                TransitionComponent={TransitionLeft}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-                    <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }} variant='filled'>
-                        <>{errorMessage}</>
-                    </Alert>
-                </Snackbar>
+                {errorMessage &&
+                    <Snackbar open={openSnack} autoHideDuration={6000} onClose={handleClose} 
+                    // TransitionComponent={TransitionLeft}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+                        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }} variant='filled'>
+                            <>{errorMessage}</>
+                        </Alert>
+                    </Snackbar>
+                }
                 <Grid sx={{ height: '100%', width: '100%' }}>
                     <Header farmMeta={farmMeta} datasetChoice={datasetChoice} selectedConnection={selectedConnection} />
                     <Divider />

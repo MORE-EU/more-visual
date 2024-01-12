@@ -113,7 +113,7 @@ public class DatasetResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of datasets in body.
      */
-    @GetMapping("/datasets/all")
+    @GetMapping("/datasets")
     public List<AbstractDataset> getAllDatasets() {
         log.debug("REST request to get all Datasets");
         return datasetRepository.findAll();
@@ -129,7 +129,7 @@ public class DatasetResource {
     public ResponseEntity<AbstractDataset> getDataset(@PathVariable String farmName, @PathVariable String id) throws IOException, SQLException {
         log.debug("REST request to get Dataset : {}/{}", farmName, id);
         Optional<AbstractDataset> dataset = null;
-        if (datasetRepository.getFarmType() == "csv" || datasetRepository.getFarmType() == null) //null case to be removed
+        if (datasetRepository.getFarmType() == null)
             dataset = datasetRepository.findById(id, farmName);
         else{
             QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
@@ -148,7 +148,7 @@ public class DatasetResource {
     @GetMapping("/datasets/{farmName}/sample")
     public List<?> getSample(@PathVariable String farmName) throws IOException, SQLException {
         log.debug("REST request to get Sample File");
-        if (datasetRepository.getFarmType() == "csv")
+        if (datasetRepository.getFarmType() == null)
             return datasetRepository.findSample(farmName); // remove sample type
         else {
             QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
@@ -182,7 +182,7 @@ public class DatasetResource {
     public ResponseEntity<QueryResults> executeQuery(@PathVariable String farmName, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
         log.debug("REST request to execute Query: {}", query);
         Optional<QueryResults> queryResultsOptional = null;
-        if (datasetRepository.getFarmType() == "csv" || datasetRepository.getFarmType() == null) //null case to be removed
+        if (datasetRepository.getFarmType() == null)
             queryResultsOptional =
                 datasetRepository.findById(id, farmName).map(dataset -> {
                         return csvDataService.executeQuery((CsvDataset) dataset, query);
@@ -318,12 +318,10 @@ public class DatasetResource {
 
     @PostMapping("/database/disconnect")
     public ResponseEntity<Boolean> disconnector() throws SQLException {
-        log.debug("Rest request to close db connection");
-            if (datasetRepository.getFarmType() != null) {
-                datasetRepository.deleteAll();
-                if (datasetRepository.getFarmType() != "csv")
-                    databaseConnection.closeConnection();
-            }
-            return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+        log.debug("Rest request to close connection");
+        datasetRepository.deleteAll();
+        if (datasetRepository.getFarmType() != null)
+            databaseConnection.closeConnection();
+        return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }
 }
