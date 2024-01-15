@@ -7,7 +7,8 @@ import PageNotFound from 'app/shared/error/page-not-found';
 import Visualizer from "app/modules/visualizer/visualizer";
 import Upload from './modules/upload/upload-farm';
 import Dashboard from './modules/dashboard/farm-dashboard';
-import EmptyVisualizer from './modules/visualizer/empty-visualizer';
+import Connector from './modules/visualizer/vis-connector/connector';
+import VisConfigurer from './modules/visualizer/vis-configurer/configurer';
 
 const Routes = () => {
   const { pathname } = useLocation(); 
@@ -18,7 +19,8 @@ const Routes = () => {
       <ErrorBoundaryRoute path="/" exact component={Home}/>
       <ErrorBoundaryRoute path="/upload" exact component={Upload}/>
       <ErrorBoundaryRoute path="/dashboard/:id" exact component={Dashboard}/>
-      <ErrorBoundaryRoute exact path={"/visualize"} component={EmptyVisualizer}/>
+      <ErrorBoundaryRoute exact path={"/visualize"} component={Connector}/>
+      <ErrorBoundaryRoute exact path={"/configure/:folder"} component={VisConfigurer} />
       <ErrorBoundaryRoute exact path={"/visualize/:folder/:id?"} component={Visualizer}/>
       <ErrorBoundaryRoute component={PageNotFound}/>
     </Switch>

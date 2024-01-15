@@ -7,25 +7,26 @@ import Alert from '@mui/material/Alert';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Snackbar from '@mui/material/Snackbar';
-import CircularProgress from '@mui/material/CircularProgress';
 import Slide, { SlideProps } from '@mui/material/Slide';
 
-import { useAppDispatch, useAppSelector } from '../store/storeConfig';
-import { setDatasetIsConfiged, disconnector, setErrorMessage } from '../store/visualizerSlice';
-import Header from './header/header';
-import VisConnector from './vis-connector/vis-connector';
-import VisControlDatasetConfig from './vis-control/vis-control-dataset-config';
-import VisControlDatasetSelection from './vis-control/vis-control-dataset-selection';
+import { useAppDispatch, useAppSelector } from '../../store/storeConfig';
+import { setDatasetIsConfiged, disconnector, setErrorMessage, resetFetchData } from '../../store/visualizerSlice';
+import Header from '../header/header';
+import VisConnector from './vis-connector';
 
 const mdTheme = createTheme();
 type TransitionProps = Omit<SlideProps, 'direction'>;
 
-export const EmptyVisualizer = () => {
-    const [isBusy, setIsBusy] = useState(true);
+export const Connector = () => {
     const [openSnack, setOpenSnack] = useState(false);
-    const { farmMeta, datasetChoice, selectedConnection, connected, datasetIsConfiged, errorMessage } = useAppSelector(state => state.visualizer);
+    const { farmMeta, datasetChoice, selectedConnection, connected, errorMessage } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const history = useHistory();
+
+    useEffect(() => {
+        dispatch(resetFetchData());
+        dispatch(disconnector());
+    },[]);
 
     function TransitionLeft(props: TransitionProps) {
         return <Slide {...props} direction="left" />;
@@ -33,27 +34,13 @@ export const EmptyVisualizer = () => {
     
 
     useEffect(() => {
-        if (farmMeta) {
-            setIsBusy(true);
-        }
-        else {
-            setIsBusy(false);
-            dispatch(setDatasetIsConfiged(false));
-            dispatch(disconnector());
-        }
+        if (farmMeta && farmMeta.isTimeSeries) history.push(`/visualize/${farmMeta.name}/${farmMeta.data[datasetChoice].id}`);
         
-        if (farmMeta && farmMeta.isTimeSeries) {
-            history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[datasetChoice].id}`);
-        }
-        if (farmMeta && datasetIsConfiged) 
-            history.push(`${location.pathname}/${farmMeta.name}/${farmMeta.data[datasetChoice].id}`);
-    }, [farmMeta]);
-
+        if (farmMeta && !farmMeta.isTimeSeries) history.push(`/configure/${farmMeta.name}`);
+    },[farmMeta]);
+    
     useEffect(() => {
-        if(errorMessage) {
-            setOpenSnack(true);
-            if (farmMeta && !farmMeta.data[datasetChoice].isConfiged ) dispatch(setDatasetIsConfiged(false));
-        }
+        if(errorMessage) setOpenSnack(true);
     }, [errorMessage]);
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -66,8 +53,8 @@ export const EmptyVisualizer = () => {
         <div>
             <ThemeProvider theme={mdTheme}>
                 {errorMessage &&
-                    <Snackbar open={openSnack} autoHideDuration={6000} onClose={handleClose} 
-                    // TransitionComponent={TransitionLeft}
+                    <Snackbar open={openSnack} autoHideDuration={6000} onClose={handleClose}
+                    TransitionComponent={TransitionLeft}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
                         <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }} variant='filled'>
                             <>{errorMessage}</>
@@ -88,7 +75,7 @@ export const EmptyVisualizer = () => {
                     >
                         <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
                             <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
-                                {isBusy ?  farmMeta ? <VisControlDatasetSelection /> : <CircularProgress /> : <VisConnector />}
+                                <VisConnector />
                             </Paper>
                         </Grid>
                         <Grid sx={{ width: '80%', p: 1, flexGrow: 1, height: 'calc(100% - 30px)' }}>
@@ -100,7 +87,6 @@ export const EmptyVisualizer = () => {
                                     height: '100%',
                                 }}
                             >
-                                {farmMeta && !farmMeta.isTimeSeries && <VisControlDatasetConfig /> }
                             </Paper>
                         </Grid>
                     </Grid>
@@ -110,4 +96,4 @@ export const EmptyVisualizer = () => {
     );
 };
 
-export default EmptyVisualizer;
+export default Connector;

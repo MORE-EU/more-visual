@@ -145,6 +145,16 @@ public class DatasetResource {
         return ResponseUtil.wrapOrNotFound(datasetRepository.findFarm(farmName));
     }
 
+    @PutMapping("/datasets/{farmName}")
+    public ResponseEntity<FarmInfo> updateFarmInfo(@PathVariable String farmName, @Valid @RequestBody FarmInfo info) throws IOException {
+        log.debug("REST request to update info dataset metadata");
+        FarmInfo result = datasetRepository.updateFarmInfo(info);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.toString()))
+            .body(result);
+    }
+
+
     @GetMapping("/datasets/{farmName}/sample")
     public List<?> getSample(@PathVariable String farmName) throws IOException, SQLException {
         log.debug("REST request to get Sample File");

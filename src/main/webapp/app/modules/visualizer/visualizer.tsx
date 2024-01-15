@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
-import { getAlerts, getDataset, getDatasets, getFarmMeta, setDatasetIsConfiged, setFolder, updateDatasetChoice } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getDatasets, getFarmMeta, setDatasetIsConfiged, setErrorMessage, setFolder, updateDatasetChoice, updateDatasetMeta } from '../store/visualizerSlice';
 import CircularProgress  from '@mui/material/CircularProgress';
 import Header from './header/header';
 import React, { useEffect, useState } from 'react';
@@ -17,7 +17,7 @@ const mdTheme = createTheme();
 type TransitionProps = Omit<SlideProps, 'direction'>;
 
 export const Visualizer = () => {
-  const { farmMeta, dataset, datasetChoice, connected, uploadDatasetError, errorMessage} = useAppSelector(state => state.visualizer);
+  const { farmMeta, dataset, datasetChoice, uploadDatasetError, errorMessage} = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const dispatch = useAppDispatch();
@@ -25,7 +25,7 @@ export const Visualizer = () => {
   const history = useHistory();
 
   useEffect(() => {
-    dispatch(getFarmMeta(params.folder));
+    !farmMeta && dispatch(getFarmMeta(params.folder));
   }, []);
 
 
@@ -36,14 +36,6 @@ export const Visualizer = () => {
   function TransitionLeft(props: TransitionProps) {
     return <Slide {...props} direction="left" />;
   }
-
-  // useEffect(() => {
-  //   dispatch(getFarmMeta(params.folder));
-  //   dispatch(getDatasets(params.folder));
-  //   return () => {
-  //     dispatch(resetFarmMeta());
-  //   };
-  // }, []);
 
   useEffect(() => {
     if (params.id !== undefined) {
@@ -63,15 +55,16 @@ export const Visualizer = () => {
   }, [dataset]);
 
   useEffect(() => {
-    params.id === undefined && farmMeta && history.push(`${params.folder}/${farmMeta.data[0].id}`);
+    params.id === undefined && farmMeta && history.replace(`${params.folder}/${farmMeta.data[0].id}`);
     params.id !== undefined && farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
   }, [farmMeta]);
 
   useEffect(() => {
     if (uploadDatasetError)
-      if (connected && farmMeta && !farmMeta.isTimeSeries) {
+      if (farmMeta && !farmMeta.isTimeSeries && farmMeta.type !== "csv") {
         dispatch(setDatasetIsConfiged(false));
-        history.push('/visualize');
+        dispatch(updateDatasetMeta({folder: params.folder, dataset: farmMeta.data[datasetChoice]}));
+        history.replace(`/configure/${params.folder}`);
       }
   }, [uploadDatasetError]);
 

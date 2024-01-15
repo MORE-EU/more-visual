@@ -145,12 +145,8 @@ const concatenateAndSortDistinctArrays = (array1: number[], array2: number[]) =>
 }
 
 export const connector = createAsyncThunk('connector', async (dbConnector: {name: string, type: string, host: string, port: string, username: string, password: string, database: string}) => {
-  try {
     const response = await axios.post(`api/database/connect`, dbConnector).then(res => res);
     return response;
-  } catch (error) {
-    throw new Error("Credentials Error");
-  }
 });
 
 export const disconnector = createAsyncThunk('disconnector', async () => {
@@ -175,22 +171,13 @@ export const getDBColumnNames = createAsyncThunk('getDBColumnNames', async (data
 
 export const updateFarmInfoColumnNames = createAsyncThunk('updateFarmInfoColumnNames', async (data: { tableName: string, columns: {timeCol: string; idCol: string; valueCol: string;}}) => {
   const { tableName, columns } = data;
-  try {
     const response = await axios.put(`api/datasets/metadata/columns/${tableName}`, columns).then(res => res);
     return response;
-  } catch (e) {
-    throw new Error("Can't update metadata");
-  }
 });
 
 export const checkConnection = createAsyncThunk('checkConnection', async (bdConfig: { url: string; port: string; }) => {
-  try {
   const response = await axios.post(`api/datasets/checkConnection`, bdConfig).then(res => res);
   return response;
-} catch (error) {
-  // Use the response data (error.response.data) as the error message
-  throw new Error(error.response.data);
-}
 });
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
@@ -212,6 +199,12 @@ export const getFarmMeta = createAsyncThunk('getFarmMeta', async (folder: string
   const response = await axios.get(`api/datasets/${folder}`).then(res => res);
   return response;
 });
+
+export const updateDatasetMeta = createAsyncThunk('updateDatasetMeta', async (data: {folder: string, dataset: IDataset}) => {
+  const response = await axios.put(`api/datasets/${data.folder}`, data.dataset).then(res => res);
+  return response;
+
+})
 
 export const getDirectories = createAsyncThunk('getDirectories', async () => {
   const response = await axios.get(`api/datasets/directories`).then(res => res);
@@ -633,10 +626,13 @@ const visualizer = createSlice({
       state.loading = false;
       state.farmMeta = action.payload.data;
       state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
-    })
+    });
+    builder.addCase(updateDatasetMeta.fulfilled, (state, action) => {
+      state.loading = false;
+    });
     builder.addCase(getDatasets.fulfilled, (state, action) => {
       state.datasets = {data: action.payload.data, loading: false, error: null};
-    })
+    });
     builder.addCase(getDirectories.fulfilled, (state, action) => {
       state.loading = false;
       state.directories = action.payload.data;
@@ -709,7 +705,7 @@ const visualizer = createSlice({
     builder.addCase(getDatasets.rejected, (state, action) => {
       state.datasets = {...state.datasets, loading: false, error: "there was an error loading the data"}
     });
-    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending,updateFarmInfoColumnNames.pending,getDBColumnNames.pending, connector.pending, disconnector.pending), state => {
+    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending,updateDatasetMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending,updateFarmInfoColumnNames.pending,getDBColumnNames.pending, connector.pending, disconnector.pending), state => {
       state.loading = true;
     });
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending, applyDeviationDetection.pending), state => {
@@ -727,25 +723,25 @@ const visualizer = createSlice({
       state.connectionLoading = true;
     });
     builder.addMatcher(
-      isAnyOf( getFarmMeta.rejected, getDirectories.rejected, getSampleFile.rejected, getDBColumnNames.rejected, disconnector.rejected),
+      isAnyOf( getDbMetadata.rejected,getFarmMeta.rejected,updateDatasetMeta.rejected, updateFarmInfoColumnNames.rejected, getDirectories.rejected, getSampleFile.rejected, getDBColumnNames.rejected, disconnector.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = "unable to reach server";
       }
     );
     builder.addMatcher(
-      isAnyOf(getDbMetadata.rejected,updateFarmInfoColumnNames.rejected, connector.rejected),
+      isAnyOf(connector.rejected),
       (state, action) => {
         state.loading = false;
-        state.errorMessage = action.error.message;
+        state.errorMessage = "credentials error";
       }
     );
     builder.addMatcher(isAnyOf(getDataset.rejected), 
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.error.message;
-        state.uploadDatasetError = true;
         state.farmMeta.data[state.datasetChoice].isConfiged = false;
+        state.uploadDatasetError = true;
       }
     );
     builder.addMatcher(isAnyOf(checkConnection.rejected), (state, action) => {

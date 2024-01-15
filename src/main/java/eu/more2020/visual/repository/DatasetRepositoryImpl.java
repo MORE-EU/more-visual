@@ -352,6 +352,18 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         return null;
     }
 
+    @Override
+    public FarmInfo  updateFarmInfo(FarmInfo info) {
+        Assert.notNull(info.getId(), "FarmInfo must not be null");
+        for (FarmInfo farmInfo : farm.getData()) {
+            if (farmInfo.getId().equals(info.getId())) {
+                farmInfo.setIsConfiged(info.getIsConfiged());
+                return farmInfo;
+            }
+        }
+        return null;
+    }
+
 
     private AbstractDataset createDBDataset(FarmInfo farmInfo, QueryExecutor queryExecutor) throws SQLException {
         AbstractDataset dataset = null;

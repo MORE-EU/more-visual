@@ -47,6 +47,8 @@ public interface DatasetRepository {
 
     FarmInfo updateFarmInfoColumns(String id, DbColumns columns);
 
+    FarmInfo updateFarmInfo(FarmInfo info);
+
     void deleteById(String id);
 
     void deleteAll();

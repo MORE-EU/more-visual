@@ -7,7 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getDataset, updateDatasetChoice, resetFetchData, setDatasetIsConfiged, setConnented, resetDataset } from 'app/modules/store/visualizerSlice';
+import { getDataset, updateDatasetChoice, resetFetchData, setDatasetIsConfiged, resetDataset } from 'app/modules/store/visualizerSlice';
 import React, { useState } from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
@@ -19,7 +19,6 @@ const VisControlDatasets = () => {
   const dispatch = useAppDispatch();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
-  const history = useHistory();
   
   const handleDataset = dataset => {
     const idx = farmMeta.data.findIndex(file => file.schema === dataset.schema && file.id === dataset.id);
@@ -37,7 +36,6 @@ const VisControlDatasets = () => {
     dispatch(updateDatasetChoice(farmMeta.data.findIndex(file => !file.isConfiged)));
     dispatch(setDatasetIsConfiged(false));
     dispatch(resetDataset());
-    history.push('/visualize');
   }
 
   return (
@@ -87,17 +85,19 @@ const VisControlDatasets = () => {
               </ListItemButton>
             )}
             {farmMeta.type !== "csv" && !farmMeta.isTimeSeries && (
-              <ListItemButton key={'new-db-dataset-list-button-sd'} component="label" onClick={handleDBUpoladChange}>
+              <ListItemButton key={'new-db-dataset-list-button-sd'} 
+              component={Link}
+              to={`/configure/${folder}`}
+              onClick={handleDBUpoladChange}>
                 <ListItemText  primary={`new dataset`} sx={ {display: { xs: 'none', md: 'block' }}} />
                 <ControlPointIcon />
-              </ListItemButton>
-            
+              </ListItemButton>            
             )}
-            <ListItemButton key={'close-connection-list-button-sd'} component="label" onClick={() => { 
-              dispatch(setConnented(false));
-              dispatch(resetFetchData());
-              history.push('/visualize');        
-            }}>
+            <ListItemButton key={'close-connection-list-button-sd'}
+              component={Link}
+              to={`/visualize`}
+              onClick={() => {dispatch(resetFetchData());}}
+            >
                 <ListItemText primary={`close connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
                 <LogoutIcon />
             </ListItemButton>

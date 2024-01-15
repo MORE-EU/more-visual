@@ -15,7 +15,7 @@ import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import { Link, useHistory } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import { updateDatasetChoice, getDataset, setConnented, resetFetchData } from "app/modules/store/visualizerSlice";
+import { updateDatasetChoice, resetFetchData } from "app/modules/store/visualizerSlice";
 
 interface ISelectedDataset {
     schema: string;
@@ -125,18 +125,18 @@ const VisControlDatasetSelection = () => {
                         component={Link}
                         to={`/visualize/${file.schema}/${file.id}`}
                         onClick={() => {
-                            handleDataset(file), dispatch(getDataset({ folder: file.schema, id: file.id }));
+                            handleDataset(file);
                         }}
                         divider
                     >
                         <ListItemText primary={`${file.id}`} />
                     </ListItemButton>
                     ))}
-                    <ListItemButton key={'close-connection-list-button-sd'} component="label" onClick={() => { 
-                        dispatch(setConnented(false));
-                        dispatch(resetFetchData());
-                        history.push('/visualize');            
-                    }}>
+                    <ListItemButton key={'close-connection-list-button-sd'}
+                        component={Link}
+                        to={`/visualize`}
+                        onClick={() => {dispatch(resetFetchData());}}
+                    >
                         <ListItemText primary={`close connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
                         <LogoutIcon />
                     </ListItemButton>
