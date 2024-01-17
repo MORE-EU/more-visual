@@ -75,13 +75,25 @@ export const deleteModelByName = createAsyncThunk('deleteModelByName', async (mo
   return response;
 });
 
-export const getInference = createAsyncThunk('getInference', async (info: { timestamp: number; model_name: string; kind: string }) => {
-  const response = await axios.post(`api/forecasting/inference`, info).then(res => res.data);
-  return response;
-});
+export const getInference = createAsyncThunk(
+  'getInference',
+  async (info: { timestamp: number; model_name: string; kind: string }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`api/forecasting/inference`, info).then(res => res.data);
+      return response;
+    } catch (error) {
+      return rejectWithValue('An error occurred while fetching data from the server. Please try another date.');
+    }
+  }
+);
 
 export const getAthenaInference = createAsyncThunk('getAthenaInference', async (info: { timestamp: number; model_name: string }) => {
-  const infoList = {data_id: info.model_name, start_date: moment(info.timestamp).format('YYYY-MM-DD HH:mm:ss'), end_date: moment(info.timestamp).format('YYYY-MM-DD HH:mm:ss'), use_case_id: "forecasting" }
+  const infoList = {
+    data_id: info.model_name,
+    start_date: moment(info.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+    end_date: moment(info.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+    use_case_id: 'forecasting',
+  };
   const response = await axios.post(`api/forecasting/Athenainference`, infoList).then(res => res.data);
   return response;
 });
@@ -94,7 +106,7 @@ export const getInitialSeries = createAsyncThunk(
     const query = {
       from,
       to,
-      viewPort: {width: 1000, height: 600},
+      viewPort: { width: 1000, height: 600 },
       measures: [state.visualizer.dataset.header.indexOf(measure)],
       filter: {},
     };
@@ -122,6 +134,9 @@ const forecasting = createSlice({
     setForecastingInference(state, action) {
       state.forecastingInference = action.payload;
     },
+    setForecastingError(state, action) {
+      state.forecastingError = action.payload;
+    }
   },
   extraReducers(builder) {
     builder.addCase(getAthenaInference.fulfilled, (state, action) => {
@@ -131,6 +146,7 @@ const forecasting = createSlice({
     builder.addCase(getInference.fulfilled, (state, action) => {
       state.forecastingLoading = false;
       state.forecastingInference = action.payload.predictions;
+      state.forecastingError = null;
     });
     builder.addCase(startTraining.fulfilled, (state, action) => {
       state.forecastingLoading = false;
@@ -164,6 +180,7 @@ const forecasting = createSlice({
       ),
       state => {
         state.forecastingLoading = true;
+        state.forecastingError = null;
       }
     );
     builder.addMatcher(
@@ -191,5 +208,6 @@ export const {
   setPredModalOpen,
   setSelectedModel,
   setForecastingInference,
+  setForecastingError,
 } = forecasting.actions;
 export default forecasting.reducer;
