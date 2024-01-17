@@ -13,7 +13,6 @@ import React, { useState } from 'react';
 import grey from '@mui/material/colors/grey';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
 
 const style = {
   position: 'absolute',
@@ -106,7 +105,7 @@ const ForecastingPredModal = () => {
               sx={{ height: '20%', display: 'flex', columnGap: 2, justifyContent: 'center', borderBottom: `1px solid ${grey[500]}`, pb: 2 }}
             >
               <DateTimePicker
-                label={'Give a Date'}
+                label={'Date'}
                 minDateTime={dataset.timeRange.from}
                 maxDateTime={dataset.timeRange.to}
                 renderInput={props => <TextField size="small" {...props} />}
@@ -130,11 +129,11 @@ const ForecastingPredModal = () => {
                   {forecastingLoading && forecastingError === null ? (
                     <CircularProgress />
                   ) : !forecastingLoading && forecastingError !== null ? (
-                    <Alert severity="error" sx={{ width: '100%' }} variant="filled">
+                    <Typography id="modal-modal-title" variant="body1" sx={{ textAlign: 'center' }}>
                       {forecastingError}
-                    </Alert>
+                    </Typography>
                   ) : (
-                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                    <Typography id="modal-modal-title" variant="body1" sx={{ textAlign: 'center' }}>
                       Provide a Date and press the button to see the results
                     </Typography>
                   )}

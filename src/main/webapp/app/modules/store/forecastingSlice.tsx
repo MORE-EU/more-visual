@@ -82,7 +82,7 @@ export const getInference = createAsyncThunk(
       const response = await axios.post(`api/forecasting/inference`, info).then(res => res.data);
       return response;
     } catch (error) {
-      return rejectWithValue('An error occurred while fetching data from the server. Please try another date.');
+      return rejectWithValue('There are no available data for the date you provided. Please select a new date.');
     }
   }
 );
