@@ -1,10 +1,6 @@
 import React from 'react';
-
-import PatternIcon from '@mui/icons-material/Pattern'; // patterns
-import ManageSearchIcon from '@mui/icons-material/ManageSearch'; // changepoint
 import TimelineIcon from '@mui/icons-material/Timeline'; // segmentation
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import AnalyticsIcon from '@mui/icons-material/Analytics';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { setOpenToolkit, updateActiveTool } from 'app/modules/store/visualizerSlice';
 import Grid from '@mui/material/Grid';
@@ -13,17 +9,14 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { YawMisalignment } from 'app/modules/visualizer/tools/yaw-misalignment/yaw-misalignment';
-import ListItem from '@mui/material/ListItem';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import SimpleBar from 'simplebar-react';
 import Divider from '@mui/material/Divider';
 import grey from '@mui/material/colors/grey';
-import Tooltip from '@mui/material/Tooltip';
 
 const VisToolkit = () => {
-  const { farmMeta, dataset, data } = useAppSelector(state => state.visualizer);
+  const { schemaMeta, dataset, data } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   const handleToolClick = key => e => {
@@ -37,69 +30,18 @@ const VisToolkit = () => {
           Tools
         </Typography>
       </Box>
-      {farmMeta && dataset ? (
-        <SimpleBar key="SimpleBarTools" style={{ maxHeight: '90%', border: `1px solid ${grey[300]}`, borderRadius: 10 }}>
-          <Box sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
+      {schemaMeta && dataset ? (
+        <SimpleBar key="SimpleBarTools" style={{ border: `1px solid ${grey[300]}`, borderRadius: 10 }}>
+          <Box sx={{ overflowY: 'auto', overflowX: 'hidden', margin: 'auto'}}>
             <List disablePadding>
-              {/* <ListItemButton key={0} onClick={handleToolClick("Pattern Extraction")} disabled={dataset.id !== "eugene" || data === null}>
-              <ListItemIcon>
-                <PatternIcon/>
-              </ListItemIcon>
-              <ListItemText primary={"Pattern Extraction"}/>
-            </ListItemButton>
-            <Divider /> */}
-              <Tooltip
-                placement="right"
-                title={
-                  farmMeta.resType === 0
-                    ? dataset.id === 'eugene' || dataset.id === 'cocoa'
-                      ? ''
-                      : 'This tool is unavailable for this dataset'
-                    : 'This tool is unavailable for this type of RES.'
-                }
-              >
-                <span>
-                <ListItemButton key={1} onClick={handleToolClick('Soiling Detection')} disabled={farmMeta.resType !== 0 || data === null || (dataset.id !== "eugene" && dataset.id !== "cocoa")}>
-                  <ListItemIcon>
-                    <ManageSearchIcon />
-                  </ListItemIcon>
-                  <ListItemText primary={'Soiling Detection'} />
-                </ListItemButton>
-                </span>
-              </Tooltip>
-              <Divider />
-              <Tooltip
-                placement="right"
-                title={
-                  farmMeta.resType === 1
-                    ? dataset.id === 'BEZ2'
-                      ? ''
-                      : 'This tool is unavailable for this dataset.'
-                    : 'This tool is unavailable for this type of RES.'
-                }
-              >
-                <span>
-              <ListItemButton
-                key={2}
-                onClick={handleToolClick('Yaw Misalignment Detection')}
-                disabled={dataset.id !== 'BEZ2' || data === null}
-              >              
-                <ListItemIcon>
-                  <ManageSearchIcon />
-                </ListItemIcon> 
-                <ListItemText primary={'Yaw Misalignment Detection'} />
-              </ListItemButton>
-              </span>
-              </Tooltip>
-              <Divider />
-              <ListItemButton key={3} onClick={handleToolClick('Forecasting')} disabled={data === null}>
+              <ListItemButton key={0} onClick={handleToolClick('Forecasting')} disabled={data === null}>
                 <ListItemIcon>
                   <TimelineIcon />
                 </ListItemIcon>
                 <ListItemText primary={'Forecasting'} />
               </ListItemButton>
               <Divider />
-              <ListItemButton key={4} onClick={handleToolClick('Filtering')} disabled={data === null}>
+              <ListItemButton key={1} onClick={handleToolClick('Filtering')} disabled={data === null}>
                 <ListItemIcon>
                   <FilterAltIcon />
                 </ListItemIcon>

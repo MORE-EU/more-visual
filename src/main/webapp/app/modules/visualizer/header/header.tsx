@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 
 const Header = props => {
-  const { farmMeta, datasetChoice } = props;
+  const { schemaMeta, datasetChoice } = props;
 
   const params: any = useParams();
 
@@ -33,14 +33,14 @@ const Header = props => {
           Home
           </Typography>
         </Link>
-        {farmMeta ?<Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`/visualize`}>
+        {schemaMeta ?<Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`/visualize`}>
         <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
-          {farmMeta.name}
+          {schemaMeta.name}
           </Typography>
         </Link>:
         <Skeleton variant='text' width={50}/>}
-        {farmMeta ? <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
-          {farmMeta.data[datasetChoice].name}
+        {schemaMeta ? <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
+          {schemaMeta.data[datasetChoice].name}
         </Typography> : <Skeleton variant='text' width={50}/>}
       </Breadcrumbs>
     </Grid>

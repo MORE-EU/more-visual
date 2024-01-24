@@ -1,13 +1,12 @@
 import { IDataset } from './dataset.model';
 
-export interface IFarmMeta {
+export interface ISchemaMeta {
   name?: string;
   type?: string;
-  resType?: number;
   data?: IDataset[];
   latitude?: number | null;
   longitude?: number | null;
   isTimeSeries?: boolean;
 }
 
-export const defaultValue: Readonly<IFarmMeta> = {};
+export const defaultValue: Readonly<ISchemaMeta> = {};

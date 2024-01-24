@@ -21,7 +21,7 @@ import TableBody from "@mui/material/TableBody";
 
 import grey from '@mui/material/colors/grey';
 import blue from '@mui/material/colors/blue';
-import { getDBColumnNames, updateFarmInfoColumnNames, setDatasetIsConfiged, getSampleFile, resetSampleFile, resetColumnNames, resetUploadDatasetError } from "app/modules/store/visualizerSlice";
+import { getDBColumnNames, updateSchemaInfoColumnNames, setDatasetIsConfiged, getSampleFile, resetSampleFile, resetColumnNames, resetUploadDatasetError } from "app/modules/store/visualizerSlice";
 
 
 interface IConfigForm  {
@@ -39,7 +39,7 @@ const defaultForm: IConfigForm = {
 
 const VisControlDatasetConfig = () => {
     const [ selectedItem, setSelectedItem ] = useState('Denormalized');
-    const {farmMeta, columnNames, datasetChoice, sampleFile} = useAppSelector(state => state.visualizer);
+    const {schemaMeta, columnNames, datasetChoice, sampleFile} = useAppSelector(state => state.visualizer);
     const [configForm, setConfigForm] = useState<IConfigForm>(defaultForm);
     const {timeCol, idCol, valueCol} = configForm;
     const dispatch = useAppDispatch();
@@ -49,8 +49,8 @@ const VisControlDatasetConfig = () => {
         dispatch(resetSampleFile());
         dispatch(resetColumnNames());
         dispatch(resetUploadDatasetError());
-        farmMeta && dispatch(getDBColumnNames({tableName: farmMeta.data[datasetChoice].id }));
-        farmMeta && dispatch(getSampleFile(farmMeta.data[datasetChoice].id));
+        schemaMeta && dispatch(getDBColumnNames({tableName: schemaMeta.data[datasetChoice].id }));
+        schemaMeta && dispatch(getSampleFile(schemaMeta.data[datasetChoice].id));
     },[datasetChoice]);
 
 
@@ -69,7 +69,7 @@ const VisControlDatasetConfig = () => {
 
     const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
         event.preventDefault();
-        dispatch(updateFarmInfoColumnNames({ tableName: farmMeta.data[datasetChoice].id, columns: {timeCol, idCol, valueCol}}));
+        dispatch(updateSchemaInfoColumnNames({ tableName: schemaMeta.data[datasetChoice].id, columns: {timeCol, idCol, valueCol}}));
         dispatch(setDatasetIsConfiged(true));
     }
 
@@ -128,7 +128,7 @@ const VisControlDatasetConfig = () => {
                     <Grid sx={{ border: '1px solid rgb(0,0,0,0.2)', borderRadius: 4, overflow: 'hidden' }}>
                         <Grid sx={{ bgcolor: blue[800], pb: 2}}>
                             <Typography variant="subtitle1" fontWeight={800} fontSize={20} sx={{ color: grey[200], ml: 3 }}>
-                                {farmMeta.data[datasetChoice].id}
+                                {schemaMeta.data[datasetChoice].id}
                             </Typography>
                         </Grid>
                         <Grid container spacing={1} sx={{ bgcolor: grey[50]}}>

@@ -1,9 +1,8 @@
-import { PayloadAction, createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { IAlerts } from 'app/shared/model/alert.model';
-import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
 import { IConnection } from 'app/shared/model/connection.model';
 import { IDataPoint } from 'app/shared/model/data-point.model';
-import { IFarmMeta } from 'app/shared/model/farmMeta.model';
+import { ISchemaMeta } from 'app/shared/model/schemaMeta';
 import { IQueryResults } from 'app/shared/model/query-results.model';
 import { defaultValue as defaultQuery, IQuery } from 'app/shared/model/query.model';
 import {ICustomMeasure} from "app/shared/model/custom-measures.model";
@@ -14,6 +13,7 @@ import { IDatasets, defaultDatasets } from 'app/shared/model/datasets.model';
 import { RootState } from './storeConfig';
 import { IDataset } from 'app/shared/model/dataset.model';
 import { IAlertResults } from 'app/shared/model/alert-results.model';
+import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
 
 
 const seedrandom = require('seedrandom');
@@ -80,22 +80,19 @@ const initialState = {
   measureColors: [],
   from: null as number,
   to: null as number,
-  farmMeta: null as IFarmMeta,
+  schemaMeta: null as ISchemaMeta,
   sampleFile: [],
   directories: [],
   resampleFreq: '',
   filter: {},
-  patterns: null,
   changeChart: true,
   datasetChoice: null,
-  patternNav: '0',
   folder: '',
   graphZoom: null,
   activeTool: null as null | string,
   compare: {} as {[key: string]: number[]},
   chartRef: null,
   showDatePick: false,
-  showChangepointFunction: false,
   comparePopover: false,
   singleDateValue: { start: null, end: null },
   dateValues: [],
@@ -105,17 +102,8 @@ const initialState = {
   forecastData: null as IDataPoint[],
   secondaryData: null as IDataPoint[],
   customChangepoints: [] as IChangepointDate[],
-  manualChangepoints: [] as IChangepointDate[],
-  detectedChangepoints: [] as IChangepointDate[],
-  soilingWeeks: 1,
-  soilingType: 'soilingRatio',
-  changepointDetectionEnabled: false,
-  manualChangepointsEnabled: false,
   customChangepointsEnabled: false,
-  detectedChangepointFilter: null,
   forecasting: false,
-  soilingEnabled: false,
-  yawMisalignmentEnabled: false,
   anchorEl: null,
   alerts: [] as IAlerts[],
   alertsLoading: false,
@@ -154,9 +142,9 @@ export const disconnector = createAsyncThunk('disconnector', async () => {
     return response;
 });
 
-export const getDbMetadata = createAsyncThunk('getDbMetadata', async (data: { database: string; farmName: string; }) => {
+export const getDbMetadata = createAsyncThunk('getDbMetadata', async (data: { database: string; schemaName: string; }) => {
   try {
-    const response = await axios.get(`api/datasets/metadata/${data.database}/${data.farmName}`).then(res => res);
+    const response = await axios.get(`api/datasets/metadata/${data.database}/${data.schemaName}`).then(res => res);
     return response;
   } catch (error) {
     throw new Error("Can't get database metadata");
@@ -169,7 +157,7 @@ export const getDBColumnNames = createAsyncThunk('getDBColumnNames', async (data
 });
 
 
-export const updateFarmInfoColumnNames = createAsyncThunk('updateFarmInfoColumnNames', async (data: { tableName: string, columns: {timeCol: string; idCol: string; valueCol: string;}}) => {
+export const updateSchemaInfoColumnNames = createAsyncThunk('updateSchemaInfoColumnNames', async (data: { tableName: string, columns: {timeCol: string; idCol: string; valueCol: string;}}) => {
   const { tableName, columns } = data;
     const response = await axios.put(`api/datasets/metadata/columns/${tableName}`, columns).then(res => res);
     return response;
@@ -195,7 +183,7 @@ export const getDatasets = createAsyncThunk('getDatasets', async () => {
   return response;
 });
 
-export const getFarmMeta = createAsyncThunk('getFarmMeta', async (folder: string) => {
+export const getSchemaMeta = createAsyncThunk('getSchemaMeta', async (folder: string) => {
   const response = await axios.get(`api/datasets/${folder}`).then(res => res);
   return response;
 });
@@ -433,9 +421,6 @@ const visualizer = createSlice({
     updateChartRef(state, action) {
       state.chartRef = action.payload;
     },
-    updateManualChangepoints(state, action) {
-      state.manualChangepoints = action.payload;
-    },
     updateCustomChangepoints(state, action) {
       state.customChangepoints = action.payload;
     },
@@ -454,26 +439,12 @@ const visualizer = createSlice({
     updateAnchorEl(state, action) {
       state.anchorEl = action.payload;
     },
-    updateSoilingWeeks(state, action) {
-      state.soilingWeeks = action.payload;
-    },
-    updateSoilingType(state, action) {
-      state.soilingType = action.payload;
-    },
-    updateDetectedChangepoints(state, action) {
-      state.detectedChangepoints  = action.payload;
-    },
-    setDetectedChangepointFilter(state, action) {
-      state.detectedChangepointFilter = action.payload;
-    },
+  
     updateAlertResults(state, action) {
       state.alertResults = { ...action.payload };
     },
     setShowDatePick(state, action) {
       state.showDatePick = action.payload;
-    },
-    setShowChangepointFunction(state, action) {
-      state.showChangepointFunction = action.payload;
     },
     setCompareData(state, action) {
       state.compareData = action.payload;
@@ -532,28 +503,14 @@ const visualizer = createSlice({
     setConnented(state, action) {
       state.connected = action.payload;
     },
-    toggleChangepointDetection(state, action) {
-      state.changepointDetectionEnabled = action.payload;
-    },
-    toggleSoilingDetection(state, action) {
-      state.soilingEnabled = action.payload;
-      state.secondaryData = state.soilingEnabled ? state.secondaryData : null;
-    },
-    toggleYawMisalignmentDetection(state, action) {
-      state.yawMisalignmentEnabled = action.payload;
-      state.secondaryData = state.yawMisalignmentEnabled ? state.secondaryData : null;
-    },
     toggleForecasting(state, action) {
       state.forecasting = action.payload;
-    },
-    toggleManualChangepoints(state, action) {
-      state.manualChangepointsEnabled = action.payload;
     },
     toggleCustomChangepoints(state, action) {
       state.customChangepointsEnabled = action.payload;
     },
-    resetFarmMeta(state) {
-      state.farmMeta = null;
+    resetSchemaMeta(state) {
+      state.schemaMeta = null;
       state.chartRef = null;
     },
     resetForecastingState(state) {
@@ -589,7 +546,7 @@ const visualizer = createSlice({
     builder.addCase(getDataset.fulfilled, (state, action) => {
       state.loading = false;
       state.dataset = action.payload.data;
-      state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
+      state.datasetChoice = (state.schemaMeta && state.dataset) ? state.schemaMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
       state.measureColors = [...state.dataset.header.map(() => generateColor())];
       state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
       state.selectedMeasures = [action.payload.data.measures[0]];
@@ -609,12 +566,12 @@ const visualizer = createSlice({
     });
     builder.addCase(getDbMetadata.fulfilled, (state, action) => {
       state.loading = false;
-      state.farmMeta = action.payload.data;
+      state.schemaMeta = action.payload.data;
       state.datasetChoice = 0;
     });
-    builder.addCase(updateFarmInfoColumnNames.fulfilled, (state, action) => {
+    builder.addCase(updateSchemaInfoColumnNames.fulfilled, (state, action) => {
       state.loading = false;
-      state.farmMeta.data[state.datasetChoice] = action.payload.data;
+      state.schemaMeta.data[state.datasetChoice] = action.payload.data;
     });
 
     builder.addCase(getDBColumnNames.fulfilled, (state, action) => {
@@ -622,10 +579,10 @@ const visualizer = createSlice({
       state.columnNames = action.payload.data;
     });
 
-    builder.addCase(getFarmMeta.fulfilled, (state, action) => {
+    builder.addCase(getSchemaMeta.fulfilled, (state, action) => {
       state.loading = false;
-      state.farmMeta = action.payload.data;
-      state.datasetChoice = (state.farmMeta && state.dataset) ? state.farmMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
+      state.schemaMeta = action.payload.data;
+      state.datasetChoice = (state.schemaMeta && state.dataset) ? state.schemaMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
     });
     builder.addCase(updateDatasetMeta.fulfilled, (state, action) => {
       state.loading = false;
@@ -705,7 +662,7 @@ const visualizer = createSlice({
     builder.addCase(getDatasets.rejected, (state, action) => {
       state.datasets = {...state.datasets, loading: false, error: "there was an error loading the data"}
     });
-    builder.addMatcher(isAnyOf(getDataset.pending, getFarmMeta.pending,updateDatasetMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending,updateFarmInfoColumnNames.pending,getDBColumnNames.pending, connector.pending, disconnector.pending), state => {
+    builder.addMatcher(isAnyOf(getDataset.pending, getSchemaMeta.pending,updateDatasetMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending,updateSchemaInfoColumnNames.pending,getDBColumnNames.pending, connector.pending, disconnector.pending), state => {
       state.loading = true;
     });
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending, applyDeviationDetection.pending), state => {
@@ -723,7 +680,7 @@ const visualizer = createSlice({
       state.connectionLoading = true;
     });
     builder.addMatcher(
-      isAnyOf( getDbMetadata.rejected,getFarmMeta.rejected,updateDatasetMeta.rejected, updateFarmInfoColumnNames.rejected, getDirectories.rejected, getSampleFile.rejected, getDBColumnNames.rejected, disconnector.rejected),
+      isAnyOf( getDbMetadata.rejected,getSchemaMeta.rejected,updateDatasetMeta.rejected, updateSchemaInfoColumnNames.rejected, getDirectories.rejected, getSampleFile.rejected, getDBColumnNames.rejected, disconnector.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = "unable to reach server";
@@ -740,7 +697,7 @@ const visualizer = createSlice({
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.error.message;
-        state.farmMeta.data[state.datasetChoice].isConfiged = false;
+        state.schemaMeta.data[state.datasetChoice].isConfiged = false;
         state.uploadDatasetError = true;
       }
     );
@@ -763,12 +720,6 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(saveConnection.rejected, getConnection.rejected, getAllConnections.rejected, deleteConnection.rejected), state => {
       state.connectionLoading = false;
     });
-    builder.addMatcher(isAnyOf(applyChangepointDetection.fulfilled), (state, action) => {
-      state.detectedChangepoints = action.payload.length === 0 ? null : action.payload;
-    });
-    builder.addMatcher(isAnyOf(getManualChangepoints.fulfilled), (state, action) => {
-      state.manualChangepoints = action.payload.length === 0 ? null : action.payload;
-    });
     builder.addMatcher(isAnyOf(applyDeviationDetection.fulfilled, applyYawMisalignmentDetection.fulfilled), (state, action) => {
       state.secondaryData = action.payload.length === 0 ? null : action.payload;
     });
@@ -776,13 +727,17 @@ const visualizer = createSlice({
 });
 
 export const {
-  resetChartValues,resetFetchData,updateSelectedMeasures,updateCustomSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
-  updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef, updateDetectedChangepoints,
-  updateManualChangepoints,updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData,updateSoilingWeeks,
-  updateSoilingType,toggleSoilingDetection,toggleChangepointDetection,setForecastingDataSplit,toggleYawMisalignmentDetection,
-  toggleManualChangepoints,toggleCustomChangepoints,setAutoMLStartDate,setAutoMLEndDate,setShowDatePick,setShowChangepointFunction,
-  setCompareData, setComparePopover,setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,resetForecastingState,setDetectedChangepointFilter,
-  setExpand,setOpenToolkit,setFolder,resetFilters,setChartType,setAlertingPreview,updateAlertResults,setCheckConnectionResponse, setSelectedConnection,
-  setErrorMessage,setDatasetIsConfiged,resetSampleFile,resetColumnNames, setConnented, resetDataset, resetUploadDatasetError, resetFarmMeta,
+  toggleCustomChangepoints, toggleForecasting, 
+  updateSelectedMeasures,updateCustomSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
+  updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef, 
+  updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData, updateAlertResults,
+  setForecastingDataSplit,
+  setAutoMLStartDate,setAutoMLEndDate,setShowDatePick, setCompareData, setComparePopover,
+  setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,
+  setExpand,setOpenToolkit,setFolder,setChartType,setAlertingPreview,setCheckConnectionResponse, setSelectedConnection,
+  setErrorMessage,setDatasetIsConfiged, setConnented,
+  resetChartValues,resetFetchData,
+  resetSampleFile,resetColumnNames, resetFilters,
+  resetDataset, resetForecastingState,resetUploadDatasetError,resetSchemaMeta,
 } = visualizer.actions;
 export default visualizer.reducer;

@@ -29,10 +29,10 @@ export const uploadDataset = createAsyncThunk('uploadDataset', async (fileData: 
   return response;
 });
 
-export const uploadFile = createAsyncThunk('uploadFile', async (data: {farmName: String, fileData: FormData}, { getState, dispatch }) => {
-  const {farmName, fileData} = data;
+export const uploadFile = createAsyncThunk('uploadFile', async (data: {schemaName: String, fileData: FormData}, { getState, dispatch }) => {
+  const {schemaName, fileData} = data;
   const response = await axios
-    .post(`api/files/upload/${farmName}`, fileData, {
+    .post(`api/files/upload/${schemaName}`, fileData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -58,26 +58,26 @@ export const uploadFile = createAsyncThunk('uploadFile', async (data: {farmName:
   return response;
 });
 
-export const uploadFarm = createAsyncThunk('uploadFarm', async (data: FormData, { getState, dispatch }) => {
+export const uploadSchema = createAsyncThunk('uploadSchema', async (data: FormData, { getState, dispatch }) => {
   const response = await axios
-    .post(`api/files/upload/farm`, data, {
+    .post(`api/files/upload/schema`, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
       onUploadProgress: (progressEvent) => {
         const progress = (progressEvent.loaded / progressEvent.total) * 100;
-        dispatch(setUploadFarmState(progress));
+        dispatch(setUploadSchemaState(progress));
       },
       onDownloadProgress: (progressEvent) => {
         const percentage = Math.round(
           (progressEvent.loaded * 100) / progressEvent.total
         );
-        dispatch(setUploadFarmState(percentage))
+        dispatch(setUploadSchemaState(percentage))
         if (percentage === 100 || percentage === Infinity) {
-            dispatch(setUploadFarmState(100));
+            dispatch(setUploadSchemaState(100));
             setTimeout(() => {
-            dispatch(setUploadFarmState(0));
-            dispatch(setLoadingFarmUpload(false));
+            dispatch(setUploadSchemaState(0));
+            dispatch(setLoadingSchemaUpload(false));
           }, 1000);
         }
       },
@@ -89,12 +89,12 @@ export const uploadFarm = createAsyncThunk('uploadFarm', async (data: FormData, 
 const initialState = {
     answer: null,
     uploadState: 0,
-    uploadFarmState: 0,
+    uploadSchemaState: 0,
     loadingButton: false,
     uploadLoading: false,
-    saveFarmAnswer: null,
+    saveSchemaAnswer: null,
     saveDatasetAnswer: null,
-    loadingFarmUpload: false
+    loadingSchemaUpload: false
 };
 
 const fileManagement = createSlice({
@@ -104,11 +104,11 @@ const fileManagement = createSlice({
     setUploadState(state, action){
       state.uploadState = action.payload
     },
-    setUploadFarmState(state, action){
-      state.uploadFarmState = action.payload
+    setUploadSchemaState(state, action){
+      state.uploadSchemaState = action.payload
     },
-    setLoadingFarmUpload(state, action){
-      state.loadingFarmUpload = action.payload
+    setLoadingSchemaUpload(state, action){
+      state.loadingSchemaUpload = action.payload
     },
     setLoadingButton(state, action){
       state.loadingButton = action.payload
@@ -123,19 +123,19 @@ const fileManagement = createSlice({
         state.answer = action.payload.data;
         state.uploadLoading = false;
     });
-    builder.addCase(uploadFarm.fulfilled, (state, action) => {
-        state.saveFarmAnswer = action.payload.data;
+    builder.addCase(uploadSchema.fulfilled, (state, action) => {
+        state.saveSchemaAnswer = action.payload.data;
         state.uploadLoading = false;
     });
-    builder.addMatcher(isAnyOf(uploadFile.pending, uploadFarm.pending, uploadDataset.pending), (state) => {
+    builder.addMatcher(isAnyOf(uploadFile.pending, uploadSchema.pending, uploadDataset.pending), (state) => {
         state.uploadLoading = true;
     });
-    builder.addMatcher(isAnyOf(uploadFile.rejected, uploadFarm.rejected, uploadDataset.rejected), (state) => {
+    builder.addMatcher(isAnyOf(uploadFile.rejected, uploadSchema.rejected, uploadDataset.rejected), (state) => {
         state.uploadLoading = false;
         state.answer = "Error occured";
     });
   },
 });
 
-export const {setUploadState, setLoadingButton, setLoadingFarmUpload, setUploadFarmState} = fileManagement.actions;
+export const {setUploadState, setLoadingButton, setLoadingSchemaUpload, setUploadSchemaState} = fileManagement.actions;
 export default fileManagement.reducer;

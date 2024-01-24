@@ -73,14 +73,6 @@ export const Filter = (props: IFilterProps) => {
         onChange={onChange}
         renderBuilder={renderBuilder}
       />
-      {/* <div className="query-builder-result"> */}
-      {/*  <div>*/}
-      {/*    Query string:{" "}*/}
-      {/*    <pre>*/}
-      {/*      {JSON.stringify(QbUtils.queryString(state.tree, state.config))}*/}
-      {/*    </pre>*/}
-      {/*  </div>*/}
-      {/* </div>*/}
     </div>
   );
 };

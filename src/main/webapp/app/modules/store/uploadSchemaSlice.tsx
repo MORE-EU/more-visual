@@ -7,8 +7,8 @@ const initialState = {
     metaData: null
 };
 
-const uploadFarm = createSlice({
-  name: 'uploadFarm',
+const uploadSchema = createSlice({
+  name: 'uploadSchema',
   initialState,
   reducers: {
     setCsvSample(state, action){
@@ -24,5 +24,5 @@ const uploadFarm = createSlice({
   extraReducers(builder) {},
 });
 
-export const {setCsvSample, setFiles, setMetaData} = uploadFarm.actions;
-export default uploadFarm.reducer;
+export const {setCsvSample, setFiles, setMetaData} = uploadSchema.actions;
+export default uploadSchema.reducer;

@@ -48,7 +48,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
     private Map<String, AbstractDataset> datasets = new HashMap<String, AbstractDataset>();
 
-    private FarmMeta farm = new FarmMeta();
+    private SchemaMeta schemaMeta = new SchemaMeta();
 
     @Value("${application.timeFormat}")
     private String timeFormat;
@@ -65,34 +65,34 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public Optional<FarmMeta> findFarm(String farmName) throws IOException {
-        if (farm.getType() != null && farm.getName().equals(farmName)) return Optional.ofNullable(farm);
-        FarmMeta farm = null;
+    public Optional<SchemaMeta> findSchema(String schemaName) throws IOException {
+        if (schemaMeta.getType() != null && schemaMeta.getName().equals(schemaName)) return Optional.ofNullable(schemaMeta);
+        SchemaMeta schema = null;
         ObjectMapper mapper = new ObjectMapper();
-        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName, farmName + ".meta.json");
+        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + schemaName, schemaName + ".meta.json");
 
         if (metadataFile.exists()) {
             FileReader reader = new FileReader(metadataFile);
-            farm = mapper.readValue(reader, FarmMeta.class);
-            for (FarmInfo farmInfo : farm.getData()) farmInfo.setIsConfiged(true);
+            schema = mapper.readValue(reader, SchemaMeta.class);
+            for (SchemaInfo schemaInfo : schema.getData()) schemaInfo.setIsConfiged(true);
         }
-        return Optional.ofNullable(farm);
+        return Optional.ofNullable(schema);
     }
 
     @Override
-    public Optional<AbstractDataset> findById(String id, String farmName) throws IOException, SQLException {
+    public Optional<AbstractDataset> findById(String id, String schemaName) throws IOException, SQLException {
         Assert.notNull(id, "Id must not be null!");
         ObjectMapper mapper = new ObjectMapper();
         AbstractDataset dataset = null;
-        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + farmName,
-                farmName + ".meta.json");
+        File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + schemaName,
+                schemaName + ".meta.json");
         ObjectMapper objectMapper = new ObjectMapper();
         if(datasets.containsKey(id)) dataset = datasets.get(id);
         else {
             if (metadataFile.exists()) {
                 JsonNode jsonNode = objectMapper.readTree(metadataFile);
-                FarmMeta farm = objectMapper.treeToValue(jsonNode, FarmMeta.class);
-                String type = farm.getType();
+                SchemaMeta schemaMeta = objectMapper.treeToValue(jsonNode, SchemaMeta.class);
+                String type = schemaMeta.getType();
                 for (JsonNode datasetNode : jsonNode.get("data")) {
                     String datasetId = datasetNode.get("id").asText();
                     if (!datasetId.equals(id))
@@ -105,7 +105,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                         String timeCol = datasetNode.get("timeCol").asText();
                         String delimiter = datasetNode.get("delimiter").asText();
                         boolean hasHeader = datasetNode.get("hasHeader").asBoolean();
-                        File file = new File(applicationProperties.getWorkspacePath() + "/" + farmName, id + ".csv");
+                        File file = new File(applicationProperties.getWorkspacePath() + "/" + schemaName, id + ".csv");
                         dataset = new CsvDataset(path, id, name, timeCol, timeFormat, delimiter, hasHeader);
                         CsvDataset finalDataset = (CsvDataset) dataset;
                         if (!file.isDirectory()) {
@@ -148,7 +148,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                         String valueCol = datasetNode.get("valueCol").asText();
                         String idCol = datasetNode.get("idCol").asText();
                         
-                        // dataset = createDBDataset(datasetId, farm.getType(), schema, name, timeCol, valueCol, idCol,
+                        // dataset = createDBDataset(datasetId, schema.getType(), schema, name, timeCol, valueCol, idCol,
                         //         config);
                     }
                 }
@@ -195,8 +195,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public List<Sample> findSample (String farmName) throws IOException {
-        Path f = Paths.get(applicationProperties.getWorkspacePath() + "/" + farmName + "/" + farmName + ".sample.csv");
+    public List<Sample> findSample (String schemaName) throws IOException {
+        Path f = Paths.get(applicationProperties.getWorkspacePath() + "/" + schemaName + "/" + schemaName + ".sample.csv");
         System.out.println(f.toString());
         List<Sample> list = List.of(); // Default to empty list.
         try {
@@ -238,9 +238,9 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     public List<Object[]> findDbSample(String tableName, QueryExecutor queryExecutor) throws SQLException {
         List<Object[]> resultList = new ArrayList<>();
         String schemaName = null;
-        for (FarmInfo farmInfo : farm.getData()) {
-            if (farmInfo.getId().equals(tableName)) {
-                schemaName = farmInfo.getSchema();
+        for (SchemaInfo schemaInfo : schemaMeta.getData()) {
+            if (schemaInfo.getId().equals(tableName)) {
+                schemaName = schemaInfo.getSchema();
                 break;
             }
         }
@@ -274,8 +274,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public String getFarmType() {
-        return farm.getType();
+    public String getSchemaType() {
+        return schemaMeta.getType();
     }
 
     @Override
@@ -286,9 +286,9 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     @Override
     public void deleteAll() {
         if(!datasets.isEmpty()) datasets.clear();
-        if (farm != null) {
-            if (farm.getData() != null) farm.getData().clear();
-            farm.setType(null);
+        if (schemaMeta != null) {
+            if (schemaMeta.getData() != null) schemaMeta.getData().clear();
+            schemaMeta.setType(null);
         }
     }
 
@@ -298,10 +298,10 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         AbstractDataset dataset = null;
         if(datasets.containsKey(id)) dataset = datasets.get(id);
         else {
-            for(FarmInfo farmInfo : farm.getData()) {
-                if (farmInfo.getId().equals(id)) {
-                    dataset = createDBDataset(farmInfo, queryExecutor);
-                    datasets.put(farmInfo.getId(), dataset);
+            for(SchemaInfo schemaInfo : schemaMeta.getData()) {
+                if (schemaInfo.getId().equals(id)) {
+                    dataset = createDBDataset(schemaInfo, queryExecutor);
+                    datasets.put(schemaInfo.getId(), dataset);
                     break;
                 }
             }
@@ -310,78 +310,78 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public FarmMeta getDBMetadata (String database, String farmName, QueryExecutor queryExecutor) throws SQLException {
-        List<FarmInfo> farmInfos = new ArrayList<FarmInfo>();
+    public SchemaMeta getDBMetadata (String database, String schemaName, QueryExecutor queryExecutor) throws SQLException {
+        List<SchemaInfo> schemaInfos = new ArrayList<SchemaInfo>();
         List<TableInfo> tableInfoArray = new ArrayList<TableInfo>();
-        farm.setName(farmName);
-        farm.setType(database);
-        if(database.equals("influx")) farm.setIsTimeSeries(true);
-        else farm.setIsTimeSeries(false);
+        schemaMeta.setName(schemaName);
+        schemaMeta.setType(database);
+        if(database.equals("influx")) schemaMeta.setIsTimeSeries(true);
+        else schemaMeta.setIsTimeSeries(false);
         try {
             tableInfoArray = queryExecutor.getTableInfo();
             for (TableInfo tableInfo : tableInfoArray) {
-                FarmInfo farmInfo = new FarmInfo();
-                farmInfo.setId(tableInfo.getTable());
-                farmInfo.setSchema(tableInfo.getSchema());
-                farmInfo.setName(tableInfo.getTable());
-                farmInfo.setType(database);
-                if (database.equals("influx")) farmInfo.setIsConfiged(true);
-                else farmInfo.setIsConfiged(false);
-                farmInfos.add(farmInfo);
+                SchemaInfo schemaInfo = new SchemaInfo();
+                schemaInfo.setId(tableInfo.getTable());
+                schemaInfo.setSchema(tableInfo.getSchema());
+                schemaInfo.setName(tableInfo.getTable());
+                schemaInfo.setType(database);
+                if (database.equals("influx")) schemaInfo.setIsConfiged(true);
+                else schemaInfo.setIsConfiged(false);
+                schemaInfos.add(schemaInfo);
             }
             if (tableInfoArray.isEmpty()) throw new SQLException("No available data.");
-            farm.setData(farmInfos);
-            return farm;
+            schemaMeta.setData(schemaInfos);
+            return schemaMeta;
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public FarmInfo updateFarmInfoColumns(String id, DbColumns columns) {
-        Assert.notNull(id, "FarmInfo must not be null");
-        for (FarmInfo farmInfo : farm.getData()) {
-            if (farmInfo.getId().equals(id)) {
-                farmInfo.setTimeCol(columns.getTimeCol());
-                farmInfo.setIdCol(columns.getIdCol());
-                farmInfo.setValueCol(columns.getValueCol());
-                farmInfo.setIsConfiged(true);
-                return farmInfo;
+    public SchemaInfo updateSchemaInfoColumns(String id, DbColumns columns) {
+        Assert.notNull(id, "Schema ID must not be null");
+        for (SchemaInfo schemaInfo : schemaMeta.getData()) {
+            if (schemaInfo.getId().equals(id)) {
+                schemaInfo.setTimeCol(columns.getTimeCol());
+                schemaInfo.setIdCol(columns.getIdCol());
+                schemaInfo.setValueCol(columns.getValueCol());
+                schemaInfo.setIsConfiged(true);
+                return schemaInfo;
             }
         }
         return null;
     }
 
     @Override
-    public FarmInfo  updateFarmInfo(FarmInfo info) {
-        Assert.notNull(info.getId(), "FarmInfo must not be null");
-        for (FarmInfo farmInfo : farm.getData()) {
-            if (farmInfo.getId().equals(info.getId())) {
-                farmInfo.setIsConfiged(info.getIsConfiged());
-                return farmInfo;
+    public SchemaInfo updateSchemaInfo(SchemaInfo info) {
+        Assert.notNull(info.getId(), "schemaInfo must not be null");
+        for (SchemaInfo schemaInfo : schemaMeta.getData()) {
+            if (schemaInfo.getId().equals(info.getId())) {
+                schemaInfo.setIsConfiged(info.getIsConfiged());
+                return schemaInfo;
             }
         }
         return null;
     }
 
 
-    private AbstractDataset createDBDataset(FarmInfo farmInfo, QueryExecutor queryExecutor) throws SQLException {
+    private AbstractDataset createDBDataset(SchemaInfo schemaInfo, QueryExecutor queryExecutor) throws SQLException {
         AbstractDataset dataset = null;
-        log.debug("creating new dataset {}", farmInfo.getId());
-        switch (farmInfo.getType()) {
+        log.debug("creating new dataset {}", schemaInfo.getId());
+        switch (schemaInfo.getType()) {
             case "postgres":
                 SQLQueryExecutor sqlQueryExecutor = (SQLQueryExecutor) queryExecutor;
-                dataset = new PostgreSQLDataset(sqlQueryExecutor, farmInfo.getId(), farmInfo.getSchema(), farmInfo.getId(), timeFormat, 
-                                                farmInfo.getTimeCol(),farmInfo.getIdCol(), farmInfo.getValueCol());
+                dataset = new PostgreSQLDataset(sqlQueryExecutor, schemaInfo.getId(), schemaInfo.getSchema(), schemaInfo.getId(), timeFormat, 
+                                                schemaInfo.getTimeCol(),schemaInfo.getIdCol(), schemaInfo.getValueCol());
                 break;           
             case "modelar":
                 ModelarDBQueryExecutor modelarDBQueryExecutor = (ModelarDBQueryExecutor) queryExecutor;
-                dataset = new ModelarDBDataset(modelarDBQueryExecutor, farmInfo.getId(), farmInfo.getSchema(), farmInfo.getId(), timeFormat, 
-                                                farmInfo.getTimeCol(), farmInfo.getIdCol(), farmInfo.getValueCol());
+                dataset = new ModelarDBDataset(modelarDBQueryExecutor, schemaInfo.getId(), schemaInfo.getSchema(), schemaInfo.getId(), timeFormat, 
+                                                schemaInfo.getTimeCol(), schemaInfo.getIdCol(), schemaInfo.getValueCol());
                 break;
             case "influx":
                 InfluxDBQueryExecutor influxDBQueryExecutor = (InfluxDBQueryExecutor) queryExecutor;
-                dataset = new InfluxDBDataset(influxDBQueryExecutor, farmInfo.getId(), farmInfo.getSchema(), farmInfo.getId(), timeFormat, farmInfo.getTimeCol());
+                dataset = new InfluxDBDataset(influxDBQueryExecutor, schemaInfo.getId(), schemaInfo.getSchema(), schemaInfo.getId(), timeFormat, schemaInfo.getTimeCol());
                 break;
             default:
                 break;

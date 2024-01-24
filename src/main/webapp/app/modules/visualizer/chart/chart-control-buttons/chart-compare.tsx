@@ -16,7 +16,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 export const ChartCompare = () => {
   const dispatch = useAppDispatch();
 
-  const { farmMeta, dataset, comparePopover, compare, datasets, selectedMeasures, customSelectedMeasures, compareData } = useAppSelector(state => state.visualizer);
+  const { schemaMeta, dataset, comparePopover, compare, datasets, selectedMeasures, customSelectedMeasures, compareData } = useAppSelector(state => state.visualizer);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -151,7 +151,7 @@ export const ChartCompare = () => {
                   </Box>
                 )
             )}
-          {/* {farmMeta.data.map(
+          {/* {schemaMeta.data.map(
             (file, idx) =>
               file.id !== dataset.id && (
                 <MenuItem key={`${file.id}-${idx}`} selected={compare.includes(file.id)} onClick={handleOnClick(file.id)}>

@@ -121,16 +121,16 @@ public class DatasetResource {
 
     /**
      * {@code GET  /datasets/:id} : get the "id" dataset.
-     * @param farmName the name of the farm
+     * @param schema the name of the schema
      * @param id the id of the dataset to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the dataset, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/datasets/{farmName}/{id}")
-    public ResponseEntity<AbstractDataset> getDataset(@PathVariable String farmName, @PathVariable String id) throws IOException, SQLException {
-        log.debug("REST request to get Dataset : {}/{}", farmName, id);
+    @GetMapping("/datasets/{schemaName}/{id}")
+    public ResponseEntity<AbstractDataset> getDataset(@PathVariable String schemaName, @PathVariable String id) throws IOException, SQLException {
+        log.debug("REST request to get Dataset : {}/{}", schemaName, id);
         Optional<AbstractDataset> dataset = null;
-        if (datasetRepository.getFarmType() == null)
-            dataset = datasetRepository.findById(id, farmName);
+        if (datasetRepository.getSchemaType() == null)
+            dataset = datasetRepository.findById(id, schemaName);
         else{
             QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
             dataset = datasetRepository.findDBDatasetById(id, queryExecutor);
@@ -139,31 +139,19 @@ public class DatasetResource {
         return ResponseUtil.wrapOrNotFound(dataset);
     }
 
-    @GetMapping("/datasets/{farmName}")
-    public ResponseEntity<FarmMeta> getFarm(@PathVariable String farmName) throws IOException {
-        log.debug("REST request to get farm metadata");
-        return ResponseUtil.wrapOrNotFound(datasetRepository.findFarm(farmName));
+    @GetMapping("/datasets/{schema}")
+    public ResponseEntity<SchemaMeta> getSchema(@PathVariable String schemaName) throws IOException {
+        log.debug("REST request to get schema metadata");
+        return ResponseUtil.wrapOrNotFound(datasetRepository.findSchema(schemaName));
     }
 
-    @PutMapping("/datasets/{farmName}")
-    public ResponseEntity<FarmInfo> updateFarmInfo(@PathVariable String farmName, @Valid @RequestBody FarmInfo info) throws IOException {
+    @PutMapping("/datasets/{schema}")
+    public ResponseEntity<SchemaInfo> updateSchemaInfo(@PathVariable String schemaName, @Valid @RequestBody SchemaInfo info) throws IOException {
         log.debug("REST request to update info dataset metadata");
-        FarmInfo result = datasetRepository.updateFarmInfo(info);
+        SchemaInfo result = datasetRepository.updateSchemaInfo(info);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.toString()))
             .body(result);
-    }
-
-
-    @GetMapping("/datasets/{farmName}/sample")
-    public List<?> getSample(@PathVariable String farmName) throws IOException, SQLException {
-        log.debug("REST request to get Sample File");
-        if (datasetRepository.getFarmType() == null)
-            return datasetRepository.findSample(farmName); // remove sample type
-        else {
-            QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-            return datasetRepository.findDbSample(farmName, queryExecutor);
-        }
     }
 
     @GetMapping("/datasets/directories")
@@ -188,13 +176,13 @@ public class DatasetResource {
     /**
      * POST executeQuery
      */
-    @PostMapping("/datasets/{farmName}/{id}/query")
-    public ResponseEntity<QueryResults> executeQuery(@PathVariable String farmName, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
+    @PostMapping("/datasets/{schemaName}/{id}/query")
+    public ResponseEntity<QueryResults> executeQuery(@PathVariable String schemaName, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
         log.debug("REST request to execute Query: {}", query);
         Optional<QueryResults> queryResultsOptional = null;
-        if (datasetRepository.getFarmType() == null)
+        if (datasetRepository.getSchemaType() == null)
             queryResultsOptional =
-                datasetRepository.findById(id, farmName).map(dataset -> {
+                datasetRepository.findById(id, schemaName).map(dataset -> {
                         return csvDataService.executeQuery((CsvDataset) dataset, query);
                     });
         else {
@@ -203,38 +191,36 @@ public class DatasetResource {
                 return dataService.executeQuery(databaseConnection.getQueryExecutor(dataset), dataset, query);
             });
         }
-
-        //queryResultsOptional.ifPresent(queryResults -> log.debug(queryResults.toString()));
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
     }
 
 
 
-    @PostMapping("/files/upload/{farmName}")
-    public ResponseEntity<FarmMeta> saveUploadedFile (@PathVariable String farmName, @RequestParam("files") MultipartFile[] files) throws URISyntaxException, IOException {
-    log.debug("Rest request to save uploaded file to {} farm", farmName);
+    @PostMapping("/files/upload/{schemaName}")
+    public ResponseEntity<SchemaMeta> saveUploadedFile (@PathVariable String schemaName, @RequestParam("files") MultipartFile[] files) throws URISyntaxException, IOException {
+    log.debug("Rest request to save uploaded file to {} schema", schemaName);
     try {
       List<String> fileNames = new ArrayList<>();
       Arrays.asList(files).stream().forEach(file -> {
-        fileHandlingRepository.saveFile(farmName, file, null);
+        fileHandlingRepository.saveFile(schemaName, file, null);
         fileNames.add(file.getOriginalFilename());
       });
       log.debug("Uploaded the files successfully: {}", fileNames);
-      return ResponseUtil.wrapOrNotFound(datasetRepository.findFarm(farmName));
+      return ResponseUtil.wrapOrNotFound(datasetRepository.findSchema(schemaName));
     } catch (Exception e) {
       log.debug("Fail to upload files!");
       return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
     }
 
-    @PostMapping("/files/upload/farm")
-    public ResponseEntity<FarmMeta> createNewFarm (@RequestParam("meta") String metaInfo, @RequestParam("files") MultipartFile[] files) throws URISyntaxException, IOException {
+    @PostMapping("/files/upload/schema")
+    public ResponseEntity<SchemaMeta> createNewSchema (@RequestParam("meta") String metaInfo, @RequestParam("files") MultipartFile[] files) throws URISyntaxException, IOException {
     ObjectMapper ob = new ObjectMapper();
-    FarmMeta m = ob.readValue(metaInfo, FarmMeta.class);
-    log.debug("Rest request to save farm with name {}", m.getName());
+    SchemaMeta m = ob.readValue(metaInfo, SchemaMeta.class);
+    log.debug("Rest request to save schema with name {}", m.getName());
     try {
-      fileHandlingRepository.saveFarm(m, files);
-      return ResponseUtil.wrapOrNotFound(datasetRepository.findFarm(m.getName()));
+      fileHandlingRepository.saveSchema(m, files);
+      return ResponseUtil.wrapOrNotFound(datasetRepository.findSchema(m.getName()));
     } catch (Exception e) {
       log.debug("Fail to upload files! {}", e.getMessage());
       return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -242,13 +228,13 @@ public class DatasetResource {
     }
 
     @PostMapping("/files/upload/dataset")
-    public ResponseEntity<FarmMeta> uploadDataset (@RequestParam("meta") String metaInfo, @RequestParam("farmName") String farmName, @RequestParam("file") MultipartFile file) throws URISyntaxException, IOException {
+    public ResponseEntity<SchemaMeta> uploadDataset (@RequestParam("meta") String metaInfo, @RequestParam("schemaName") String schemaName, @RequestParam("file") MultipartFile file) throws URISyntaxException, IOException {
     ObjectMapper ob = new ObjectMapper();
-    FarmInfo m = ob.readValue(metaInfo, FarmInfo.class);
+    SchemaInfo m = ob.readValue(metaInfo, SchemaInfo.class);
     log.debug("Rest request to save dataset with name {}", m.getName());
     try {
-      fileHandlingRepository.uploadDataset(m, file, farmName);
-      return ResponseUtil.wrapOrNotFound(datasetRepository.findFarm(farmName));
+      fileHandlingRepository.uploadDataset(m, file, schemaName);
+      return ResponseUtil.wrapOrNotFound(datasetRepository.findSchema(schemaName));
     } catch (Exception e) {
       log.debug("Fail to upload files! {}", e.getMessage());
       return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -287,14 +273,14 @@ public class DatasetResource {
     }
 
 
-    @GetMapping("/datasets/metadata/{database}/{farmName}")
-    public ResponseEntity<FarmMeta> getDbMetadata(@PathVariable String database, @PathVariable String farmName) throws SQLException {
-        log.debug("Rest request to get db metadata from {} database with name {}", database, farmName);
-        FarmMeta farmMeta = new FarmMeta();
+    @GetMapping("/datasets/metadata/{database}/{schemaName}")
+    public ResponseEntity<SchemaMeta> getDbMetadata(@PathVariable String database, @PathVariable String schemaName) throws SQLException {
+        log.debug("Rest request to get db metadata from {} database with name {}", database, schemaName);
+        SchemaMeta schemaMeta = new SchemaMeta();
         try {
             QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-            farmMeta = datasetRepository.getDBMetadata(database, farmName, queryExecutor);
-            return new ResponseEntity<FarmMeta>(farmMeta, HttpStatus.OK);
+            schemaMeta = datasetRepository.getDBMetadata(database, schemaName, queryExecutor);
+            return new ResponseEntity<SchemaMeta>(schemaMeta, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
@@ -314,12 +300,12 @@ public class DatasetResource {
     }
 
     @PutMapping("/datasets/metadata/columns/{tableName}")
-    public ResponseEntity<FarmInfo> updateFarmInfoColumnNames( @PathVariable String tableName,@Valid @RequestBody DbColumns dbColumns) {
-        log.debug("Rest request to update columns of farmInfo with id {} with columns {}", tableName, dbColumns.toString());
+    public ResponseEntity<SchemaInfo> updateSchemaInfoColumnNames( @PathVariable String tableName, @Valid @RequestBody DbColumns dbColumns) {
+        log.debug("Rest request to update columns of schemaInfo with id {} with columns {}", tableName, dbColumns.toString());
         if (tableName == null) {
-            throw new BadRequestAlertException("Invalid tableName", ENTITY_NAME, "tableNamenull");
+            throw new BadRequestAlertException("Invalid tableName", ENTITY_NAME, "tableNameNull");
         }
-        FarmInfo result = datasetRepository.updateFarmInfoColumns(tableName, dbColumns);
+        SchemaInfo result = datasetRepository.updateSchemaInfoColumns(tableName, dbColumns);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.toString()))
             .body(result);
@@ -330,7 +316,7 @@ public class DatasetResource {
     public ResponseEntity<Boolean> disconnector() throws SQLException {
         log.debug("Rest request to close connection");
         datasetRepository.deleteAll();
-        if (datasetRepository.getFarmType() != null)
+        if (datasetRepository.getSchemaType() != null)
             databaseConnection.closeConnection();
         return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }

@@ -15,7 +15,6 @@ export interface IDataset {
   measures?: number[];
   name?: string;
   path?: string | null;
-  resType?: string | null;
   samplingInterval?: string | null;
   schema?: string | null;
   table?: string | null;
@@ -24,7 +23,7 @@ export interface IDataset {
   timeRange?: IDatasetTimeRange;
   type?: string;
   valueCol?: string;
-  isConfiged ?: boolean;
+  isConfiged?: boolean;
 }
 
 export const defaultValue: Readonly<IDataset> = {};

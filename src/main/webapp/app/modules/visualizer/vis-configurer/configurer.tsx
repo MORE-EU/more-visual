@@ -14,14 +14,14 @@ import VisControlDatasetSelection from './vis-control-dataset-selection';
 
 
 import { useAppDispatch, useAppSelector } from '../../store/storeConfig';
-import { setDatasetIsConfiged, setErrorMessage, getFarmMeta, updateDatasetChoice } from '../../store/visualizerSlice';
+import { setDatasetIsConfiged, setErrorMessage, getSchemaMeta, updateDatasetChoice } from '../../store/visualizerSlice';
 import Header from '../header/header';
 
 const mdTheme = createTheme();
 
 export const VisConfigurer = () => {
     const [openSnack, setOpenSnack] = useState(false);
-    const { farmMeta, datasetChoice, selectedConnection, datasetIsConfiged, errorMessage } = useAppSelector(state => state.visualizer);
+    const { schemaMeta, datasetChoice, selectedConnection, datasetIsConfiged, errorMessage } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const history = useHistory();
     const params: any = useParams();
@@ -29,17 +29,17 @@ export const VisConfigurer = () => {
 
     useEffect(() => {
         dispatch(setDatasetIsConfiged(false));
-        !farmMeta && dispatch(getFarmMeta(params.folder));
+        !schemaMeta && dispatch(getSchemaMeta(params.folder));
     },[]);
 
     useEffect(() => {
-        if (farmMeta && datasetIsConfiged) history.push(`/visualize/${farmMeta.name}/${farmMeta.data[datasetChoice].id}`);
+        if (schemaMeta && datasetIsConfiged) history.push(`/visualize/${schemaMeta.name}/${schemaMeta.data[datasetChoice].id}`);
     }, [datasetIsConfiged]);
 
     useEffect(() => {
         if(errorMessage) {
             setOpenSnack(true);
-            if (farmMeta && !farmMeta.data[datasetChoice].isConfiged ) dispatch(setDatasetIsConfiged(false));
+            if (schemaMeta && !schemaMeta.data[datasetChoice].isConfiged ) dispatch(setDatasetIsConfiged(false));
         }
     }, [errorMessage]);
 
@@ -60,7 +60,7 @@ export const VisConfigurer = () => {
                     </Snackbar>
                 }
                 <Grid sx={{ height: '100%', width: '100%' }}>
-                    <Header farmMeta={farmMeta} datasetChoice={datasetChoice} selectedConnection={selectedConnection} />
+                    <Header schemaMeta={schemaMeta} datasetChoice={datasetChoice} selectedConnection={selectedConnection} />
                     <Divider />
                     <Grid
                     sx={{
@@ -73,7 +73,7 @@ export const VisConfigurer = () => {
                     >
                         <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
                             <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
-                                {farmMeta && <VisControlDatasetSelection />}
+                                {schemaMeta && <VisControlDatasetSelection />}
                             </Paper>
                         </Grid>
                         <Grid sx={{ width: '80%', p: 1, flexGrow: 1, height: 'calc(100% - 30px)' }}>
@@ -85,7 +85,7 @@ export const VisConfigurer = () => {
                                     height: '100%',
                                 }}
                             >
-                                {farmMeta && !farmMeta.data[datasetChoice].isConfiged && <VisControlDatasetConfig /> }
+                                {schemaMeta && !schemaMeta.data[datasetChoice].isConfiged && <VisControlDatasetConfig /> }
                             </Paper>
                         </Grid>
                     </Grid>

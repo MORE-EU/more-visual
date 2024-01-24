@@ -21,7 +21,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { setLoadingButton, uploadDataset } from 'app/modules/store/fileManagementSlice';
-import { CircularProgressWithLabel } from 'app/modules/home/home-left-menu';
+import { CircularProgressWithLabel } from 'app/modules/visualizer/vis-configurer/circular-progress';
 import grey from '@mui/material/colors/grey';
 import blue from '@mui/material/colors/blue';
 import red from '@mui/material/colors/red';
@@ -135,7 +135,7 @@ const VisControlDatasetUpload = (props: IVisUploadDataset) => {
       const data = new FormData();
       data.append('file', uploadFile[0]);
       data.append('meta', JSON.stringify(formData));
-      data.append('farmName', params.folder);
+      data.append('schemaName', params.folder);
       dispatch(uploadDataset(data));
     }
   };

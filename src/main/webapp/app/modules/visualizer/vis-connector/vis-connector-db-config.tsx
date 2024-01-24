@@ -40,7 +40,7 @@ const VisConnectorDBConfig = ({closeHandler}) => {
 
     useEffect(() => {
         if (connected) {
-            dispatch(getDbMetadata({database:dbForm.type, farmName:dbForm.database}));
+            dispatch(getDbMetadata({database:dbForm.type, schemaName:dbForm.database}));
             dispatch(saveConnection(dbForm));
         }
     }, [connected]);

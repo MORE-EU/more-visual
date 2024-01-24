@@ -19,7 +19,7 @@ type TransitionProps = Omit<SlideProps, 'direction'>;
 
 export const Connector = () => {
     const [openSnack, setOpenSnack] = useState(false);
-    const { farmMeta, datasetChoice, selectedConnection, connected, errorMessage } = useAppSelector(state => state.visualizer);
+    const { schemaMeta, datasetChoice, selectedConnection, connected, errorMessage } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const history = useHistory();
 
@@ -34,17 +34,17 @@ export const Connector = () => {
     
 
     useEffect(() => {
-        if (farmMeta && farmMeta.isTimeSeries) history.push(`/visualize/${farmMeta.name}/${farmMeta.data[datasetChoice].id}`);
+        if (schemaMeta && schemaMeta.isTimeSeries) history.push(`/visualize/${schemaMeta.name}/${schemaMeta.data[datasetChoice].id}`);
         
-        if (farmMeta && !farmMeta.isTimeSeries) history.push(`/configure/${farmMeta.name}`);
-    },[farmMeta]);
+        if (schemaMeta && !schemaMeta.isTimeSeries) history.push(`/configure/${schemaMeta.name}`);
+    },[schemaMeta]);
     
     useEffect(() => {
         if(errorMessage) setOpenSnack(true);
     }, [errorMessage]);
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-        if (!farmMeta && connected) dispatch(disconnector());
+        if (!schemaMeta && connected) dispatch(disconnector());
         dispatch(setErrorMessage(null));
         setOpenSnack(false);
     };
@@ -62,7 +62,7 @@ export const Connector = () => {
                     </Snackbar>
                 }
                 <Grid sx={{ height: '100%', width: '100%' }}>
-                    <Header farmMeta={farmMeta} datasetChoice={datasetChoice} selectedConnection={selectedConnection} />
+                    <Header schemaMeta={schemaMeta} datasetChoice={datasetChoice} selectedConnection={selectedConnection} />
                     <Divider />
                     <Grid
                     sx={{

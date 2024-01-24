@@ -1,27 +1,19 @@
 package eu.more2020.visual.web.rest;
 
 import eu.more2020.visual.domain.Alert;
-import eu.more2020.visual.domain.Changepoint;
 import eu.more2020.visual.domain.Connection;
-import eu.more2020.visual.domain.Detection.ChangepointDetection;
-import eu.more2020.visual.domain.Detection.DeviationDetection;
-import eu.more2020.visual.domain.Detection.PatternDetection;
-import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.middleware.domain.MultiVariateDataPoint;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.ConnectionRepository;
 import eu.more2020.visual.service.ToolsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api")
@@ -39,41 +31,12 @@ public class ToolsResource {
         this.alertRepository = alertRepository;
     }
 
-    @PostMapping("/tools/changepoint_detection")
-    public ResponseEntity<List<Changepoint>> changepointDetection(@Valid @RequestBody ChangepointDetection changepoints) throws IOException {
-        log.debug("CP for {}", changepoints);
-        List<Changepoint> detectedChangepoints = toolsService.changepointDetection(changepoints);
-        log.debug("Detected CP for {}", detectedChangepoints);
-        return new ResponseEntity<>(detectedChangepoints, HttpStatus.OK);
-    }
-
-    @GetMapping("/tools/changepoint_detection/washes/{id}")
-    public List<Changepoint> getManualChangepoints(@PathVariable String id) throws IOException {
-        log.debug("REST request to get manual changepoints ");
-        return toolsService.getManualChangepoints(id);
-    }
-
     @PostMapping("/tools/forecasting/{id}")
     public List<MultiVariateDataPoint> forecast(@PathVariable String id) throws IOException {
         log.debug("REST request to get Forecast");
         return toolsService.forecasting(id);
     }
-
-    @PostMapping("/tools/soiling")
-    public List<MultiVariateDataPoint> soilingDetection(@Valid @RequestBody DeviationDetection deviationDetection) {
-        return toolsService.soilingDetection(deviationDetection);
-    }
-
-     @PostMapping("/tools/pattern")
-     public List<Changepoint> patternDetection(@Valid @RequestBody PatternDetection patternDetection) {
-         return toolsService.patternDetection(patternDetection);
-     }
-
-
-    @PostMapping("/tools/yaw_misalignment")
-    public List<MultiVariateDataPoint> yawMisalignmentDetection(@Valid @RequestBody RangeDetection yawMisalignmentDetection) {
-        return toolsService.yawMisalignmentDetection(yawMisalignmentDetection);
-    }
+    
 
     @GetMapping("/alerts/{datasetId}")
     public List<Alert> getAlerts(@PathVariable String datasetId) throws IOException {

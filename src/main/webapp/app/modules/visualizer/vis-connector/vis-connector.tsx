@@ -31,7 +31,7 @@ const VisConnector = () => {
 
     useEffect(() => {
         if(connected && connectionInfo)
-            dispatch(getDbMetadata({database: connectionInfo.type, farmName: connectionInfo.database}));
+            dispatch(getDbMetadata({database: connectionInfo.type, schemaName: connectionInfo.database}));
     },[connected])
 
     const closeHandler = () => {

@@ -10,8 +10,7 @@ import errorMiddleware from 'app/config/error-middleware';
 import loggerMiddleware from 'app/config/logger-middleware';
 import home from "./homeSlice";
 import fileManagement from "./fileManagementSlice"
-import uploadFarm from "./uploadFarmSlice";
-import patternExtraction from "./patternExtractionSlice";
+import uploadSchema from "./uploadSchemaSlice";
 import forecasting from "./forecastingSlice";
 
 enableMapSet();
@@ -23,9 +22,8 @@ export const store = configureStore({
         visualizer,
         home,
         fileManagement,
-        uploadFarm,
+        uploadSchema,
         forecasting,
-        patternExtraction,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false

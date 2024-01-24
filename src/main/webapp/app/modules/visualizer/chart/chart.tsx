@@ -8,13 +8,7 @@ import { useScrollBlock } from 'app/shared/util/useScrollBlock';
 import { ITimeRange } from 'app/shared/model/time-range.model';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import {
-  applyChangepointDetection,
-  applyDeviationDetection,
-  applyYawMisalignmentDetection,
-  toggleChangepointDetection,
   toggleCustomChangepoints,
-  toggleSoilingDetection,
-  toggleYawMisalignmentDetection,
   updateAlertResults,
   updateChartRef,
   updateCompareQueryResults,
@@ -25,7 +19,6 @@ import {
 } from 'app/modules/store/visualizerSlice';
 import { ChartPlotBands } from 'app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands';
 import chartAlertingChecker, { alertingPlotBandsCreator } from './chart-alerting/chart-alerting-functions';
-import { filterChangepoints } from 'app/modules/visualizer/tools/changepoint-detection/changepoint-detection';
 import grey from '@mui/material/colors/grey';
 import LinearProgress from '@mui/material/LinearProgress';
 import Grid from '@mui/material/Grid';
@@ -49,20 +42,14 @@ export const Chart = () => {
     queryResults,
     changeChart,
     compare,
-    changepointDetectionEnabled,
-    detectedChangepointFilter,
     customChangepointsEnabled,
     data,
     compareData,
     errorMessage,
     forecastData,
-    soilingEnabled,
-    soilingType,
     alertingPlotMode,
     alertResults,
     forecastingDataSplit,
-    soilingWeeks,
-    yawMisalignmentEnabled,
     secondaryData,
     chartType,
     liveDataImplLoading,
@@ -91,14 +78,10 @@ export const Chart = () => {
   const latestFolder = useRef(null);
   const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
-  const latestSoilingWeeks = useRef(soilingWeeks);
   const latestCompare = useRef(compare);
   const latestFilter = useRef(filter);
   const latestPreview = useRef(alertingPreview);
   const latestCustomChangepoints = useRef([]);
-  const isSoilingEnabled = useRef(soilingEnabled);
-  const isYawMisalignmentEnabled = useRef(yawMisalignmentEnabled);
-  const isChangepointDetectionEnabled = useRef(changepointDetectionEnabled);
 
   //change zones if forecasting is activated and both start & end date is set
   const getZones = color => {
@@ -155,9 +138,6 @@ export const Chart = () => {
     latestPreview.current = alertingPreview;
   }, [alertingPreview]);
 
-  useEffect(() => {
-    isSoilingEnabled.current = soilingEnabled;
-  }, [soilingEnabled]);
 
   useEffect(() => {
     data && alerts && dispatch(updateAlertResults(chartAlertingChecker(data, alerts, dataset, selectedMeasures, alertResults)));
@@ -170,10 +150,6 @@ export const Chart = () => {
   useEffect(() => {
     Object.keys(alertResults).length > 0 && setAlertingPlotBands(alertingPlotBandsCreator(alertResults, alerts));
   }, [alertResults, alerts]);
-
-  useEffect(() => {
-    isYawMisalignmentEnabled.current = yawMisalignmentEnabled;
-  }, [yawMisalignmentEnabled]);
 
   useEffect(() => {
     latestFilter.current = filter;
@@ -220,15 +196,6 @@ export const Chart = () => {
   useEffect(() => {
     latestCompare.current = compare;
   }, [compare]);
-
-  useEffect(() => {
-    latestSoilingWeeks.current = soilingWeeks;
-  }, [soilingWeeks]);
-
-  useEffect(() => {
-    if (!changepointDetectionEnabled) setDetectedPlotBands([]);
-    isChangepointDetectionEnabled.current = changepointDetectionEnabled;
-  }, [changepointDetectionEnabled]);
 
   useEffect(() => {
     if (customChangepointsEnabled && changepointHighlight === false) {
@@ -330,21 +297,6 @@ export const Chart = () => {
             filter: latestFilter.current,
           })
         );
-      if (isChangepointDetectionEnabled.current)
-        dispatch(applyChangepointDetection({ id: latestDatasetId.current, from: min, to: max })).then(res => {
-          if (isSoilingEnabled.current)
-            dispatch(
-              applyDeviationDetection({
-                id: latestDatasetId.current,
-                weeks: latestSoilingWeeks.current,
-                from: min,
-                to: max,
-                type: soilingType,
-                changepoints: filterChangepoints(res.payload, detectedChangepointFilter),
-              })
-            );
-        });
-      if (isYawMisalignmentEnabled.current) dispatch(applyYawMisalignmentDetection({ id: latestDatasetId.current, from: min, to: max }));
     };
 
     const handleEventTimeout = event => {
@@ -422,17 +374,7 @@ export const Chart = () => {
   };
 
   const getSecondaryText = () => {
-    if (isYawMisalignmentEnabled.current) return 'Yaw Angle';
-    if (isSoilingEnabled.current) {
-      switch (soilingType) {
-        case 'soilingRatio':
-          return 'Soiling Ratio';
-        case 'powerLoss':
-          return 'Power Loss';
-        default:
-          return 'Soiling Ratio';
-      }
-    }
+    return '';
   };
 
   // Required for pan to work

@@ -31,22 +31,22 @@ const VisControlDatasetSelection = () => {
     const [selectedDataset, setSelectedDataset] = useState<ISelectedDataset>(defaultSelectedDataset);
 
     const dispatch = useAppDispatch();
-    const { farmMeta, datasetChoice} = useAppSelector(state => state.visualizer);
+    const { schemaMeta, datasetChoice} = useAppSelector(state => state.visualizer);
     const history = useHistory();
     
     useEffect(() => {
-        farmMeta && setSelectedDataset(prevDataset =>
+        schemaMeta && setSelectedDataset(prevDataset =>
             {
                 return {...prevDataset,
-                    schema: farmMeta.data[datasetChoice].schema,
-                    table: farmMeta.data[datasetChoice].id
+                    schema: schemaMeta.data[datasetChoice].schema,
+                    table: schemaMeta.data[datasetChoice].id
                 }
             });
     },[]);
 
     useEffect(() => {
         if (selectedDataset.table) {
-            const idx = farmMeta.data.findIndex(file => file.schema === selectedDataset.schema && file.id === selectedDataset.table);
+            const idx = schemaMeta.data.findIndex(file => file.schema === selectedDataset.schema && file.id === selectedDataset.table);
             if (datasetChoice !== idx)
                 dispatch(updateDatasetChoice(idx));
         }
@@ -66,7 +66,7 @@ const VisControlDatasetSelection = () => {
     }
 
     const handleDataset = (dataset) => {
-        const idx = farmMeta.data.findIndex(file => file.schema === dataset.schema && file.id === dataset.id);
+        const idx = schemaMeta.data.findIndex(file => file.schema === dataset.schema && file.id === dataset.id);
         if (datasetChoice !== idx) {
             dispatch(updateDatasetChoice(idx));
         }
@@ -84,7 +84,7 @@ const VisControlDatasetSelection = () => {
                             Schema
                         </InputLabel>
                         <Select labelId="schemaInput" id="schemaSelectInput" name="schema" label="schema" value={selectedDataset.schema} onChange={schemaSelectChange}>
-                            {farmMeta.data.map(file => file.schema).filter(
+                            {schemaMeta.data.map(file => file.schema).filter(
                             (schema, idx, curr_schema) => curr_schema.indexOf(schema) === idx).map(schema => 
                             (<MenuItem key={schema} value={schema}>{schema}</MenuItem>)
                             )}
@@ -96,10 +96,10 @@ const VisControlDatasetSelection = () => {
                         Tables
                     </Typography>
                     <List disablePadding dense>
-                    {farmMeta.data.filter(file => file.schema === selectedDataset.schema && !file.isConfiged).map((file, idx) => (
+                    {schemaMeta.data.filter(file => file.schema === selectedDataset.schema && !file.isConfiged).map((file, idx) => (
                         <ListItemButton
                             key={idx}
-                            selected={farmMeta.data[datasetChoice].id === file.id && farmMeta.data[datasetChoice].schema === file.schema}
+                            selected={schemaMeta.data[datasetChoice].id === file.id && schemaMeta.data[datasetChoice].schema === file.schema}
                             onClick={() => {tableChange(file.id)}}
                             divider
                         >
@@ -112,16 +112,16 @@ const VisControlDatasetSelection = () => {
                 </Grid>
             </Grid>
             <Grid>
-                {(farmMeta.data.filter( file => file.isConfiged).length > 0) && 
+                {(schemaMeta.data.filter( file => file.isConfiged).length > 0) && 
                     <Typography variant="h6" gutterBottom>
                         Configured Datasets
                     </Typography>
                 }
                 <List disablePadding dense>
-                    {farmMeta.data.filter( file => file.isConfiged).map((file, idx) => (
+                    {schemaMeta.data.filter( file => file.isConfiged).map((file, idx) => (
                     <ListItemButton
                         key={idx}
-                        selected={farmMeta.data[datasetChoice].id === file.id && farmMeta.data[datasetChoice].schema === file.schema}
+                        selected={schemaMeta.data[datasetChoice].id === file.id && schemaMeta.data[datasetChoice].schema === file.schema}
                         component={Link}
                         to={`/visualize/${file.schema}/${file.id}`}
                         onClick={() => {

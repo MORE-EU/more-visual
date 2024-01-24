@@ -3,26 +3,24 @@ package eu.more2020.visual.domain;
 import java.io.Serializable;
 import java.util.List;
 
-public class FarmMeta implements Serializable {
+public class SchemaMeta implements Serializable {
 
     private String name;
     private String type;
-    private Integer resType;
     private String config;
-    private List<FarmInfo> data;
+    private List<SchemaInfo> data;
     private Float latitude;
     private Float longitude;
     private Boolean isTimeSeries;
 
 
-    public FarmMeta () {
+    public SchemaMeta () {
 
     }
 
-    public FarmMeta(String name, String type, Integer resType, String config, List<FarmInfo> data, Float latitude, Float longitude) {
+    public SchemaMeta(String name, String type, String config, List<SchemaInfo> data, Float latitude, Float longitude) {
         this.name = name;
         this.type = type;
-        this.resType = resType;
         this.config = config;
         this.data = data;
         this.latitude = latitude;
@@ -37,11 +35,11 @@ public class FarmMeta implements Serializable {
         this.name = name;
     }
 
-    public List<FarmInfo> getData() {
+    public List<SchemaInfo> getData() {
         return this.data;
     }
 
-    public void setData(List<FarmInfo> data) {
+    public void setData(List<SchemaInfo> data) {
         this.data = data;
     }
 
@@ -77,14 +75,6 @@ public class FarmMeta implements Serializable {
         this.type = type;
     }
 
-    public Integer getResType() {
-        return resType;
-    }
-
-    public void setResType(Integer resType) {
-        this.resType = resType;
-    }
-
     public Boolean getIsTimeSeries() {
         return isTimeSeries;
     }
@@ -96,10 +86,9 @@ public class FarmMeta implements Serializable {
 
     @Override
     public String toString() {
-        return "FarmMeta{" +
+        return "SchemaMeta{" +
             "name='" + name + '\'' +
             ", type='" + type + '\'' +
-            ", resType=" + resType +
             ", config='" + config + '\'' +
             ", data=" + data +
             ", latitude=" + latitude +

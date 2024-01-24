@@ -5,16 +5,16 @@ import java.io.IOException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import eu.more2020.visual.domain.FarmInfo;
-import eu.more2020.visual.domain.FarmMeta;
+import eu.more2020.visual.domain.SchemaInfo;
+import eu.more2020.visual.domain.SchemaMeta;
 
 @SuppressWarnings("unused")
 public interface FileHandlingRepository {
 
-    void saveFile(String farmName, MultipartFile file, String fileName);
+    void saveFile(String schemaName, MultipartFile file, String fileName);
    
-    void uploadDataset(FarmInfo metaInfo, MultipartFile file, String farmName) throws IOException;
+    void uploadDataset(SchemaInfo metaInfo, MultipartFile file, String schemaName) throws IOException;
 
-    void saveFarm(FarmMeta metaInfo, MultipartFile[] files) throws IOException;
+    void saveSchema(SchemaMeta metaInfo, MultipartFile[] files) throws IOException;
 
 }

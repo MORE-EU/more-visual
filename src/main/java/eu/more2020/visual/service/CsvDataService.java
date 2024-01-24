@@ -24,8 +24,8 @@ public class CsvDataService {
     private HashMap<String, CsvTTI> indexes = new HashMap<>();
 
 
-    public void removeIndex(String id, String farmName) {
-        indexes.remove(id, farmName);
+    public void removeIndex(String id, String schemaName) {
+        indexes.remove(id, schemaName);
     }
 
     private synchronized List<CsvTTI> getIndexes(CsvDataset dataset, Query query) throws IOException {

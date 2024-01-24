@@ -2,7 +2,7 @@ package eu.more2020.visual.domain;
 
 import java.util.List;
 
-public class FarmInfo {
+public class SchemaInfo {
     private String id;
     private String path;
     private String type;

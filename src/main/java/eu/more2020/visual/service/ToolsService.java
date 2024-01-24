@@ -3,10 +3,6 @@ package eu.more2020.visual.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.protobuf.InvalidProtocolBufferException;
 import eu.more2020.visual.domain.*;
-import eu.more2020.visual.domain.Detection.ChangepointDetection;
-import eu.more2020.visual.domain.Detection.DeviationDetection;
-import eu.more2020.visual.domain.Detection.PatternDetection;
-import eu.more2020.visual.domain.Detection.RangeDetection;
 import eu.more2020.visual.middleware.domain.ImmutableDataPoint;
 import eu.more2020.visual.middleware.domain.MultiVariateDataPoint;
 
@@ -18,17 +14,6 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 public interface ToolsService {
-
-    List<Changepoint> getManualChangepoints(String id) throws InvalidProtocolBufferException, JsonProcessingException;
-
     List<MultiVariateDataPoint> forecasting(String id);
-
-    List<Changepoint> changepointDetection(ChangepointDetection changepoints) throws IOException;
-
-    List<MultiVariateDataPoint> soilingDetection(DeviationDetection deviationDetection);
-
-    List<MultiVariateDataPoint> yawMisalignmentDetection(RangeDetection rangeDetection);
-
-    List<Changepoint> patternDetection(PatternDetection patternDetection);
 
 }

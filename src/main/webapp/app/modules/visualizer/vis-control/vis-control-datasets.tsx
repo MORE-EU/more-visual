@@ -8,20 +8,21 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { getDataset, updateDatasetChoice, resetFetchData, setDatasetIsConfiged, resetDataset } from 'app/modules/store/visualizerSlice';
-import React, { useState } from 'react';
+import React from 'react';
+import {useState} from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { Link, useHistory } from 'react-router-dom';
 import VisControlDatasetUpload from './vis-control-dataset-upload';
 
 const VisControlDatasets = () => {
-  const { folder, dataset, compare, datasetChoice, farmMeta } = useAppSelector(state => state.visualizer);
+  const { folder, dataset, compare, datasetChoice, schemaMeta } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
   
   const handleDataset = dataset => {
-    const idx = farmMeta.data.findIndex(file => file.schema === dataset.schema && file.id === dataset.id);
+    const idx = schemaMeta.data.findIndex(file => file.schema === dataset.schema && file.id === dataset.id);
     if (datasetChoice !== idx) {
       dispatch(updateDatasetChoice(idx));
     }
@@ -33,7 +34,7 @@ const VisControlDatasets = () => {
   };
 
   const handleDBUpoladChange = e => {
-    dispatch(updateDatasetChoice(farmMeta.data.findIndex(file => !file.isConfiged)));
+    dispatch(updateDatasetChoice(schemaMeta.data.findIndex(file => !file.isConfiged)));
     dispatch(setDatasetIsConfiged(false));
     dispatch(resetDataset());
   }
@@ -48,15 +49,15 @@ const VisControlDatasets = () => {
           setUploadFile={setUploadFile}
         />
       )}
-      {farmMeta && (
+      {schemaMeta && (
         <>
           {dataset && (
             <Typography variant="h6" gutterBottom>
-              {dataset.farmName}
+              {dataset.schemaName}
             </Typography>)
           }
           <List disablePadding dense>
-            {farmMeta.data.filter( file => file.isConfiged).map((file, idx) => (
+            {schemaMeta.data.filter( file => file.isConfiged).map((file, idx) => (
               <ListItemButton
                 key={idx}
                 selected={datasetChoice === idx}
@@ -77,14 +78,14 @@ const VisControlDatasets = () => {
                 )}
               </ListItemButton>
             ))}
-            { farmMeta.type === "csv" && (
+            { schemaMeta.type === "csv" && (
               <ListItemButton key={'new-dataset-list-button-sd'} component="label">
                 <input hidden type="file" accept=".csv" onChange={handleUploadChange} />
                 <ListItemText  primary={`new dataset`} sx={ {display: { xs: 'none', md: 'block' }}} />
                 <ControlPointIcon />
               </ListItemButton>
             )}
-            {farmMeta.type !== "csv" && !farmMeta.isTimeSeries && (
+            {schemaMeta.type !== "csv" && !schemaMeta.isTimeSeries && (
               <ListItemButton key={'new-db-dataset-list-button-sd'} 
               component={Link}
               to={`/configure/${folder}`}

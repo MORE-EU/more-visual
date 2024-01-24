@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
-import { getAlerts, getDataset, getDatasets, getFarmMeta, setDatasetIsConfiged, setErrorMessage, setFolder, updateDatasetChoice, updateDatasetMeta } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getDatasets, getSchemaMeta, setDatasetIsConfiged, setErrorMessage, setFolder, updateDatasetChoice, updateDatasetMeta } from '../store/visualizerSlice';
 import CircularProgress  from '@mui/material/CircularProgress';
 import Header from './header/header';
 import React, { useEffect, useState } from 'react';
@@ -17,7 +17,7 @@ const mdTheme = createTheme();
 type TransitionProps = Omit<SlideProps, 'direction'>;
 
 export const Visualizer = () => {
-  const { farmMeta, dataset, datasetChoice, uploadDatasetError, errorMessage} = useAppSelector(state => state.visualizer);
+  const { schemaMeta, dataset, datasetChoice, uploadDatasetError, errorMessage} = useAppSelector(state => state.visualizer);
   const { loadingButton } = useAppSelector(state => state.fileManagement);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const dispatch = useAppDispatch();
@@ -25,7 +25,7 @@ export const Visualizer = () => {
   const history = useHistory();
 
   useEffect(() => {
-    !farmMeta && dispatch(getFarmMeta(params.folder));
+    !schemaMeta && dispatch(getSchemaMeta(params.folder));
   }, []);
 
 
@@ -41,7 +41,7 @@ export const Visualizer = () => {
     if (params.id !== undefined) {
       dispatch(setFolder(params.folder));
       dispatch(getDataset({ folder: params.folder, id: params.id }));
-      farmMeta !== null && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
+      schemaMeta !== null && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
     }
   }, [params.id]);
 
@@ -55,15 +55,15 @@ export const Visualizer = () => {
   }, [dataset]);
 
   useEffect(() => {
-    params.id === undefined && farmMeta && history.replace(`${params.folder}/${farmMeta.data[0].id}`);
-    params.id !== undefined && farmMeta && dispatch(updateDatasetChoice(farmMeta.data.findIndex(dat => dat.id === params.id)));
-  }, [farmMeta]);
+    params.id === undefined && schemaMeta && history.replace(`${params.folder}/${schemaMeta.data[0].id}`);
+    params.id !== undefined && schemaMeta && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
+  }, [schemaMeta]);
 
   useEffect(() => {
     if (uploadDatasetError)
-      if (farmMeta && !farmMeta.isTimeSeries && farmMeta.type !== "csv") {
+      if (schemaMeta && !schemaMeta.isTimeSeries && schemaMeta.type !== "csv") {
         dispatch(setDatasetIsConfiged(false));
-        dispatch(updateDatasetMeta({folder: params.folder, dataset: farmMeta.data[datasetChoice]}));
+        dispatch(updateDatasetMeta({folder: params.folder, dataset: schemaMeta.data[datasetChoice]}));
         history.replace(`/configure/${params.folder}`);
       }
   }, [uploadDatasetError]);
@@ -80,7 +80,7 @@ export const Visualizer = () => {
               {errorMessage + " try another dataset"}
             </Alert>
           </Snackbar>}
-          <Header farmMeta={farmMeta} datasetChoice={datasetChoice} />
+          <Header schemaMeta={schemaMeta} datasetChoice={datasetChoice} />
           <Divider />
           <Grid
             sx={{
@@ -93,7 +93,7 @@ export const Visualizer = () => {
           >
             <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
               <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-              {farmMeta && <VisControl />}
+              {schemaMeta && <VisControl />}
               </Paper>
             </Grid>
             <Grid sx={{ width: '80%', p: 1, flexGrow: 1, height: 'calc(100% - 30px)' }}>
@@ -105,7 +105,7 @@ export const Visualizer = () => {
                   height: '100%',
                 }}
               >
-                {farmMeta && dataset ? <ChartContainer /> : (errorMessage == null && <CircularProgress sx={{margin: 'auto'}}/>)}
+                {schemaMeta && dataset ? <ChartContainer /> : (errorMessage == null && <CircularProgress sx={{margin: 'auto'}}/>)}
               </Paper>
             </Grid>
           </Grid>
