@@ -139,13 +139,13 @@ public class DatasetResource {
         return ResponseUtil.wrapOrNotFound(dataset);
     }
 
-    @GetMapping("/datasets/{schema}")
+    @GetMapping("/datasets/{schemaName}")
     public ResponseEntity<SchemaMeta> getSchema(@PathVariable String schemaName) throws IOException {
-        log.debug("REST request to get schema metadata");
+        log.debug("REST request to get schema metadata for {}", schemaName);
         return ResponseUtil.wrapOrNotFound(datasetRepository.findSchema(schemaName));
     }
 
-    @PutMapping("/datasets/{schema}")
+    @PutMapping("/datasets/{schemaName}")
     public ResponseEntity<SchemaInfo> updateSchemaInfo(@PathVariable String schemaName, @Valid @RequestBody SchemaInfo info) throws IOException {
         log.debug("REST request to update info dataset metadata");
         SchemaInfo result = datasetRepository.updateSchemaInfo(info);

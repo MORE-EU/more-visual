@@ -1,5 +1,6 @@
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
+import { Redirect } from 'react-router-dom';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
@@ -27,7 +28,6 @@ export const Visualizer = () => {
   useEffect(() => {
     !schemaMeta && dispatch(getSchemaMeta(params.folder));
   }, []);
-
 
   const handleSnackClose = () => {
     setOpenSnackbar(false);

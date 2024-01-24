@@ -15,6 +15,7 @@ import eu.more2020.visual.middleware.domain.DataFileInfo;
 import eu.more2020.visual.middleware.domain.Dataset.*;
 import eu.more2020.visual.middleware.domain.TimeRange;
 import eu.more2020.visual.middleware.util.DateTimeUtil;
+import eu.more2020.visual.middleware.util.io.SerializationUtilities;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -70,7 +71,6 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         SchemaMeta schema = null;
         ObjectMapper mapper = new ObjectMapper();
         File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + schemaName, schemaName + ".meta.json");
-
         if (metadataFile.exists()) {
             FileReader reader = new FileReader(metadataFile);
             schema = mapper.readValue(reader, SchemaMeta.class);
@@ -99,58 +99,46 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                         continue;
                     // Extract data from JSON node and create the desired subclass of
                     // AbstractDataset
-                    if (type.equals("csv")) {
-                        String name = datasetNode.get("name").asText();
-                        String path = datasetNode.get("path").asText();
-                        String timeCol = datasetNode.get("timeCol").asText();
-                        String delimiter = datasetNode.get("delimiter").asText();
-                        boolean hasHeader = datasetNode.get("hasHeader").asBoolean();
-                        File file = new File(applicationProperties.getWorkspacePath() + "/" + schemaName, id + ".csv");
-                        dataset = new CsvDataset(path, id, name, timeCol, timeFormat, delimiter, hasHeader);
-                        CsvDataset finalDataset = (CsvDataset) dataset;
-                        if (!file.isDirectory()) {
-                            DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
-                            fillDataFileInfo((CsvDataset) dataset, dataFileInfo);
-                            dataset.getFileInfoList().add(dataFileInfo);
-                        } else {
-                            List<DataFileInfo> fileInfoList = Arrays
-                                    .stream(file.listFiles(f -> !f.isDirectory() && f.getName().endsWith(".csv")))
-                                    .map(f -> {
-                                        DataFileInfo dataFileInfo = new DataFileInfo(f.getAbsolutePath());
-                                        try {
-                                            fillDataFileInfo(finalDataset, dataFileInfo);
-                                        } catch (IOException e) {
-                                            new RuntimeException(e);
-                                        }
-                                        return dataFileInfo;
-                                    }).collect(Collectors.toList());
-                            // sort csv files by their time ranges ascending
-                            fileInfoList.sort(Comparator.comparing(i -> i.getTimeRange().getFrom()));
-                            dataset.setFileInfoList(fileInfoList);
-                        }
-                        List<Integer> measures = IntStream.rangeClosed(0, dataset.getHeader().length - 1)
-                                .boxed()
-                                .filter(i -> i != finalDataset.getMeasureIndex(finalDataset.getTimeCol()))
-                                .collect(Collectors.toList());
-                        finalDataset.setMeasures(measures);
-                        if (dataset.getTimeRange() == null) {
-                            dataset.setTimeRange(dataset.getFileInfoList().get(0).getTimeRange());
-                        }
-                        dataset.setTimeRange(dataset.getFileInfoList().stream().map(DataFileInfo::getTimeRange)
-                                .reduce(dataset.getTimeRange(), TimeRange::span));
-                        dataset.setType(type);
-                        datasets.put(name,dataset);
-                    } else {
-                        String config = jsonNode.get("config").asText();
-                        String schema = datasetNode.get("schema").asText();
-                        String name = datasetNode.get("name").asText();
-                        String timeCol = datasetNode.get("timeCol").asText();
-                        String valueCol = datasetNode.get("valueCol").asText();
-                        String idCol = datasetNode.get("idCol").asText();
-                        
-                        // dataset = createDBDataset(datasetId, schema.getType(), schema, name, timeCol, valueCol, idCol,
-                        //         config);
+                    String name = datasetNode.get("name").asText();
+                    String path = datasetNode.get("path").asText();
+                    String timeCol = datasetNode.get("timeCol").asText();
+                    String delimiter = datasetNode.get("delimiter").asText();
+                    boolean hasHeader = datasetNode.get("hasHeader").asBoolean();
+                    File file = new File(applicationProperties.getWorkspacePath() + "/" + schemaName, id + ".csv");
+                    dataset = new CsvDataset(path, id, name, timeCol, timeFormat, delimiter, hasHeader);
+                    CsvDataset finalDataset = (CsvDataset) dataset;
+                    if (!file.isDirectory()) {
+                        DataFileInfo dataFileInfo = new DataFileInfo(file.getAbsolutePath());
+                        fillDataFileInfo((CsvDataset) dataset, dataFileInfo);
+                        dataset.getFileInfoList().add(dataFileInfo);
+                   } else {
+                        List<DataFileInfo> fileInfoList = Arrays
+                                .stream(file.listFiles(f -> !f.isDirectory() && f.getName().endsWith(".csv")))
+                                .map(f -> {
+                                    DataFileInfo dataFileInfo = new DataFileInfo(f.getAbsolutePath());
+                                    try {
+                                        fillDataFileInfo(finalDataset, dataFileInfo);
+                                    } catch (IOException e) {
+                                        new RuntimeException(e);
+                                    }
+                                    return dataFileInfo;
+                                }).collect(Collectors.toList());
+                        // sort csv files by their time ranges ascending
+                        fileInfoList.sort(Comparator.comparing(i -> i.getTimeRange().getFrom()));
+                        dataset.setFileInfoList(fileInfoList);
                     }
+                    List<Integer> measures = IntStream.rangeClosed(0, dataset.getHeader().length - 1)
+                            .boxed()
+                            .filter(i -> i != finalDataset.getMeasureIndex(finalDataset.getTimeCol()))
+                            .collect(Collectors.toList());
+                    finalDataset.setMeasures(measures);
+                    if (dataset.getTimeRange() == null) {
+                        dataset.setTimeRange(dataset.getFileInfoList().get(0).getTimeRange());
+                    }
+                    dataset.setTimeRange(dataset.getFileInfoList().stream().map(DataFileInfo::getTimeRange)
+                        .reduce(dataset.getTimeRange(), TimeRange::span));
+                    dataset.setType(type);
+                    datasets.put(name,dataset);
                 }
                 log.info(String.valueOf(dataset));
             }
@@ -293,8 +281,8 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public Optional<AbstractDataset> findDBDatasetById(String id,QueryExecutor queryExecutor) throws SQLException {
-        Assert.notNull(id, "Id must not be null!");
+    public Optional<AbstractDataset> findDBDatasetById(String id, QueryExecutor queryExecutor) throws SQLException {
+        Assert.notNull(id, "ID must not be null!");
         AbstractDataset dataset = null;
         if(datasets.containsKey(id)) dataset = datasets.get(id);
         else {
@@ -368,20 +356,26 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     private AbstractDataset createDBDataset(SchemaInfo schemaInfo, QueryExecutor queryExecutor) throws SQLException {
         AbstractDataset dataset = null;
         log.debug("creating new dataset {}", schemaInfo.getId());
+        String p = "";
         switch (schemaInfo.getType()) {
             case "postgres":
                 SQLQueryExecutor sqlQueryExecutor = (SQLQueryExecutor) queryExecutor;
-                dataset = new PostgreSQLDataset(sqlQueryExecutor, schemaInfo.getId(), schemaInfo.getSchema(), schemaInfo.getId(), timeFormat, 
+                p = String.valueOf(Paths.get(applicationProperties.getWorkspacePath(), "postgres-" + schemaInfo.getId()));
+                if (new File(p).exists()) dataset = (PostgreSQLDataset) SerializationUtilities.loadSerializedObject(p);
+                else{
+                    dataset = new PostgreSQLDataset(sqlQueryExecutor, schemaInfo.getId(), schemaInfo.getSchema(), schemaInfo.getId(), timeFormat, 
                                                 schemaInfo.getTimeCol(),schemaInfo.getIdCol(), schemaInfo.getValueCol());
-                break;           
-            case "modelar":
-                ModelarDBQueryExecutor modelarDBQueryExecutor = (ModelarDBQueryExecutor) queryExecutor;
-                dataset = new ModelarDBDataset(modelarDBQueryExecutor, schemaInfo.getId(), schemaInfo.getSchema(), schemaInfo.getId(), timeFormat, 
-                                                schemaInfo.getTimeCol(), schemaInfo.getIdCol(), schemaInfo.getValueCol());
-                break;
+                    SerializationUtilities.storeSerializedObject(dataset, p);
+                }
+                break; 
             case "influx":
                 InfluxDBQueryExecutor influxDBQueryExecutor = (InfluxDBQueryExecutor) queryExecutor;
-                dataset = new InfluxDBDataset(influxDBQueryExecutor, schemaInfo.getId(), schemaInfo.getSchema(), schemaInfo.getId(), timeFormat, schemaInfo.getTimeCol());
+                p = String.valueOf(Paths.get(applicationProperties.getWorkspacePath(), "influx-" + schemaInfo.getId()));
+                if (new File(p).exists()) dataset = (InfluxDBDataset) SerializationUtilities.loadSerializedObject(p);
+                else{
+                    dataset = new InfluxDBDataset(influxDBQueryExecutor, schemaInfo.getId(), schemaInfo.getSchema(), schemaInfo.getId(), timeFormat, schemaInfo.getTimeCol());
+                    SerializationUtilities.storeSerializedObject(dataset, p);
+                }
                 break;
             default:
                 break;
