@@ -825,12 +825,12 @@
                                     <npmVersion>${npm.version}</npmVersion>
                                 </configuration>
                             </execution>
-                            <!-- <execution>
+                            <execution>
                                 <id>npm install</id>
                                 <goals>
                                     <goal>npm</goal>
                                 </goals>
-                            </execution> -->
+                            </execution>
                             <execution>
                                 <id>webpack build dev</id>
                                 <goals>

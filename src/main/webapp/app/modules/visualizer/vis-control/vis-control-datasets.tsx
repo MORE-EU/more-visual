@@ -15,7 +15,7 @@ import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { Link, useHistory } from 'react-router-dom';
 import VisControlDatasetUpload from './vis-control-dataset-upload';
 
-const VisControlDatasets = () => {
+const VisControlDatasets = ({ isSurvey }) => {
   const { folder, dataset, compare, datasetChoice, schemaMeta } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -62,7 +62,7 @@ const VisControlDatasets = () => {
                 key={idx}
                 selected={datasetChoice === idx}
                 component={Link}
-                to={`/visualize/${folder}/${file.id}`}
+                to={!isSurvey ? `/visualize/${folder}/${file.id}` : `/survey/visualize/${folder}/${file.id}`}
                 onClick={() => {
                   handleDataset(file), dispatch(getDataset({ folder, id: file.id }));
                 }}

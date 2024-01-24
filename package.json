@@ -59,7 +59,8 @@
     "seedrandom": "^3.0.5",
     "simplebar-react": "^2.4.3",
     "tslib": "1.11.1",
-    "uuid": "7.0.3"
+    "uuid": "7.0.3",
+    "rimraf": "3.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.19.1",

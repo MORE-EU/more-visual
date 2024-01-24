@@ -7,7 +7,7 @@ import VisToolkit from './vis-control-toolkit';
 import VisControlDatasets from './vis-control-datasets';
 import Grid from '@mui/material/Grid';
 
-export const VisControl = () => {
+export const VisControl = ({ isSurvey }) => {
   const { dataset, schemaMeta, datasetChoice } = useAppSelector( state => state.visualizer);
   const dispatch = useAppDispatch();
   const location = useLocation();
@@ -19,7 +19,7 @@ export const VisControl = () => {
   return (
     <Grid sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', rowGap: 3 }}>
       <Grid sx={{ height: '30%', width: '100%' }}>
-        <VisControlDatasets />
+        <VisControlDatasets isSurvey={isSurvey}  />
       </Grid>
       <Grid sx={{ height: '40%', width: '100%' }}>
         <VisToolkit />
