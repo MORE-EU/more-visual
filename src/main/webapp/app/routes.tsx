@@ -17,9 +17,9 @@ const Routes = () => {
       <Redirect from="/:url*(/+)" to={pathname.slice(0, -1)} /> 
       <ErrorBoundaryRoute path="/" exact component={Home}/>
       <ErrorBoundaryRoute exact path={"/visualize"} component={Connector}/>
-      <ErrorBoundaryRoute exact path={"/configure/:folder"} component={VisConfigurer} />
-      <ErrorBoundaryRoute exact path={"/visualize/:folder/:id?"} component={Visualizer}/>
-      <ErrorBoundaryRoute exact path={"/survey/visualize/:folder?/:id?"} component={SurveyVisualizer}/>
+      <ErrorBoundaryRoute exact path={"/configure/:schema"} component={VisConfigurer} />
+      <ErrorBoundaryRoute exact path={"/visualize/:schema/:id?"} component={Visualizer}/>
+      <ErrorBoundaryRoute exact path={"/survey/visualize/:schema?/:id?"} component={SurveyVisualizer}/>
       <ErrorBoundaryRoute component={PageNotFound}/>
     </Switch>
   </div>

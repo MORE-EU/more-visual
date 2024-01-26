@@ -26,31 +26,29 @@ public interface DatasetRepository {
 
     List<AbstractDataset> findAll();
 
-    List<Sample> findSample(String schemaName) throws IOException;
-
-    List<Object[]> findDbSample(String tableName, QueryExecutor queryExecutor) throws SQLException;
+    List<Object[]> findSample(String tableName, QueryExecutor queryExecutor) throws SQLException;
 
     List<String> findDirectories() throws IOException;
 
     Optional<SchemaMeta> findSchema(String schema) throws IOException;
 
     @Cacheable(cacheNames = DATASETS_CACHE)
-    Optional<AbstractDataset> findById(String id, String schemaName) throws IOException, SQLException;
+    Optional<AbstractDataset> findById(String id, String schemaName, QueryExecutor queryExecutor) throws IOException, SQLException;
 
     AbstractDataset save(AbstractDataset dataset) throws IOException;
 
-    Optional<AbstractDataset> findDBDatasetById(String id, QueryExecutor queryExecutor) throws SQLException;
-
-    SchemaMeta getDBMetadata (String database, String schema, QueryExecutor queryExecutor) throws SQLException;
+    SchemaMeta getSchemaMetadata (String database, String schema, QueryExecutor queryExecutor) throws SQLException;
     
     String getSchemaType();
 
-    SchemaInfo updateSchemaInfoColumns(String id, DbColumns columns);
-
     SchemaInfo updateSchemaInfo(SchemaInfo info);
+
+    SchemaInfo updateSchemaInfoColumns(String id, DbColumns dbColumns);
 
     void deleteById(String id);
 
     void deleteAll();
+
+    List<String> getColumnNames(String tableName, QueryExecutor queryExecutor);
 
 }

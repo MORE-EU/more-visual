@@ -10,15 +10,15 @@ import TextField from '@mui/material/TextField';
 const ChartDatePicker = () => {
   const dispatch = useAppDispatch();
 
-  const { chartRef, folder, dataset, from, to, data, selectedMeasures, queryResults } = useAppSelector(state => state.visualizer);
+  const { chartRef, schema, dataset, from, to, data, selectedMeasures, queryResults } = useAppSelector(state => state.visualizer);
 
   const handleOnAccept = (e, category) => {
     if (category === 'from') {
       chartRef.xAxis[0].setExtremes(e.getTime(), to);
-      dispatch(updateQueryResults({ folder, id: dataset.id, from: e.getTime(), to, selectedMeasures, filter: {} }));
+      dispatch(updateQueryResults({ schema, id: dataset.id, from: e.getTime(), to, selectedMeasures, filter: {} }));
     } else {
       chartRef.xAxis[0].setExtremes(from, e.getTime());
-      dispatch(updateQueryResults({ folder, id: dataset.id, from, to: e.getTime(), selectedMeasures, filter: {} }));
+      dispatch(updateQueryResults({ schema, id: dataset.id, from, to: e.getTime(), selectedMeasures, filter: {} }));
     }
   };
 

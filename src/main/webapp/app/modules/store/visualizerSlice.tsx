@@ -87,7 +87,7 @@ const initialState = {
   filter: {},
   changeChart: true,
   datasetChoice: null,
-  folder: '',
+  schema: '',
   graphZoom: null,
   activeTool: null as null | string,
   compare: {} as {[key: string]: number[]},
@@ -142,24 +142,24 @@ export const disconnector = createAsyncThunk('disconnector', async () => {
     return response;
 });
 
-export const getDbMetadata = createAsyncThunk('getDbMetadata', async (data: { database: string; schemaName: string; }) => {
+export const getDbMetadata = createAsyncThunk('getDbMetadata', async (data: { database: string; schema: string; }) => {
   try {
-    const response = await axios.get(`api/datasets/metadata/${data.database}/${data.schemaName}`).then(res => res);
+    const response = await axios.get(`api/datasets/metadata/${data.database}/${data.schema}`).then(res => res);
     return response;
   } catch (error) {
     throw new Error("Can't get database metadata");
   }
 });
 
-export const getDBColumnNames = createAsyncThunk('getDBColumnNames', async (data: { tableName: string;}) => {
-  const response = await axios.get(`api/datasets/metadata/columns/${data.tableName}`).then(res => res);
+export const getColumnNames = createAsyncThunk('getColumnNames', async (data: { schema: string, id: string;}) => {
+  const response = await axios.get(`api/datasets/metadata/columns/${data.schema}/${data.id}`).then(res => res);
   return response;  
 });
 
 
-export const updateSchemaInfoColumnNames = createAsyncThunk('updateSchemaInfoColumnNames', async (data: { tableName: string, columns: {timeCol: string; idCol: string; valueCol: string;}}) => {
-  const { tableName, columns } = data;
-    const response = await axios.put(`api/datasets/metadata/columns/${tableName}`, columns).then(res => res);
+export const updateSchemaInfoColumnNames = createAsyncThunk('updateSchemaInfoColumnNames', async (data: { schema: string, id: string, columns: {timeCol: string; idCol: string; valueCol: string;}}) => {
+  const { schema, id, columns } = data;
+    const response = await axios.put(`api/datasets/metadata/columns/${schema}/${id}`, columns).then(res => res);
     return response;
 });
 
@@ -168,10 +168,10 @@ export const checkConnection = createAsyncThunk('checkConnection', async (bdConf
   return response;
 });
 
-export const getDataset = createAsyncThunk('getDataset', async (data: { folder: string; id: string }) => {
-  const { folder, id } = data;
+export const getDataset = createAsyncThunk('getDataset', async (data: { schema: string; id: string }) => {
+  const { schema, id } = data;
   try {
-    const response = await axios.get(`api/datasets/${folder}/${id}`).then(res => res);
+    const response = await axios.get(`api/datasets/${schema}/${id}`).then(res => res);
     return response;  
   } catch (error) {
     throw new Error("Error retrieving data.Please try again.");
@@ -183,13 +183,13 @@ export const getDatasets = createAsyncThunk('getDatasets', async () => {
   return response;
 });
 
-export const getSchemaMeta = createAsyncThunk('getSchemaMeta', async (folder: string) => {
-  const response = await axios.get(`api/datasets/${folder}`).then(res => res);
+export const getSchemaMeta = createAsyncThunk('getSchemaMeta', async (schema: string) => {
+  const response = await axios.get(`api/datasets/${schema}`).then(res => res);
   return response;
 });
 
-export const updateDatasetMeta = createAsyncThunk('updateDatasetMeta', async (data: {folder: string, dataset: IDataset}) => {
-  const response = await axios.put(`api/datasets/${data.folder}`, data.dataset).then(res => res);
+export const updateDatasetMeta = createAsyncThunk('updateDatasetMeta', async (data: {schema: string, dataset: IDataset}) => {
+  const response = await axios.put(`api/datasets/${data.schema}`, data.dataset).then(res => res);
   return response;
 
 })
@@ -250,14 +250,14 @@ export const deleteConnection = createAsyncThunk('deleteConnection', async(conne
 export const updateQueryResults = createAsyncThunk(
   'updateQueryResults',
   async (data: {
-    folder: string;
+    schema: string;
     id: string;
     from: number;
     to: number;
     selectedMeasures: any[];
     filter?: {};
   }, {getState}) => {
-    const { folder, id, from, to, selectedMeasures, filter } = data;
+    const { schema, id, from, to, selectedMeasures, filter } = data;
     let query;
     const {visualizer} = getState() as RootState;
     const customSelectedMeasures = [];
@@ -274,7 +274,7 @@ export const updateQueryResults = createAsyncThunk(
         } as IQuery)
       : (query = {});
 
-    const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
+    const response = await axios.post(`api/datasets/${schema}/${id}/query`, query).then(res => res);
     return {id, response: response.data};
   }
 );
@@ -282,14 +282,14 @@ export const updateQueryResults = createAsyncThunk(
 export const liveDataImplementation = createAsyncThunk(
   'liveDataImplementation',
   async (data: {
-    folder: string;
+    schema: string;
     id: string[];
     from: number;
     to: number;
     selectedMeasures: any[];
     filter?: {};
   }) => {
-    const { folder, id, from, to, selectedMeasures, filter } = data;
+    const { schema, id, from, to, selectedMeasures, filter } = data;
     let query;
     (from !== null && to !== null)
       ? (query = {
@@ -300,21 +300,21 @@ export const liveDataImplementation = createAsyncThunk(
           filter: filter ? filter : null,
         } as IQuery)
       : (query = { from: null, to: null });
-    const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
+    const response = await axios.post(`api/datasets/${schema}/${id}/query`, query).then(res => res);
     return response.data;
   }
 );
 
 export const updateCompareQueryResults = createAsyncThunk(
   'updateCompareQueryResults',
-  async (data: { folder: string, compare: {[key: number]: any[]}; from: number; to: number; filter: {} }, {getState}) => {
+  async (data: { schema: string, compare: {[key: number]: any[]}; from: number; to: number; filter: {} }, {getState}) => {
     const {visualizer} = getState() as RootState;
-    const { compare, from, to, filter, folder } = data;
+    const { compare, from, to, filter, schema } = data;
     const response = await Promise.all(
       Object.keys(compare).map(
       key => {
         const query = from !== null && to !== null ? {from,to,viewPort: {width: 1000, height: 600}, measures: compare[key], filter} : {range: null}
-        return axios.post(`api/datasets/${folder}/${key}/query`, query).then(res => ({name: key, data: res.data.data}))
+        return axios.post(`api/datasets/${schema}/${key}/query`, query).then(res => ({name: key, data: res.data.data}))
       }
     )).then(res => res.map(r => r));
     return response;
@@ -473,8 +473,8 @@ const visualizer = createSlice({
     setOpenToolkit(state, action) {
       state.openToolkit = action.payload;
     },
-    setFolder(state, action) {
-      state.folder = action.payload;
+    setSchema(state, action) {
+      state.schema = action.payload;
     },
     setChartType(state, action) {
       state.chartType = action.payload;
@@ -574,7 +574,7 @@ const visualizer = createSlice({
       state.schemaMeta.data[state.datasetChoice] = action.payload.data;
     });
 
-    builder.addCase(getDBColumnNames.fulfilled, (state, action) => {
+    builder.addCase(getColumnNames.fulfilled, (state, action) => {
       state.loading = false;
       state.columnNames = action.payload.data;
     });
@@ -662,7 +662,7 @@ const visualizer = createSlice({
     builder.addCase(getDatasets.rejected, (state, action) => {
       state.datasets = {...state.datasets, loading: false, error: "there was an error loading the data"}
     });
-    builder.addMatcher(isAnyOf(getDataset.pending, getSchemaMeta.pending,updateDatasetMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending,updateSchemaInfoColumnNames.pending,getDBColumnNames.pending, connector.pending, disconnector.pending), state => {
+    builder.addMatcher(isAnyOf(getDataset.pending, getSchemaMeta.pending,updateDatasetMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending,updateSchemaInfoColumnNames.pending,getColumnNames.pending, connector.pending, disconnector.pending), state => {
       state.loading = true;
     });
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending, applyDeviationDetection.pending), state => {
@@ -680,7 +680,7 @@ const visualizer = createSlice({
       state.connectionLoading = true;
     });
     builder.addMatcher(
-      isAnyOf( getDbMetadata.rejected,getSchemaMeta.rejected,updateDatasetMeta.rejected, updateSchemaInfoColumnNames.rejected, getDirectories.rejected, getSampleFile.rejected, getDBColumnNames.rejected, disconnector.rejected),
+      isAnyOf( getDbMetadata.rejected,getSchemaMeta.rejected,updateDatasetMeta.rejected, updateSchemaInfoColumnNames.rejected, getDirectories.rejected, getSampleFile.rejected, getColumnNames.rejected, disconnector.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = "unable to reach server";
@@ -734,7 +734,7 @@ export const {
   setForecastingDataSplit,
   setAutoMLStartDate,setAutoMLEndDate,setShowDatePick, setCompareData, setComparePopover,
   setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,
-  setExpand,setOpenToolkit,setFolder,setChartType,setAlertingPreview,setCheckConnectionResponse, setSelectedConnection,
+  setExpand,setOpenToolkit,setSchema,setChartType,setAlertingPreview,setCheckConnectionResponse, setSelectedConnection,
   setErrorMessage,setDatasetIsConfiged, setConnented,
   resetChartValues,resetFetchData,
   resetSampleFile,resetColumnNames, resetFilters,

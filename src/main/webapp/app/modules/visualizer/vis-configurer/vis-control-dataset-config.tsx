@@ -21,7 +21,7 @@ import TableBody from "@mui/material/TableBody";
 
 import grey from '@mui/material/colors/grey';
 import blue from '@mui/material/colors/blue';
-import { getDBColumnNames, updateSchemaInfoColumnNames, setDatasetIsConfiged, getSampleFile, resetSampleFile, resetColumnNames, resetUploadDatasetError } from "app/modules/store/visualizerSlice";
+import { getColumnNames, updateSchemaInfoColumnNames, setDatasetIsConfiged, getSampleFile, resetSampleFile, resetColumnNames, resetUploadDatasetError } from "app/modules/store/visualizerSlice";
 
 
 interface IConfigForm  {
@@ -49,7 +49,7 @@ const VisControlDatasetConfig = () => {
         dispatch(resetSampleFile());
         dispatch(resetColumnNames());
         dispatch(resetUploadDatasetError());
-        schemaMeta && dispatch(getDBColumnNames({tableName: schemaMeta.data[datasetChoice].id }));
+        schemaMeta && dispatch(getColumnNames({schema: schemaMeta.name, id: schemaMeta.data[datasetChoice].id }));
         schemaMeta && dispatch(getSampleFile(schemaMeta.data[datasetChoice].id));
     },[datasetChoice]);
 
@@ -69,7 +69,7 @@ const VisControlDatasetConfig = () => {
 
     const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
         event.preventDefault();
-        dispatch(updateSchemaInfoColumnNames({ tableName: schemaMeta.data[datasetChoice].id, columns: {timeCol, idCol, valueCol}}));
+        dispatch(updateSchemaInfoColumnNames({ schema: schemaMeta.name, id: schemaMeta.data[datasetChoice].id, columns: {timeCol, idCol, valueCol}}));
         dispatch(setDatasetIsConfiged(true));
     }
 

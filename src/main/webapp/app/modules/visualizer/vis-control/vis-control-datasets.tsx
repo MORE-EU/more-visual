@@ -16,7 +16,7 @@ import { Link, useHistory } from 'react-router-dom';
 import VisControlDatasetUpload from './vis-control-dataset-upload';
 
 const VisControlDatasets = ({ isSurvey }) => {
-  const { folder, dataset, compare, datasetChoice, schemaMeta } = useAppSelector(state => state.visualizer);
+  const { schema, dataset, compare, datasetChoice, schemaMeta } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
@@ -62,9 +62,9 @@ const VisControlDatasets = ({ isSurvey }) => {
                 key={idx}
                 selected={datasetChoice === idx}
                 component={Link}
-                to={!isSurvey ? `/visualize/${folder}/${file.id}` : `/survey/visualize/${folder}/${file.id}`}
+                to={!isSurvey ? `/visualize/${schema}/${file.id}` : `/survey/visualize/${schema}/${file.id}`}
                 onClick={() => {
-                  handleDataset(file), dispatch(getDataset({ folder, id: file.id }));
+                  handleDataset(file), dispatch(getDataset({ schema, id: file.id }));
                 }}
                 divider
               >
@@ -88,7 +88,7 @@ const VisControlDatasets = ({ isSurvey }) => {
             {schemaMeta.type !== "csv" && !schemaMeta.isTimeSeries && (
               <ListItemButton key={'new-db-dataset-list-button-sd'} 
               component={Link}
-              to={`/configure/${folder}`}
+              to={`/configure/${schema}`}
               onClick={handleDBUpoladChange}>
                 <ListItemText  primary={`new dataset`} sx={ {display: { xs: 'none', md: 'block' }}} />
                 <ControlPointIcon />

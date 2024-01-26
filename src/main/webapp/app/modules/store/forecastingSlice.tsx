@@ -88,8 +88,8 @@ export const getAthenaInference = createAsyncThunk('getAthenaInference', async (
 
 export const getInitialSeries = createAsyncThunk(
   'getInitialSeries',
-  async (data: { from; to; folder; id; measure }, { getState, dispatch }) => {
-    const { from, to, folder, id, measure } = data;
+  async (data: { from; to; schema; id; measure }, { getState, dispatch }) => {
+    const { from, to, schema, id, measure } = data;
     const state: any = getState();
     const query = {
       from,
@@ -98,7 +98,7 @@ export const getInitialSeries = createAsyncThunk(
       measures: [state.visualizer.dataset.header.indexOf(measure)],
       filter: {},
     };
-    const response = await axios.post(`api/datasets/${folder}/${id}/query`, query).then(res => res);
+    const response = await axios.post(`api/datasets/${schema}/${id}/query`, query).then(res => res);
     return response.data;
   }
 );

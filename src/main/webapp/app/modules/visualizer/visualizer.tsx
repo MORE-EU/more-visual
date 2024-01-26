@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
-import { getAlerts, getDataset, getDatasets, getSchemaMeta, setDatasetIsConfiged, setErrorMessage, setFolder, updateDatasetChoice, updateDatasetMeta } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getDatasets, getSchemaMeta, setDatasetIsConfiged, setErrorMessage, setSchema, updateDatasetChoice, updateDatasetMeta } from '../store/visualizerSlice';
 import CircularProgress  from '@mui/material/CircularProgress';
 import Header from './header/header';
 import React, { useEffect, useState } from 'react';
@@ -26,7 +26,7 @@ export const Visualizer = () => {
   const history = useHistory();
 
   useEffect(() => {
-    !schemaMeta && dispatch(getSchemaMeta(params.folder));
+    !schemaMeta && dispatch(getSchemaMeta(params.schema));
   }, []);
 
   const handleSnackClose = () => {
@@ -39,8 +39,8 @@ export const Visualizer = () => {
 
   useEffect(() => {
     if (params.id !== undefined) {
-      dispatch(setFolder(params.folder));
-      dispatch(getDataset({ folder: params.folder, id: params.id }));
+      dispatch(setSchema(params.schema));
+      dispatch(getDataset({ schema: params.schema, id: params.id }));
       schemaMeta !== null && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
     }
   }, [params.id]);
@@ -55,7 +55,7 @@ export const Visualizer = () => {
   }, [dataset]);
 
   useEffect(() => {
-    params.id === undefined && schemaMeta && history.replace(`${params.folder}/${schemaMeta.data[0].id}`);
+    params.id === undefined && schemaMeta && history.replace(`${params.schema}/${schemaMeta.data[0].id}`);
     params.id !== undefined && schemaMeta && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
   }, [schemaMeta]);
 
@@ -63,8 +63,8 @@ export const Visualizer = () => {
     if (uploadDatasetError)
       if (schemaMeta && !schemaMeta.isTimeSeries && schemaMeta.type !== "csv") {
         dispatch(setDatasetIsConfiged(false));
-        dispatch(updateDatasetMeta({folder: params.folder, dataset: schemaMeta.data[datasetChoice]}));
-        history.replace(`/configure/${params.folder}`);
+        dispatch(updateDatasetMeta({schema: params.schema, dataset: schemaMeta.data[datasetChoice]}));
+        history.replace(`/configure/${params.schema}`);
       }
   }, [uploadDatasetError]);
 

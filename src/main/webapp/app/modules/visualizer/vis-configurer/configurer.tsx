@@ -29,7 +29,7 @@ export const VisConfigurer = () => {
 
     useEffect(() => {
         dispatch(setDatasetIsConfiged(false));
-        !schemaMeta && dispatch(getSchemaMeta(params.folder));
+        !schemaMeta && dispatch(getSchemaMeta(params.schema));
     },[]);
 
     useEffect(() => {

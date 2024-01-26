@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Slider from '@mui/material/Slider';
 
 export const Filter = () => {
-  const { queryResults, filter, folder, dataset, from, to, resampleFreq, selectedMeasures, chartRef, queryResultsLoading } = useAppSelector(
+  const { queryResults, filter, schema, dataset, from, to, resampleFreq, selectedMeasures, chartRef, queryResultsLoading } = useAppSelector(
     state => state.visualizer
   );
   const dispatch = useAppDispatch();
@@ -42,7 +42,7 @@ export const Filter = () => {
   const filterReset = () => {
     dispatch(resetFilters());
     updateWindowFilters(getFirstFilters());
-    dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: {} }));
+    dispatch(updateQueryResults({ schema, id: dataset.id, from, to, selectedMeasures, filter: {} }));
   };
 
   const onSliderChange = measureCol => (e, range) => {
@@ -52,7 +52,7 @@ export const Filter = () => {
   const handleFilterSlider = colName => (e, newRange) => {
     const newFilter = { ...windowFilters, [colName]: newRange };
     dispatch(updateFilter(newFilter));
-    dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
+    dispatch(updateQueryResults({ schema, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
   };
 
   const getParsedValue = val => {
@@ -74,7 +74,7 @@ export const Filter = () => {
         const newFilter = { ...windowFilters, [col]: [value, windowFilters[col][1]] };
         clearTimeout(debounceTimer.current);
         debounceTimer.current = setTimeout(() => {
-          dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
+          dispatch(updateQueryResults({ schema, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
         }, 1000);
       }
     } else {
@@ -89,7 +89,7 @@ export const Filter = () => {
         const newFilter = { ...windowFilters, [col]: [windowFilters[col][0], value] };
         clearTimeout(debounceTimer.current);
         debounceTimer.current = setTimeout(() => {
-          dispatch(updateQueryResults({ folder, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
+          dispatch(updateQueryResults({ schema, id: dataset.id, from, to, selectedMeasures, filter: newFilter }));
         }, 1000);
       }
     }

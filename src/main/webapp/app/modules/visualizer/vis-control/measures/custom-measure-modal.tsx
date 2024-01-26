@@ -12,7 +12,7 @@ import {updateCustomSelectedMeasures, updateQueryResults} from "app/modules/stor
 const CustomMeasureModal = ({ open, onClose }) => {
   const [selectedMeasure1, setSelectedMeasure1] = useState('');
   const [selectedMeasure2, setSelectedMeasure2] = useState('');
-  const { dataset, folder, from, to, selectedMeasures, filter, customSelectedMeasures } = useAppSelector(state => state.visualizer);
+  const { dataset, schema, from, to, selectedMeasures, filter, customSelectedMeasures } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
 
   let indexes = [dataset.header.indexOf(dataset.timeCol)];
@@ -50,7 +50,7 @@ const CustomMeasureModal = ({ open, onClose }) => {
     const id2 = dataset.header.indexOf(selectedMeasure2);
     dispatch(updateCustomSelectedMeasures([...customSelectedMeasures, {measure1: id1, measure2: id2}]));
     dispatch(
-      updateQueryResults({ folder, id: dataset.id,
+      updateQueryResults({ schema, id: dataset.id,
         from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
         to: to ? to : dataset.timeRange.to, selectedMeasures, filter })
     );

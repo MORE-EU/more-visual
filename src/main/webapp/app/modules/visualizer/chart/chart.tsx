@@ -29,7 +29,7 @@ annotationsAdvanced(Highcharts);
 export const Chart = () => {
   const {
     chartRef,
-    folder,
+    schema,
     dataset,
     from,
     to,
@@ -75,7 +75,7 @@ export const Chart = () => {
   const fetchDataRef = useRef({ isScrolling: false, scrollTimeout: null });
   const chart = useRef(chartRef);
   const timeRange = useRef(null);
-  const latestFolder = useRef(null);
+  const latestSchema = useRef(null);
   const latestDatasetId = useRef(null);
   const latestMeasures = useRef(selectedMeasures);
   const latestCompare = useRef(compare);
@@ -163,7 +163,7 @@ export const Chart = () => {
 
   useEffect(() => {
     if (Object.keys(compare).length !== 0) {
-      dispatch(updateCompareQueryResults({ folder, compare, from, to, filter }));
+      dispatch(updateCompareQueryResults({ schema, compare, from, to, filter }));
     }
   }, [compare]);
 
@@ -172,7 +172,7 @@ export const Chart = () => {
       latestMeasures.current = selectedMeasures;
       dispatch(
         updateQueryResults({
-          folder,
+          schema,
           id: dataset.id,
           from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
           to: to ? to : dataset.timeRange.to,
@@ -181,7 +181,7 @@ export const Chart = () => {
         })
       );
       if (Object.keys(compare).length !== 0) {
-        dispatch(updateCompareQueryResults({ folder, compare, from, to, filter }));
+        dispatch(updateCompareQueryResults({ schema, compare, from, to, filter }));
       }
       if (
         selectedMeasures.length +
@@ -264,7 +264,7 @@ export const Chart = () => {
     chart.current = e.target;
     timeRange.current = queryResults.timeRange;
     latestDatasetId.current = dataset.id;
-    latestFolder.current = folder;
+    latestSchema.current = schema;
     // CHART: INSTRUCTIONS
     // chart.current.showLoading('Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear');
     // Highcharts.addEvent(chart.current.container, 'click', (event: MouseEvent) => {
@@ -277,7 +277,7 @@ export const Chart = () => {
       chart.current.showLoading();
       dispatch(
         updateQueryResults({
-          folder: latestFolder.current,
+          schema: latestSchema.current,
           id: latestDatasetId.current,
           from: min,
           to: max,
@@ -290,7 +290,7 @@ export const Chart = () => {
       if (Object.keys(latestCompare.current).length !== 0)
         dispatch(
           updateCompareQueryResults({
-            folder: latestFolder.current,
+            schema: latestSchema.current,
             compare: latestCompare.current,
             from: min,
             to: max,
@@ -353,7 +353,7 @@ export const Chart = () => {
     //     if (max >= data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp) {
     //       dispatch(
     //         liveDataImplementation({
-    //           folder: latestFolder.current,
+    //           schema: latestSchema.current,
     //           id: latestDatasetId.current,
     //           from: dataMax,
     //           to: dataMax + 50000,

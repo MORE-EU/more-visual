@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
-import { getAlerts, getConnection, getDataset, getDatasets, getSchemaMeta, setDatasetIsConfiged, setErrorMessage, setFolder, updateDatasetChoice, updateDatasetMeta, getDbMetadata, connector } from '../store/visualizerSlice';
+import { getAlerts, getConnection, getDataset, getDatasets, getSchemaMeta, setDatasetIsConfiged, setErrorMessage, setSchema, updateDatasetChoice, updateDatasetMeta, getDbMetadata, connector } from '../store/visualizerSlice';
 import CircularProgress  from '@mui/material/CircularProgress';
 import Header from './header/header';
 import React, { useEffect, useState } from 'react';
@@ -33,7 +33,7 @@ export const SurveyVisualizer = () => {
   },[connections]);
 
   useEffect(() => {
-    connected && dispatch(getDbMetadata({database: connections.find(connection => connection.name === "pulsar-influx").type, schemaName: connections.find(connection => connection.name === "pulsar-influx").database}));
+    connected && dispatch(getDbMetadata({database: connections.find(connection => connection.name === "pulsar-influx").type, schema: connections.find(connection => connection.name === "pulsar-influx").database}));
   }, [connected]);
 
 
@@ -47,8 +47,8 @@ export const SurveyVisualizer = () => {
 
   useEffect(() => {
     if (params.id !== undefined) {
-      dispatch(setFolder(params.folder));
-      dispatch(getDataset({ folder: params.folder, id: params.id }));
+      dispatch(setSchema(params.schema));
+      dispatch(getDataset({ schema: params.schema, id: params.id }));
       schemaMeta !== null && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
     }
   }, [params.id]);
@@ -71,8 +71,8 @@ export const SurveyVisualizer = () => {
     if (uploadDatasetError)
       if (schemaMeta && !schemaMeta.isTimeSeries && schemaMeta.type !== "csv") {
         dispatch(setDatasetIsConfiged(false));
-        dispatch(updateDatasetMeta({folder: params.folder, dataset: schemaMeta.data[datasetChoice]}));
-        history.replace(`/configure/${params.folder}`);
+        dispatch(updateDatasetMeta({schema: params.schema, dataset: schemaMeta.data[datasetChoice]}));
+        history.replace(`/configure/${params.schema}`);
       }
   }, [uploadDatasetError]);
 

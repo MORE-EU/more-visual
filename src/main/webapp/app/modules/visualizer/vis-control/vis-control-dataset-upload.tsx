@@ -135,7 +135,7 @@ const VisControlDatasetUpload = (props: IVisUploadDataset) => {
       const data = new FormData();
       data.append('file', uploadFile[0]);
       data.append('meta', JSON.stringify(formData));
-      data.append('schemaName', params.folder);
+      data.append('schemaName', params.schema);
       dispatch(uploadDataset(data));
     }
   };

@@ -21,7 +21,7 @@ const style = {
 };
 
 const ModalWithChart = props => {
-  const { chartRef, folder, dataset } = useAppSelector(state => state.visualizer);
+  const { chartRef, schema, dataset } = useAppSelector(state => state.visualizer);
   const { forecastingInitialSeries } = useAppSelector(state => state.forecasting);
   const { resultsModal, setResultsModal, forecastingData } = props;
   const dispatch = useAppDispatch();
@@ -34,7 +34,7 @@ const ModalWithChart = props => {
       );
       const minTimestamp = Math.min(...timestamps);
       const maxTimestamp = Math.max(...timestamps);
-      dispatch(getInitialSeries({ from: minTimestamp, to: maxTimestamp, folder, id: dataset.id, measure: resultsModal }));
+      dispatch(getInitialSeries({ from: minTimestamp, to: maxTimestamp, schema, id: dataset.id, measure: resultsModal }));
     }
   }, [forecastingData.results[resultsModal]]);
 
