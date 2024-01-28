@@ -7,24 +7,17 @@ public class SchemaMeta implements Serializable {
 
     private String name;
     private String type;
-    private String config;
     private List<SchemaInfo> data;
-    private Float latitude;
-    private Float longitude;
     private Boolean isTimeSeries;
-
 
     public SchemaMeta () {
 
     }
 
-    public SchemaMeta(String name, String type, String config, List<SchemaInfo> data, Float latitude, Float longitude) {
+    public SchemaMeta(String name, String type, List<SchemaInfo> data) {
         this.name = name;
         this.type = type;
-        this.config = config;
         this.data = data;
-        this.latitude = latitude;
-        this.longitude = longitude;
     }
 
     public String getName() {
@@ -41,30 +34,6 @@ public class SchemaMeta implements Serializable {
 
     public void setData(List<SchemaInfo> data) {
         this.data = data;
-    }
-
-    public Float getLatitude() {
-        return this.latitude;
-    }
-
-    public void setLatitude(Float latitude) {
-        this.latitude = latitude;
-    }
-
-    public Float getLongitude() {
-        return this.longitude;
-    }
-
-    public void setLongitude(Float longitude) {
-        this.longitude = longitude;
-    }
-
-    public String getConfig() {
-        return config;
-    }
-
-    public void setConfig(String config) {
-        this.config = config;
     }
 
     public String getType() {
@@ -89,10 +58,7 @@ public class SchemaMeta implements Serializable {
         return "SchemaMeta{" +
             "name='" + name + '\'' +
             ", type='" + type + '\'' +
-            ", config='" + config + '\'' +
             ", data=" + data +
-            ", latitude=" + latitude +
-            ", longitude=" + longitude +
             '}';
     }
 }

@@ -15,7 +15,6 @@ import eu.more2020.visual.service.DataService;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
-import io.micrometer.core.instrument.Meter.Id;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,44 +130,31 @@ public class DatasetResource {
     }
 
     /**
-     * {@code GET  /datasets/:schemaName/:id} : get the "id" dataset from "schema" schema.
+     * {@code GET  /datasets/:schema/:id} : get the "id" dataset from "schema" schema.
      * @param schema the name of the schema
      * @param id the id of the dataset to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the dataset, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/datasets/{schemaName}/{id}")
-    public ResponseEntity<AbstractDataset> getDataset(@PathVariable String schemaName, @PathVariable String id) throws IOException, SQLException {
-        log.debug("REST request to get Dataset : {}/{}", schemaName, id);
+    @GetMapping("/datasets/{schema}/{id}")
+    public ResponseEntity<AbstractDataset> getDataset(@PathVariable String schema, @PathVariable String id) throws IOException, SQLException {
+        log.debug("REST request to get Dataset : {}/{}", schema, id);
         Optional<AbstractDataset> dataset = null;
         QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-        dataset = datasetRepository.findById(id, schemaName, queryExecutor);
-       
+        dataset = datasetRepository.findById(id, schema, queryExecutor);
         log.debug(dataset.toString());
         return ResponseUtil.wrapOrNotFound(dataset);
-    }
-
-
-     /**
-     * {@code GET /datasets/directories}
-     * @param schema the name of the "schema" we want metadata for
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the schema metadata,
-     * @throws IOException
-     */
-    @GetMapping("/datasets/directories")
-    public List<String> getDirectories() throws IOException {
-        log.debug("REST request to get Directories");
-        return datasetRepository.findDirectories();
     }
 
     /**
      * POST executeQuery
      */
-    @PostMapping("/datasets/{schemaName}/{id}/query")
-    public ResponseEntity<QueryResults> executeQuery(@PathVariable String schemaName, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
+    @PostMapping("/datasets/{schema}/{id}/query")
+    public ResponseEntity<QueryResults> executeQuery(@PathVariable String schema, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
         log.debug("REST request to execute Query: {}", query);
+        log.debug("{}", databaseConnection);
         Optional<QueryResults> queryResultsOptional = null;
         QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-        queryResultsOptional =  datasetRepository.findById(id, schemaName, queryExecutor).map(dataset -> {
+        queryResultsOptional = datasetRepository.findById(id, schema, queryExecutor).map(dataset -> {
             return dataService.executeQuery(databaseConnection.getQueryExecutor(dataset), dataset, query);
         });
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
@@ -177,7 +163,6 @@ public class DatasetResource {
     @PostMapping("/database/connect") 
     public ResponseEntity<Boolean> connector(@RequestBody DbConnector dbConnector) throws SQLException {
         log.debug("Rest request to connect to db");
-        log.debug(dbConnector.toString());
         String url = null;
         switch (dbConnector.getType()) {
             case "postgres":
@@ -199,33 +184,32 @@ public class DatasetResource {
         }
     }
 
-    @GetMapping("/datasets/{schemaName}/sample")
-    public List<Object[]> getSample(@PathVariable String schemaName) throws IOException, SQLException {
+    @GetMapping("/datasets/{schema}/sample")
+    public List<Object[]> getSample(@PathVariable String schema) throws IOException, SQLException {
         log.debug("REST request to get Sample File");
         QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-        return datasetRepository.findSample(schemaName, queryExecutor);
+        return datasetRepository.findSample(schema, queryExecutor);
     }
 
-    @GetMapping("/datasets/metadata/{database}/{schemaName}")
-    public ResponseEntity<SchemaMeta> getSchemaMetadata(@PathVariable String database, @PathVariable String schemaName) throws SQLException {
-        log.debug("Rest request to get schema metadata from {} database with name {}", database, schemaName);
-        SchemaMeta schemaMeta = new SchemaMeta();
+    @GetMapping("/datasets/metadata/{schema}")
+    public ResponseEntity<Optional<SchemaMeta>> getSchemaMetadata(@PathVariable String schema) {
+        log.debug("Rest request to get schema metadata for {}", schema);
         try {
             QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-            schemaMeta = datasetRepository.getSchemaMetadata(database, schemaName, queryExecutor);
-            return new ResponseEntity<SchemaMeta>(schemaMeta, HttpStatus.OK);
+            Optional<SchemaMeta> schemaMeta = datasetRepository.findSchema(databaseConnection, schema, queryExecutor);
+            return new ResponseEntity<Optional<SchemaMeta>>(schemaMeta, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
-    @GetMapping("/datasets/metadata/columns/{schemaName}/{tableName}")
-    public ResponseEntity<List<String>> getColumnNames(@PathVariable String schemaName, @PathVariable String tableName) throws SQLException {
-        log.debug("Rest request to get column names for table {}", tableName);
+    @GetMapping("/datasets/metadata/columns/{schema}/{id}")
+    public ResponseEntity<List<String>> getColumnNames(@PathVariable String schema, @PathVariable String id) throws SQLException {
+        log.debug("Rest request to get column names for table {}", id);
         List<String> columnNames = new ArrayList<>();
         try {
             QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-            columnNames = datasetRepository.getColumnNames(tableName, queryExecutor);
+            columnNames = datasetRepository.getColumnNames(id, queryExecutor);
             return new ResponseEntity<List<String>>(columnNames, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -233,16 +217,16 @@ public class DatasetResource {
     }
 
     /**
-     * {@code PUT  /datasets/metadata/columns/:schemaName/:id} : set the corresponding time, id and value columns of a table
+     * {@code PUT  /datasets/metadata/columns/:schema/:id} : set the corresponding time, id and value columns of a table
      * @param id
      * @param dbColumns
      * @return a new schema info with the updated column fields
      */
-    @PutMapping("/datasets/metadata/columns/{schemaName}/{id}")
-    public ResponseEntity<SchemaInfo> updateSchemaInfoColumnNames( @PathVariable String id, @Valid @RequestBody DbColumns dbColumns) {
-        log.debug("Rest request to update columns of schemaInfo with id {} with columns {}", id, dbColumns.toString());
+    @PutMapping("/datasets/metadata/columns/{schema}/{id}")
+    public ResponseEntity<SchemaInfo> updateSchemaInfoColumnNames(@PathVariable String schema, @PathVariable String id, @Valid @RequestBody DbColumns dbColumns) {
+        log.debug("Rest request to update columns of table with id {} on schema {} with columns {}", id, dbColumns.toString());
         if (id == null) {
-            throw new BadRequestAlertException("Invalid tableName", ENTITY_NAME, "tableNameNull");
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "NULL_ID");
         }
         SchemaInfo result = datasetRepository.updateSchemaInfoColumns(id, dbColumns);
         return ResponseEntity.ok()
@@ -255,8 +239,8 @@ public class DatasetResource {
     public ResponseEntity<Boolean> disconnector() throws SQLException {
         log.debug("Rest request to close connection");
         datasetRepository.deleteAll();
-        if (datasetRepository.getSchemaType() != null)
-            databaseConnection.closeConnection();
+        dataService.deleteCaches();
+        if(databaseConnection != null) databaseConnection.closeConnection();
         return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }
 }

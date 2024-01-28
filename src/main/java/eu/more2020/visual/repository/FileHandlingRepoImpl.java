@@ -63,7 +63,7 @@ public class FileHandlingRepoImpl implements FileHandlingRepository {
         .stream()
         .forEach(
           file -> {
-            this.saveFile(metaInfo.getName(), file, metaInfo.getData().get(Arrays.asList(files).indexOf(file)).getName());
+            this.saveFile(metaInfo.getName(), file, metaInfo.getData().get(Arrays.asList(files).indexOf(file)).getId());
           }
         );
     } catch (Exception e) {
@@ -81,7 +81,7 @@ public class FileHandlingRepoImpl implements FileHandlingRepository {
     thisSchema.setData(schemaData);
     obm.writeValue(metaFile, thisSchema);
     try {
-    this.saveFile(schemaName, file, metaInfo.getName());
+    this.saveFile(schemaName, file, metaInfo.getId());
     } catch (Exception e) {
       log.debug("Fail to upload files!");
     }

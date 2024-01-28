@@ -14,24 +14,25 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import VisConnectorDBConfig from "./vis-connector-db-config";
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import { connector, getDbMetadata, deleteConnection, getAllConnections } from "app/modules/store/visualizerSlice";
+import { connector, getSchemaMetadata, deleteConnection, getAllConnections, disconnector } from "app/modules/store/visualizerSlice";
 import { IConnection } from "app/shared/model/connection.model";
 
 const mdTheme = createTheme();
 
 const VisConnector = () => {
     const [ step, setStep ] = useState(false);
-    const { connections, connected } = useAppSelector(state => state.visualizer);
+    const {connections, connected} = useAppSelector(state => state.visualizer);
     const [connectionInfo, setConnectionInfo] = useState<IConnection>(null);
     const dispatch = useAppDispatch();
 
     useEffect(() => {
         dispatch(getAllConnections());
+        dispatch(disconnector());
     },[]);
 
     useEffect(() => {
         if(connected && connectionInfo)
-            dispatch(getDbMetadata({database: connectionInfo.type, schema: connectionInfo.database}));
+            dispatch(getSchemaMetadata({schema: connectionInfo.database}));
     },[connected])
 
     const closeHandler = () => {

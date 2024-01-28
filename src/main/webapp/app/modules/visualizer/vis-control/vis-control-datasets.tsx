@@ -1,3 +1,5 @@
+import React, {useEffect} from 'react';
+
 import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -7,26 +9,35 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getDataset, updateDatasetChoice, resetFetchData, setDatasetIsConfiged, resetDataset } from 'app/modules/store/visualizerSlice';
-import React from 'react';
+import { getDataset, updateDatasetChoice, resetFetchData, setDatasetIsConfiged, resetDataset, disconnector } from 'app/modules/store/visualizerSlice';
 import {useState} from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { Link, useHistory } from 'react-router-dom';
 import VisControlDatasetUpload from './vis-control-dataset-upload';
 
-const VisControlDatasets = ({ isSurvey }) => {
-  const { schema, dataset, compare, datasetChoice, schemaMeta } = useAppSelector(state => state.visualizer);
+const VisControlDatasets = ({}) => {
+  const { dataset, compare, datasetChoice, schemaMeta } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
-  
+  const [survey, setSurvey] = useState(false);
+
+  useEffect(() => {
+    // Get the current URL
+    const currentUrl = window.location.href;
+    // Check if the URL contains survey
+    const isSurvey = currentUrl.includes('survey');
+    setSurvey(isSurvey);
+  }, []); // Run this effect only once when the component mounts
+
   const handleDataset = dataset => {
     const idx = schemaMeta.data.findIndex(file => file.schema === dataset.schema && file.id === dataset.id);
     if (datasetChoice !== idx) {
       dispatch(updateDatasetChoice(idx));
     }
   };
+  
 
   const handleUploadChange = e => {
     setUploadModalOpen(prev => !prev);
@@ -62,15 +73,15 @@ const VisControlDatasets = ({ isSurvey }) => {
                 key={idx}
                 selected={datasetChoice === idx}
                 component={Link}
-                to={!isSurvey ? `/visualize/${schema}/${file.id}` : `/survey/visualize/${schema}/${file.id}`}
+                to={!survey ? `/visualize/${schemaMeta.name}/${file.id}` : `/survey/visualize/${schemaMeta.name}/${file.id}`}
                 onClick={() => {
-                  handleDataset(file), dispatch(getDataset({ schema, id: file.id }));
+                  handleDataset(file), dispatch(getDataset({ schema: schemaMeta.name, id: file.id }));
                 }}
                 divider
               >
               <ListItemText primary={`${file.id}`} />
                 {Object.hasOwn(compare, file.id) && (
-                  <Tooltip title="Currently comparing this file">
+                  <Tooltip title="Currently comparing this dataset">
                     <ListItemIcon>
                       <CompareArrowsIcon />
                     </ListItemIcon>
@@ -88,7 +99,7 @@ const VisControlDatasets = ({ isSurvey }) => {
             {schemaMeta.type !== "csv" && !schemaMeta.isTimeSeries && (
               <ListItemButton key={'new-db-dataset-list-button-sd'} 
               component={Link}
-              to={`/configure/${schema}`}
+              to={`/configure/${schemaMeta.name}`}
               onClick={handleDBUpoladChange}>
                 <ListItemText  primary={`new dataset`} sx={ {display: { xs: 'none', md: 'block' }}} />
                 <ControlPointIcon />
@@ -97,7 +108,7 @@ const VisControlDatasets = ({ isSurvey }) => {
             <ListItemButton key={'close-connection-list-button-sd'}
               component={Link}
               to={`/visualize`}
-              onClick={() => {dispatch(resetFetchData());}}
+              onClick={() => {dispatch(resetFetchData())}}
             >
                 <ListItemText primary={`close connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
                 <LogoutIcon />

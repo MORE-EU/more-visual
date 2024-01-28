@@ -14,6 +14,7 @@ import { RootState } from './storeConfig';
 import { IDataset } from 'app/shared/model/dataset.model';
 import { IAlertResults } from 'app/shared/model/alert-results.model';
 import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
+import { IViewPort } from 'app/shared/model/viewport.model';
 
 
 const seedrandom = require('seedrandom');
@@ -80,14 +81,14 @@ const initialState = {
   measureColors: [],
   from: null as number,
   to: null as number,
+  accuracy: null as number,
+  viewPort: null as IViewPort,
   schemaMeta: null as ISchemaMeta,
   sampleFile: [],
-  directories: [],
   resampleFreq: '',
   filter: {},
   changeChart: true,
   datasetChoice: null,
-  schema: '',
   graphZoom: null,
   activeTool: null as null | string,
   compare: {} as {[key: string]: number[]},
@@ -134,7 +135,7 @@ const concatenateAndSortDistinctArrays = (array1: number[], array2: number[]) =>
 
 export const connector = createAsyncThunk('connector', async (dbConnector: {name: string, type: string, host: string, port: string, username: string, password: string, database: string}) => {
     const response = await axios.post(`api/database/connect`, dbConnector).then(res => res);
-    return response;
+    return response ? dbConnector : null as IConnection;
 });
 
 export const disconnector = createAsyncThunk('disconnector', async () => {
@@ -142,9 +143,9 @@ export const disconnector = createAsyncThunk('disconnector', async () => {
     return response;
 });
 
-export const getDbMetadata = createAsyncThunk('getDbMetadata', async (data: { database: string; schema: string; }) => {
+export const getSchemaMetadata = createAsyncThunk('getSchemaMetadata', async (data: {schema: string; }) => {
   try {
-    const response = await axios.get(`api/datasets/metadata/${data.database}/${data.schema}`).then(res => res);
+    const response = await axios.get(`api/datasets/metadata/${data.schema}`).then(res => res);
     return response;
   } catch (error) {
     throw new Error("Can't get database metadata");
@@ -163,11 +164,6 @@ export const updateSchemaInfoColumnNames = createAsyncThunk('updateSchemaInfoCol
     return response;
 });
 
-export const checkConnection = createAsyncThunk('checkConnection', async (bdConfig: { url: string; port: string; }) => {
-  const response = await axios.post(`api/datasets/checkConnection`, bdConfig).then(res => res);
-  return response;
-});
-
 export const getDataset = createAsyncThunk('getDataset', async (data: { schema: string; id: string }) => {
   const { schema, id } = data;
   try {
@@ -183,21 +179,10 @@ export const getDatasets = createAsyncThunk('getDatasets', async () => {
   return response;
 });
 
-export const getSchemaMeta = createAsyncThunk('getSchemaMeta', async (schema: string) => {
-  const response = await axios.get(`api/datasets/${schema}`).then(res => res);
+export const updateDataset = createAsyncThunk('updateDataset', async (data: {dataset: IDataset}) => {
+  const response = await axios.put(`api/datasets`, data.dataset).then(res => res);
   return response;
-});
-
-export const updateDatasetMeta = createAsyncThunk('updateDatasetMeta', async (data: {schema: string, dataset: IDataset}) => {
-  const response = await axios.put(`api/datasets/${data.schema}`, data.dataset).then(res => res);
-  return response;
-
 })
-
-export const getDirectories = createAsyncThunk('getDirectories', async () => {
-  const response = await axios.get(`api/datasets/directories`).then(res => res);
-  return response;
-});
 
 export const getSampleFile = createAsyncThunk('getSampleFile', async (id: string) => {
   const response = await axios.get(`api/datasets/${id}/sample`).then(res => res);
@@ -254,13 +239,15 @@ export const updateQueryResults = createAsyncThunk(
     id: string;
     from: number;
     to: number;
+    viewPort: IViewPort;
     selectedMeasures: any[];
     filter?: {};
   }, {getState}) => {
-    const { schema, id, from, to, selectedMeasures, filter } = data;
+    const { schema, id, from, to, viewPort, selectedMeasures, filter } = data;
     let query;
     const {visualizer} = getState() as RootState;
     const customSelectedMeasures = [];
+    const accuracy = visualizer.accuracy;
     visualizer.customSelectedMeasures
       .forEach(customMeasure => customSelectedMeasures.push(customMeasure.measure1, customMeasure.measure2));
     let measures = concatenateAndSortDistinctArrays(selectedMeasures, customSelectedMeasures);
@@ -268,7 +255,8 @@ export const updateQueryResults = createAsyncThunk(
       ? (query = {
           from,
           to,
-          viewPort: {width: 1000, height: 600},
+          viewPort,
+          accuracy,
           measures,
           filter: filter ? filter : null,
         } as IQuery)
@@ -307,13 +295,14 @@ export const liveDataImplementation = createAsyncThunk(
 
 export const updateCompareQueryResults = createAsyncThunk(
   'updateCompareQueryResults',
-  async (data: { schema: string, compare: {[key: number]: any[]}; from: number; to: number; filter: {} }, {getState}) => {
+  async (data: { schema: string, compare: {[key: number]: any[]}; from: number; to: number; viewPort: IViewPort; filter: {} }, {getState}) => {
     const {visualizer} = getState() as RootState;
-    const { compare, from, to, filter, schema } = data;
+    const accuracy = visualizer.accuracy;
+    const { compare, from, to, viewPort, filter, schema } = data;
     const response = await Promise.all(
       Object.keys(compare).map(
       key => {
-        const query = from !== null && to !== null ? {from,to,viewPort: {width: 1000, height: 600}, measures: compare[key], filter} : {range: null}
+        const query = from !== null && to !== null ? {from, to, viewPort, accuracy, measures: compare[key], filter} : {range: null}
         return axios.post(`api/datasets/${schema}/${key}/query`, query).then(res => ({name: key, data: res.data.data}))
       }
     )).then(res => res.map(r => r));
@@ -338,46 +327,6 @@ export const applyChangepointDetection = createAsyncThunk(
 export const applyForecasting = createAsyncThunk('applyForecasting', async (id: string) => {
   const requestUrl = `api/tools/forecasting/${id}`;
   const response = await axios.post(requestUrl);
-  return response.data;
-});
-
-export const applyDeviationDetection = createAsyncThunk(
-  'applyDeviationDetection',
-  async (data: { id: string; from: number; to: number; weeks: number; type: string; changepoints: IChangepointDate[] }) => {
-    const requestUrl = `api/tools/soiling`;
-    const id = data.id;
-    const type = data.type;
-    const range = ({ from: data.from, to: data.to } as unknown) as ITimeRange;
-    const changepoints = data.changepoints;
-    const weeks = data.weeks;
-    const response = await axios.post(requestUrl, {
-      id,
-      range,
-      type,
-      changepoints,
-      weeks,
-    });
-    return response.data;
-  }
-);
-
-export const applyYawMisalignmentDetection = createAsyncThunk(
-  'applyYawMisalignmentDetection',
-  async (data: { id: string; from: number; to: number }) => {
-    const requestUrl = `api/tools/yaw_misalignment`;
-    const id = data.id;
-    const range = ({ from: data.from, to: data.to } as unknown) as ITimeRange;
-    const response = await axios.post(requestUrl, {
-      id,
-      range,
-    });
-    return response.data;
-  }
-);
-
-export const getManualChangepoints = createAsyncThunk('getManualChangepoints', async (id: string) => {
-  const requestUrl = `api/tools/changepoint_detection/washes/${id}`;
-  const response = await axios.get(requestUrl);
   return response.data;
 });
 
@@ -439,9 +388,14 @@ const visualizer = createSlice({
     updateAnchorEl(state, action) {
       state.anchorEl = action.payload;
     },
-  
     updateAlertResults(state, action) {
       state.alertResults = { ...action.payload };
+    },
+    updateViewPort(state, action) {
+      state.viewPort = action.payload;
+    },
+    updateAccuracy(state, action) {
+      state.accuracy = action.payload;
     },
     setShowDatePick(state, action) {
       state.showDatePick = action.payload;
@@ -473,14 +427,8 @@ const visualizer = createSlice({
     setOpenToolkit(state, action) {
       state.openToolkit = action.payload;
     },
-    setSchema(state, action) {
-      state.schema = action.payload;
-    },
     setChartType(state, action) {
       state.chartType = action.payload;
-    },
-    setCheckConnectionResponse(state, action) {
-      state.checkConnectionResponse = action.payload;
     },
     setErrorMessage(state, action) {
       state.errorMessage = action.payload;
@@ -551,7 +499,7 @@ const visualizer = createSlice({
       state.resampleFreq = calculateFreqFromDiff(action.payload.data.timeRange);
       state.selectedMeasures = [action.payload.data.measures[0]];
     });
-    builder.addCase(connector.fulfilled, state => {
+    builder.addCase(connector.fulfilled, (state, action) => {
       state.loading = false;
       state.connected = true;
     });
@@ -559,15 +507,10 @@ const visualizer = createSlice({
       state.loading = false;
       state.connected = false;
     });
-    builder.addCase(checkConnection.fulfilled, (state, action) => {
-      state.checkConnectionLoading = false;
-      state.checkConnectionResponse = action.payload.data;
-      state.checkConnectionError = false;
-    });
-    builder.addCase(getDbMetadata.fulfilled, (state, action) => {
+    builder.addCase(getSchemaMetadata.fulfilled, (state, action) => {
       state.loading = false;
       state.schemaMeta = action.payload.data;
-      state.datasetChoice = 0;
+      state.datasetChoice = (state.schemaMeta && state.dataset) ? state.schemaMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
     });
     builder.addCase(updateSchemaInfoColumnNames.fulfilled, (state, action) => {
       state.loading = false;
@@ -578,21 +521,11 @@ const visualizer = createSlice({
       state.loading = false;
       state.columnNames = action.payload.data;
     });
-
-    builder.addCase(getSchemaMeta.fulfilled, (state, action) => {
-      state.loading = false;
-      state.schemaMeta = action.payload.data;
-      state.datasetChoice = (state.schemaMeta && state.dataset) ? state.schemaMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
-    });
-    builder.addCase(updateDatasetMeta.fulfilled, (state, action) => {
+    builder.addCase(updateDataset.fulfilled, (state, action) => {
       state.loading = false;
     });
     builder.addCase(getDatasets.fulfilled, (state, action) => {
       state.datasets = {data: action.payload.data, loading: false, error: null};
-    });
-    builder.addCase(getDirectories.fulfilled, (state, action) => {
-      state.loading = false;
-      state.directories = action.payload.data;
     });
     builder.addCase(getSampleFile.fulfilled, (state, action) => {
       state.loading = false;
@@ -662,10 +595,10 @@ const visualizer = createSlice({
     builder.addCase(getDatasets.rejected, (state, action) => {
       state.datasets = {...state.datasets, loading: false, error: "there was an error loading the data"}
     });
-    builder.addMatcher(isAnyOf(getDataset.pending, getSchemaMeta.pending,updateDatasetMeta.pending, getDirectories.pending, getSampleFile.pending, getDbMetadata.pending,updateSchemaInfoColumnNames.pending,getColumnNames.pending, connector.pending, disconnector.pending), state => {
+    builder.addMatcher(isAnyOf(getDataset.pending, updateDataset.pending, getSampleFile.pending, getSchemaMetadata.pending, updateSchemaInfoColumnNames.pending,getColumnNames.pending, connector.pending, disconnector.pending), state => {
       state.loading = true;
     });
-    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending, applyDeviationDetection.pending), state => {
+    builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
       state.queryResultsLoading = true;
       state.errorMessage = null;
     });
@@ -680,7 +613,7 @@ const visualizer = createSlice({
       state.connectionLoading = true;
     });
     builder.addMatcher(
-      isAnyOf( getDbMetadata.rejected,getSchemaMeta.rejected,updateDatasetMeta.rejected, updateSchemaInfoColumnNames.rejected, getDirectories.rejected, getSampleFile.rejected, getColumnNames.rejected, disconnector.rejected),
+      isAnyOf( getSchemaMetadata.rejected, updateDataset.rejected, updateSchemaInfoColumnNames.rejected, getSampleFile.rejected, getColumnNames.rejected, disconnector.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = "unable to reach server";
@@ -701,11 +634,6 @@ const visualizer = createSlice({
         state.uploadDatasetError = true;
       }
     );
-    builder.addMatcher(isAnyOf(checkConnection.rejected), (state, action) => {
-      state.checkConnectionLoading = false;
-      state.checkConnectionResponse = action.error.message;
-      state.checkConnectionError = true;
-    });
     builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected), (state, action) => {
       state.queryResultsLoading = false;
       state.errorMessage = action.error.message;
@@ -720,9 +648,6 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(saveConnection.rejected, getConnection.rejected, getAllConnections.rejected, deleteConnection.rejected), state => {
       state.connectionLoading = false;
     });
-    builder.addMatcher(isAnyOf(applyDeviationDetection.fulfilled, applyYawMisalignmentDetection.fulfilled), (state, action) => {
-      state.secondaryData = action.payload.length === 0 ? null : action.payload;
-    });
   },
 });
 
@@ -731,10 +656,11 @@ export const {
   updateSelectedMeasures,updateCustomSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
   updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef, 
   updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData, updateAlertResults,
+  updateViewPort, updateAccuracy,
   setForecastingDataSplit,
   setAutoMLStartDate,setAutoMLEndDate,setShowDatePick, setCompareData, setComparePopover,
   setSingleDateValue,setDateValues,setFixedWidth,setAlertingPlotMode,
-  setExpand,setOpenToolkit,setSchema,setChartType,setAlertingPreview,setCheckConnectionResponse, setSelectedConnection,
+  setExpand,setOpenToolkit,setChartType,setAlertingPreview, setSelectedConnection,
   setErrorMessage,setDatasetIsConfiged, setConnented,
   resetChartValues,resetFetchData,
   resetSampleFile,resetColumnNames, resetFilters,

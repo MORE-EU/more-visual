@@ -95,18 +95,20 @@ export const VisMeasures = () => {
                     : ''
                 }
               >
-                <VisMeasuresList
-                  width={'80%'}
-                  value={null}
-                  onChange={handleAddMeasure}
-                  options={shownMeasures}
-                  disabled={
-                    selectedMeasures.length +
-                      customSelectedMeasures.length +
-                      Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) ===
-                    6
-                  }
-                />
+                <>
+                  <VisMeasuresList
+                    width={'80%'}
+                    value={null}
+                    onChange={handleAddMeasure}
+                    options={shownMeasures}
+                    disabled={
+                      selectedMeasures.length +
+                        customSelectedMeasures.length +
+                        Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) ===
+                      6
+                    }
+                  />
+                </>
               </Tooltip>
               <CustomMeasureButton onClick={handleCustomMeasureClick} />
               <CustomMeasureModal open={isCustomMeasureDialogOpen} onClose={handleCustomMeasureModalClose} />

@@ -1,6 +1,6 @@
-export interface IViewport {
+export interface IViewPort {
   width?: number;
   height?: number;
 }
 
-export const IViewport: Readonly<IViewport> = { width: 1000, height: 600 };
+export const IViewport: Readonly<IViewPort> = { width: 1000, height: 600 };

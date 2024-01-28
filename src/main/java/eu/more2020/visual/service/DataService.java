@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 
 @Service
@@ -18,14 +19,16 @@ public class DataService {
     private final Logger LOG = LoggerFactory.getLogger(DataService.class);
     private HashMap<String, MinMaxCache> caches = new HashMap<>();
 
-    public void removeIndex(String id, String schema) {
-        caches.remove(id, schema);
+    public void deleteCaches() {
+        if(caches.isEmpty()) return;
+        caches.clear();
+        caches = new HashMap<>();
     }
 
     private synchronized MinMaxCache getCache(QueryExecutor queryExecutor, AbstractDataset dataset, Query query) {
         MinMaxCache minMaxCache = caches.get(dataset.getTable());
         if(minMaxCache == null){
-            minMaxCache = new MinMaxCache(queryExecutor, dataset, 1, 8, 4);
+            minMaxCache = new MinMaxCache(queryExecutor, dataset, 0, 4, 4);
             caches.put(dataset.getTable(), minMaxCache);
         }
         return minMaxCache;

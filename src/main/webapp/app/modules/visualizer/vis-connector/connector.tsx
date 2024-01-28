@@ -25,17 +25,14 @@ export const Connector = () => {
 
     useEffect(() => {
         dispatch(resetFetchData());
-        dispatch(disconnector());
     },[]);
 
     function TransitionLeft(props: TransitionProps) {
         return <Slide {...props} direction="left" />;
     }
     
-
     useEffect(() => {
         if (schemaMeta && schemaMeta.isTimeSeries) history.push(`/visualize/${schemaMeta.name}/${schemaMeta.data[datasetChoice].id}`);
-        
         if (schemaMeta && !schemaMeta.isTimeSeries) history.push(`/configure/${schemaMeta.name}`);
     },[schemaMeta]);
     

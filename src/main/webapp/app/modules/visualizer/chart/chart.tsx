@@ -16,6 +16,7 @@ import {
   updateFrom,
   updateQueryResults,
   updateTo,
+  updateViewPort,
 } from 'app/modules/store/visualizerSlice';
 import { ChartPlotBands } from 'app/modules/visualizer/chart/chart-plot-bands/chart-plot-bands';
 import chartAlertingChecker, { alertingPlotBandsCreator } from './chart-alerting/chart-alerting-functions';
@@ -29,11 +30,11 @@ annotationsAdvanced(Highcharts);
 export const Chart = () => {
   const {
     chartRef,
-    schema,
     dataset,
     from,
     to,
-    resampleFreq,
+    schemaMeta,
+    viewPort,
     selectedMeasures,
     customSelectedMeasures,
     measureColors,
@@ -47,12 +48,10 @@ export const Chart = () => {
     compareData,
     errorMessage,
     forecastData,
-    alertingPlotMode,
     alertResults,
     forecastingDataSplit,
     secondaryData,
     chartType,
-    liveDataImplLoading,
     alerts,
     alertingPreview,
     activeTool,
@@ -163,25 +162,28 @@ export const Chart = () => {
 
   useEffect(() => {
     if (Object.keys(compare).length !== 0) {
-      dispatch(updateCompareQueryResults({ schema, compare, from, to, filter }));
+      dispatch(updateCompareQueryResults({ schema: schemaMeta.name, compare, from, to, viewPort, filter }));
     }
   }, [compare]);
 
   useEffect(() => {
     if (dataset) {
       latestMeasures.current = selectedMeasures;
+      const viewPort = {width: 1000, height: 600};
       dispatch(
         updateQueryResults({
-          schema,
+          schema: schemaMeta.name,
           id: dataset.id,
           from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
           to: to ? to : dataset.timeRange.to,
+          viewPort,
           selectedMeasures,
           filter,
         })
       );
+      dispatch(updateViewPort(viewPort));
       if (Object.keys(compare).length !== 0) {
-        dispatch(updateCompareQueryResults({ schema, compare, from, to, filter }));
+        dispatch(updateCompareQueryResults({ schema: schemaMeta.name, compare, from, to, viewPort, filter }));
       }
       if (
         selectedMeasures.length +
@@ -264,7 +266,8 @@ export const Chart = () => {
     chart.current = e.target;
     timeRange.current = queryResults.timeRange;
     latestDatasetId.current = dataset.id;
-    latestSchema.current = schema;
+    latestSchema.current = schemaMeta.name;
+    
     // CHART: INSTRUCTIONS
     // chart.current.showLoading('Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear');
     // Highcharts.addEvent(chart.current.container, 'click', (event: MouseEvent) => {
@@ -275,18 +278,21 @@ export const Chart = () => {
     const fetchData = () => {
       const { max, min } = chart.current.xAxis[0].getExtremes();
       chart.current.showLoading();
+      const viewPort = {width: chart.current.plotWidth, height: chart.current.plotHeight};
       dispatch(
         updateQueryResults({
           schema: latestSchema.current,
           id: latestDatasetId.current,
           from: min,
           to: max,
+          viewPort,
           selectedMeasures: latestMeasures.current,
           filter: latestFilter.current,
         })
       );
       dispatch(updateFrom(min));
       dispatch(updateTo(max));
+      dispatch(updateViewPort(viewPort));
       if (Object.keys(latestCompare.current).length !== 0)
         dispatch(
           updateCompareQueryResults({
@@ -294,6 +300,7 @@ export const Chart = () => {
             compare: latestCompare.current,
             from: min,
             to: max,
+            viewPort,
             filter: latestFilter.current,
           })
         );

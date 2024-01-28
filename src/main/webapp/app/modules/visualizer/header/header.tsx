@@ -1,17 +1,24 @@
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HomeIcon from '@mui/icons-material/Home';
 import Typography from '@mui/material/Typography';
 import grey from '@mui/material/colors/grey';
-import { useParams } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 
 const Header = props => {
-  const { schemaMeta, datasetChoice } = props;
+  const { schemaMeta, datasetChoice, isSurvey } = props;
+  const [survey, setSurvey] = useState(false);
 
-  const params: any = useParams();
+  useEffect(() => {
+    // Get the current URL
+    const currentUrl = window.location.href;
+    // Check if the URL contains survey
+    const isSurvey = currentUrl.includes('survey');
+    setSurvey(isSurvey);
+  }, []); // Run this effect only once when the component mounts
+
 
   return (
     <Grid
@@ -33,14 +40,14 @@ const Header = props => {
           Home
           </Typography>
         </Link>
-        {schemaMeta ?<Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`/visualize/` + schemaMeta.name}>
+        {schemaMeta ?<Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`${survey ? "survey" : ""}/visualize/${schemaMeta.name}`}>
         <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
           {schemaMeta.name}
           </Typography>
         </Link>:
         <Skeleton variant='text' width={50}/>}
         {schemaMeta ? <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
-          {schemaMeta.data[datasetChoice].name}
+          {schemaMeta.data[datasetChoice].id}
         </Typography> : <Skeleton variant='text' width={50}/>}
       </Breadcrumbs>
     </Grid>

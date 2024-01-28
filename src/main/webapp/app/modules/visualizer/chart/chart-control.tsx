@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {ChartCompare} from './chart-control-buttons/chart-compare';
-import { useAppSelector } from 'app/modules/store/storeConfig';
+import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { ChartAlerting } from './chart-control-buttons/chart-alerting-button';
 import ChartDatePicker from './chart-control-buttons/chart-datepicker';
 import Grid from '@mui/material/Grid';
@@ -8,18 +8,38 @@ import Slider from '@mui/material/Slider';
 import Box from '@mui/material/Box';
 import ChartView from './chart-control-buttons/chart-view-buttons';
 import Typography from '@mui/material/Typography';
+import { updateAccuracy } from 'app/modules/store/visualizerSlice';
 
-export const ChartControl = ({isSurvey}) => {
-  const [value, setValue] = React.useState<number>(95);
-  const {datasetChoice} = useAppSelector(state => state.visualizer);
+export const ChartControl = ({}) => {
+  const [value, setValue] = useState<number>(95);
+  const {datasetChoice, accuracy} = useAppSelector(state => state.visualizer);
+  const dispatch = useAppDispatch();
+  
+  const [survey, setSurvey] = useState(false);
+
+  useEffect(() => {
+    // Get the current URL
+    const currentUrl = window.location.href;
+    // Check if the URL contains survey
+    const isSurvey = currentUrl.includes('survey');
+    setSurvey(isSurvey);
+  }, []); // Run this effect only once when the component mounts
+
+
   const handleChange = (event: Event, newValue: number | number[]) => {
     if (typeof newValue === 'number') {
-      setValue(newValue);
+        setValue(newValue);
+      }
+  };
+
+  const handleCommitChange = (event: Event, newValue: number | number[]) => {
+    if (typeof newValue === 'number') {
+      dispatch(updateAccuracy(newValue / 100));
     }
   };
 
   useEffect(() => {
-    setValue(95);
+    setValue(accuracy * 100);
   },[datasetChoice]);
 
   return (
@@ -28,7 +48,7 @@ export const ChartControl = ({isSurvey}) => {
           <ChartDatePicker />
           <ChartCompare />
           <ChartAlerting />
-          {isSurvey && (
+          {survey && (
             <Box sx={{width: '30%', margin: 'auto'}}>
               <Typography id="slidebar-label">
                 Accuracy: {value}%
@@ -39,7 +59,7 @@ export const ChartControl = ({isSurvey}) => {
               step={1}
               max={100}
               onChange={handleChange}
-              // onChangeCommitted={}
+              onChangeCommitted={handleCommitChange}
               valueLabelDisplay="auto"
               aria-labelledby="lidebar-label"
               />

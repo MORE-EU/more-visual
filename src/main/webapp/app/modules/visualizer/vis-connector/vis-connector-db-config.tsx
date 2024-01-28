@@ -17,7 +17,7 @@ import InputLabel from '@mui/material/InputLabel';
 import DBFormInput from "./db-form-input";
 
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import { getDbMetadata, saveConnection } from '../../store/visualizerSlice';
+import { getSchemaMetadata, saveConnection } from '../../store/visualizerSlice';
 import { connector } from '../../store/visualizerSlice';
 import { IConnection } from "app/shared/model/connection.model";
 
@@ -40,7 +40,7 @@ const VisConnectorDBConfig = ({closeHandler}) => {
 
     useEffect(() => {
         if (connected) {
-            dispatch(getDbMetadata({database: dbForm.type, schema: dbForm.database}));
+            dispatch(getSchemaMetadata({schema: dbForm.database}));
             dispatch(saveConnection(dbForm));
         }
     }, [connected]);

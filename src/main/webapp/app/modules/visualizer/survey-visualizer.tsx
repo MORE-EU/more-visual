@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
-import { getAlerts, getConnection, getDataset, getDatasets, getSchemaMeta, setDatasetIsConfiged, setErrorMessage, setSchema, updateDatasetChoice, updateDatasetMeta, getDbMetadata, connector } from '../store/visualizerSlice';
+import { getAlerts, getConnection, getDataset, getDatasets, setDatasetIsConfiged, updateDataset, updateDatasetChoice, getSchemaMetadata, connector, updateAccuracy } from '../store/visualizerSlice';
 import CircularProgress  from '@mui/material/CircularProgress';
 import Header from './header/header';
 import React, { useEffect, useState } from 'react';
@@ -18,7 +18,6 @@ type TransitionProps = Omit<SlideProps, 'direction'>;
 
 export const SurveyVisualizer = () => {
   const { schemaMeta, dataset, datasetChoice, uploadDatasetError, errorMessage, connections, connected} = useAppSelector(state => state.visualizer);
-  const { loadingButton } = useAppSelector(state => state.fileManagement);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const dispatch = useAppDispatch();
   const params: any = useParams();
@@ -26,6 +25,7 @@ export const SurveyVisualizer = () => {
 
   useEffect(() => {
     dispatch(getConnection("pulsar-influx"));
+    dispatch(updateAccuracy(0.95));
   }, []);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export const SurveyVisualizer = () => {
   },[connections]);
 
   useEffect(() => {
-    connected && dispatch(getDbMetadata({database: connections.find(connection => connection.name === "pulsar-influx").type, schema: connections.find(connection => connection.name === "pulsar-influx").database}));
+    connected && dispatch(getSchemaMetadata({schema: connections.find(connection => connection.name === "pulsar-influx").database}));
   }, [connected]);
 
 
@@ -47,7 +47,6 @@ export const SurveyVisualizer = () => {
 
   useEffect(() => {
     if (params.id !== undefined) {
-      dispatch(setSchema(params.schema));
       dispatch(getDataset({ schema: params.schema, id: params.id }));
       schemaMeta !== null && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
     }
@@ -71,7 +70,7 @@ export const SurveyVisualizer = () => {
     if (uploadDatasetError)
       if (schemaMeta && !schemaMeta.isTimeSeries && schemaMeta.type !== "csv") {
         dispatch(setDatasetIsConfiged(false));
-        dispatch(updateDatasetMeta({schema: params.schema, dataset: schemaMeta.data[datasetChoice]}));
+        dispatch(updateDataset({dataset: schemaMeta.data[datasetChoice]}));
         history.replace(`/configure/${params.schema}`);
       }
   }, [uploadDatasetError]);
@@ -101,7 +100,7 @@ export const SurveyVisualizer = () => {
           >
             <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
               <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-              {schemaMeta && <VisControl isSurvey={true} />}
+              {schemaMeta && <VisControl/>}
               </Paper>
             </Grid>
             <Grid sx={{ width: '80%', p: 1, flexGrow: 1, height: 'calc(100% - 30px)' }}>
@@ -113,7 +112,7 @@ export const SurveyVisualizer = () => {
                   height: '100%',
                 }}
               >
-                {schemaMeta && dataset ? <ChartContainer isSurvey={true} /> : (errorMessage == null && <CircularProgress sx={{margin: 'auto'}}/>)}
+                {schemaMeta && dataset ? <ChartContainer/> : (errorMessage == null && <CircularProgress sx={{margin: 'auto'}}/>)}
               </Paper>
             </Grid>
           </Grid>

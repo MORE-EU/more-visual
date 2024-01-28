@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import eu.more2020.visual.config.ApplicationProperties;
-import eu.more2020.visual.domain.Alert;
 import eu.more2020.visual.domain.Connection;
 import eu.more2020.visual.web.rest.DatasetResource;
 
