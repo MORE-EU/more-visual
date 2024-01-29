@@ -6,6 +6,7 @@ import HighchartsMore from 'highcharts/highcharts-more';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import Grid from '@mui/material/Grid';
 import { getInitialSeries, setForecastingInitialSeries } from 'app/modules/store/forecastingSlice';
+import { useParams } from 'react-router-dom';
 
 HighchartsMore(Highcharts);
 
@@ -21,9 +22,11 @@ const style = {
 };
 
 const ModalWithChart = props => {
-  const { chartRef, schema, dataset } = useAppSelector(state => state.visualizer);
+  const { chartRef, dataset } = useAppSelector(state => state.visualizer);
   const { forecastingInitialSeries } = useAppSelector(state => state.forecasting);
   const { resultsModal, setResultsModal, forecastingData } = props;
+  const params: any = useParams();
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -34,7 +37,7 @@ const ModalWithChart = props => {
       );
       const minTimestamp = Math.min(...timestamps);
       const maxTimestamp = Math.max(...timestamps);
-      dispatch(getInitialSeries({ from: minTimestamp, to: maxTimestamp, schema, id: dataset.id, measure: resultsModal }));
+      dispatch(getInitialSeries({ from: minTimestamp, to: maxTimestamp, schema: params.schema, id: dataset.id, measure: resultsModal }));
     }
   }, [forecastingData.results[resultsModal]]);
 
