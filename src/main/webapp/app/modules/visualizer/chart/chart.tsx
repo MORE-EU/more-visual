@@ -530,18 +530,6 @@ export const Chart = () => {
           ];
         }, [])
       );
-    // .concat(...[dummyPointCreator("minPoint", "0px", "0px"), dummyPointCreator("maxPoint", "0px", "0px")])
-    // changeChart ?
-    // : selectedMeasures.map((measure, idx) => ({
-    //     title: {
-    //       enabled: false,
-    //       text: dataset.header[measure],
-    //     },
-    //     opposite: false,
-    //     top: '0%',
-    //     height: '100%',
-    //     offset: undefined,
-    //   }))
     if (secondaryData) {
       const sz = yAxisData.length;
       const percent = Math.floor(90 / sz);

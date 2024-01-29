@@ -12,20 +12,9 @@ import { updateAccuracy } from 'app/modules/store/visualizerSlice';
 
 export const ChartControl = ({}) => {
   const [value, setValue] = useState<number>(95);
-  const {datasetChoice, accuracy} = useAppSelector(state => state.visualizer);
+  const {datasetChoice, accuracy, isUserStudy} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   
-  const [survey, setSurvey] = useState(false);
-
-  useEffect(() => {
-    // Get the current URL
-    const currentUrl = window.location.href;
-    // Check if the URL contains survey
-    const isSurvey = currentUrl.includes('survey');
-    setSurvey(isSurvey);
-  }, []); // Run this effect only once when the component mounts
-
-
   const handleChange = (event: Event, newValue: number | number[]) => {
     if (typeof newValue === 'number') {
         setValue(newValue);
@@ -46,9 +35,13 @@ export const ChartControl = ({}) => {
     <Grid container direction="row">
       <Grid item alignItems="center" sx={{display: "flex", flex: 1, flexDirection: "row", justifyContent: "flex-start", columnGap: 2}}>
           <ChartDatePicker />
-          <ChartCompare />
-          <ChartAlerting />
-          {survey && (
+          {!isUserStudy && 
+            <>
+              <ChartCompare />
+              <ChartAlerting />
+            </>
+          }
+          {isUserStudy && (
             <Box sx={{width: '30%', margin: 'auto'}}>
               <Typography id="slidebar-label">
                 Accuracy: {value}%
@@ -66,7 +59,7 @@ export const ChartControl = ({}) => {
             </Box>
           )}
       </Grid>
-      <ChartView />
+      {!isUserStudy && <ChartView /> }
   
     </Grid>
   );

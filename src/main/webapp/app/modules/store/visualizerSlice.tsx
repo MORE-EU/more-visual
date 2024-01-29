@@ -119,6 +119,7 @@ const initialState = {
   connections: [] as IConnection[],
   connectionLoading: false,
   uploadDatasetError: false,
+  isUserStudy: true,
 };
 
 const concatenateAndSortDistinctArrays = (array1: number[], array2: number[]) => {
@@ -457,6 +458,9 @@ const visualizer = createSlice({
     toggleCustomChangepoints(state, action) {
       state.customChangepointsEnabled = action.payload;
     },
+    toggleUserStudy(state, action) {
+      state.isUserStudy = action.payload;
+    },
     resetSchemaMeta(state) {
       state.schemaMeta = null;
       state.chartRef = null;
@@ -652,7 +656,7 @@ const visualizer = createSlice({
 });
 
 export const {
-  toggleCustomChangepoints, toggleForecasting, 
+  toggleCustomChangepoints, toggleForecasting, toggleUserStudy,
   updateSelectedMeasures,updateCustomSelectedMeasures,updateFrom,updateTo,updateResampleFreq,updateFilter,
   updateChangeChart,updateDatasetChoice,updateDatasetMeasures,updateCustomChangepoints,updateChartRef, 
   updateSecondaryData,updateActiveTool,updateCompare,updateAnchorEl,updateData, updateAlertResults,

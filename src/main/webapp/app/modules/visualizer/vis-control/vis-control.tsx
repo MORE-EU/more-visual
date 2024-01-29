@@ -8,7 +8,7 @@ import VisControlDatasets from './vis-control-datasets';
 import Grid from '@mui/material/Grid';
 
 export const VisControl = ({}) => {
-  const { dataset, schemaMeta, datasetChoice } = useAppSelector( state => state.visualizer);
+  const { dataset, isUserStudy } = useAppSelector( state => state.visualizer);
   const dispatch = useAppDispatch();
   const location = useLocation();
 
@@ -21,9 +21,11 @@ export const VisControl = ({}) => {
       <Grid sx={{ height: '30%', width: '100%' }}>
         <VisControlDatasets />
       </Grid>
-      <Grid sx={{ height: '40%', width: '100%' }}>
-        <VisToolkit />
-      </Grid>
+      {!isUserStudy &&
+        <Grid sx={{ height: '40%', width: '100%' }}>
+          <VisToolkit />
+        </Grid>
+      }
       <Grid sx={{ height: '30%', width: '100%' }}>
         { dataset && <VisMeasures /> }
       </Grid>

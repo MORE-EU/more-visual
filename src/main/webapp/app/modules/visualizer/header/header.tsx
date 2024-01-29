@@ -6,19 +6,10 @@ import HomeIcon from '@mui/icons-material/Home';
 import Typography from '@mui/material/Typography';
 import grey from '@mui/material/colors/grey';
 import Skeleton from '@mui/material/Skeleton';
+import { useAppSelector } from 'app/modules/store/storeConfig';
 
 const Header = props => {
-  const { schemaMeta, datasetChoice, isSurvey } = props;
-  const [survey, setSurvey] = useState(false);
-
-  useEffect(() => {
-    // Get the current URL
-    const currentUrl = window.location.href;
-    // Check if the URL contains survey
-    const isSurvey = currentUrl.includes('survey');
-    setSurvey(isSurvey);
-  }, []); // Run this effect only once when the component mounts
-
+  const { schemaMeta, datasetChoice, isUserStudy} = useAppSelector(state => state.visualizer);
 
   return (
     <Grid
@@ -40,7 +31,7 @@ const Header = props => {
           Home
           </Typography>
         </Link>
-        {schemaMeta ?<Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`${survey ? "survey" : ""}/visualize/${schemaMeta.name}`}>
+        {schemaMeta ?<Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`${isUserStudy ? "user-study" : ""}/visualize/${schemaMeta.name}`}>
         <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
           {schemaMeta.name}
           </Typography>

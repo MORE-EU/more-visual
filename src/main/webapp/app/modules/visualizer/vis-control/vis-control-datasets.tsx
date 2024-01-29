@@ -17,19 +17,10 @@ import { Link, useHistory } from 'react-router-dom';
 import VisControlDatasetUpload from './vis-control-dataset-upload';
 
 const VisControlDatasets = ({}) => {
-  const { dataset, compare, datasetChoice, schemaMeta } = useAppSelector(state => state.visualizer);
+  const { dataset, compare, datasetChoice, schemaMeta, isUserStudy } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
-  const [survey, setSurvey] = useState(false);
-
-  useEffect(() => {
-    // Get the current URL
-    const currentUrl = window.location.href;
-    // Check if the URL contains survey
-    const isSurvey = currentUrl.includes('survey');
-    setSurvey(isSurvey);
-  }, []); // Run this effect only once when the component mounts
 
   const handleDataset = dataset => {
     const idx = schemaMeta.data.findIndex(file => file.schema === dataset.schema && file.id === dataset.id);
@@ -73,7 +64,7 @@ const VisControlDatasets = ({}) => {
                 key={idx}
                 selected={datasetChoice === idx}
                 component={Link}
-                to={!survey ? `/visualize/${schemaMeta.name}/${file.id}` : `/survey/visualize/${schemaMeta.name}/${file.id}`}
+                to={!isUserStudy ? `/visualize/${schemaMeta.name}/${file.id}` : `/user-study/visualize/${schemaMeta.name}/${file.id}`}
                 onClick={() => {
                   handleDataset(file), dispatch(getDataset({ schema: schemaMeta.name, id: file.id }));
                 }}

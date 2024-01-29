@@ -3,4 +3,4 @@ export interface IViewPort {
   height?: number;
 }
 
-export const IViewport: Readonly<IViewPort> = { width: 1000, height: 600 };
+export const IViewPort: Readonly<IViewPort> = { width: 1000, height: 600 };

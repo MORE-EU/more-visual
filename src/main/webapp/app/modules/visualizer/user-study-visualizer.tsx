@@ -16,7 +16,7 @@ import { useAppDispatch, useAppSelector } from '../store/storeConfig';
 const mdTheme = createTheme();
 type TransitionProps = Omit<SlideProps, 'direction'>;
 
-export const SurveyVisualizer = () => {
+export const UserStudyVisualizer = () => {
   const { schemaMeta, dataset, datasetChoice, uploadDatasetError, errorMessage, connections, connected} = useAppSelector(state => state.visualizer);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const dispatch = useAppDispatch();
@@ -62,7 +62,7 @@ export const SurveyVisualizer = () => {
   }, [dataset]);
 
   useEffect(() => {
-    params.id === undefined && schemaMeta && history.replace(`/survey/visualize/${schemaMeta.name}/${schemaMeta.data[0].id}`);
+    params.id === undefined && schemaMeta && history.replace(`/user-study/visualize/${schemaMeta.name}/${schemaMeta.data[0].id}`);
     params.id !== undefined && schemaMeta && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
   }, [schemaMeta]);
 
@@ -112,7 +112,9 @@ export const SurveyVisualizer = () => {
                   height: '100%',
                 }}
               >
-                {schemaMeta && dataset ? <ChartContainer/> : (errorMessage == null && <CircularProgress sx={{margin: 'auto'}}/>)}
+                {schemaMeta && dataset ? 
+                <ChartContainer/> : (errorMessage == null && 
+                <CircularProgress sx={{margin: 'auto'}}/>)}
               </Paper>
             </Grid>
           </Grid>
@@ -122,4 +124,4 @@ export const SurveyVisualizer = () => {
   );
 };
 
-export default SurveyVisualizer;
+export default UserStudyVisualizer;

@@ -1,12 +1,10 @@
-import { ITimeRange } from './time-range.model';
-import { IChangepointDate } from 'app/shared/model/changepoint-date.model';
-import { IViewport } from 'app/shared/model/viewport.model';
+import { IViewPort } from 'app/shared/model/viewport.model';
 
 export interface IQuery {
   from?: number;
   to?: number;
   measures?: number[];
-  viewPort?: IViewport;
+  viewPort?: IViewPort;
   filter?: {};
   secondaryMeasures?: number[];
 }
