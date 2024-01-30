@@ -9,6 +9,15 @@ public class SchemaInfo {
     private String valueCol;
     private String idCol;
     private Boolean isConfiged;
+    private String schema;
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
 
     public Boolean getIsConfiged() {
         return isConfiged;
@@ -53,7 +62,7 @@ public class SchemaInfo {
     @Override
     public String toString() {
         return "SchemaInfo [id=" + id + ", idCol=" + idCol + ", isConfiged=" + isConfiged + ", timeCol=" + timeCol
-                + ", valueCol=" + valueCol + "]";
+                + ", valueCol=" + valueCol + ", schema=" + schema + "]";
     }
     
 }

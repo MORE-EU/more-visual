@@ -119,7 +119,7 @@ const initialState = {
   connections: [] as IConnection[],
   connectionLoading: false,
   uploadDatasetError: false,
-  isUserStudy: true,
+  isUserStudy: false,
 };
 
 const concatenateAndSortDistinctArrays = (array1: number[], array2: number[]) => {
@@ -147,6 +147,15 @@ export const disconnector = createAsyncThunk('disconnector', async () => {
 export const getSchemaMetadata = createAsyncThunk('getSchemaMetadata', async (data: {schema: string; }) => {
   try {
     const response = await axios.get(`api/datasets/metadata/${data.schema}`).then(res => res);
+    return response;
+  } catch (error) {
+    throw new Error("Can't get database metadata");
+  }
+});
+
+export const getUserStudySchemaMetadata = createAsyncThunk('getUserStudySchemaMetadata', async (data: {schema: string;}) =>{
+  try {
+    const response = await axios.get(`api/user-study/metadata/${data.schema}`).then(res => res);
     return response;
   } catch (error) {
     throw new Error("Can't get database metadata");
@@ -516,6 +525,12 @@ const visualizer = createSlice({
       state.schemaMeta = action.payload.data;
       state.datasetChoice = (state.schemaMeta && state.dataset) ? state.schemaMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
     });
+    builder.addCase(getUserStudySchemaMetadata.fulfilled, (state, action) => {
+      state.loading = false;
+      state.schemaMeta = action.payload.data;
+      state.datasetChoice = (state.schemaMeta && state.dataset) ? state.schemaMeta.data.findIndex(item => item.id === state.dataset.id) : 0;
+    });
+
     builder.addCase(updateSchemaInfoColumnNames.fulfilled, (state, action) => {
       state.loading = false;
       state.schemaMeta.data[state.datasetChoice] = action.payload.data;
@@ -599,7 +614,7 @@ const visualizer = createSlice({
     builder.addCase(getDatasets.rejected, (state, action) => {
       state.datasets = {...state.datasets, loading: false, error: "there was an error loading the data"}
     });
-    builder.addMatcher(isAnyOf(getDataset.pending, updateDataset.pending, getSampleFile.pending, getSchemaMetadata.pending, updateSchemaInfoColumnNames.pending,getColumnNames.pending, connector.pending, disconnector.pending), state => {
+    builder.addMatcher(isAnyOf(getDataset.pending, updateDataset.pending, getSampleFile.pending, getSchemaMetadata.pending, getUserStudySchemaMetadata.pending, updateSchemaInfoColumnNames.pending,getColumnNames.pending, connector.pending, disconnector.pending), state => {
       state.loading = true;
     });
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
@@ -617,7 +632,7 @@ const visualizer = createSlice({
       state.connectionLoading = true;
     });
     builder.addMatcher(
-      isAnyOf( getSchemaMetadata.rejected, updateDataset.rejected, updateSchemaInfoColumnNames.rejected, getSampleFile.rejected, getColumnNames.rejected, disconnector.rejected),
+      isAnyOf( getSchemaMetadata.rejected, getUserStudySchemaMetadata.rejected, updateDataset.rejected, updateSchemaInfoColumnNames.rejected, getSampleFile.rejected, getColumnNames.rejected, disconnector.rejected),
       (state, action) => {
         state.loading = false;
         state.errorMessage = "unable to reach server";

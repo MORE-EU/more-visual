@@ -93,6 +93,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
             for (TableInfo tableInfo : tableInfoArray) {
                 SchemaInfo schemaInfo = new SchemaInfo();
                 schemaInfo.setId(tableInfo.getTable());
+                schemaInfo.setSchema(tableInfo.getSchema());
                 if (connection instanceof InfluxDBConnection) schemaInfo.setIsConfiged(true);
                 else schemaInfo.setIsConfiged(false);
                 schemaInfos.add(schemaInfo);
@@ -101,6 +102,25 @@ public class DatasetRepositoryImpl implements DatasetRepository {
             schemaMeta.setData(schemaInfos);
             return Optional.ofNullable(schemaMeta);
         } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public Optional<SchemaMeta> findUserStudySchema(String schema) throws IOException {
+        if (schemaMeta.getType() != null && schemaMeta.getName().equals(schema)) return Optional.ofNullable(schemaMeta);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            File metadataFile = new File(applicationProperties.getWorkspacePath() + "/more.meta.json");
+            if (metadataFile.exists()) {
+                FileReader reader = new FileReader(metadataFile);
+                schemaMeta = mapper.readValue(reader, SchemaMeta.class);
+            }
+            log.debug("{}", schemaMeta);
+            for (SchemaInfo schemaInfo : schemaMeta.getData()) schemaInfo.setIsConfiged(true);
+            if (schemaMeta.getData().isEmpty()) throw new IOException("No available data.");
+            return Optional.ofNullable(schemaMeta);
+        } catch(Exception e) {
             throw e;
         }
     }
@@ -120,7 +140,13 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     @Override
     public List<Object[]> findSample(String id, QueryExecutor queryExecutor) throws SQLException {
         List<Object[]> resultList = new ArrayList<>();
-        String schema = schemaMeta.getName();
+        String schema = null;
+        for (SchemaInfo schemaInfo : schemaMeta.getData()) {
+            if (schemaInfo.getId().equals(id)) {
+                schema = schemaInfo.getSchema();
+                break;
+            }
+        }
         try {
         resultList = queryExecutor.getSample(schema, id);
         } catch (Exception e) {
@@ -205,7 +231,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 p = String.valueOf(Paths.get(applicationProperties.getWorkspacePath(), "postgres-" + schemaInfo.getId()));
                 if (new File(p).exists()) dataset = (PostgreSQLDataset) SerializationUtilities.loadSerializedObject(p);
                 else{
-                    dataset = new PostgreSQLDataset(sqlQueryExecutor, schemaInfo.getId(), schemaMeta.getName(), schemaInfo.getId(), timeFormat, 
+                    dataset = new PostgreSQLDataset(sqlQueryExecutor, schemaInfo.getId(), schemaInfo.getSchema(), schemaInfo.getId(), timeFormat, 
                                                 schemaInfo.getTimeCol(),schemaInfo.getIdCol(), schemaInfo.getValueCol());
                     SerializationUtilities.storeSerializedObject(dataset, p);
                 }
@@ -215,7 +241,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 p = String.valueOf(Paths.get(applicationProperties.getWorkspacePath(), "influx-" + schemaInfo.getId()));
                 if (new File(p).exists()) dataset = (InfluxDBDataset) SerializationUtilities.loadSerializedObject(p);
                 else{
-                    dataset = new InfluxDBDataset(influxDBQueryExecutor, schemaInfo.getId(), schemaMeta.getName(), schemaInfo.getId(), timeFormat, schemaInfo.getTimeCol());
+                    dataset = new InfluxDBDataset(influxDBQueryExecutor, schemaInfo.getId(), schemaInfo.getSchema(), schemaInfo.getId(), timeFormat, schemaInfo.getTimeCol());
                     SerializationUtilities.storeSerializedObject(dataset, p);
                 }
                 break;

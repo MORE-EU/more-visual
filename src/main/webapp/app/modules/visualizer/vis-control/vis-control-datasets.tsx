@@ -9,11 +9,11 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getDataset, updateDatasetChoice, resetFetchData, setDatasetIsConfiged, resetDataset, disconnector } from 'app/modules/store/visualizerSlice';
+import { getDataset, updateDatasetChoice, resetFetchData, setDatasetIsConfiged, resetDataset } from 'app/modules/store/visualizerSlice';
 import {useState} from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import VisControlDatasetUpload from './vis-control-dataset-upload';
 
 const VisControlDatasets = ({}) => {
@@ -21,6 +21,7 @@ const VisControlDatasets = ({}) => {
   const dispatch = useAppDispatch();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
+  const params: any = useParams();
 
   const handleDataset = dataset => {
     const idx = schemaMeta.data.findIndex(file => file.schema === dataset.schema && file.id === dataset.id);
@@ -64,7 +65,7 @@ const VisControlDatasets = ({}) => {
                 key={idx}
                 selected={datasetChoice === idx}
                 component={Link}
-                to={!isUserStudy ? `/visualize/${schemaMeta.name}/${file.id}` : `/user-study/visualize/${schemaMeta.name}/${file.id}`}
+                to={!isUserStudy ? `/visualize/${schemaMeta.name}/${file.id}` : `/user-study/${params.type}/visualize/${schemaMeta.name}/${file.id}`}
                 onClick={() => {
                   handleDataset(file), dispatch(getDataset({ schema: schemaMeta.name, id: file.id }));
                 }}

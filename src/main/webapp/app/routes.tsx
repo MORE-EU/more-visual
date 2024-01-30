@@ -19,7 +19,7 @@ const Routes = () => {
       <ErrorBoundaryRoute exact path={"/visualize"} component={Connector}/>
       <ErrorBoundaryRoute exact path={"/configure/:schema"} component={VisConfigurer} />
       <ErrorBoundaryRoute exact path={"/visualize/:schema/:id?"} component={Visualizer}/>
-      <ErrorBoundaryRoute exact path={"/user-study/visualize/:schema?/:id?"} component={UserStudyVisualizer}/>
+      <ErrorBoundaryRoute exact path={"/user-study/:type(influx|postgres)/visualize/:schema?/:id?"} component={UserStudyVisualizer}/>
       <ErrorBoundaryRoute component={PageNotFound}/>
     </Switch>
   </div>

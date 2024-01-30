@@ -203,6 +203,17 @@ public class DatasetResource {
         }
     }
 
+    @GetMapping("/user-study/metadata/{schema}")
+    public ResponseEntity<Optional<SchemaMeta>> getUserStudySchemaMetadata (@PathVariable String schema) throws IOException {
+        log.debug("Rest request to get user study schema metadata for {}", schema);
+        try {
+            Optional<SchemaMeta> schemaMeta = datasetRepository.findUserStudySchema(schema);
+            return new ResponseEntity<Optional<SchemaMeta>>(schemaMeta, HttpStatus.OK);
+        } catch(Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/datasets/metadata/columns/{schema}/{id}")
     public ResponseEntity<List<String>> getColumnNames(@PathVariable String schema, @PathVariable String id) throws SQLException {
         log.debug("Rest request to get column names for table {}", id);
