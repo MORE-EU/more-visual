@@ -29,6 +29,8 @@ public interface DatasetRepository {
     
     Optional<SchemaMeta> findSchema (DatabaseConnection connection, String schema, QueryExecutor queryExecutor) throws SQLException, IOException;
 
+    Optional<SchemaMeta> findUserStudySchema(String schema) throws IOException;
+
     @Cacheable(cacheNames = DATASETS_CACHE)
     Optional<AbstractDataset> findById(String id, String schema, QueryExecutor queryExecutor) throws IOException, SQLException;
 

@@ -10,7 +10,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Slide, { SlideProps } from '@mui/material/Slide';
 
 import { useAppDispatch, useAppSelector } from '../../store/storeConfig';
-import { setDatasetIsConfiged, disconnector, setErrorMessage, resetFetchData } from '../../store/visualizerSlice';
+import { disconnector, setErrorMessage, resetFetchData } from '../../store/visualizerSlice';
 import Header from '../header/header';
 import VisConnector from './vis-connector';
 
@@ -19,12 +19,14 @@ type TransitionProps = Omit<SlideProps, 'direction'>;
 
 export const Connector = () => {
     const [openSnack, setOpenSnack] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
     const { schemaMeta, datasetChoice, selectedConnection, connected, errorMessage } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const history = useHistory();
 
     useEffect(() => {
         dispatch(resetFetchData());
+        setIsMounted(true);
     },[]);
 
     function TransitionLeft(props: TransitionProps) {
@@ -32,16 +34,16 @@ export const Connector = () => {
     }
     
     useEffect(() => {
-        if (schemaMeta && schemaMeta.isTimeSeries) history.push(`/visualize/${schemaMeta.name}/${schemaMeta.data[datasetChoice].id}`);
-        if (schemaMeta && !schemaMeta.isTimeSeries) history.push(`/configure/${schemaMeta.name}`);
+        if (isMounted && schemaMeta && schemaMeta.isTimeSeries) history.push(`/visualize/${schemaMeta.name}/${schemaMeta.data[datasetChoice].id}`);
+        if (isMounted && schemaMeta && !schemaMeta.isTimeSeries) history.push(`/configure/${schemaMeta.name}`);
     },[schemaMeta]);
     
     useEffect(() => {
         if(errorMessage) setOpenSnack(true);
+        if (!schemaMeta && connected) dispatch(disconnector());
     }, [errorMessage]);
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-        if (!schemaMeta && connected) dispatch(disconnector());
         dispatch(setErrorMessage(null));
         setOpenSnack(false);
     };

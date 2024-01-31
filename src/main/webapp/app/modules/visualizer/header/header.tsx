@@ -7,9 +7,11 @@ import Typography from '@mui/material/Typography';
 import grey from '@mui/material/colors/grey';
 import Skeleton from '@mui/material/Skeleton';
 import { useAppSelector } from 'app/modules/store/storeConfig';
+import { useParams } from 'react-router-dom';
 
 const Header = props => {
   const { schemaMeta, datasetChoice, isUserStudy} = useAppSelector(state => state.visualizer);
+  const params: any = useParams();
 
   return (
     <Grid
@@ -31,7 +33,7 @@ const Header = props => {
           Home
           </Typography>
         </Link>
-        {schemaMeta ?<Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`${isUserStudy ? "user-study" : ""}/visualize/${schemaMeta.name}`}>
+        {schemaMeta ?<Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`${isUserStudy ?  `user-study/${params.type}` : ""}/visualize/${schemaMeta.name}`}>
         <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
           {schemaMeta.name}
           </Typography>

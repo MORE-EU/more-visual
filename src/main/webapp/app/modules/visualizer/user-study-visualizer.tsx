@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
-import { getAlerts, getConnection, getDataset, getDatasets, setDatasetIsConfiged, updateDataset, updateDatasetChoice, getSchemaMetadata, connector, updateAccuracy } from '../store/visualizerSlice';
+import {getDataset, updateDatasetChoice, getSchemaMetadata, connector, updateAccuracy, getUserStudySchemaMetadata, getAllConnections } from '../store/visualizerSlice';
 import CircularProgress  from '@mui/material/CircularProgress';
 import Header from './header/header';
 import React, { useEffect, useState } from 'react';
@@ -17,23 +17,25 @@ const mdTheme = createTheme();
 type TransitionProps = Omit<SlideProps, 'direction'>;
 
 export const UserStudyVisualizer = () => {
-  const { schemaMeta, dataset, datasetChoice, uploadDatasetError, errorMessage, connections, connected} = useAppSelector(state => state.visualizer);
+  const { schemaMeta, dataset, datasetChoice, errorMessage, connections, connected} = useAppSelector(state => state.visualizer);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const dispatch = useAppDispatch();
   const params: any = useParams();
   const history = useHistory();
 
   useEffect(() => {
-    dispatch(getConnection("pulsar-influx"));
+    dispatch(getAllConnections());
     dispatch(updateAccuracy(0.95));
   }, []);
 
   useEffect(() => {
-    connections.length > 0 && dispatch(connector(connections.find(connection => connection.name === "pulsar-influx")))
+    connections.length > 0 && params.type === "influx" && dispatch(connector(connections.find(connection => connection.name === "pulsar-influx")));
+    connections.length > 0 && params.type === "postgres" && dispatch(connector(connections.find(connection => connection.name === "pulsar-postgres")));
   },[connections]);
 
   useEffect(() => {
-    connected && dispatch(getSchemaMetadata({schema: connections.find(connection => connection.name === "pulsar-influx").database}));
+    connected && params.type === "influx" && dispatch(getSchemaMetadata({schema: connections.find(connection => connection.name === "pulsar-influx").database}));
+    connected && params.type === "postgres" && dispatch(getUserStudySchemaMetadata({schema: connections.find(connection => connection.name === "pulsar-postgres").database}));
   }, [connected]);
 
 
@@ -57,23 +59,10 @@ export const UserStudyVisualizer = () => {
   }, [errorMessage])
 
   useEffect(() => {
-    dataset && dispatch(getAlerts(dataset.id));
-    dataset && dispatch(getDatasets());
-  }, [dataset]);
-
-  useEffect(() => {
-    params.id === undefined && schemaMeta && history.replace(`/user-study/visualize/${schemaMeta.name}/${schemaMeta.data[0].id}`);
+    params.id === undefined && schemaMeta && history.replace(`/user-study/${params.type}/visualize/${schemaMeta.name}/${schemaMeta.data[0].id}`);
+    params.id !== undefined && schemaMeta && dispatch(getDataset({ schema: params.schema, id: params.id })); // Get dataset on browser reload case
     params.id !== undefined && schemaMeta && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
   }, [schemaMeta]);
-
-  useEffect(() => {
-    if (uploadDatasetError)
-      if (schemaMeta && !schemaMeta.isTimeSeries && schemaMeta.type !== "csv") {
-        dispatch(setDatasetIsConfiged(false));
-        dispatch(updateDataset({dataset: schemaMeta.data[datasetChoice]}));
-        history.replace(`/configure/${params.schema}`);
-      }
-  }, [uploadDatasetError]);
 
   return (
     <div>

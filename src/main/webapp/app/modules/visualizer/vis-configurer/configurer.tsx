@@ -7,20 +7,20 @@ import Alert from '@mui/material/Alert';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Snackbar from '@mui/material/Snackbar';
-import CircularProgress from '@mui/material/CircularProgress';
 
 import VisControlDatasetConfig from './vis-control-dataset-config';
 import VisControlDatasetSelection from './vis-control-dataset-selection';
 
 
 import { useAppDispatch, useAppSelector } from '../../store/storeConfig';
-import { setDatasetIsConfiged, setErrorMessage, getSchemaMetadata, updateDatasetChoice, getDatasets } from '../../store/visualizerSlice';
+import { setDatasetIsConfiged, setErrorMessage, getSchemaMetadata, resetDataset } from '../../store/visualizerSlice';
 import Header from '../header/header';
 
 const mdTheme = createTheme();
 
 export const VisConfigurer = () => {
     const [openSnack, setOpenSnack] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
     const { schemaMeta, datasetChoice, selectedConnection, datasetIsConfiged, errorMessage } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const history = useHistory();
@@ -29,11 +29,13 @@ export const VisConfigurer = () => {
 
     useEffect(() => {
         dispatch(setDatasetIsConfiged(false));
+        dispatch(resetDataset());
+        setIsMounted(true);
         !schemaMeta && dispatch(getSchemaMetadata({schema: params.schema}));
     },[]);
 
     useEffect(() => {
-        if (schemaMeta && datasetIsConfiged) history.push(`/visualize/${schemaMeta.name}/${schemaMeta.data[datasetChoice].id}`);
+        if (isMounted && schemaMeta && datasetIsConfiged) history.push(`/visualize/${schemaMeta.name}/${schemaMeta.data[datasetChoice].id}`);
     }, [datasetIsConfiged]);
 
     useEffect(() => {
