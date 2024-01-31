@@ -40,7 +40,7 @@ const Home = () => {
                 </a>
               </li>
               <li>
-                <a href="/user-study/visualize/" rel="noopener noreferrer">
+                <a href="/user-study/influx/visualize/" rel="noopener noreferrer">
                   User Study
                 </a>
               </li>
