@@ -44,7 +44,7 @@ export const ChartControl = ({}) => {
           {isUserStudy && (
             <Box sx={{width: '30%', margin: 'auto'}}>
               <Typography id="slidebar-label">
-                Accuracy: {value}%
+                Min. Accuracy: {value}%
               </Typography>
               <Slider 
               value={value}

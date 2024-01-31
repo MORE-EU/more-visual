@@ -73,9 +73,12 @@ const initialState = {
   chartType: 'line' as String,
   queryResults: null as IQueryResults,
   data: null as any,
+  m4Data: null as any,
+  m4QueryResults: null as IQueryResults,
   compareData: [],
   liveDataImplLoading: false,
   queryResultsLoading: true as boolean,
+  m4QueryResultsLoading: true as boolean,
   selectedMeasures: [],
   customSelectedMeasures: [] as ICustomMeasure[],
   measureColors: [],
@@ -119,7 +122,7 @@ const initialState = {
   connections: [] as IConnection[],
   connectionLoading: false,
   uploadDatasetError: false,
-  isUserStudy: true,
+  isUserStudy: false,
 };
 
 const concatenateAndSortDistinctArrays = (array1: number[], array2: number[]) => {
@@ -263,6 +266,40 @@ export const updateQueryResults = createAsyncThunk(
         } as IQuery)
       : (query = {});
 
+    const response = await axios.post(`api/datasets/${schema}/${id}/query`, query).then(res => res);
+    return {id, response: response.data};
+  }
+);
+
+export const updateM4QueryResults = createAsyncThunk(
+  'updateM4QueryResults',
+  async (data: {
+    schema: string;
+    id: string;
+    from: number;
+    to: number;
+    viewPort: IViewPort;
+    selectedMeasures: any[];
+    filter?: {};
+  }, {getState}) => {
+    const { schema, id, from, to, viewPort, selectedMeasures, filter } = data;
+    let query;
+    const {visualizer} = getState() as RootState;
+    const customSelectedMeasures = [];
+    const accuracy = 1.0
+    visualizer.customSelectedMeasures
+      .forEach(customMeasure => customSelectedMeasures.push(customMeasure.measure1, customMeasure.measure2));
+    let measures = concatenateAndSortDistinctArrays(selectedMeasures, customSelectedMeasures);
+    from !== null && to !== null
+      ? (query = {
+          from,
+          to,
+          viewPort,
+          accuracy,
+          measures,
+          filter: filter ? filter : null,
+        } as IQuery)
+      : (query = {});
     const response = await axios.post(`api/datasets/${schema}/${id}/query`, query).then(res => res);
     return {id, response: response.data};
   }
@@ -473,8 +510,11 @@ const visualizer = createSlice({
     },
     resetChartValues(state) {
       state.queryResultsLoading = initialState.queryResultsLoading;
+      state.m4QueryResultsLoading = initialState.m4QueryResultsLoading;
       state.queryResults = initialState.queryResults;
+      state.m4QueryResults = initialState.m4QueryResults;
       state.data = initialState.data;
+      state.m4Data = initialState.m4Data;
       state.from = initialState.from;
       state.to = initialState.to;
       state.compareData = initialState.compareData;
@@ -573,6 +613,11 @@ const visualizer = createSlice({
       state.from = action.payload.response.data[Object.keys(action.payload.response.data)[0]][0].timestamp;
       state.to = action.payload.response.data[Object.keys(action.payload.response.data)[0]][action.payload.response.data[Object.keys(action.payload.response.data)[0]].length - 1].timestamp;
     });
+    builder.addCase(updateM4QueryResults.fulfilled, (state, action) => {
+      state.m4QueryResultsLoading = false;
+      state.m4QueryResults = action.payload.response;
+      state.m4Data = action.payload.response.data;
+    });
     builder.addCase(updateCompareQueryResults.fulfilled, (state, action) => {
       state.compareData = action.payload;
       state.queryResultsLoading = false;
@@ -604,6 +649,10 @@ const visualizer = createSlice({
     });
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
       state.queryResultsLoading = true;
+      state.errorMessage = null;
+    });
+    builder.addMatcher(isAnyOf(updateM4QueryResults.pending), state => {
+      state.m4QueryResultsLoading = true;
       state.errorMessage = null;
     });
     builder.addMatcher(isAnyOf(liveDataImplementation.pending), state => {
@@ -638,8 +687,9 @@ const visualizer = createSlice({
         state.uploadDatasetError = true;
       }
     );
-    builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateCompareQueryResults.rejected), (state, action) => {
+    builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateM4QueryResults.rejected, updateCompareQueryResults.rejected), (state, action) => {
       state.queryResultsLoading = false;
+      state.m4QueryResultsLoading = false;
       state.errorMessage = action.error.message;
     });
     builder.addMatcher(isAnyOf(liveDataImplementation.rejected), (state, action) => {

@@ -14,6 +14,7 @@ import {
   updateCompareQueryResults,
   updateCustomChangepoints,
   updateFrom,
+  updateM4QueryResults,
   updateQueryResults,
   updateTo,
   updateViewPort,
@@ -39,12 +40,14 @@ export const Chart = () => {
     customSelectedMeasures,
     measureColors,
     queryResultsLoading,
+    m4QueryResultsLoading,
     filter,
     queryResults,
     changeChart,
     compare,
     customChangepointsEnabled,
     data,
+    m4Data,
     compareData,
     errorMessage,
     forecastData,
@@ -58,6 +61,7 @@ export const Chart = () => {
     forecastingStartDate,
     forecastingEndDate,
     datasets,
+    isUserStudy,
   } = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
@@ -70,9 +74,11 @@ export const Chart = () => {
   const [alertingPlotBands, setAlertingPlotBands] = useState([]);
   const [detectedPlotBands, setDetectedPlotBands] = useState([]);
   const [changepointHighlight, setChangepointHighlight] = useState(false);
+  const [m4Chart, setM4Chart] = useState(null);
   //Refs
   const fetchDataRef = useRef({ isScrolling: false, scrollTimeout: null });
   const chart = useRef(chartRef);
+  const latestM4Chart = useRef(m4Chart);
   const timeRange = useRef(null);
   const latestSchema = useRef(null);
   const latestDatasetId = useRef(null);
@@ -161,6 +167,12 @@ export const Chart = () => {
   }, [queryResultsLoading]);
 
   useEffect(() => {
+    if (m4Chart !== null) {
+      !m4QueryResultsLoading && m4Chart.hideLoading();
+    }
+  }, [m4QueryResultsLoading]);
+
+  useEffect(() => {
     if (Object.keys(compare).length !== 0) {
       dispatch(updateCompareQueryResults({ schema: schemaMeta.name, compare, from, to, viewPort, filter }));
     }
@@ -181,6 +193,18 @@ export const Chart = () => {
           filter,
         })
       );
+      if(isUserStudy)
+        dispatch(
+          updateM4QueryResults({
+            schema: schemaMeta.name,
+            id: dataset.id,
+            from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
+            to: to ? to : dataset.timeRange.to,
+            viewPort,
+            selectedMeasures,
+            filter,
+          })
+        );
       dispatch(updateViewPort(viewPort));
       if (Object.keys(compare).length !== 0) {
         dispatch(updateCompareQueryResults({ schema: schemaMeta.name, compare, from, to, viewPort, filter }));
@@ -198,6 +222,10 @@ export const Chart = () => {
   useEffect(() => {
     latestCompare.current = compare;
   }, [compare]);
+
+  useEffect(() => {
+    latestM4Chart.current = m4Chart;
+  }, [m4Chart]);
 
   useEffect(() => {
     if (customChangepointsEnabled && changepointHighlight === false) {
@@ -261,19 +289,11 @@ export const Chart = () => {
     latestCustomChangepoints.current = newCustomChangepoints;
     dispatch(updateCustomChangepoints(latestCustomChangepoints.current));
   };
-
   const chartFunctions = (e: { target: any }) => {
     chart.current = e.target;
     timeRange.current = queryResults.timeRange;
     latestDatasetId.current = dataset.id;
     latestSchema.current = schemaMeta.name;
-    
-    // CHART: INSTRUCTIONS
-    // chart.current.showLoading('Click and drag to Pan <br> Use mouse wheel to zoom in/out <br> click once for this message to disappear');
-    // Highcharts.addEvent(chart.current.container, 'click', (event: MouseEvent) => {
-    //   chart.current.hideLoading();
-    //   Highcharts.removeEvent(chart.current.container, 'click');
-    // });
 
     const fetchData = () => {
       const { max, min } = chart.current.xAxis[0].getExtremes();
@@ -304,6 +324,21 @@ export const Chart = () => {
             filter: latestFilter.current,
           })
         );
+        
+      if(isUserStudy){
+          latestM4Chart.current.showLoading();
+          dispatch(
+            updateM4QueryResults({
+              schema: latestSchema.current,
+              id: latestDatasetId.current,
+              from: min,
+              to: max,
+              viewPort,
+              selectedMeasures: latestMeasures.current,
+              filter: latestFilter.current,
+            })
+          )
+      }
     };
 
     const handleEventTimeout = event => {
@@ -352,26 +387,6 @@ export const Chart = () => {
         handleEventTimeout(event);
       }
     });
-
-    // LIVE DATA IMPLEMENTATION
-    // setInterval(() => {
-    //   if (!latestPreview.current) {
-    //     const { max, min, dataMax } = chart.current.xAxis[0].getExtremes();
-    //     if (max >= data[selectedMeasures[0]][data[selectedMeasures[0]].length - 1].timestamp) {
-    //       dispatch(
-    //         liveDataImplementation({
-    //           schema: latestSchema.current,
-    //           id: latestDatasetId.current,
-    //           from: dataMax,
-    //           to: dataMax + 50000,
-    //           selectedMeasures: latestMeasures.current,
-    //           filter: latestFilter.current,
-    //         })
-    //       );
-    //       max === dataMax && chart.current.xAxis[0].setExtremes(min, dataMax + 50000, true, true);
-    //     }
-    //   }
-    // }, 500);
 
     // Set initial extremes
     chart.current.xAxis[0].setExtremes(
@@ -428,6 +443,7 @@ export const Chart = () => {
     const normalizedData2 = normalizeData(data2);
     return normalizedData1.map((item, index) => [item.timestamp, item.value / normalizedData2[index].value]);
   };
+
   const computeChartData = () => {
     let chartData =
       data !== null
@@ -474,6 +490,7 @@ export const Chart = () => {
     }
     return chartData;
   };
+
 
   const computeYAxisData = () => {
     const allMeasuresLength =
@@ -562,6 +579,42 @@ export const Chart = () => {
     return yAxisData;
   };
 
+  const computeM4ChartData = () => {
+    let chartData =
+      m4Data !== null
+        ? selectedMeasures
+            .map((measure, index) => ({
+              data: m4Data[measure]
+                ? m4Data[measure].map(d => {
+                    const val = d.value;
+                    return [d.timestamp, isNaN(val) ? null : val];
+                  })
+                : [],
+              name: dataset.header[measure],
+              color: measureColors[measure],
+              yAxis: changeChart ? index : 0,
+              zoneAxis: 'x',
+              showInLegend: true,
+              enableMouseTracking: true,
+            }))
+            .concat(
+              customSelectedMeasures.map((customMeasure, index) => ({
+                data:
+                  m4Data[customMeasure.measure1] && m4Data[customMeasure.measure2]
+                      ? combineData(m4Data[customMeasure.measure1], m4Data[customMeasure.measure2])
+                      : [],
+                  name: dataset.header[customMeasure.measure1] + '/' + dataset.header[customMeasure.measure2],
+                  color: measureColors[customMeasure.measure1],
+                  yAxis: changeChart ? index + selectedMeasures.length : 0,
+                  zoneAxis: 'x',
+                  showInLegend: true,
+                  enableMouseTracking: true,
+              }))
+            )
+        : [];
+    return chartData;
+  };
+
   const forecastChartData =
     forecastData !== null
       ? selectedMeasures.map((measure, index) => ({
@@ -619,138 +672,258 @@ export const Chart = () => {
     allowScroll();
   };
 
+  // Event handler for chart updates
+  const handleChartUpdate = (chart) => {
+    setM4Chart(chart);
+    // Synchronize secondary chart with the main chart
+    const secondaryChart = chartRef && chartRef.current.chart;
+
+    if (secondaryChart) {
+      secondaryChart.series[0].setData(chart.series[0].options.data, true, false, false);
+    }
+  };
+
   return (
-    <Grid
-      sx={{
-        border: '1px solid rgba(0, 0, 0, .1)',
-        height: activeTool ? (activeTool === 'Yaw Misalignment Detection' ? '70%' : '40%') : '70%',
-        position: 'relative',
-      }}
-      onMouseOver={() => (data ? handleMouseOverChart() : null)}
-      onMouseLeave={() => (data ? handleMouseLeaveChart() : null)}
-    >
-      {queryResultsLoading && errorMessage === null ? (
-        <LinearProgress />
-      ) : !queryResultsLoading && errorMessage !== null ? (
-        <LinearProgress variant="determinate" color="error" value={100} className={'linear-prog-hide'} />
-      ) : (
-        <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />
-      )}
-      {data && (
-        <HighchartsReact
-          highcharts={Highcharts}
-          constructorType={'stockChart'}
-          containerProps={{ className: 'chartContainer', style: { height: 'calc(100% - 4px)', position: 'absolute', width: '100%' } }}
-          allowChartUpdate={true}
-          immutable={false}
-          callback={getChartRef}
-          updateArgs={[true, true, true]}
-          options={{
-            title: null,
-            plotOptions: {
-              line: {
-                dataGrouping: {
-                  enabled: true
-                }
-              },
-              series: {
-                connectNulls: false,
-                connectorAllowed: false,
-                maxPointWidth: 80,
-                turboThreshold: 100000, // TODO: REMOVE THIS IS ONLY FOR ALEX YAW
-                marker: {
-                  enabled: Object.keys(filter).length !== 0 ? true : false,
+    <>
+      <Grid
+        sx={{
+          border: '1px solid rgba(0, 0, 0, .1)',
+          height: isUserStudy ? '50%' : '70%',
+          position: 'relative',
+        }}
+        onMouseOver={() => (data ? handleMouseOverChart() : null)}
+        onMouseLeave={() => (data ? handleMouseLeaveChart() : null)}
+      > {isUserStudy ?
+          m4QueryResultsLoading && errorMessage === null ? (
+            <LinearProgress />
+          ) : !m4QueryResultsLoading && errorMessage !== null ? (
+            <LinearProgress variant="determinate" color="error" value={100} className={'linear-prog-hide'} />
+          ) : (
+            <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />
+          )
+          :
+          queryResultsLoading && errorMessage === null ? (
+            <LinearProgress />
+          ) : !queryResultsLoading && errorMessage !== null ? (
+            <LinearProgress variant="determinate" color="error" value={100} className={'linear-prog-hide'} />
+          ) : (
+            <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />
+          )
+        }
+        {data && (
+            <HighchartsReact
+              highcharts={Highcharts}
+              constructorType={'stockChart'}
+              containerProps={{ className: 'chartContainer', style: { height: 'calc(100% - 4px)', position: 'absolute', width: '100%' } }}
+              allowChartUpdate={true}
+              immutable={false}
+              ref={chartRef}
+              callback={getChartRef}
+              updateArgs={[true, true, true]}
+              options={{
+                title: null,
+                plotOptions: {
+                  line: {
+                    dataGrouping: {
+                      enabled: false
+                    }
+                  },
+                  series: {
+                    connectNulls: false,
+                    connectorAllowed: false,
+                    maxPointWidth: 80,
+                    marker: {
+                      enabled: Object.keys(filter).length !== 0 ? true : false,
+                    },
+                  },
                 },
-              },
-            },
-            tooltip: {
-              formatter: function () {
-                // The first returned item is the header, subsequent items are the
-                // points
-                return ['<b>' + new Date(this.x) + '</b>'].concat(
-                  this.points
-                    ? this.points.map(function (point) {
-                        let ss = `<div><span style="color: ${point.color}; font-size: 12px; margin-right:5px;">●</span>  ${
-                          point.series.name
-                        }: ${point.y.toFixed(2)}</div>`;
-                        ss += point.point.tt ? `<br>${point.point.tt}</br>` : '';
-                        return ss;
-                      })
-                    : []
-                );
-              },
-              split: true,
-            },
-            series: [
-              ...computeChartData(),
-              ...forecastChartData,
-              ...compareChartData(),
-              dummySeriesCreator('minPoint', dataset.timeRange.from, 0),
-              dummySeriesCreator('maxPoint', dataset.timeRange.to, 1),
-            ],
-            chart: {
-              type: chartType,
-              marginTop: 10,
-              plotBorderWidth: 0,
-              backgroundColor: !activeTool ? null : 'rgba(0,0,0, 0.05)',
-              zoomType: customChangepointsEnabled ? 'x' : false,
-              panning: {
-                enabled: true,
-                type: 'x',
-              },
-              events: {
-                plotBackgroundColor: 'rgba(10,0,0,0)', // dummy color, to create an element
-                load: chartFunctions,
-                selection: customChangepointSelection,
-              },
-            },
-            xAxis: {
-              ordinal: false,
-              type: 'datetime',
-              plotBands: [...manualPlotBands, ...detectedPlotBands, ...customPlotBands, ...alertingPlotBands],
-            },
-            yAxis: computeYAxisData(),
-            rangeSelector: {
-              enabled: false,
-            },
-            navigator: {
-              enabled: false,
-              adaptToUpdatedData: false,
-            },
-            scrollbar: {
-              enabled: false,
-              liveRedraw: false,
-            },
-            colorAxis: null,
-            legend: {
-              enabled: !changeChart,
-            },
-            credits: {
-              enabled: false,
-            },
-            loading: {
-              labelStyle: {
-                color: 'black',
-                fontSize: '20px',
-              },
-              style: {
-                backgroundColor: 'transparent',
-              },
-            },
-          }}
+                tooltip: {
+                  formatter: function () {
+                    // The first returned item is the header, subsequent items are the
+                    // points
+                    return ['<b>' + new Date(this.x) + '</b>'].concat(
+                      this.points
+                        ? this.points.map(function (point) {
+                            let ss = `<div><span style="color: ${point.color}; font-size: 12px; margin-right:5px;">●</span>  ${
+                              point.series.name
+                            }: ${point.y.toFixed(2)}</div>`;
+                            ss += point.point.tt ? `<br>${point.point.tt}</br>` : '';
+                            return ss;
+                          })
+                        : []
+                    );
+                  },
+                  split: true,
+                },
+                series: [
+                  ...computeChartData(),
+                  ...forecastChartData,
+                  ...compareChartData(),
+                  dummySeriesCreator('minPoint', dataset.timeRange.from, 0),
+                  dummySeriesCreator('maxPoint', dataset.timeRange.to, 1),
+                ],
+                chart: {
+                  type: chartType,
+                  marginTop: 10,
+                  plotBorderWidth: 0,
+                  backgroundColor: !activeTool ? null : 'rgba(0,0,0, 0.05)',
+                  zoomType: customChangepointsEnabled ? 'x' : false,
+                  panning: {
+                    enabled: true,
+                    type: 'x',
+                  },
+                  events: {
+                    plotBackgroundColor: 'rgba(10,0,0,0)', // dummy color, to create an element
+                    load: chartFunctions,
+                    selection: customChangepointSelection,
+                  },
+                },
+                xAxis: {
+                  ordinal: false,
+                  type: 'datetime',
+                  plotBands: [...manualPlotBands, ...detectedPlotBands, ...customPlotBands, ...alertingPlotBands],
+                },
+                yAxis: computeYAxisData(),
+                rangeSelector: {
+                  enabled: false,
+                },
+                navigator: {
+                  enabled: false,
+                  adaptToUpdatedData: false,
+                },
+                scrollbar: {
+                  enabled: false,
+                  liveRedraw: false,
+                },
+                colorAxis: null,
+                legend: {
+                  enabled: !changeChart,
+                },
+                credits: {
+                  enabled: false,
+                },
+                loading: {
+                  labelStyle: {
+                    color: 'black',
+                    fontSize: '20px',
+                  },
+                  style: {
+                    backgroundColor: 'transparent',
+                  },
+                },
+              }}
+            />
+        )}
+        <ChartPlotBands
+          manualPlotBands={manualPlotBands}
+          setManualPlotBands={setManualPlotBands}
+          detectedPlotBands={detectedPlotBands}
+          setDetectedPlotBands={setDetectedPlotBands}
+          customPlotBands={customPlotBands}
+          setCustomPlotBands={setCustomPlotBands}
+          customChangepoints={latestCustomChangepoints.current}
+          setCustomChangepoints={setCustomChangepoints}
         />
-      )}
-      <ChartPlotBands
-        manualPlotBands={manualPlotBands}
-        setManualPlotBands={setManualPlotBands}
-        detectedPlotBands={detectedPlotBands}
-        setDetectedPlotBands={setDetectedPlotBands}
-        customPlotBands={customPlotBands}
-        setCustomPlotBands={setCustomPlotBands}
-        customChangepoints={latestCustomChangepoints.current}
-        setCustomChangepoints={setCustomChangepoints}
-      />
-    </Grid>
+      </Grid>
+      {isUserStudy && 
+        <Grid
+          sx={{
+            border: '1px solid rgba(0, 0, 0, .1)',
+            height: '50%',
+            position: 'relative',
+          }}
+        >
+          {m4Data && (
+              <HighchartsReact
+                highcharts={Highcharts}
+                constructorType={'stockChart'}
+                containerProps={{ className: 'secondChartContainer', style: { height: 'calc(100% - 4px)', position: 'absolute', width: '100%' } }}
+                allowChartUpdate={true}
+                immutable={false}
+                callback={handleChartUpdate}
+                updateArgs={[true, true, true]}
+                options={{
+                  title: null,
+                  plotOptions: {
+                    line: {
+                      dataGrouping: {
+                        enabled: false
+                      }
+                    },
+                    series: {
+                      connectNulls: false,
+                      connectorAllowed: false,
+                      maxPointWidth: 80,
+                      marker: {
+                        enabled: Object.keys(filter).length !== 0 ? true : false,
+                      },
+                    },
+                  },
+                  tooltip: {
+                    formatter: function () {
+                      // The first returned item is the header, subsequent items are the
+                      // points
+                      return ['<b>' + new Date(this.x) + '</b>'].concat(
+                        this.points
+                          ? this.points.map(function (point) {
+                              let ss = `<div><span style="color: ${point.color}; font-size: 12px; margin-right:5px;">●</span>  ${
+                                point.series.name
+                              }: ${point.y.toFixed(2)}</div>`;
+                              ss += point.point.tt ? `<br>${point.point.tt}</br>` : '';
+                              return ss;
+                            })
+                          : []
+                      );
+                    },
+                    split: true,
+                  },
+                  series: [
+                    ...computeM4ChartData(),
+                  ],
+                  chart: {
+                    type: chartType,
+                    marginTop: 10,
+                    plotBorderWidth: 0,
+                    backgroundColor: !activeTool ? null : 'rgba(0,0,0, 0.05)',
+                  },
+                  xAxis: {
+                    ordinal: false,
+                    type: 'datetime',
+                  },
+                  yAxis: computeYAxisData(),
+                  rangeSelector: {
+                    enabled: false,
+                  },
+                  navigator: {
+                    enabled: false,
+                    adaptToUpdatedData: false,
+                  },
+                  scrollbar: {
+                    enabled: false,
+                    liveRedraw: false,
+                  },
+                  colorAxis: null,
+                  legend: {
+                    enabled: !changeChart,
+                  },
+                  credits: {
+                    enabled: false,
+                  },
+                  loading: {
+                    labelStyle: {
+                      color: 'black',
+                      fontSize: '20px',
+                    },
+                    style: {
+                      backgroundColor: 'transparent',
+                    },
+                  },
+                }}
+              />
+          )}
+        </Grid>
+      }
+    </>
   );
 };
 

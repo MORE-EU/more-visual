@@ -1,47 +1,27 @@
 package eu.more2020.visual.repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 import eu.more2020.visual.config.ApplicationProperties;
 import eu.more2020.visual.domain.*;
 import eu.more2020.visual.middleware.datasource.QueryExecutor.QueryExecutor;
 import eu.more2020.visual.middleware.datasource.QueryExecutor.InfluxDBQueryExecutor;
-import eu.more2020.visual.middleware.datasource.QueryExecutor.ModelarDBQueryExecutor;
 import eu.more2020.visual.middleware.datasource.QueryExecutor.SQLQueryExecutor;
 import eu.more2020.visual.middleware.domain.TableInfo;
-import eu.more2020.visual.middleware.domain.DataFileInfo;
 import eu.more2020.visual.middleware.domain.DatabaseConnection;
 import eu.more2020.visual.middleware.domain.Dataset.*;
 import eu.more2020.visual.middleware.domain.InfluxDB.InfluxDBConnection;
-import eu.more2020.visual.middleware.domain.TimeRange;
-import eu.more2020.visual.middleware.util.DateTimeUtil;
 import eu.more2020.visual.middleware.util.io.SerializationUtilities;
 
-import org.apache.calcite.avatica.com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import java.io.*;
-
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Repository
 public class DatasetRepositoryImpl implements DatasetRepository {
