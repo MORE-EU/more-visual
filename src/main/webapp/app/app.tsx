@@ -17,16 +17,6 @@ export const App = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    // Get the current URL
-    const currentUrl = window.location.href;
-    // Check if the URL contains survey
-    const isSurvey = currentUrl.includes('user-study');
-    dispatch(toggleUserStudy(isSurvey)); 
-    isSurvey && dispatch(disconnector());
-  }, []); // Run this effect only once when the component mounts
-
-
-  useEffect(() => {
     dispatch(getProfile());
   }, []);
 

@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
-import { getAlerts, getDataset, getDatasets, getSchemaMetadata, setDatasetIsConfiged, setErrorMessage, updateDatasetChoice, updateDataset, updateAccuracy } from '../store/visualizerSlice';
+import { getAlerts, getDataset, getDatasets, getSchemaMetadata, setDatasetIsConfiged, setErrorMessage, updateDatasetChoice, updateDataset, updateAccuracy, toggleUserStudy, disconnector } from '../store/visualizerSlice';
 import CircularProgress  from '@mui/material/CircularProgress';
 import Header from './header/header';
 import React, { useEffect, useState } from 'react';
@@ -24,9 +24,16 @@ export const Visualizer = () => {
   const history = useHistory();
 
   useEffect(() => {
+    // Get the current URL
+    const currentUrl = window.location.href;
+    // Check if the URL contains survey
+    const isSurvey = currentUrl.includes('user-study');
+    dispatch(toggleUserStudy(isSurvey)); 
+    isSurvey && dispatch(disconnector());
     !schemaMeta && dispatch(getSchemaMetadata({schema: params.schema}));
     dispatch(updateAccuracy(0.95));
-  }, []);
+  }, []); // Run this effect only once when the component mounts
+
 
   const handleSnackClose = () => {
     setOpenSnackbar(false);

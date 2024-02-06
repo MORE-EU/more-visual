@@ -30,7 +30,6 @@ const VisControlDatasets = ({}) => {
     }
   };
   
-
   const handleUploadChange = e => {
     setUploadModalOpen(prev => !prev);
     setUploadFile(e.target.files);
@@ -97,14 +96,27 @@ const VisControlDatasets = ({}) => {
                 <ControlPointIcon />
               </ListItemButton>            
             )}
+            {isUserStudy ? 
+            <ListItemButton key={'close-connection-list-button-sd'}
+              component={Link}
+              to={`./`}
+              onClick={() => {dispatch(resetFetchData())}}
+            >
+                <ListItemText primary={`Reset Cache`} sx={ {display: { xs: 'none', md: 'block' }}} />
+                <LogoutIcon />
+            </ListItemButton>
+
+            :
+
             <ListItemButton key={'close-connection-list-button-sd'}
               component={Link}
               to={`/visualize`}
               onClick={() => {dispatch(resetFetchData())}}
             >
-                <ListItemText primary={`close connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
+                <ListItemText primary={`Close Connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
                 <LogoutIcon />
             </ListItemButton>
+            } 
           </List>
         </>
       )}
