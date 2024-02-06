@@ -9,6 +9,7 @@ import Box from '@mui/material/Box';
 import ChartView from './chart-control-buttons/chart-view-buttons';
 import Typography from '@mui/material/Typography';
 import { updateAccuracy } from 'app/modules/store/visualizerSlice';
+import { Button } from '@mui/material';
 
 export const ChartControl = ({}) => {
   const [value, setValue] = useState<number>(95);
@@ -19,6 +20,22 @@ export const ChartControl = ({}) => {
     if (typeof newValue === 'number') {
         setValue(newValue);
       }
+  };
+
+  const handleIncrement = () => {
+    const newValue = Math.min(value + 0.5, 100);
+    setValue(newValue);
+    if (typeof newValue === 'number') {
+      dispatch(updateAccuracy(newValue / 100));
+    }
+  };
+
+  const handleDecrement = () => {
+    const newValue = Math.max(value - 0.5, 90);
+    setValue(newValue);
+    if (typeof newValue === 'number') {
+      dispatch(updateAccuracy(newValue / 100));
+    }
   };
 
   const handleCommitChange = (event: Event, newValue: number | number[]) => {
@@ -42,21 +59,32 @@ export const ChartControl = ({}) => {
             </>
           }
           {isUserStudy && (
-            <Box sx={{width: '30%', margin: 'auto'}}>
-              <Typography id="slidebar-label">
-                Min. Accuracy: {value}%
-              </Typography>
-              <Slider 
-              value={value}
-              min={60}
-              step={1}
-              max={100}
-              onChange={handleChange}
-              onChangeCommitted={handleCommitChange}
-              valueLabelDisplay="auto"
-              aria-labelledby="lidebar-label"
-              />
-            </Box>
+            <>
+              <Box sx={{ width: '10%', margin: 'auto', display: 'flex', alignItems: 'center' }}>
+                <Typography id="slidebar-label">
+                  Min. Accuracy: {value}%
+                </Typography>
+              </Box>
+              <Box sx={{ width: '40%', margin: 'auto', display: 'flex', alignItems: 'center' }}>
+                <Button onClick={handleDecrement} variant="contained" color="primary" sx={{marginRight: '1em' }}>
+                  -
+                </Button>
+                <Slider
+                  value={value}
+                  min={90}
+                  step={0.5}
+                  max={100}
+                  onChange={handleChange}
+                  onChangeCommitted={handleCommitChange}
+                  valueLabelDisplay="auto"
+                  aria-labelledby="lidebar-label"
+                  sx={{ flexGrow: 1 }}
+                />
+                <Button onClick={handleIncrement} variant="contained" color="primary" sx={{marginLeft: '1em' }}>
+                  +
+                </Button>
+              </Box>
+          </>
           )}
       </Grid>
       {!isUserStudy && <ChartView /> }

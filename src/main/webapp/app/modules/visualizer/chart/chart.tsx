@@ -43,6 +43,7 @@ export const Chart = () => {
     m4QueryResultsLoading,
     filter,
     queryResults,
+    m4QueryResults,
     changeChart,
     compare,
     customChangepointsEnabled,
@@ -237,6 +238,7 @@ export const Chart = () => {
   const getChartRef = (chartR: any) => {
     dispatch(updateChartRef(chartR));
   };
+
 
   const toast = toastMessage => {
     chart.current.toast && chart.current.toast.destroy();
@@ -707,110 +709,116 @@ export const Chart = () => {
             <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />
           )
         }
+        
         {data && (
-          <HighchartsReact
-              highcharts={Highcharts}
-                constructorType={'stockChart'}
-                containerProps={{ className: 'chartContainer', style: { height: 'calc(100% - 4px)', position: 'absolute', width: '100%' } }}
-                allowChartUpdate={true}
-                immutable={false}
-                ref={chartRef}
-                callback={getChartRef}
-                updateArgs={[true, true, true]}
-                options={{
-                  title: null,
-                  plotOptions: {
-                    line: {
-                      dataGrouping: {
-                        enabled: false
-                      }
-                    },
-                    series: {
-                      connectNulls: false,
-                      connectorAllowed: false,
-                      lineWidth: 1,
-                      maxPointWidth: 80,
-                      marker: {
-                        enabled: Object.keys(filter).length !== 0 ? true : false,
+          <>
+            <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 999 }}>
+              <div><b>Accuracy: </b>{Object.entries(queryResults.error).map(([key, value]) => `${dataset.header[key]}: ${((1 - parseFloat(value)) * 100).toFixed(2)}%`).join('\n')}</div>
+              <div><b>Time: </b>{queryResults.queryTime.toFixed(2)}s</div>
+            </div>
+            <HighchartsReact
+                highcharts={Highcharts}
+                  constructorType={'stockChart'}
+                  containerProps={{ className: 'chartContainer', style: { height: 'calc(100% - 4px)', position: 'absolute', width: '100%' } }}
+                  allowChartUpdate={true}
+                  immutable={false}
+                  ref={chartRef}
+                  callback={getChartRef}
+                  updateArgs={[true, true, true]}
+                  options={{
+                    title: null,
+                    plotOptions: {
+                      line: {
+                        dataGrouping: {
+                          enabled: false
+                        }
+                      },
+                      series: {
+                        connectNulls: false,
+                        connectorAllowed: false,
+                        lineWidth: 1.3,
+                        marker: {
+                          enabled: Object.keys(filter).length !== 0 ? true : false,
+                        },
                       },
                     },
-                  },
-                  tooltip: {
-                    formatter: function () {
-                      // The first returned item is the header, subsequent items are the
-                      // points
-                      return ['<b>' + new Date(this.x) + '</b>'].concat(
-                        this.points
-                          ? this.points.map(function (point) {
-                              let ss = `<div><span style="color: ${point.color}; font-size: 12px; margin-right:5px;">●</span>  ${
-                                point.series.name
-                              }: ${point.y.toFixed(2)}</div>`;
-                              ss += point.point.tt ? `<br>${point.point.tt}</br>` : '';
-                              return ss;
-                            })
-                          : []
-                      );
+                    tooltip: {
+                      formatter: function () {
+                        // The first returned item is the header, subsequent items are the
+                        // points
+                        return ['<b>' + new Date(this.x) + '</b>'].concat(
+                          this.points
+                            ? this.points.map(function (point) {
+                                let ss = `<div><span style="color: ${point.color}; font-size: 12px; margin-right:5px;">●</span>  ${
+                                  point.series.name
+                                }: ${point.y.toFixed(2)}</div>`;
+                                ss += point.point.tt ? `<br>${point.point.tt}</br>` : '';
+                                return ss;
+                              })
+                            : []
+                        );
+                      },
+                      split: true,
                     },
-                    split: true,
-                  },
-                  series: [
-                    ...computeChartData(),
-                    ...forecastChartData,
-                    ...compareChartData(),
-                    dummySeriesCreator('minPoint', dataset.timeRange.from, 0),
-                    dummySeriesCreator('maxPoint', dataset.timeRange.to, 1),
-                  ],
-                  chart: {
-                    type: chartType,
-                    marginTop: 10,
-                    plotBorderWidth: 0,
-                    backgroundColor: !activeTool ? null : 'rgba(0,0,0, 0.05)',
-                    zoomType: customChangepointsEnabled ? 'x' : false,
-                    panning: {
-                      enabled: getPanningStatus(),
-                      type: 'x',
+                    series: [
+                      ...computeChartData(),
+                      ...forecastChartData,
+                      ...compareChartData(),
+                      dummySeriesCreator('minPoint', dataset.timeRange.from, 0),
+                      dummySeriesCreator('maxPoint', dataset.timeRange.to, 1),
+                    ],
+                    chart: {
+                      type: chartType,
+                      marginTop: 10,
+                      plotBorderWidth: 0,
+                      backgroundColor: !activeTool ? null : 'rgba(0,0,0, 0.05)',
+                      zoomType: customChangepointsEnabled ? 'x' : false,
+                      panning: {
+                        enabled: getPanningStatus(),
+                        type: 'x',
+                      },
+                      events: {
+                        plotBackgroundColor: 'rgba(10,0,0,0)', // dummy color, to create an element
+                        load: chartFunctions,
+                        selection: customChangepointSelection,
+                      },
                     },
-                    events: {
-                      plotBackgroundColor: 'rgba(10,0,0,0)', // dummy color, to create an element
-                      load: chartFunctions,
-                      selection: customChangepointSelection,
+                    xAxis: {
+                      ordinal: false,
+                      type: 'datetime',
+                      plotBands: [...manualPlotBands, ...detectedPlotBands, ...customPlotBands, ...alertingPlotBands],
                     },
-                  },
-                  xAxis: {
-                    ordinal: false,
-                    type: 'datetime',
-                    plotBands: [...manualPlotBands, ...detectedPlotBands, ...customPlotBands, ...alertingPlotBands],
-                  },
-                  yAxis: computeYAxisData(),
-                  rangeSelector: {
-                    enabled: false,
-                  },
-                  navigator: {
-                    enabled: false,
-                    adaptToUpdatedData: false,
-                  },
-                  scrollbar: {
-                    enabled: false,
-                    liveRedraw: false,
-                  },
-                  colorAxis: null,
-                  legend: {
-                    enabled: !changeChart,
-                  },
-                  credits: {
-                    enabled: false,
-                  },
-                  loading: {
-                    labelStyle: {
-                      color: 'black',
-                      fontSize: '20px',
+                    yAxis: computeYAxisData(),
+                    rangeSelector: {
+                      enabled: false,
                     },
-                    style: {
-                      backgroundColor: 'transparent',
+                    navigator: {
+                      enabled: false,
+                      adaptToUpdatedData: false,
                     },
-                  },
-            }}
-          />
+                    scrollbar: {
+                      enabled: false,
+                      liveRedraw: false,
+                    },
+                    colorAxis: null,
+                    legend: {
+                      enabled: !changeChart,
+                    },
+                    credits: {
+                      enabled: false,
+                    },
+                    loading: {
+                      labelStyle: {
+                        color: 'black',
+                        fontSize: '20px',
+                      },
+                      style: {
+                        backgroundColor: 'transparent',
+                      },
+                    },
+              }}
+            />
+          </>
         )}
         <ChartPlotBands
           manualPlotBands={manualPlotBands}
@@ -840,6 +848,10 @@ export const Chart = () => {
             )
           }
           {m4Data && (
+            <>
+              <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 999 }}>
+                <div><b>Time: </b>{m4QueryResults.queryTime.toFixed(2)}s</div>
+              </div>
               <HighchartsReact
                 highcharts={Highcharts}
                 constructorType={'stockChart'}
@@ -859,8 +871,7 @@ export const Chart = () => {
                     series: {
                       connectNulls: false,
                       connectorAllowed: false,
-                      maxPointWidth: 80,
-                      lineWidth: 1,
+                      lineWidth: 1.3,
                       marker: {
                         enabled: Object.keys(filter).length !== 0 ? true : false,
                       },
@@ -927,6 +938,7 @@ export const Chart = () => {
                   },
                 }}
               />
+            </>
           )}
         </Grid>
       }
