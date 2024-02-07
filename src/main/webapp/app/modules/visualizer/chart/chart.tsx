@@ -403,6 +403,8 @@ export const Chart = () => {
     height,
     lineWidth: 2,
     offset: 10,
+    startOnTick: false,
+    endOnTick: false
   });
 
   // Required for pan to work
@@ -517,7 +519,7 @@ export const Chart = () => {
           lineWidth: 2,
           offset: 10,
           startOnTick: false,
-          endOnTick: false
+          endOnTick: false,
         }))
       )
       .concat(
