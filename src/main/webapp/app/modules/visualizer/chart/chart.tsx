@@ -211,6 +211,7 @@ export const Chart = () => {
 
   useEffect(() => {
     if(isUserStudy && queryResultsCompleted) {
+      latestM4Chart.current && latestM4Chart.current.showLoading();
       dispatch(
         updateM4QueryResults({
           schema: schemaMeta.name,
@@ -333,20 +334,7 @@ export const Chart = () => {
           })
         );
         
-      if(isUserStudy){
-          latestM4Chart.current.showLoading();
-          dispatch(
-            updateM4QueryResults({
-              schema: latestSchema.current,
-              id: latestDatasetId.current,
-              from: min,
-              to: max,
-              viewPort,
-              selectedMeasures: latestMeasures.current,
-              filter: latestFilter.current,
-            })
-          )
-      }
+
       chart.current.showOptions
     };
 
@@ -372,7 +360,7 @@ export const Chart = () => {
       const { min, max, dataMax, dataMin } = chart.current.xAxis[0].getExtremes();
       const stepleft = (p - min) * 0.25;
       const stepright = (max - p) * 0.25;
-      if (!chart.current.loadingShown) {
+      if (!chart.current.loadingShown && !latestM4Chart.current.loadingShown) {
         if (event.deltaY < 0 && max - min > 10000) {
           // in, 10000 is the max range on a zoom level
           chart.current.xAxis[0].setExtremes(min + stepleft, max - stepright, true, false);
@@ -392,7 +380,7 @@ export const Chart = () => {
 
     // CHART: PAN FUNCTION
     Highcharts.addEvent(chart.current.container, 'mouseup', (event: MouseEvent) => {
-      if (!chart.current.loadingShown) {
+      if (!chart.current.loadingShown && !latestM4Chart.current.loadingShown) {
         handleEventTimeout(event);
       }
     });
