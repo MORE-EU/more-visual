@@ -63,6 +63,7 @@ export const Chart = () => {
     forecastingEndDate,
     datasets,
     isUserStudy,
+    queryResultsCompleted,
   } = useAppSelector(state => state.visualizer);
 
   const dispatch = useAppDispatch();
@@ -194,18 +195,6 @@ export const Chart = () => {
           filter,
         })
       );
-      if(isUserStudy)
-        dispatch(
-          updateM4QueryResults({
-            schema: schemaMeta.name,
-            id: dataset.id,
-            from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
-            to: to ? to : dataset.timeRange.to,
-            viewPort,
-            selectedMeasures,
-            filter,
-          })
-        );
       dispatch(updateViewPort(viewPort));
       if (Object.keys(compare).length !== 0) {
         dispatch(updateCompareQueryResults({ schema: schemaMeta.name, compare, from, to, viewPort, filter }));
@@ -219,6 +208,23 @@ export const Chart = () => {
         toast('Maximum number of measures reached');
     }
   }, [dataset, selectedMeasures]);
+
+  useEffect(() => {
+    if(isUserStudy && queryResultsCompleted) {
+      dispatch(
+        updateM4QueryResults({
+          schema: schemaMeta.name,
+          id: dataset.id,
+          from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
+          to: to ? to : dataset.timeRange.to,
+          viewPort,
+          selectedMeasures,
+          filter,
+        })
+      );
+      dispatch(updateViewPort(viewPort));
+    }
+  },[queryResultsCompleted]);
 
   useEffect(() => {
     latestCompare.current = compare;
@@ -839,13 +845,13 @@ export const Chart = () => {
             position: 'relative',
           }}
         >
-          { m4QueryResultsLoading && errorMessage === null ? (
+          {queryResultsCompleted && ( m4QueryResultsLoading && errorMessage === null ? (
             <LinearProgress />
             ) : !m4QueryResultsLoading && errorMessage !== null ? (
               <LinearProgress variant="determinate" color="error" value={100} className={'linear-prog-hide'} />
             ) : (
               <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />
-            )
+            ))
           }
           {m4Data && (
             <>

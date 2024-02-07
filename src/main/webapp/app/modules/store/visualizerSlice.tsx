@@ -79,6 +79,7 @@ const initialState = {
   liveDataImplLoading: false,
   queryResultsLoading: true as boolean,
   m4QueryResultsLoading: true as boolean,
+  queryResultsCompleted: false as boolean,
   selectedMeasures: [],
   customSelectedMeasures: [] as ICustomMeasure[],
   measureColors: [],
@@ -623,6 +624,7 @@ const visualizer = createSlice({
     });
     builder.addCase(updateQueryResults.fulfilled, (state, action) => {
       state.queryResultsLoading = false;
+      state.queryResultsCompleted = true;
       state.queryResults = action.payload.response;
       state.data = action.payload.response.data;
       state.from = action.payload.response.data[Object.keys(action.payload.response.data)[0]][0].timestamp;
@@ -664,6 +666,7 @@ const visualizer = createSlice({
     });
     builder.addMatcher(isAnyOf(updateQueryResults.pending, updateCompareQueryResults.pending), state => {
       state.queryResultsLoading = true;
+      state.queryResultsCompleted = false;
       state.errorMessage = null;
     });
     builder.addMatcher(isAnyOf(updateM4QueryResults.pending), state => {
