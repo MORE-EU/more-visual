@@ -738,6 +738,11 @@ export const Chart = () => {
                         marker: {
                           enabled: Object.keys(filter).length !== 0 ? true : false,
                         },
+                        states: {
+                          hover: {
+                            enabled: false
+                          },
+                        },
                       },
                     },
                     tooltip: {
@@ -873,6 +878,11 @@ export const Chart = () => {
                       lineWidth: 1.3,
                       marker: {
                         enabled: Object.keys(filter).length !== 0 ? true : false,
+                      },
+                      states: {
+                        hover: {
+                          enabled: false
+                        },
                       },
                     },
                   },
