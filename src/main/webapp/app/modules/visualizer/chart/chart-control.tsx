@@ -13,7 +13,7 @@ import { Button } from '@mui/material';
 
 export const ChartControl = ({}) => {
   const [value, setValue] = useState<number>(95);
-  const {datasetChoice, accuracy, isUserStudy} = useAppSelector(state => state.visualizer);
+  const {datasetChoice, accuracy, isUserStudy, queryResults, m4QueryResults, dataset} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   
   const handleChange = (event: Event, newValue: number | number[]) => {
@@ -60,29 +60,31 @@ export const ChartControl = ({}) => {
           }
           {isUserStudy && (
             <>
-              <Box sx={{ width: '10%', margin: 'auto', display: 'flex', alignItems: 'center' }}>
-                <Typography id="slidebar-label">
-                  Min. Accuracy: {value}%
-                </Typography>
-              </Box>
-              <Box sx={{ width: '40%', margin: 'auto', display: 'flex', alignItems: 'center' }}>
-                <Button onClick={handleDecrement} variant="contained" color="primary" sx={{marginRight: '1em' }}>
-                  -
-                </Button>
-                <Slider
-                  value={value}
-                  min={90}
-                  step={0.5}
-                  max={100}
-                  onChange={handleChange}
-                  onChangeCommitted={handleCommitChange}
-                  valueLabelDisplay="auto"
-                  aria-labelledby="lidebar-label"
-                  sx={{ flexGrow: 1 }}
-                />
-                <Button onClick={handleIncrement} variant="contained" color="primary" sx={{marginLeft: '1em' }}>
-                  +
-                </Button>
+              <Box sx={{ width: '40%', margin: 'auto', display: 'flex', alignItems: 'left' }}>
+                <Box sx={{ width: '40%', margin: 'auto', display: 'flex', alignItems: 'left' }}>
+                  <Typography id="slidebar-label">
+                    Min. Accuracy: {value}%
+                  </Typography>
+                </Box>
+                <Box sx={{ width: '60%', margin: 'auto', display: 'flex', alignItems: 'left' }}>
+                  <Button size="small" onClick={handleDecrement} variant="contained" color="primary" sx={{marginRight: '1em' }}>
+                    -
+                  </Button>
+                  <Slider
+                    value={value}
+                    min={90}
+                    step={0.5}
+                    max={100}
+                    onChange={handleChange}
+                    onChangeCommitted={handleCommitChange}
+                    valueLabelDisplay="auto"
+                    aria-labelledby="lidebar-label"
+                    sx={{ flexGrow: 1 }}
+                  />
+                  <Button size="small" onClick={handleIncrement} variant="contained" color="primary" sx={{marginLeft: '1em' }}>
+                    +
+                  </Button>
+                </Box>
               </Box>
           </>
           )}

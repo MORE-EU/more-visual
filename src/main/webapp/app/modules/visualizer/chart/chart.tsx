@@ -150,10 +150,6 @@ export const Chart = () => {
     data && alerts && dispatch(updateAlertResults(chartAlertingChecker(data, alerts, dataset, selectedMeasures, alertResults)));
   }, [selectedMeasures, data, alerts]);
 
-  // useEffect(() => {
-  //   !liveDataImplLoading && data && alerts && dispatch(updateAlertResults(chartAlertingChecker(data, alerts, dataset, selectedMeasures, alertResults)));
-  // }, [liveDataImplLoading, selectedMeasures, alerts]);
-
   useEffect(() => {
     Object.keys(alertResults).length > 0 && setAlertingPlotBands(alertingPlotBandsCreator(alertResults, alerts));
   }, [alertResults, alerts]);
@@ -211,7 +207,7 @@ export const Chart = () => {
 
   useEffect(() => {
     if(isUserStudy && queryResultsCompleted) {
-      latestM4Chart.current && latestM4Chart.current.showLoading();
+      latestM4Chart.current && latestM4Chart.current.loading && latestM4Chart.current.showLoading();
       dispatch(
         updateM4QueryResults({
           schema: schemaMeta.name,
@@ -506,6 +502,8 @@ export const Chart = () => {
         height: changeChart ? `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%` : '100%',
         lineWidth: 2,
         offset: 10,
+        startOnTick: false,
+        endOnTick: false
       }))
       .concat(
         customSelectedMeasures.map((customMeasure, idx) => ({
@@ -518,6 +516,8 @@ export const Chart = () => {
           height: changeChart ? `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%` : '100%',
           lineWidth: 2,
           offset: 10,
+          startOnTick: false,
+          endOnTick: false
         }))
       )
       .concat(
@@ -557,6 +557,8 @@ export const Chart = () => {
         height: `10%`,
         lineWidth: 2,
         offset: 10,
+        startOnTick: false,
+        endOnTick: false,
         plotBands: [],
       };
       yAxisData = changeChart
@@ -706,7 +708,7 @@ export const Chart = () => {
         
         {data && (
           <>
-            <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 999 }}>
+            <div style={{background: 'rgb(0,0,0,0.1)', padding:'1px', position: 'absolute', top: '-3px', right: '0px', zIndex: 999 }}>
               <div><b>Accuracy: </b>{Object.entries(queryResults.error).map(([key, value]) => `${dataset.header[key]}: ${((1 - parseFloat(value)) * 100).toFixed(2)}%`).join('\n')}</div>
               <div><b>Time: </b>{queryResults.queryTime.toFixed(2)}s</div>
             </div>
@@ -843,7 +845,8 @@ export const Chart = () => {
           }
           {m4Data && (
             <>
-              <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 999 }}>
+            <div style={{background: 'rgb(0,0,0,0.1)', padding:'1px', position: 'absolute', top: '-3px', right: '0px', zIndex: 999 }}>
+                <div><b>Error-free Visualization</b></div>
                 <div><b>Time: </b>{m4QueryResults.queryTime.toFixed(2)}s</div>
               </div>
               <HighchartsReact
