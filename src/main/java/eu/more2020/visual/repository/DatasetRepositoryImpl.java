@@ -12,6 +12,7 @@ import eu.more2020.visual.middleware.domain.Dataset.*;
 import eu.more2020.visual.middleware.domain.InfluxDB.InfluxDBConnection;
 import eu.more2020.visual.middleware.util.io.SerializationUtilities;
 
+import org.h2.engine.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -145,15 +146,15 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public Optional<AbstractDataset> findById(String id, String schema, QueryExecutor queryExecutor) throws SQLException {
+    public Optional<AbstractDataset> findById(String id, String schema, DatabaseConnection databaseConnection) throws SQLException {
         Assert.notNull(id, "ID must not be null!");
-        log.info("{}", schemaMeta);
+        String datasetID = databaseConnection.getType() + "_" + id + "_" + schema;
         AbstractDataset dataset = null;
-        if(datasets.containsKey(id)) dataset = datasets.get(id);
+        if(datasets.containsKey(datasetID)) dataset = datasets.get(datasetID);
         else {
             for(SchemaInfo schemaInfo : schemaMeta.getData()) {
                 if (schemaInfo.getId().equals(id)) {
-                    dataset = createDBDataset(schemaMeta.getType(), schemaInfo, queryExecutor);
+                    dataset = createDBDataset(databaseConnection.getType(), schemaInfo, databaseConnection.getQueryExecutor());
                     datasets.put(schemaInfo.getId(), dataset);
                     break;
                 }
@@ -189,7 +190,6 @@ public class DatasetRepositoryImpl implements DatasetRepository {
         }
         return null;
     }
-
 
     private AbstractDataset createDBDataset(String type, SchemaInfo schemaInfo, QueryExecutor queryExecutor) throws SQLException {
         AbstractDataset dataset = null;

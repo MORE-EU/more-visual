@@ -66,6 +66,7 @@ const checkConnectionInitialState = {
 }
 
 const initialState = {
+  sessionId: null as any,
   loading: false,
   errorMessage: null,
   dataset: null,
@@ -76,7 +77,6 @@ const initialState = {
   m4Data: null as any,
   m4QueryResults: null as IQueryResults,
   compareData: [],
-  liveDataImplLoading: false,
   queryResultsLoading: true as boolean,
   m4QueryResultsLoading: true as boolean,
   queryResultsCompleted: false as boolean,
@@ -140,7 +140,7 @@ const concatenateAndSortDistinctArrays = (array1: number[], array2: number[]) =>
 
 export const connector = createAsyncThunk('connector', async (dbConnector: {name: string, type: string, host: string, port: string, username: string, password: string, database: string}) => {
     const response = await axios.post(`api/database/connect`, dbConnector).then(res => res);
-    return response ? dbConnector : null as IConnection;
+    return response;
 });
 
 export const disconnector = createAsyncThunk('disconnector', async () => {
@@ -148,9 +148,11 @@ export const disconnector = createAsyncThunk('disconnector', async () => {
     return response;
 });
 
-export const getSchemaMetadata = createAsyncThunk('getSchemaMetadata', async (data: {schema: string; }) => {
+export const getSchemaMetadata = createAsyncThunk('getSchemaMetadata', async (data: {schema: string; }, {getState}) => {
   try {
-    const response = await axios.get(`api/datasets/metadata/${data.schema}`).then(res => res);
+    const {visualizer} = getState() as RootState;
+    const sessionId = visualizer.sessionId;
+    const response = await axios.get(`api/datasets/metadata/${data.schema}`, {params : {sessionId}}).then(res => res);
     return response;
   } catch (error) {
     throw new Error("Can't get database metadata");
@@ -166,8 +168,10 @@ export const getUserStudySchemaMetadata = createAsyncThunk('getUserStudySchemaMe
   }
 });
 
-export const getColumnNames = createAsyncThunk('getColumnNames', async (data: { schema: string, id: string;}) => {
-  const response = await axios.get(`api/datasets/metadata/columns/${data.schema}/${data.id}`).then(res => res);
+export const getColumnNames = createAsyncThunk('getColumnNames', async (data: { schema: string, id: string;}, {getState}) => {
+  const {visualizer} = getState() as RootState;
+  const sessionId = visualizer.sessionId;
+  const response = await axios.get(`api/datasets/metadata/columns/${data.schema}/${data.id}`, {params : {sessionId}}).then(res => res);
   return response;  
 });
 
@@ -178,10 +182,12 @@ export const updateSchemaInfoColumnNames = createAsyncThunk('updateSchemaInfoCol
     return response;
 });
 
-export const getDataset = createAsyncThunk('getDataset', async (data: { schema: string; id: string }) => {
+export const getDataset = createAsyncThunk('getDataset', async (data: { schema: string; id: string }, {getState}) => {
   const { schema, id } = data;
+  const {visualizer} = getState() as RootState;
+  const sessionId = visualizer.sessionId;
   try {
-    const response = await axios.get(`api/datasets/${schema}/${id}`).then(res => res);
+    const response = await axios.get(`api/datasets/${schema}/${id}`, {params : {sessionId}}).then(res => res);
     return response;  
   } catch (error) {
     throw new Error("Error retrieving data.Please try again.");
@@ -198,8 +204,10 @@ export const updateDataset = createAsyncThunk('updateDataset', async (data: {dat
   return response;
 })
 
-export const getSampleFile = createAsyncThunk('getSampleFile', async (id: string) => {
-  const response = await axios.get(`api/datasets/${id}/sample`).then(res => res);
+export const getSampleFile = createAsyncThunk('getSampleFile', async (id: string, {getState}) => {
+  const {visualizer} = getState() as RootState;
+  const sessionId = visualizer.sessionId;
+  const response = await axios.get(`api/datasets/${id}/sample`, {params : {sessionId}}).then(res => res);
   return response;
 });
 
@@ -261,6 +269,7 @@ export const updateQueryResults = createAsyncThunk(
     let query;
     const {visualizer} = getState() as RootState;
     const customSelectedMeasures = [];
+    const sessionId = visualizer.sessionId;
     const accuracy = visualizer.accuracy;
     visualizer.customSelectedMeasures
       .forEach(customMeasure => customSelectedMeasures.push(customMeasure.measure1, customMeasure.measure2));
@@ -275,8 +284,7 @@ export const updateQueryResults = createAsyncThunk(
           filter: filter ? filter : null,
         } as IQuery)
       : (query = {});
-
-    const response = await axios.post(`api/datasets/${schema}/${id}/query`, query).then(res => res);
+    const response = await axios.post(`api/datasets/${schema}/${id}/query`, query, {params : {sessionId}}).then(res => res);
     return {id, response: response.data};
   }
 );
@@ -297,6 +305,7 @@ export const updateM4QueryResults = createAsyncThunk(
     const {visualizer} = getState() as RootState;
     const customSelectedMeasures = [];
     const accuracy = 1.0
+    const sessionId = visualizer.sessionId;
     visualizer.customSelectedMeasures
       .forEach(customMeasure => customSelectedMeasures.push(customMeasure.measure1, customMeasure.measure2));
     let measures = concatenateAndSortDistinctArrays(selectedMeasures, customSelectedMeasures);
@@ -310,48 +319,24 @@ export const updateM4QueryResults = createAsyncThunk(
           filter: filter ? filter : null,
         } as IQuery)
       : (query = {});
-    const response = await axios.post(`api/datasets/${schema}/${id}/query`, query).then(res => res);
+    const response = await axios.post(`api/datasets/${schema}/${id}/query`,  query, {params : {sessionId}}).then(res => res);
     return {id, response: response.data};
   }
 );
 
-export const liveDataImplementation = createAsyncThunk(
-  'liveDataImplementation',
-  async (data: {
-    schema: string;
-    id: string[];
-    from: number;
-    to: number;
-    selectedMeasures: any[];
-    filter?: {};
-  }) => {
-    const { schema, id, from, to, selectedMeasures, filter } = data;
-    let query;
-    (from !== null && to !== null)
-      ? (query = {
-          from,
-          to,
-          viewPort: {width: 1000, height: 600},
-          measures: selectedMeasures,
-          filter: filter ? filter : null,
-        } as IQuery)
-      : (query = { from: null, to: null });
-    const response = await axios.post(`api/datasets/${schema}/${id}/query`, query).then(res => res);
-    return response.data;
-  }
-);
 
 export const updateCompareQueryResults = createAsyncThunk(
   'updateCompareQueryResults',
   async (data: { schema: string, compare: {[key: number]: any[]}; from: number; to: number; viewPort: IViewPort; filter: {} }, {getState}) => {
     const {visualizer} = getState() as RootState;
     const accuracy = visualizer.accuracy;
+    const sessionId = visualizer.sessionId;
     const { compare, from, to, viewPort, filter, schema } = data;
     const response = await Promise.all(
       Object.keys(compare).map(
       key => {
         const query = from !== null && to !== null ? {from, to, viewPort, accuracy, measures: compare[key], filter} : {range: null}
-        return axios.post(`api/datasets/${schema}/${key}/query`, query).then(res => ({name: key, data: res.data.data}))
+        return axios.post(`api/datasets/${schema}/${key}/query`,  query, {params : {sessionId}}).then(res => ({name: key, data: res.data.data}))
       }
     )).then(res => res.map(r => r));
     return response;
@@ -564,6 +549,7 @@ const visualizer = createSlice({
     builder.addCase(connector.fulfilled, (state, action) => {
       state.loading = false;
       state.connected = true;
+      state.sessionId = action.payload.data;
     });
     builder.addCase(disconnector.fulfilled, state => {
       state.loading = false;
@@ -647,22 +633,6 @@ const visualizer = createSlice({
       state.compareData = action.payload;
       state.queryResultsLoading = false;
     });
-    // builder.addCase(liveDataImplementation.fulfilled, (state, action) => {
-    //   state.liveDataImplLoading = false;
-    //   state.queryResultsLoading = false;
-    //   state.data = action.payload.data.length !== 0 ? [...state.data, ...action.payload.data.slice(0)] : state.data;
-    // });
-    builder.addCase(liveDataImplementation.fulfilled, (state, action) =>
-    {
-      state.liveDataImplLoading = false;
-      state.queryResultsLoading = false;
-      state.data = action.payload.data[Object.keys(action.payload.data)[0]].length !== 0 ?
-        state.selectedMeasures.map(m => {
-          const d = action.payload.data[m];
-          return [...state.data[m], ...d.slice(0)];
-        })
-        : state.data;
-    });
     builder.addCase(getDatasets.pending, state => {
       state.datasets = {data: [], loading: true, error: null}
     });
@@ -680,10 +650,6 @@ const visualizer = createSlice({
     builder.addMatcher(isAnyOf(updateM4QueryResults.pending), state => {
       state.m4QueryResultsLoading = true;
       state.errorMessage = null;
-    });
-    builder.addMatcher(isAnyOf(liveDataImplementation.pending), state => {
-      state.liveDataImplLoading = true;
-      state.queryResultsLoading = true;
     });
     builder.addMatcher(isAnyOf(saveAlert.pending, deleteAlert.pending, getAlerts.pending, editAlert.pending), state => {
       state.alertsLoading = true;
@@ -717,10 +683,6 @@ const visualizer = createSlice({
       state.queryResultsLoading = false;
       state.m4QueryResultsLoading = false;
       state.errorMessage = action.error.message;
-    });
-    builder.addMatcher(isAnyOf(liveDataImplementation.rejected), (state, action) => {
-      state.liveDataImplLoading = false;
-      state.queryResultsLoading = false;
     });
     builder.addMatcher(isAnyOf(saveAlert.rejected, deleteAlert.rejected, getAlerts.rejected, editAlert.rejected), (state, action) => {
       state.alertsLoading = false;

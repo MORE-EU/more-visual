@@ -3,8 +3,11 @@ package eu.more2020.visual.service;
 import eu.more2020.visual.middleware.cache.MinMaxCache;
 import eu.more2020.visual.middleware.datasource.QueryExecutor.QueryExecutor;
 import eu.more2020.visual.middleware.domain.Query.Query;
+import eu.more2020.visual.middleware.domain.DatabaseConnection;
 import eu.more2020.visual.middleware.domain.QueryResults;
 import eu.more2020.visual.middleware.domain.Dataset.AbstractDataset;
+
+import org.apache.commons.configuration2.DatabaseConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,17 +31,18 @@ public class DataService {
         caches = new HashMap<>();
     }
 
-    private synchronized MinMaxCache getCache(QueryExecutor queryExecutor, AbstractDataset dataset, Query query) {
-        MinMaxCache minMaxCache = caches.get(dataset.getTable());
+    private synchronized MinMaxCache getCache(DatabaseConnection databaseConnection, AbstractDataset dataset, Query query) {
+        String cacheId = databaseConnection.getType() + "_" + dataset.getTable();
+        MinMaxCache minMaxCache = caches.get(cacheId); //TODO: change to name not type
         if(minMaxCache == null){
-            minMaxCache = new MinMaxCache(queryExecutor, dataset, 0, 2, 6);
-            caches.put(dataset.getTable(), minMaxCache);
+            minMaxCache = new MinMaxCache(databaseConnection.getQueryExecutor(dataset), dataset, 0, 2, 6);
+            caches.put(cacheId, minMaxCache);
         }
         return minMaxCache;
     }
 
-    public QueryResults executeQuery(QueryExecutor queryExecutor, AbstractDataset dataset, Query query) {
-        MinMaxCache minMaxCache = getCache(queryExecutor, dataset, query);
+    public QueryResults executeQuery(DatabaseConnection databaseConnection, AbstractDataset dataset, Query query) {
+        MinMaxCache minMaxCache = getCache(databaseConnection, dataset, query);
         return minMaxCache.executeQuery(query);
     }
 }

@@ -12,12 +12,16 @@ import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.FileHandlingRepository;
 import eu.more2020.visual.service.CsvDataService;
 import eu.more2020.visual.service.DataService;
+import eu.more2020.visual.service.SessionService;
+import eu.more2020.visual.service.DatabaseConnectionService;
 import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 
+import org.h2.engine.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,10 +46,12 @@ public class DatasetResource {
     private final Logger log = LoggerFactory.getLogger(DatasetResource.class);
     private final DatasetRepository datasetRepository;
     private final DataService dataService;
-    private final CsvDataService csvDataService;
+    private final DatabaseConnectionService databaseConnectionService;
 
-    //db conncetion
-    private DatabaseConnection databaseConnection;
+    @Autowired
+    private final SessionService sessionService;
+    @Autowired
+    private final CsvDataService csvDataService;
 
     private final FileHandlingRepository fileHandlingRepository;
 
@@ -58,8 +64,12 @@ public class DatasetResource {
     public DatasetResource(DatasetRepository datasetRepository,
                            AlertRepository alertRepository,
                            CsvDataService csvDataService,
+                           SessionService sessionService,
+                           DatabaseConnectionService databaseConnectionService,
                            DataService dataService, FileHandlingRepository fileHandlingRepository) {
         this.datasetRepository = datasetRepository;
+        this.sessionService = sessionService;
+        this.databaseConnectionService = databaseConnectionService;
         this.csvDataService = csvDataService;
         this.dataService = dataService;
         this.fileHandlingRepository = fileHandlingRepository;
@@ -136,12 +146,16 @@ public class DatasetResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the dataset, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/datasets/{schema}/{id}")
-    public ResponseEntity<AbstractDataset> getDataset(@PathVariable String schema, @PathVariable String id) throws IOException, SQLException {
+    public ResponseEntity<AbstractDataset> getDataset(@RequestParam String sessionId, @PathVariable String schema, @PathVariable String id) throws IOException, SQLException {
         log.debug("REST request to get Dataset : {}/{}", schema, id);
         Optional<AbstractDataset> dataset = null;
-        QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-        dataset = datasetRepository.findById(id, schema, queryExecutor);
-        log.debug(dataset.toString());
+        UserSession userSession = sessionService.getSession(sessionId);
+        if (userSession != null) {
+            DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
+            dataset = datasetRepository.findById(id, schema, databaseConnection);
+            log.debug(dataset.toString());
+        }
+        else return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         return ResponseUtil.wrapOrNotFound(dataset);
     }
 
@@ -149,20 +163,28 @@ public class DatasetResource {
      * POST executeQuery
      */
     @PostMapping("/datasets/{schema}/{id}/query")
-    public ResponseEntity<QueryResults> executeQuery(@PathVariable String schema, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
+    public ResponseEntity<QueryResults> executeQuery(@RequestParam String sessionId, @PathVariable String schema, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
         log.debug("REST request to execute Query: {}", query);
-        log.debug("{}", databaseConnection);
+        log.debug("{}", sessionId);
+        UserSession userSession = sessionService.getSession(sessionId);
         Optional<QueryResults> queryResultsOptional = null;
-        QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-        queryResultsOptional = datasetRepository.findById(id, schema, queryExecutor).map(dataset -> {
-            return dataService.executeQuery(databaseConnection.getQueryExecutor(dataset), dataset, query);
-        });
+        if (userSession != null) {
+            // Access database connection details from the session
+            DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
+            queryResultsOptional = datasetRepository.findById(id, schema, databaseConnection).map(dataset -> {
+                return dataService.executeQuery(databaseConnection, dataset, query);
+            });
+        } 
+        else return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         return ResponseUtil.wrapOrNotFound(queryResultsOptional);
+        
     }
 
     @PostMapping("/database/connect") 
-    public ResponseEntity<Boolean> connector(@RequestBody DbConnector dbConnector) throws SQLException {
+    public ResponseEntity<String> connector(@RequestBody DbConnector dbConnector) throws SQLException {
         log.debug("Rest request to connect to db");
+        UserSession userSession = sessionService.createSession();
+        DatabaseConnection databaseConnection = null;
         String url = null;
         switch (dbConnector.getType()) {
             case "postgres":
@@ -177,27 +199,37 @@ public class DatasetResource {
                 break;
         }
         try {
-            databaseConnection.connect();
-            return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+            databaseConnectionService.connectToDatabase(userSession, databaseConnection);
+            return ResponseEntity.ok(userSession.getSessionId());
         } catch (Exception e) {
-        return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/datasets/{schema}/sample")
-    public List<Object[]> getSample(@PathVariable String schema) throws IOException, SQLException {
+    public List<Object[]> getSample(@RequestParam String sessionId, @PathVariable String schema) throws IOException, SQLException {
         log.debug("REST request to get Sample File");
-        QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-        return datasetRepository.findSample(schema, queryExecutor);
+        UserSession userSession = sessionService.getSession(sessionId);
+        if (userSession != null) {
+            DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
+            QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
+            return datasetRepository.findSample(schema, queryExecutor);
+        }
+        else return new ArrayList<>();
     }
 
     @GetMapping("/datasets/metadata/{schema}")
-    public ResponseEntity<Optional<SchemaMeta>> getSchemaMetadata(@PathVariable String schema) {
+    public ResponseEntity<Optional<SchemaMeta>> getSchemaMetadata(@RequestParam String sessionId, @PathVariable String schema) {
         log.debug("Rest request to get schema metadata for {}", schema);
         try {
-            QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-            Optional<SchemaMeta> schemaMeta = datasetRepository.findSchema(databaseConnection, schema, queryExecutor);
-            return new ResponseEntity<Optional<SchemaMeta>>(schemaMeta, HttpStatus.OK);
+            UserSession userSession = sessionService.getSession(sessionId);
+            if (userSession != null) {
+                DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
+                QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
+                Optional<SchemaMeta> schemaMeta = datasetRepository.findSchema(databaseConnection, schema, queryExecutor);
+                return new ResponseEntity<Optional<SchemaMeta>>(schemaMeta, HttpStatus.OK);
+            }
+            else return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
@@ -215,13 +247,18 @@ public class DatasetResource {
     }
 
     @GetMapping("/datasets/metadata/columns/{schema}/{id}")
-    public ResponseEntity<List<String>> getColumnNames(@PathVariable String schema, @PathVariable String id) throws SQLException {
+    public ResponseEntity<List<String>> getColumnNames(@RequestParam String sessionId, @PathVariable String schema, @PathVariable String id) throws SQLException {
         log.debug("Rest request to get column names for table {}", id);
         List<String> columnNames = new ArrayList<>();
         try {
-            QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-            columnNames = datasetRepository.getColumnNames(id, queryExecutor);
-            return new ResponseEntity<List<String>>(columnNames, HttpStatus.OK);
+            UserSession userSession = sessionService.getSession(sessionId);
+            if (userSession != null) {
+                DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
+                QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
+                columnNames = datasetRepository.getColumnNames(id, queryExecutor);
+                return new ResponseEntity<List<String>>(columnNames, HttpStatus.OK);
+            }
+            else return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
@@ -259,12 +296,17 @@ public class DatasetResource {
 
 
     @PostMapping("/database/disconnect")
-    public ResponseEntity<Boolean> disconnector() throws SQLException {
+    public ResponseEntity<Boolean> disconnector(@RequestParam String sessionId) throws SQLException {
         log.debug("Rest request to close connection");
-        datasetRepository.deleteAll();
-        dataService.deleteCaches();
-        if(databaseConnection != null) databaseConnection.closeConnection();
-        return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+        UserSession userSession = sessionService.getSession(sessionId);
+        if (userSession != null) {
+            DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
+            datasetRepository.deleteAll();
+            dataService.deleteCaches();
+            if(databaseConnection != null) databaseConnection.closeConnection();
+            return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+        }
+        else return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
     
 }
