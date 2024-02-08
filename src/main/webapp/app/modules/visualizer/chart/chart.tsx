@@ -713,7 +713,11 @@ export const Chart = () => {
         {data && (
           <>
             <div style={{background: 'rgb(0,0,0,0.1)', padding:'1px', position: 'absolute', top: '-3px', right: '0px', zIndex: 999 }}>
-              <div><b>Accuracy: </b>{Object.entries(queryResults.error).map(([key, value]) => `${dataset.header[key]}: ${((1 - parseFloat(value)) * 100).toFixed(2)}%`).join('\n')}</div>
+              { queryResults.error ? (
+                  <div><b>Accuracy: </b>{Object.entries(queryResults.error).map(([key, value]) => `${dataset.header[key]}: ${((1 - parseFloat(value)) * 100).toFixed(2)}%`).join('\n')}</div>
+                ) : (
+                  <div><b>Accuracy: </b>{Object.entries(queryResults.data).map(([key, value]) => `${dataset.header[key]}: 100%`).join('\n')}</div>
+                )}
               <div><b>Time: </b>{queryResults.queryTime.toFixed(2)}s</div>
             </div>
             <HighchartsReact
