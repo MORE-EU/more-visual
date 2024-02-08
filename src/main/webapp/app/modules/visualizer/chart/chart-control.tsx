@@ -87,7 +87,8 @@ export const ChartControl = ({}) => {
                   </Button>
                 </Box>
                 <Box >
-                  <Button size="small" onClick={() => dispatch(resetCache({schema: schemaMeta.name, id:dataset.id}))}>
+                  <Button size="small" onClick={() => 
+                    dispatch(resetCache({schema: schemaMeta.name, id:dataset.id}))}>
                     <Tooltip title="Reset Cache">
                       <RefreshIcon />
                     </Tooltip>

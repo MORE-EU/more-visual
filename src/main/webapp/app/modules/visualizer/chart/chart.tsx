@@ -204,7 +204,7 @@ export const Chart = () => {
       )
         toast('Maximum number of measures reached');
     }
-  }, [dataset, selectedMeasures]);
+  }, [dataset, selectedMeasures, accuracy]);
 
   useEffect(() => {
     if(isUserStudy && queryResultsCompleted) {
@@ -295,6 +295,7 @@ export const Chart = () => {
     latestCustomChangepoints.current = newCustomChangepoints;
     dispatch(updateCustomChangepoints(latestCustomChangepoints.current));
   };
+
   const chartFunctions = (e: { target: any }) => {
     chart.current = e.target;
     timeRange.current = queryResults.timeRange;
