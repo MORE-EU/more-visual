@@ -48,6 +48,7 @@ export const Chart = () => {
     compare,
     customChangepointsEnabled,
     data,
+    accuracy,
     m4Data,
     compareData,
     errorMessage,
@@ -401,7 +402,7 @@ export const Chart = () => {
     opposite: false,
     top,
     height,
-    lineWidth: 2,
+    lineWidth: 1,
     offset: 10,
     startOnTick: false,
     endOnTick: false
@@ -502,7 +503,7 @@ export const Chart = () => {
         opposite: false,
         top: changeChart ? `${(100 / allMeasuresLength) * idx}%` : '0%',
         height: changeChart ? `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%` : '100%',
-        lineWidth: 2,
+        lineWidth: 1,
         offset: 10,
         startOnTick: false,
         endOnTick: false
@@ -516,7 +517,7 @@ export const Chart = () => {
           opposite: false,
           top: changeChart ? `${(100 / allMeasuresLength) * (idx + selectedMeasures.length)}%` : '0%',
           height: changeChart ? `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%` : '100%',
-          lineWidth: 2,
+          lineWidth: 1,
           offset: 10,
           startOnTick: false,
           endOnTick: false,
@@ -537,7 +538,7 @@ export const Chart = () => {
                   ? `${(100 / allMeasuresLength) * (counter + (selectedMeasures.length + customSelectedMeasures.length))}%`
                   : '0%',
                 height: changeChart ? `${allMeasuresLength > 1 ? 100 / allMeasuresLength - 5 : 100}%` : '100%',
-                lineWidth: 2,
+                lineWidth: 1,
                 offset: 10,
               };
               counter++;
@@ -557,7 +558,7 @@ export const Chart = () => {
         opposite: false,
         top: `0%`,
         height: `10%`,
-        lineWidth: 2,
+        lineWidth: 1,
         offset: 10,
         startOnTick: false,
         endOnTick: false,
@@ -734,7 +735,10 @@ export const Chart = () => {
                       series: {
                         connectNulls: false,
                         connectorAllowed: false,
-                        lineWidth: 1.3,
+                        lineWidth: 1,
+                        states: {
+                          hover: false,
+                        },
                         marker: {
                           enabled: Object.keys(filter).length !== 0 ? true : false,
                         },
@@ -870,10 +874,14 @@ export const Chart = () => {
                     series: {
                       connectNulls: false,
                       connectorAllowed: false,
-                      lineWidth: 1.3,
+                      lineWidth: 1,
+                      states: {
+                        hover: false,
+                      },
                       marker: {
                         enabled: Object.keys(filter).length !== 0 ? true : false,
                       },
+
                     },
                   },
                   tooltip: {

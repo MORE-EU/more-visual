@@ -358,6 +358,12 @@ export const updateCompareQueryResults = createAsyncThunk(
   }
 );
 
+export const resetCache = createAsyncThunk('resetCache', async (data: {schema: string, id: string}) => {
+  const requestUrl = `api/datasets/resetCache/${data.schema}/${data.id}`;
+  const response = await axios.post(requestUrl);
+  return response.data;
+});
+
 export const applyChangepointDetection = createAsyncThunk(
   'applyChangepointDetection',
   async (data: { id: string; from: number; to: number }) => {
@@ -377,6 +383,8 @@ export const applyForecasting = createAsyncThunk('applyForecasting', async (id: 
   const response = await axios.post(requestUrl);
   return response.data;
 });
+
+
 
 
 // Then, handle actions in your reducers:

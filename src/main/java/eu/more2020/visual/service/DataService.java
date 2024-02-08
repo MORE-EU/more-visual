@@ -19,6 +19,10 @@ public class DataService {
     private final Logger LOG = LoggerFactory.getLogger(DataService.class);
     private HashMap<String, MinMaxCache> caches = new HashMap<>();
 
+    public void deleteCache(String id) {
+        caches.remove(id);
+    }
+
     public void deleteCaches() {
         if(caches.isEmpty()) return;
         caches.clear();

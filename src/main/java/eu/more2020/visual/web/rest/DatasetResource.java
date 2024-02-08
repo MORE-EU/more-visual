@@ -227,6 +227,18 @@ public class DatasetResource {
         }
     }
 
+    @PostMapping("/datasets/resetCache/{schema}/{id}")
+    public ResponseEntity<Boolean> resetCache(@PathVariable String schema, @PathVariable String id) throws SQLException {
+        log.debug("Rest request to reset cache for table {}", id);
+        try {
+            dataService.deleteCache(id);
+            // QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();            
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     /**
      * {@code PUT  /datasets/metadata/columns/:schema/:id} : set the corresponding time, id and value columns of a table
      * @param id
@@ -254,4 +266,5 @@ public class DatasetResource {
         if(databaseConnection != null) databaseConnection.closeConnection();
         return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }
+    
 }

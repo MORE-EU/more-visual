@@ -51,16 +51,6 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     @Override
     public Optional<SchemaMeta> findSchema(DatabaseConnection connection, String schema, QueryExecutor queryExecutor) throws SQLException, IOException {
         if (schemaMeta.getType() != null && schemaMeta.getName().equals(schema)) return Optional.ofNullable(schemaMeta);
-
-        // ObjectMapper mapper = new ObjectMapper();
-        // File metadataFile = new File(applicationProperties.getWorkspacePath() + "/" + connection.getType(), schema + ".meta.json");
-        // if (metadataFile.exists()) {
-        //     FileReader reader = new FileReader(metadataFile);
-        //     schemaMeta = mapper.readValue(reader, SchemaMeta.class);
-        //     log.debug("{}", schemaMeta);
-        //     for (SchemaInfo schemaInfo : schemaMeta.getData()) schemaInfo.setIsConfiged(true);
-        //     return Optional.ofNullable(schemaMeta);
-        // }
         schemaMeta = new SchemaMeta();
         List<SchemaInfo> schemaInfos = new ArrayList<SchemaInfo>();
         List<TableInfo> tableInfoArray = new ArrayList<TableInfo>();

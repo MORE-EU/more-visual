@@ -8,12 +8,13 @@ import Slider from '@mui/material/Slider';
 import Box from '@mui/material/Box';
 import ChartView from './chart-control-buttons/chart-view-buttons';
 import Typography from '@mui/material/Typography';
-import { updateAccuracy } from 'app/modules/store/visualizerSlice';
-import { Button } from '@mui/material';
+import { resetCache, updateAccuracy } from 'app/modules/store/visualizerSlice';
+import { Button, Tooltip } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 export const ChartControl = ({}) => {
   const [value, setValue] = useState<number>(95);
-  const {datasetChoice, accuracy, isUserStudy, queryResults, m4QueryResults, dataset} = useAppSelector(state => state.visualizer);
+  const {datasetChoice, accuracy, isUserStudy, schemaMeta, dataset} = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   
   const handleChange = (event: Event, newValue: number | number[]) => {
@@ -66,7 +67,7 @@ export const ChartControl = ({}) => {
                     Min. Accuracy: {value}%
                   </Typography>
                 </Box>
-                <Box sx={{ width: '60%', margin: 'auto', display: 'flex', alignItems: 'left' }}>
+                <Box sx={{ width: '50%', margin: 'auto', display: 'flex', alignItems: 'left' }}>
                   <Button size="small" onClick={handleDecrement} variant="contained" color="primary" sx={{marginRight: '1em' }}>
                     -
                   </Button>
@@ -83,6 +84,13 @@ export const ChartControl = ({}) => {
                   />
                   <Button size="small" onClick={handleIncrement} variant="contained" color="primary" sx={{marginLeft: '1em' }}>
                     +
+                  </Button>
+                </Box>
+                <Box >
+                  <Button size="small" onClick={() => dispatch(resetCache({schema: schemaMeta.name, id:dataset.id}))}>
+                    <Tooltip title="Reset Cache">
+                      <RefreshIcon />
+                    </Tooltip>
                   </Button>
                 </Box>
               </Box>

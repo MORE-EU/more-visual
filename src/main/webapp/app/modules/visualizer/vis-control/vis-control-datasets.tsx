@@ -9,7 +9,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getDataset, updateDatasetChoice, resetFetchData, setDatasetIsConfiged, resetDataset } from 'app/modules/store/visualizerSlice';
+import { getDataset, updateDatasetChoice, resetFetchData, resetCache, setDatasetIsConfiged, resetDataset } from 'app/modules/store/visualizerSlice';
 import {useState} from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
@@ -17,7 +17,7 @@ import { Link, useParams } from 'react-router-dom';
 import VisControlDatasetUpload from './vis-control-dataset-upload';
 
 const VisControlDatasets = ({}) => {
-  const { dataset, compare, datasetChoice, schemaMeta, isUserStudy } = useAppSelector(state => state.visualizer);
+  const { dataset, compare, datasetChoice, schemaMeta, isUserStudy, queryResultsLoading, m4QueryResultsLoading } = useAppSelector(state => state.visualizer);
   const dispatch = useAppDispatch();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
@@ -63,6 +63,7 @@ const VisControlDatasets = ({}) => {
               <ListItemButton
                 key={idx}
                 selected={datasetChoice === idx}
+                disabled={queryResultsLoading || m4QueryResultsLoading}
                 component={Link}
                 to={!isUserStudy ? `/visualize/${schemaMeta.name}/${file.id}` : `/user-study/${params.type}/visualize/${schemaMeta.name}/${file.id}`}
                 onClick={() => {
@@ -96,18 +97,7 @@ const VisControlDatasets = ({}) => {
                 <ControlPointIcon />
               </ListItemButton>            
             )}
-            {isUserStudy ? 
-            <ListItemButton key={'close-connection-list-button-sd'}
-              component={Link}
-              to={`./`}
-              onClick={() => {dispatch(resetFetchData())}}
-            >
-                <ListItemText primary={`Reset Cache`} sx={ {display: { xs: 'none', md: 'block' }}} />
-                <LogoutIcon />
-            </ListItemButton>
-
-            :
-
+            {!isUserStudy &&
             <ListItemButton key={'close-connection-list-button-sd'}
               component={Link}
               to={`/visualize`}
