@@ -28,7 +28,7 @@ export const UserStudyVisualizer = () => {
     // Check if the URL contains survey
     const isSurvey = currentUrl.includes('user-study');
     dispatch(toggleUserStudy(isSurvey)); 
-    isSurvey && dispatch(disconnector());
+    // isSurvey && dispatch(disconnector());
     dispatch(getAllConnections());
     dispatch(updateAccuracy(0.95));
   }, []);

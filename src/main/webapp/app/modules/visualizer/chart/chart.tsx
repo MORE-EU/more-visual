@@ -208,7 +208,7 @@ export const Chart = () => {
 
   useEffect(() => {
     if(isUserStudy && queryResultsCompleted) {
-      latestM4Chart.current && latestM4Chart.current.loading && latestM4Chart.current.showLoading();
+      try { latestM4Chart.current.showLoading()} catch(e) {};
       dispatch(
         updateM4QueryResults({
           schema: schemaMeta.name,
@@ -220,7 +220,6 @@ export const Chart = () => {
           filter,
         })
       );
-      // latestM4Chart.current.redraw();
       dispatch(updateViewPort(viewPort));
     }
   },[queryResultsCompleted]);

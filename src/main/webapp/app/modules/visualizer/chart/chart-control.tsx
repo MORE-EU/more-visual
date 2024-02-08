@@ -73,7 +73,7 @@ export const ChartControl = ({}) => {
                   </Button>
                   <Slider
                     value={value}
-                    min={90}
+                    min={60}
                     step={0.5}
                     max={100}
                     onChange={handleChange}
