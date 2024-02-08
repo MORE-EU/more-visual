@@ -32,7 +32,7 @@ public class DataService {
     private synchronized MinMaxCache getCache(QueryExecutor queryExecutor, AbstractDataset dataset, Query query) {
         MinMaxCache minMaxCache = caches.get(dataset.getTable());
         if(minMaxCache == null){
-            minMaxCache = new MinMaxCache(queryExecutor, dataset, 0, 4, 4);
+            minMaxCache = new MinMaxCache(queryExecutor, dataset, 0, 2, 6);
             caches.put(dataset.getTable(), minMaxCache);
         }
         return minMaxCache;

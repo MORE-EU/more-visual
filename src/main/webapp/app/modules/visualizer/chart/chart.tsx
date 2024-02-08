@@ -220,6 +220,7 @@ export const Chart = () => {
           filter,
         })
       );
+      // latestM4Chart.current.redraw();
       dispatch(updateViewPort(viewPort));
     }
   },[queryResultsCompleted]);
@@ -330,10 +331,7 @@ export const Chart = () => {
             viewPort,
             filter: latestFilter.current,
           })
-        );
-        
-
-      chart.current.showOptions
+        );  
     };
 
     const handleEventTimeout = event => {
@@ -709,12 +707,11 @@ export const Chart = () => {
             <LinearProgress variant="determinate" color="success" value={100} className={'linear-prog-hide'} />
           )
         }
-        
         {data && (
           <>
             <div style={{background: 'rgb(0,0,0,0.1)', padding:'1px', position: 'absolute', top: '-3px', right: '0px', zIndex: 999 }}>
               { queryResults.error ? (
-                  <div><b>Accuracy: </b>{Object.entries(queryResults.error).map(([key, value]) => `${dataset.header[key]}: ${((1 - parseFloat(value)) * 100).toFixed(2)}%`).join('\n')}</div>
+                  <div><b>Accuracy: </b>{Object.entries(queryResults.error).map(([key, value]) => `${dataset.header[key]}: ${Math.floor((1 - parseFloat(value)) * 100 * 100)  / 100}%`).join('\n')}</div>
                 ) : (
                   <div><b>Accuracy: </b>{Object.entries(queryResults.data).map(([key, value]) => `${dataset.header[key]}: 100%`).join('\n')}</div>
                 )}
@@ -744,6 +741,7 @@ export const Chart = () => {
                         states: {
                           hover: false,
                         },
+                        boostThreshold: 0,
                         marker: {
                           enabled: Object.keys(filter).length !== 0 ? true : false,
                         },
@@ -880,6 +878,7 @@ export const Chart = () => {
                       connectNulls: false,
                       connectorAllowed: false,
                       lineWidth: 1,
+                      boostThreshold: 0,
                       states: {
                         hover: false,
                       },
