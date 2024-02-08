@@ -881,7 +881,6 @@ export const Chart = () => {
                       marker: {
                         enabled: Object.keys(filter).length !== 0 ? true : false,
                       },
-
                     },
                   },
                   tooltip: {
