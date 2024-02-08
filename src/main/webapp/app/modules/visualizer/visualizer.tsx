@@ -60,8 +60,9 @@ export const Visualizer = () => {
   }, [dataset]);
 
   useEffect(() => {
-    params.id === undefined && schemaMeta && history.replace(`${params.schema}/${schemaMeta.data[0].id}`);
-    params.id !== undefined && schemaMeta && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
+    params.id === undefined && schemaMeta && history.replace(`${schemaMeta.name}/${schemaMeta.data[0].id}`);
+    params.id !== undefined && schemaMeta && schemaMeta.data.filter(data => data.id === params.id).length === 0 && history.replace(`/visualize/${schemaMeta.name}/${schemaMeta.data[0].id}`);
+    params.id !== undefined && schemaMeta && schemaMeta.data.filter(data => data.id === params.id).length > 0 && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
   }, [schemaMeta]);
 
   useEffect(() => {

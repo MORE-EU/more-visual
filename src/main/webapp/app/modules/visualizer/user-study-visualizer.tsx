@@ -61,12 +61,13 @@ export const UserStudyVisualizer = () => {
 
   useEffect(() => {
     errorMessage !== null && setOpenSnackbar(true)
-  }, [errorMessage])
+  }, [errorMessage]);
 
   useEffect(() => {
     params.id === undefined && schemaMeta && history.replace(`/user-study/${params.type}/visualize/${schemaMeta.name}/${schemaMeta.data[0].id}`);
-    params.id !== undefined && schemaMeta && dispatch(getDataset({ schema: params.schema, id: params.id })); // Get dataset on browser reload case
-    params.id !== undefined && schemaMeta && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
+    params.id !== undefined && schemaMeta && schemaMeta.data.filter(data => data.id === params.id).length === 0 && history.replace(`/user-study/${params.type}/visualize/${schemaMeta.name}/${schemaMeta.data[0].id}`);
+    params.id !== undefined && schemaMeta && schemaMeta.data.filter(data => data.id === params.id).length > 0 && dispatch(getDataset({ schema: params.schema, id: params.id })); // Get dataset on browser reload case
+    params.id !== undefined && schemaMeta && schemaMeta.data.filter(data => data.id === params.id).length > 0 && dispatch(updateDatasetChoice(schemaMeta.data.findIndex(dat => dat.id === params.id)));
   }, [schemaMeta]);
 
   return (
