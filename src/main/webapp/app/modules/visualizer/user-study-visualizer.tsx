@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { useHistory, useParams } from 'react-router-dom';
 import { ChartContainer } from './chart/chart-container';
 import VisControl from 'app/modules/visualizer/vis-control/vis-control';
-import {getDataset, updateDatasetChoice, getSchemaMetadata, connector, updateAccuracy, getUserStudySchemaMetadata, getAllConnections, toggleUserStudy, disconnector } from '../store/visualizerSlice';
+import {getDataset, updateDatasetChoice, getSchemaMetadata, connector, updateAccuracy, getUserStudySchemaMetadata, getAllConnections, toggleUserStudy, disconnector, resetFetchData } from '../store/visualizerSlice';
 import CircularProgress  from '@mui/material/CircularProgress';
 import Header from './header/header';
 import React, { useEffect, useState } from 'react';
@@ -26,9 +26,9 @@ export const UserStudyVisualizer = () => {
   useEffect(() => {
     const currentUrl = window.location.href;
     // Check if the URL contains survey
-    const isSurvey = currentUrl.includes('user-study');
-    dispatch(toggleUserStudy(isSurvey)); 
-    // isSurvey && dispatch(disconnector());
+    const isUserStudy = currentUrl.includes('user-study');
+    dispatch(toggleUserStudy(isUserStudy)); 
+    isUserStudy && dispatch(disconnector());
     dispatch(getAllConnections());
     dispatch(updateAccuracy(0.95));
   }, []);

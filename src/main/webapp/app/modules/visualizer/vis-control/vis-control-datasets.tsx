@@ -41,6 +41,11 @@ const VisControlDatasets = ({}) => {
     dispatch(resetDataset());
   }
 
+  const getLoadingStatus =  () => {
+    const secondLoad = isUserStudy ? m4QueryResultsLoading : false;
+    return queryResultsLoading || secondLoad;
+  }
+
   return (
     <Grid sx={{width: "100%", height: "100%"}}>
       {uploadFile && (
@@ -63,7 +68,7 @@ const VisControlDatasets = ({}) => {
               <ListItemButton
                 key={idx}
                 selected={datasetChoice === idx}
-                disabled={queryResultsLoading || m4QueryResultsLoading}
+                disabled={getLoadingStatus()}
                 component={Link}
                 to={!isUserStudy ? `/visualize/${schemaMeta.name}/${file.id}` : `/user-study/${params.type}/visualize/${schemaMeta.name}/${file.id}`}
                 onClick={() => {

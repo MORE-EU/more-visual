@@ -355,7 +355,8 @@ export const Chart = () => {
       const { min, max, dataMax, dataMin } = chart.current.xAxis[0].getExtremes();
       const stepleft = (p - min) * 0.25;
       const stepright = (max - p) * 0.25;
-      if (!chart.current.loadingShown && !latestM4Chart.current.loadingShown) {
+      const secondLoading = isUserStudy ? !latestM4Chart.current.loadingShown : true;
+      if (!chart.current.loadingShown && secondLoading) {
         if (event.deltaY < 0 && max - min > 10000) {
           // in, 10000 is the max range on a zoom level
           chart.current.xAxis[0].setExtremes(min + stepleft, max - stepright, true, false);
@@ -375,7 +376,8 @@ export const Chart = () => {
 
     // CHART: PAN FUNCTION
     Highcharts.addEvent(chart.current.container, 'mouseup', (event: MouseEvent) => {
-      if (!chart.current.loadingShown && !latestM4Chart.current.loadingShown) {
+      const secondLoading = isUserStudy ? !latestM4Chart.current.loadingShown : true;
+      if (!chart.current.loadingShown && secondLoading) {
         handleEventTimeout(event);
       }
     });
