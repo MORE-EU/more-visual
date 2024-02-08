@@ -15,7 +15,7 @@ import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import { Link, useHistory } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
-import { updateDatasetChoice, resetFetchData } from "app/modules/store/visualizerSlice";
+import { updateDatasetChoice, resetFetchData, disconnector } from "app/modules/store/visualizerSlice";
 
 interface ISelectedDataset {
     schema: string;
@@ -135,7 +135,7 @@ const VisControlDatasetSelection = () => {
                     <ListItemButton key={'close-connection-list-button-sd'}
                         component={Link}
                         to={`/visualize`}
-                        onClick={() => {dispatch(resetFetchData());}}
+                        onClick={() => {dispatch(resetFetchData());dispatch(disconnector({}));}}
                     >
                         <ListItemText primary={`close connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
                         <LogoutIcon />

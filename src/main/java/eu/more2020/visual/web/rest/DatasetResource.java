@@ -166,6 +166,7 @@ public class DatasetResource {
     public ResponseEntity<QueryResults> executeQuery(@RequestParam String sessionId, @PathVariable String schema, @PathVariable String id, @Valid @RequestBody Query query) throws IOException, SQLException {
         log.debug("REST request to execute Query: {}", query);
         log.debug("{}", sessionId);
+        log.debug("{}", sessionService.getActiveSessions());
         UserSession userSession = sessionService.getSession(sessionId);
         Optional<QueryResults> queryResultsOptional = null;
         if (userSession != null) {
@@ -296,14 +297,17 @@ public class DatasetResource {
 
 
     @PostMapping("/database/disconnect")
-    public ResponseEntity<Boolean> disconnector(@RequestParam String sessionId) throws SQLException {
-        log.debug("Rest request to close connection");
+    public ResponseEntity<Boolean> disconnector(@Valid @RequestBody String sessionId) throws SQLException {
+        log.debug("Rest request to close connection for session {}", sessionId);
+        sessionId = sessionId.replace("=", "");
         UserSession userSession = sessionService.getSession(sessionId);
+        log.debug("{}",userSession);
         if (userSession != null) {
             DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
             datasetRepository.deleteAll();
             dataService.deleteCaches();
             if(databaseConnection != null) databaseConnection.closeConnection();
+            sessionService.removeSession(sessionId);
             return new ResponseEntity<Boolean>(true, HttpStatus.OK);
         }
         else return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);

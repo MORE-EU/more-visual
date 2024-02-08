@@ -1,13 +1,11 @@
 package eu.more2020.visual.service;
 
 import eu.more2020.visual.middleware.cache.MinMaxCache;
-import eu.more2020.visual.middleware.datasource.QueryExecutor.QueryExecutor;
 import eu.more2020.visual.middleware.domain.Query.Query;
 import eu.more2020.visual.middleware.domain.DatabaseConnection;
 import eu.more2020.visual.middleware.domain.QueryResults;
 import eu.more2020.visual.middleware.domain.Dataset.AbstractDataset;
 
-import org.apache.commons.configuration2.DatabaseConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

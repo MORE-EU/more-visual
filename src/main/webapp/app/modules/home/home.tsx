@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch } from '../store/storeConfig';
-import { resetFetchData } from '../store/visualizerSlice';
+import { resetFetchData, disconnector } from '../store/visualizerSlice';
 import './home.scss';
 
 
@@ -9,6 +9,7 @@ const Home = () => {
 
    useEffect(() => {
       dispatch(resetFetchData());
+      dispatch(disconnector({}));
   }, []);
 
   

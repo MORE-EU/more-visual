@@ -31,4 +31,9 @@ public class SessionService {
     public void removeSession(String sessionId) {
         activeSessions.remove(sessionId);
     }
+
+    public Map<String, UserSession> getActiveSessions() {
+        return activeSessions;
+    }
+
 }

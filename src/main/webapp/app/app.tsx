@@ -8,7 +8,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import './app.scss';
 import { useAppDispatch } from './modules/store/storeConfig';
 import { getProfile } from './shared/reducers/application-profile';
-import { disconnector, toggleUserStudy } from './modules/store/visualizerSlice';
 
 const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
 

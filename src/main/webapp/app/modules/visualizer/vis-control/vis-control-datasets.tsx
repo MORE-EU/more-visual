@@ -9,7 +9,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getDataset, updateDatasetChoice, resetFetchData, resetCache, setDatasetIsConfiged, resetDataset } from 'app/modules/store/visualizerSlice';
+import { getDataset, updateDatasetChoice, resetFetchData, resetCache, setDatasetIsConfiged, resetDataset, disconnector } from 'app/modules/store/visualizerSlice';
 import {useState} from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
@@ -106,7 +106,10 @@ const VisControlDatasets = ({}) => {
             <ListItemButton key={'close-connection-list-button-sd'}
               component={Link}
               to={`/visualize`}
-              onClick={() => {dispatch(resetFetchData())}}
+              onClick={() => {
+                dispatch(resetFetchData());
+                dispatch(disconnector({}));
+              }}
             >
                 <ListItemText primary={`Close Connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
                 <LogoutIcon />

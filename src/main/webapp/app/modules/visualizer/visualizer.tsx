@@ -29,7 +29,6 @@ export const Visualizer = () => {
     // Check if the URL contains survey
     const isSurvey = currentUrl.includes('user-study');
     dispatch(toggleUserStudy(isSurvey)); 
-    isSurvey && dispatch(disconnector());
     !schemaMeta && dispatch(getSchemaMetadata({schema: params.schema}));
     dispatch(updateAccuracy(0.95));
   }, []); // Run this effect only once when the component mounts

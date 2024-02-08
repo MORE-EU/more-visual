@@ -143,15 +143,16 @@ export const connector = createAsyncThunk('connector', async (dbConnector: {name
     return response;
 });
 
-export const disconnector = createAsyncThunk('disconnector', async () => {
-    const response = await axios.post(`api/database/disconnect`).then(res => res);
+export const disconnector = createAsyncThunk('disconnector', async (data: {}) => {
+    const sessionId = JSON.parse(localStorage.getItem("sessionId"));
+    console.log(sessionId);
+    const response = await axios.post(`api/database/disconnect`, sessionId).then(res => res);
     return response;
 });
 
-export const getSchemaMetadata = createAsyncThunk('getSchemaMetadata', async (data: {schema: string; }, {getState}) => {
+export const getSchemaMetadata = createAsyncThunk('getSchemaMetadata', async (data: {schema: string; }) => {
   try {
-    const {visualizer} = getState() as RootState;
-    const sessionId = visualizer.sessionId;
+    const sessionId = JSON.parse(localStorage.getItem("sessionId"));
     const response = await axios.get(`api/datasets/metadata/${data.schema}`, {params : {sessionId}}).then(res => res);
     return response;
   } catch (error) {
@@ -168,9 +169,8 @@ export const getUserStudySchemaMetadata = createAsyncThunk('getUserStudySchemaMe
   }
 });
 
-export const getColumnNames = createAsyncThunk('getColumnNames', async (data: { schema: string, id: string;}, {getState}) => {
-  const {visualizer} = getState() as RootState;
-  const sessionId = visualizer.sessionId;
+export const getColumnNames = createAsyncThunk('getColumnNames', async (data: { schema: string, id: string;}) => {
+  const sessionId = JSON.parse(localStorage.getItem("sessionId"));
   const response = await axios.get(`api/datasets/metadata/columns/${data.schema}/${data.id}`, {params : {sessionId}}).then(res => res);
   return response;  
 });
@@ -182,10 +182,9 @@ export const updateSchemaInfoColumnNames = createAsyncThunk('updateSchemaInfoCol
     return response;
 });
 
-export const getDataset = createAsyncThunk('getDataset', async (data: { schema: string; id: string }, {getState}) => {
+export const getDataset = createAsyncThunk('getDataset', async (data: { schema: string; id: string }) => {
   const { schema, id } = data;
-  const {visualizer} = getState() as RootState;
-  const sessionId = visualizer.sessionId;
+  const sessionId = JSON.parse(localStorage.getItem("sessionId"));
   try {
     const response = await axios.get(`api/datasets/${schema}/${id}`, {params : {sessionId}}).then(res => res);
     return response;  
@@ -204,9 +203,8 @@ export const updateDataset = createAsyncThunk('updateDataset', async (data: {dat
   return response;
 })
 
-export const getSampleFile = createAsyncThunk('getSampleFile', async (id: string, {getState}) => {
-  const {visualizer} = getState() as RootState;
-  const sessionId = visualizer.sessionId;
+export const getSampleFile = createAsyncThunk('getSampleFile', async (id: string) => {
+  const sessionId = JSON.parse(localStorage.getItem("sessionId"));
   const response = await axios.get(`api/datasets/${id}/sample`, {params : {sessionId}}).then(res => res);
   return response;
 });
@@ -269,7 +267,7 @@ export const updateQueryResults = createAsyncThunk(
     let query;
     const {visualizer} = getState() as RootState;
     const customSelectedMeasures = [];
-    const sessionId = visualizer.sessionId;
+    const sessionId = JSON.parse(localStorage.getItem("sessionId"));
     const accuracy = visualizer.accuracy;
     visualizer.customSelectedMeasures
       .forEach(customMeasure => customSelectedMeasures.push(customMeasure.measure1, customMeasure.measure2));
@@ -305,7 +303,7 @@ export const updateM4QueryResults = createAsyncThunk(
     const {visualizer} = getState() as RootState;
     const customSelectedMeasures = [];
     const accuracy = 1.0
-    const sessionId = visualizer.sessionId;
+    const sessionId = JSON.parse(localStorage.getItem("sessionId"));
     visualizer.customSelectedMeasures
       .forEach(customMeasure => customSelectedMeasures.push(customMeasure.measure1, customMeasure.measure2));
     let measures = concatenateAndSortDistinctArrays(selectedMeasures, customSelectedMeasures);
@@ -330,7 +328,7 @@ export const updateCompareQueryResults = createAsyncThunk(
   async (data: { schema: string, compare: {[key: number]: any[]}; from: number; to: number; viewPort: IViewPort; filter: {} }, {getState}) => {
     const {visualizer} = getState() as RootState;
     const accuracy = visualizer.accuracy;
-    const sessionId = visualizer.sessionId;
+    const sessionId = JSON.parse(localStorage.getItem("sessionId"));
     const { compare, from, to, viewPort, filter, schema } = data;
     const response = await Promise.all(
       Object.keys(compare).map(
@@ -549,7 +547,7 @@ const visualizer = createSlice({
     builder.addCase(connector.fulfilled, (state, action) => {
       state.loading = false;
       state.connected = true;
-      state.sessionId = action.payload.data;
+      localStorage.setItem("sessionId", JSON.stringify(action.payload.data));
     });
     builder.addCase(disconnector.fulfilled, state => {
       state.loading = false;

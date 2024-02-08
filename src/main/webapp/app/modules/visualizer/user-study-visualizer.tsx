@@ -28,8 +28,8 @@ export const UserStudyVisualizer = () => {
     // Check if the URL contains survey
     const isUserStudy = currentUrl.includes('user-study');
     dispatch(toggleUserStudy(isUserStudy)); 
-    isUserStudy && dispatch(disconnector());
     dispatch(getAllConnections());
+    dispatch(disconnector({}));
     dispatch(updateAccuracy(0.95));
   }, []);
 

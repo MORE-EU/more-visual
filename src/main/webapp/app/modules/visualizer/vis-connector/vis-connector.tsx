@@ -27,7 +27,7 @@ const VisConnector = () => {
 
     useEffect(() => {
         dispatch(getAllConnections());
-        dispatch(disconnector());
+        // dispatch(disconnector({}));
     },[]);
 
     useEffect(() => {
