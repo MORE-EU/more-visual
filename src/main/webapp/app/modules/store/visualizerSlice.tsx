@@ -145,7 +145,6 @@ export const connector = createAsyncThunk('connector', async (dbConnector: {name
 
 export const disconnector = createAsyncThunk('disconnector', async (data: {}) => {
     const sessionId = JSON.parse(localStorage.getItem("sessionId"));
-    console.log(sessionId);
     const response = await axios.post(`api/database/disconnect`, sessionId).then(res => res);
     return response;
 });

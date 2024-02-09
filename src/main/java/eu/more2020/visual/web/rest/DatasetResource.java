@@ -181,32 +181,6 @@ public class DatasetResource {
         
     }
 
-    @PostMapping("/database/connect") 
-    public ResponseEntity<String> connector(@RequestBody DbConnector dbConnector) throws SQLException {
-        log.debug("Rest request to connect to db");
-        UserSession userSession = sessionService.createSession();
-        DatabaseConnection databaseConnection = null;
-        String url = null;
-        switch (dbConnector.getType()) {
-            case "postgres":
-                url = "jdbc:postgresql://" + dbConnector.getHost() + ":" + dbConnector.getPort() + "/" + dbConnector.getDatabase();
-                databaseConnection = new JDBCConnection(url, dbConnector.getUsername(), dbConnector.getPassword());
-                break;
-            case "influx":
-                url = "http://" + dbConnector.getHost() + ":" + dbConnector.getPort();
-                databaseConnection = new InfluxDBConnection(url, dbConnector.getUsername(), dbConnector.getPassword(), dbConnector.getDatabase());
-                break;
-            default:
-                break;
-        }
-        try {
-            databaseConnectionService.connectToDatabase(userSession, databaseConnection);
-            return ResponseEntity.ok(userSession.getSessionId());
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @GetMapping("/datasets/{schema}/sample")
     public List<Object[]> getSample(@RequestParam String sessionId, @PathVariable String schema) throws IOException, SQLException {
         log.debug("REST request to get Sample File");
@@ -295,22 +269,45 @@ public class DatasetResource {
             .body(result);
     }
 
+    @PostMapping("/database/connect") 
+    public ResponseEntity<String> connector(@RequestBody DbConnector dbConnector) throws SQLException {
+        log.debug("Rest request to connect to db");
+        UserSession userSession = sessionService.createSession();
+        DatabaseConnection databaseConnection = null;
+        String url = null;
+        switch (dbConnector.getType()) {
+            case "postgres":
+                url = "jdbc:postgresql://" + dbConnector.getHost() + ":" + dbConnector.getPort() + "/" + dbConnector.getDatabase();
+                databaseConnection = new JDBCConnection(url, dbConnector.getUsername(), dbConnector.getPassword());
+                break;
+            case "influx":
+                url = "http://" + dbConnector.getHost() + ":" + dbConnector.getPort();
+                databaseConnection = new InfluxDBConnection(url, dbConnector.getUsername(), dbConnector.getPassword(), dbConnector.getDatabase());
+                break;
+            default:
+                break;
+        }
+        try {
+            databaseConnectionService.connectToDatabase(userSession, databaseConnection);
+            return ResponseEntity.ok(userSession.getSessionId());
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PostMapping("/database/disconnect")
     public ResponseEntity<Boolean> disconnector(@Valid @RequestBody String sessionId) throws SQLException {
         log.debug("Rest request to close connection for session {}", sessionId);
         sessionId = sessionId.replace("=", "");
         UserSession userSession = sessionService.getSession(sessionId);
-        log.debug("{}",userSession);
         if (userSession != null) {
             DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
             datasetRepository.deleteAll();
             dataService.deleteCaches();
             if(databaseConnection != null) databaseConnection.closeConnection();
             sessionService.removeSession(sessionId);
-            return new ResponseEntity<Boolean>(true, HttpStatus.OK);
         }
-        else return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }
     
 }
