@@ -10,7 +10,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Slide, { SlideProps } from '@mui/material/Slide';
 
 import { useAppDispatch, useAppSelector } from '../../store/storeConfig';
-import { setErrorMessage, resetFetchData } from '../../store/visualizerSlice';
+import { setErrorMessage, resetFetchData, setConnented } from '../../store/visualizerSlice';
 import Header from '../header/header';
 import VisConnector from './vis-connector';
 
@@ -43,6 +43,7 @@ export const Connector = () => {
     }, [errorMessage]);
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (connected) dispatch(setConnented(false));
         dispatch(setErrorMessage(null));
         setOpenSnack(false);
     };

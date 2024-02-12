@@ -442,7 +442,7 @@ export const Chart = () => {
 
   const computeChartData = () => {
     let chartData =
-      data !== null
+      (!queryResultsLoading && data !== null) // compute new chart data when fetched else clear previous data
         ? selectedMeasures
             .map((measure, index) => ({
               data: data[measure]
@@ -583,7 +583,7 @@ export const Chart = () => {
 
   const computeM4ChartData = () => {
     let chartData =
-      m4Data !== null
+      (!m4QueryResultsLoading &&  m4Data !== null)
         ? selectedMeasures
             .map((measure, index) => ({
               data: m4Data[measure]

@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { createTheme } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import CircularProgress from "@mui/material/CircularProgress";
 import VisConnectorDBConfig from "./vis-connector-db-config";
 import { useAppDispatch, useAppSelector } from "app/modules/store/storeConfig";
 import { connector, getSchemaMetadata, deleteConnection, getAllConnections, disconnector } from "app/modules/store/visualizerSlice";
@@ -21,7 +21,7 @@ const mdTheme = createTheme();
 
 const VisConnector = () => {
     const [ step, setStep ] = useState(false);
-    const {connections, connected} = useAppSelector(state => state.visualizer);
+    const {connections, connected, loading} = useAppSelector(state => state.visualizer);
     const [connectionInfo, setConnectionInfo] = useState<IConnection>(null);
     const dispatch = useAppDispatch();
 
@@ -48,24 +48,25 @@ const VisConnector = () => {
                         Available Data Sources
                     </Typography>
                 )}
-                {connections.map(connection => 
-                    ( <Grid container key={connection.name} sx={{display: 'flex', flexDirection: 'row', [mdTheme.breakpoints.down('sm')]: {flexDirection: 'column'}}}>
-                        <Grid item sm={8}>
-                            <Button variant="text" component="label"  sx={{borderRadius: 2}} onClick={() => {
-                                setConnectionInfo(connection);
-                                dispatch(connector(connection));                
-                            }}>{connection.name}</Button>
+                {!loading ? connections.map(connection => 
+                        ( <Grid container key={connection.name} sx={{display: 'flex', flexDirection: 'row', [mdTheme.breakpoints.down('sm')]: {flexDirection: 'column'}}}>
+                            <Grid item sm={8}>
+                                <Button variant="text" component="label"  sx={{borderRadius: 2}} onClick={() => {
+                                    setConnectionInfo(connection);
+                                    dispatch(connector(connection));                
+                                }}>{connection.name}</Button>
+                            </Grid>
+                            <Grid item>
+                                <Tooltip title="delete" disableInteractive> 
+                                    <Button startIcon={<DeleteIcon />} onClick={() => {
+                                        dispatch(deleteConnection(connection.name));
+                                    }} ></Button>
+                                </Tooltip>
+                            </Grid>
                         </Grid>
-                        <Grid item>
-                            <Tooltip title="delete" disableInteractive> 
-                                <Button startIcon={<DeleteIcon />} onClick={() => {
-                                    dispatch(deleteConnection(connection.name));
-                                }} ></Button>
-                            </Tooltip>
-                        </Grid>
-                    </Grid>
-                    )
-                )}
+                        )
+                    ) : <CircularProgress/>
+                }
                 <Typography variant="subtitle1" fontSize={20} sx={{ borderBottom: `2px solid ${grey[400]}`}}>
                     New Data Source
                 </Typography>

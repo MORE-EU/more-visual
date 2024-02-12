@@ -18,7 +18,6 @@ import eu.more2020.visual.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 
-import org.h2.engine.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,7 +151,7 @@ public class DatasetResource {
         UserSession userSession = sessionService.getSession(sessionId);
         if (userSession != null) {
             DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
-            dataset = datasetRepository.findById(id, schema, databaseConnection);
+            dataset = datasetRepository.findById(sessionId, id, schema, databaseConnection);
             log.debug(dataset.toString());
         }
         else return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -172,7 +171,7 @@ public class DatasetResource {
         if (userSession != null) {
             // Access database connection details from the session
             DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
-            queryResultsOptional = datasetRepository.findById(id, schema, databaseConnection).map(dataset -> {
+            queryResultsOptional = datasetRepository.findById(sessionId, id, schema, databaseConnection).map(dataset -> {
                 return dataService.executeQuery(databaseConnection, dataset, query);
             });
         } 
@@ -188,20 +187,20 @@ public class DatasetResource {
         if (userSession != null) {
             DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
             QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-            return datasetRepository.findSample(schema, queryExecutor);
+            return datasetRepository.findSample(sessionId, schema, queryExecutor);
         }
         else return new ArrayList<>();
     }
 
     @GetMapping("/datasets/metadata/{schema}")
     public ResponseEntity<Optional<SchemaMeta>> getSchemaMetadata(@RequestParam String sessionId, @PathVariable String schema) {
-        log.debug("Rest request to get schema metadata for {}", schema);
+        log.debug("Rest request to get user study schema metadata for {} with sessionId {}", schema, sessionId);
         try {
             UserSession userSession = sessionService.getSession(sessionId);
             if (userSession != null) {
                 DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
                 QueryExecutor queryExecutor = databaseConnection.getQueryExecutor();
-                Optional<SchemaMeta> schemaMeta = datasetRepository.findSchema(databaseConnection, schema, queryExecutor);
+                Optional<SchemaMeta> schemaMeta = datasetRepository.findSchema(sessionId, databaseConnection, schema, queryExecutor);
                 return new ResponseEntity<Optional<SchemaMeta>>(schemaMeta, HttpStatus.OK);
             }
             else return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -211,10 +210,10 @@ public class DatasetResource {
     }
 
     @GetMapping("/user-study/metadata/{schema}")
-    public ResponseEntity<Optional<SchemaMeta>> getUserStudySchemaMetadata (@PathVariable String schema) throws IOException {
-        log.debug("Rest request to get user study schema metadata for {}", schema);
+    public ResponseEntity<Optional<SchemaMeta>> getUserStudySchemaMetadata (@RequestParam String sessionId, @PathVariable String schema) throws IOException {
+        log.debug("Rest request to get user study schema metadata for {} with sessionId {}", schema, sessionId);
         try {
-            Optional<SchemaMeta> schemaMeta = datasetRepository.findUserStudySchema(schema);
+            Optional<SchemaMeta> schemaMeta = datasetRepository.findUserStudySchema(sessionId, schema);
             return new ResponseEntity<Optional<SchemaMeta>>(schemaMeta, HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -258,12 +257,12 @@ public class DatasetResource {
      * @return a new schema info with the updated column fields
      */
     @PutMapping("/datasets/metadata/columns/{schema}/{id}")
-    public ResponseEntity<SchemaInfo> updateSchemaInfoColumnNames(@PathVariable String schema, @PathVariable String id, @Valid @RequestBody DbColumns dbColumns) {
+    public ResponseEntity<SchemaInfo> updateSchemaInfoColumnNames(@RequestParam String sessionId, @PathVariable String schema, @PathVariable String id, @Valid @RequestBody DbColumns dbColumns) {
         log.debug("Rest request to update columns of table with id {} on schema {} with columns {}", id, dbColumns.toString());
         if (id == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "NULL_ID");
         }
-        SchemaInfo result = datasetRepository.updateSchemaInfoColumns(id, dbColumns);
+        SchemaInfo result = datasetRepository.updateSchemaInfoColumns(sessionId, id, dbColumns);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.toString()))
             .body(result);
@@ -302,7 +301,7 @@ public class DatasetResource {
         UserSession userSession = sessionService.getSession(sessionId);
         if (userSession != null) {
             DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
-            datasetRepository.deleteAll();
+            datasetRepository.deleteAll(sessionId);
             dataService.deleteCaches();
             if(databaseConnection != null) databaseConnection.closeConnection();
             sessionService.removeSession(sessionId);

@@ -25,26 +25,22 @@ public interface DatasetRepository {
 
     List<AbstractDataset> findAll();
 
-    List<Object[]> findSample(String id, QueryExecutor queryExecutor) throws SQLException;
+    List<Object[]> findSample(String sessionId, String id, QueryExecutor queryExecutor) throws SQLException;
     
-    Optional<SchemaMeta> findSchema (DatabaseConnection connection, String schema, QueryExecutor queryExecutor) throws SQLException, IOException;
+    Optional<SchemaMeta> findSchema (String sessionId, DatabaseConnection connection, String schema, QueryExecutor queryExecutor) throws SQLException, IOException;
 
-    Optional<SchemaMeta> findUserStudySchema(String schema) throws IOException;
+    Optional<SchemaMeta> findUserStudySchema(String sessionId, String schema) throws IOException;
 
     @Cacheable(cacheNames = DATASETS_CACHE)
-    Optional<AbstractDataset> findById(String id, String schema, DatabaseConnection databaseConnection) throws IOException, SQLException;
+    Optional<AbstractDataset> findById(String sessionId, String id, String schema, DatabaseConnection databaseConnection) throws IOException, SQLException;
 
     AbstractDataset save(AbstractDataset dataset) throws IOException;
     
-    String getSchemaType();
-
-    SchemaInfo updateSchemaInfo(SchemaInfo info);
-
-    SchemaInfo updateSchemaInfoColumns(String id, DbColumns dbColumns);
+    SchemaInfo updateSchemaInfoColumns(String sessionId, String id, DbColumns dbColumns);
 
     void deleteById(String id);
 
-    void deleteAll();
+    void deleteAll(String sessionId);
 
     List<String> getColumnNames(String id, QueryExecutor queryExecutor);
 
