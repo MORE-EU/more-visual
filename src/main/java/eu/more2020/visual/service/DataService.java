@@ -1,10 +1,10 @@
 package eu.more2020.visual.service;
 
-import eu.more2020.visual.middleware.cache.MinMaxCache;
-import eu.more2020.visual.middleware.domain.Query.Query;
-import eu.more2020.visual.middleware.domain.DatabaseConnection;
-import eu.more2020.visual.middleware.domain.QueryResults;
-import eu.more2020.visual.middleware.domain.Dataset.AbstractDataset;
+import gr.imsi.athenarc.visual.middleware.cache.MinMaxCache;
+import gr.imsi.athenarc.visual.middleware.domain.Query.Query;
+import gr.imsi.athenarc.visual.middleware.domain.DatabaseConnection;
+import gr.imsi.athenarc.visual.middleware.domain.QueryResults;
+import gr.imsi.athenarc.visual.middleware.domain.Dataset.AbstractDataset;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

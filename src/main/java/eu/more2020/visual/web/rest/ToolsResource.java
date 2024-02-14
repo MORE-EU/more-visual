@@ -2,7 +2,7 @@ package eu.more2020.visual.web.rest;
 
 import eu.more2020.visual.domain.Alert;
 import eu.more2020.visual.domain.Connection;
-import eu.more2020.visual.middleware.domain.MultiVariateDataPoint;
+import gr.imsi.athenarc.visual.middleware.domain.MultiVariateDataPoint;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.ConnectionRepository;
 import eu.more2020.visual.service.ToolsService;

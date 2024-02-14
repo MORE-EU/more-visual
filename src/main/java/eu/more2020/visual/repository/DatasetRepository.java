@@ -4,9 +4,9 @@ import eu.more2020.visual.domain.DbConnector;
 import eu.more2020.visual.domain.SchemaInfo;
 import eu.more2020.visual.domain.SchemaMeta;
 import eu.more2020.visual.domain.Sample;
-import eu.more2020.visual.middleware.datasource.QueryExecutor.QueryExecutor;
-import eu.more2020.visual.middleware.domain.DatabaseConnection;
-import eu.more2020.visual.middleware.domain.Dataset.AbstractDataset;
+import gr.imsi.athenarc.visual.middleware.datasource.QueryExecutor.QueryExecutor;
+import gr.imsi.athenarc.visual.middleware.domain.DatabaseConnection;
+import gr.imsi.athenarc.visual.middleware.domain.Dataset.AbstractDataset;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 

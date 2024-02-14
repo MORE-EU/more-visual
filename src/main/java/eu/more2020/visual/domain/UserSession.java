@@ -1,6 +1,6 @@
 package eu.more2020.visual.domain;
 
-import eu.more2020.visual.middleware.domain.DatabaseConnection;
+import gr.imsi.athenarc.visual.middleware.domain.DatabaseConnection;
 
 public class UserSession {
     private String sessionId;

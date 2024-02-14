@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.more2020.visual.domain.UserSession;
-import eu.more2020.visual.middleware.domain.DatabaseConnection;
+import gr.imsi.athenarc.visual.middleware.domain.DatabaseConnection;
 
 @Service
 public class DatabaseConnectionService {

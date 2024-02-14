@@ -1,12 +1,12 @@
 package eu.more2020.visual.web.rest;
 
 import eu.more2020.visual.domain.*;
-import eu.more2020.visual.middleware.datasource.QueryExecutor.QueryExecutor;
-import eu.more2020.visual.middleware.domain.*;
-import eu.more2020.visual.middleware.domain.InfluxDB.InfluxDBConnection;
-import eu.more2020.visual.middleware.domain.PostgreSQL.JDBCConnection;
-import eu.more2020.visual.middleware.domain.Dataset.AbstractDataset;
-import eu.more2020.visual.middleware.domain.Query.Query;
+import gr.imsi.athenarc.visual.middleware.datasource.QueryExecutor.QueryExecutor;
+import gr.imsi.athenarc.visual.middleware.domain.*;
+import gr.imsi.athenarc.visual.middleware.domain.InfluxDB.InfluxDBConnection;
+import gr.imsi.athenarc.visual.middleware.domain.PostgreSQL.JDBCConnection;
+import gr.imsi.athenarc.visual.middleware.domain.Dataset.AbstractDataset;
+import gr.imsi.athenarc.visual.middleware.domain.Query.Query;
 import eu.more2020.visual.repository.AlertRepository;
 import eu.more2020.visual.repository.DatasetRepository;
 import eu.more2020.visual.repository.FileHandlingRepository;
