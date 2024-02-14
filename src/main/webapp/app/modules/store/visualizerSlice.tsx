@@ -161,7 +161,8 @@ export const getSchemaMetadata = createAsyncThunk('getSchemaMetadata', async (da
 
 export const getUserStudySchemaMetadata = createAsyncThunk('getUserStudySchemaMetadata', async (data: {schema: string;}) =>{
   try {
-    const response = await axios.get(`api/user-study/metadata/${data.schema}`).then(res => res);
+    const sessionId = JSON.parse(localStorage.getItem("sessionId"));
+    const response = await axios.get(`api/user-study/metadata/${data.schema}`,  {params : {sessionId}}).then(res => res);
     return response;
   } catch (error) {
     throw new Error("Can't get database metadata");
@@ -177,8 +178,9 @@ export const getColumnNames = createAsyncThunk('getColumnNames', async (data: { 
 
 export const updateSchemaInfoColumnNames = createAsyncThunk('updateSchemaInfoColumnNames', async (data: { schema: string, id: string, columns: {timeCol: string; idCol: string; valueCol: string;}}) => {
   const { schema, id, columns } = data;
-    const response = await axios.put(`api/datasets/metadata/columns/${schema}/${id}`, columns).then(res => res);
-    return response;
+  const sessionId = JSON.parse(localStorage.getItem("sessionId"));
+  const response = await axios.put(`api/datasets/metadata/columns/${schema}/${id}`,columns, {params: {sessionId}}).then(res => res);
+  return response;
 });
 
 export const getDataset = createAsyncThunk('getDataset', async (data: { schema: string; id: string }) => {

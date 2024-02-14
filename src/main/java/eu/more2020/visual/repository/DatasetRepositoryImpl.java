@@ -33,7 +33,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
     private Map<String, AbstractDataset> datasets = new HashMap<String, AbstractDataset>();
 
-    private SchemaMeta schemaMeta = new SchemaMeta();
+    private Map<String, SchemaMeta> schemasMeta = new HashMap<String,SchemaMeta>();
 
     @Value("${application.timeFormat}")
     private String timeFormat;
@@ -50,50 +50,58 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
 
     @Override
-    public Optional<SchemaMeta> findSchema(DatabaseConnection connection, String schema, QueryExecutor queryExecutor) throws SQLException, IOException {
-        if (schemaMeta.getType() != null && schemaMeta.getName().equals(schema)) return Optional.ofNullable(schemaMeta);
-        schemaMeta = new SchemaMeta();
-        List<SchemaInfo> schemaInfos = new ArrayList<SchemaInfo>();
-        List<TableInfo> tableInfoArray = new ArrayList<TableInfo>();
-        schemaMeta.setName(schema);
-        schemaMeta.setType(connection.getType());
-        if(connection instanceof InfluxDBConnection) schemaMeta.setIsTimeSeries(true);
-        else schemaMeta.setIsTimeSeries(false);
-        try {
-            tableInfoArray = queryExecutor.getTableInfo();
-            for (TableInfo tableInfo : tableInfoArray) {
-                SchemaInfo schemaInfo = new SchemaInfo();
-                schemaInfo.setId(tableInfo.getTable());
-                schemaInfo.setSchema(tableInfo.getSchema());
-                if (connection instanceof InfluxDBConnection) schemaInfo.setIsConfiged(true);
-                else schemaInfo.setIsConfiged(false);
-                schemaInfos.add(schemaInfo);
+    public Optional<SchemaMeta> findSchema(String sessionId, DatabaseConnection connection, String schema, QueryExecutor queryExecutor) throws SQLException, IOException {
+        Assert.notNull(sessionId, "Session ID must not be null!");
+        SchemaMeta schemaMeta = new SchemaMeta();
+        if(schemasMeta.containsKey(sessionId)) schemaMeta = schemasMeta.get(sessionId);
+        else {
+            List<SchemaInfo> schemaInfos = new ArrayList<SchemaInfo>();
+            List<TableInfo> tableInfoArray = new ArrayList<TableInfo>();
+            schemaMeta.setName(schema);
+            schemaMeta.setType(connection.getType());
+            if(connection instanceof InfluxDBConnection) schemaMeta.setIsTimeSeries(true);
+            else schemaMeta.setIsTimeSeries(false);
+                try {
+                    tableInfoArray = queryExecutor.getTableInfo();
+                    for (TableInfo tableInfo : tableInfoArray) {
+                    SchemaInfo schemaInfo = new SchemaInfo();
+                    schemaInfo.setId(tableInfo.getTable());
+                    schemaInfo.setSchema(tableInfo.getSchema());
+                    if (connection instanceof InfluxDBConnection) schemaInfo.setIsConfiged(true);
+                    else schemaInfo.setIsConfiged(false);
+                    schemaInfos.add(schemaInfo);
+                }
+                schemaMeta.setData(schemaInfos);
+                schemasMeta.put(sessionId, schemaMeta);
+            } catch (Exception e) {
+                throw e;
             }
-            if (tableInfoArray.isEmpty()) throw new SQLException("No available data.");
-            schemaMeta.setData(schemaInfos);
-            return Optional.ofNullable(schemaMeta);
-        } catch (Exception e) {
-            throw e;
         }
+        return Optional.ofNullable(schemaMeta);
     }
 
     @Override
-    public Optional<SchemaMeta> findUserStudySchema(String schema) throws IOException {
-        if (schemaMeta.getType() != null && schemaMeta.getName().equals(schema)) return Optional.ofNullable(schemaMeta);
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            File metadataFile = new File(applicationProperties.getWorkspacePath() + "/more.meta.json");
-            if (metadataFile.exists()) {
-                FileReader reader = new FileReader(metadataFile);
-                schemaMeta = mapper.readValue(reader, SchemaMeta.class);
+    public Optional<SchemaMeta> findUserStudySchema(String sessionId, String schema) throws IOException {
+        Assert.notNull(sessionId, "Session ID must not be null!");
+        SchemaMeta schemaMeta = new SchemaMeta();
+        if(schemasMeta.containsKey(sessionId)) schemaMeta = schemasMeta.get(sessionId);
+        else {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                File metadataFile = new File(applicationProperties.getWorkspacePath() + "/more.meta.json");
+                if (metadataFile.exists()) {
+                    FileReader reader = new FileReader(metadataFile);
+                    schemaMeta = mapper.readValue(reader, SchemaMeta.class);
+                }
+                log.debug("{}", schemaMeta);
+                for (SchemaInfo schemaInfo : schemaMeta.getData()) schemaInfo.setIsConfiged(true);
+                if (schemaMeta.getData().isEmpty()) throw new IOException("No available data.");
+                schemasMeta.put(sessionId, schemaMeta);
+            } catch(Exception e) {
+                throw e;
             }
-            log.debug("{}", schemaMeta);
-            for (SchemaInfo schemaInfo : schemaMeta.getData()) schemaInfo.setIsConfiged(true);
-            if (schemaMeta.getData().isEmpty()) throw new IOException("No available data.");
-            return Optional.ofNullable(schemaMeta);
-        } catch(Exception e) {
-            throw e;
         }
+        return Optional.ofNullable(schemaMeta);
     }
 
     @Override
@@ -109,17 +117,20 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
 
     @Override
-    public List<Object[]> findSample(String id, QueryExecutor queryExecutor) throws SQLException {
+    public List<Object[]> findSample(String sessionId, String id, QueryExecutor queryExecutor) throws SQLException {
+        Assert.notNull(sessionId, "Session ID must not be null!");
         List<Object[]> resultList = new ArrayList<>();
         String schema = null;
-        for (SchemaInfo schemaInfo : schemaMeta.getData()) {
-            if (schemaInfo.getId().equals(id)) {
-                schema = schemaInfo.getSchema();
-                break;
-            }
-        }
         try {
-        resultList = queryExecutor.getSample(schema, id);
+            SchemaMeta schemaMeta = schemasMeta.get(sessionId);
+            if (schemaMeta == null ) throw new SQLException("No available data.");
+            for (SchemaInfo schemaInfo : schemaMeta.getData()) {
+                if (schemaInfo.getId().equals(id)) {
+                    schema = schemaInfo.getSchema();
+                    break;
+                }
+            }
+            resultList = queryExecutor.getSample(schema, id);
         } catch (Exception e) {
             throw e;
         }
@@ -127,37 +138,35 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     }
     
     @Override
-    public String getSchemaType() {
-        return schemaMeta.getType();
-    }
-
-    @Override
     public void deleteById(String id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void deleteAll() {
+    public void deleteAll(String sessionId) {
         if(!datasets.isEmpty()) datasets.clear();
-        if (schemaMeta != null) {
-            if (schemaMeta.getData() != null) schemaMeta.getData().clear();
-            schemaMeta.setType(null);
-        }
+        if(!schemasMeta.isEmpty()) schemasMeta.remove(sessionId);
     }
 
     @Override
-    public Optional<AbstractDataset> findById(String id, String schema, DatabaseConnection databaseConnection) throws SQLException {
+    public Optional<AbstractDataset> findById(String sessionId, String id, String schema, DatabaseConnection databaseConnection) throws SQLException {
         Assert.notNull(id, "ID must not be null!");
         String datasetID = databaseConnection.getType() + "_" + id + "_" + schema;
         AbstractDataset dataset = null;
         if(datasets.containsKey(datasetID)) dataset = datasets.get(datasetID);
         else {
-            for(SchemaInfo schemaInfo : schemaMeta.getData()) {
-                if (schemaInfo.getId().equals(id)) {
-                    dataset = createDBDataset(databaseConnection.getType(), schemaInfo, databaseConnection.getQueryExecutor());
-                    datasets.put(schemaInfo.getId(), dataset);
-                    break;
+            try {
+                SchemaMeta schemaMeta = schemasMeta.get(sessionId);
+                if (schemaMeta == null ) throw new SQLException("No available data.");
+                for(SchemaInfo schemaInfo : schemaMeta.getData()) {
+                    if (schemaInfo.getId().equals(id)) {
+                        dataset = createDBDataset(databaseConnection.getType(), schemaInfo, databaseConnection.getQueryExecutor());
+                        datasets.put(datasetID, dataset);
+                        break;
+                    }
                 }
+            } catch (Exception e) {
+                throw e;
             }
         }
         return Optional.ofNullable(dataset);
@@ -165,26 +174,15 @@ public class DatasetRepositoryImpl implements DatasetRepository {
 
 
     @Override
-    public SchemaInfo updateSchemaInfoColumns(String id, DbColumns columns) {
-        Assert.notNull(id, "Schema ID must not be null");
+    public SchemaInfo updateSchemaInfoColumns(String sessionId, String id, DbColumns columns) {
+        Assert.notNull(sessionId, "Session ID must not be null");
+        SchemaMeta schemaMeta = schemasMeta.get(sessionId);
         for (SchemaInfo schemaInfo : schemaMeta.getData()) {
             if (schemaInfo.getId().equals(id)) {
                 schemaInfo.setTimeCol(columns.getTimeCol());
                 schemaInfo.setIdCol(columns.getIdCol());
                 schemaInfo.setValueCol(columns.getValueCol());
                 schemaInfo.setIsConfiged(true);
-                return schemaInfo;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public SchemaInfo updateSchemaInfo(SchemaInfo info) {
-        Assert.notNull(info.getId(), "schemaInfo must not be null");
-        for (SchemaInfo schemaInfo : schemaMeta.getData()) {
-            if (schemaInfo.getId().equals(info.getId())) {
-                schemaInfo.setIsConfiged(info.getIsConfiged());
                 return schemaInfo;
             }
         }
