@@ -16,7 +16,7 @@ import { Autocomplete, Skeleton } from '@mui/material';
 import grey from '@mui/material/colors/grey';
 
 export const VisMeasures = () => {
-  const { dataset, selectedMeasures, customSelectedMeasures, measureColors, compare } = useAppSelector(state => state.visualizer);
+  const { dataset, selectedMeasures, customSelectedMeasures, isUserStudy, queryResultsLoading, m4QueryResultsLoading, measureColors, compare } = useAppSelector(state => state.visualizer);
   const [isCustomMeasureDialogOpen, setCustomMeasureDialogOpen] = useState(false);
   const [shownMeasures, setShownMeasures] = useState([]);
 
@@ -67,6 +67,12 @@ export const VisMeasures = () => {
     // Close the custom measure dialog
     setCustomMeasureDialogOpen(false);
   };
+
+  const getLoadingStatus =  () => {
+    const secondLoad = isUserStudy ? m4QueryResultsLoading : false;
+    return queryResultsLoading || secondLoad;
+  }
+
   return (
     <Grid sx={{ height: '100%', width: '100%' }}>
       <Box sx={{ height: '40%' }}>
@@ -105,12 +111,15 @@ export const VisMeasures = () => {
                       selectedMeasures.length +
                         customSelectedMeasures.length +
                         Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) ===
-                      6
+                      6 || getLoadingStatus()
                     }
                   />
                 </>
               </Tooltip>
-              <CustomMeasureButton onClick={handleCustomMeasureClick} />
+              <CustomMeasureButton onClick={handleCustomMeasureClick} disabled={selectedMeasures.length +
+                  customSelectedMeasures.length +
+                  Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) ===
+                6  || getLoadingStatus()}/>
               <CustomMeasureModal open={isCustomMeasureDialogOpen} onClose={handleCustomMeasureModalClose} />
             </>
           ) : (
@@ -132,6 +141,7 @@ export const VisMeasures = () => {
                     <Chip
                       label={dataset.header[col]}
                       key={labelId}
+                      disabled={getLoadingStatus()}
                       sx={{ bgcolor: measureColors[col], color: 'white', m: 0.5 }}
                       variant="outlined"
                       deleteIcon={
@@ -150,6 +160,7 @@ export const VisMeasures = () => {
                       <Chip
                         label={dataset.header[customMeasure.measure1] + '/' + dataset.header[customMeasure.measure2]}
                         key={labelId}
+                        disabled={getLoadingStatus()}
                         sx={{ bgcolor: measureColors[customMeasure.measure1], color: 'white', m: 0.5 }}
                         variant="outlined"
                         deleteIcon={

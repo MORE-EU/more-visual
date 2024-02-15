@@ -302,8 +302,8 @@ public class DatasetResource {
         if (userSession != null) {
             DatabaseConnection databaseConnection = userSession.getDatabaseConnection();
             datasetRepository.deleteAll(sessionId);
-            dataService.deleteCaches();
-            if(databaseConnection != null) databaseConnection.closeConnection();
+            //dataService.deleteCaches();
+            //if(databaseConnection != null) databaseConnection.closeConnection();
             sessionService.removeSession(sessionId);
         }
         return new ResponseEntity<Boolean>(true, HttpStatus.OK);

@@ -4,7 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import { useAppSelector } from 'app/modules/store/storeConfig';
 import grey from '@mui/material/colors/grey';
 
-const CustomMeasureButton = ({ onClick }) => {
+const CustomMeasureButton = ({ onClick, disabled }) => {
   const { selectedMeasures, customSelectedMeasures, compare } = useAppSelector(state => state.visualizer);
 
   return (
@@ -13,11 +13,7 @@ const CustomMeasureButton = ({ onClick }) => {
       onClick={onClick}
       sx={{border: `1px solid ${grey[300]}`}}
       size="medium"
-      disabled={selectedMeasures.length +
-        customSelectedMeasures.length +
-        Object.values(compare).reduce((acc, arr) => acc + arr.length, 0) ===
-      6}
-    >
+      disabled={disabled}>
       <TuneIcon/>
     </IconButton>
   );
