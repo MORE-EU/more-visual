@@ -73,7 +73,7 @@ export const ChartControl = ({}) => {
                   </Button>
                   <Slider
                     value={value}
-                    min={60}
+                    min={90}
                     step={0.5}
                     max={100}
                     onChange={handleChange}
@@ -86,14 +86,14 @@ export const ChartControl = ({}) => {
                     +
                   </Button>
                 </Box>
-                <Box >
+                {/* <Box >
                   <Button size="small" onClick={() => 
                     dispatch(resetCache({schema: schemaMeta.name, id:dataset.id}))}>
                     <Tooltip title="Reset Cache">
                       <RefreshIcon />
                     </Tooltip>
                   </Button>
-                </Box>
+                </Box> */}
               </Box>
           </>
           )}
