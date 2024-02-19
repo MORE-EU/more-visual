@@ -4,13 +4,15 @@ public class DbColumns {
     String timeCol;
     String idCol;
     String valueCol;
+    Boolean isConfiged;
     
     public DbColumns() {
     }
-    public DbColumns(String timeCol, String idCol, String valueCol) {
+    public DbColumns(String timeCol, String idCol, String valueCol, Boolean isConfiged) {
         this.timeCol = timeCol;
         this.idCol = idCol;
         this.valueCol = valueCol;
+        this.isConfiged = isConfiged;
     }
     public DbColumns(String timeCol) {
         this.timeCol = timeCol;
@@ -33,4 +35,11 @@ public class DbColumns {
     public void setValueCol(String valueCol) {
         this.valueCol = valueCol;
     }
+    public Boolean getIsConfiged() {
+        return isConfiged;
+    }
+    public void setIsConfiged(Boolean isConfiged) {
+        this.isConfiged = isConfiged;
+    }
+
 }

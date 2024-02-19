@@ -13,7 +13,7 @@ import VisControlDatasetSelection from './vis-control-dataset-selection';
 
 
 import { useAppDispatch, useAppSelector } from '../../store/storeConfig';
-import { setDatasetIsConfiged, setErrorMessage, getSchemaMetadata, resetDataset } from '../../store/visualizerSlice';
+import { setDatasetIsConfiged, setErrorMessage, getSchemaMetadata, resetDataset, resetUploadDatasetError } from '../../store/visualizerSlice';
 import Header from '../header/header';
 
 const mdTheme = createTheme();
@@ -30,6 +30,7 @@ export const VisConfigurer = () => {
     useEffect(() => {
         dispatch(setDatasetIsConfiged(false));
         dispatch(resetDataset());
+        dispatch(resetUploadDatasetError());
         setIsMounted(true);
         !schemaMeta && dispatch(getSchemaMetadata({schema: params.schema}));
     },[]);
@@ -41,6 +42,7 @@ export const VisConfigurer = () => {
     useEffect(() => {
         if(errorMessage) {
             setOpenSnack(true);
+            dispatch(resetUploadDatasetError());
             if (schemaMeta && !schemaMeta.data[datasetChoice].isConfiged ) dispatch(setDatasetIsConfiged(false));
         }
     }, [errorMessage]);

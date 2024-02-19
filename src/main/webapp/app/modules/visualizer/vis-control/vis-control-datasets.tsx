@@ -9,7 +9,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
-import { getDataset, updateDatasetChoice, resetFetchData, resetCache, setDatasetIsConfiged, resetDataset, disconnector } from 'app/modules/store/visualizerSlice';
+import { getDataset, updateDatasetChoice, resetFetchData, resetCache, setDatasetIsConfiged, resetDataset, disconnector, updateActiveTool, resetFilters } from 'app/modules/store/visualizerSlice';
 import {useState} from 'react';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
@@ -28,6 +28,8 @@ const VisControlDatasets = ({}) => {
     if (datasetChoice !== idx) {
       dispatch(updateDatasetChoice(idx));
     }
+    dispatch(updateActiveTool(null));
+    dispatch(resetFilters());
   };
   
   const handleUploadChange = e => {
@@ -36,6 +38,8 @@ const VisControlDatasets = ({}) => {
   };
 
   const handleDBUpoladChange = e => {
+    dispatch(updateActiveTool(null));
+    dispatch(resetFilters());
     dispatch(updateDatasetChoice(schemaMeta.data.findIndex(file => !file.isConfiged)));
     dispatch(setDatasetIsConfiged(false));
     dispatch(resetDataset());

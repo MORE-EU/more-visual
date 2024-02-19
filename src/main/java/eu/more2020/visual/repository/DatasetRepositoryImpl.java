@@ -53,17 +53,21 @@ public class DatasetRepositoryImpl implements DatasetRepository {
     public Optional<SchemaMeta> findSchema(String sessionId, DatabaseConnection connection, String schema, QueryExecutor queryExecutor) throws SQLException, IOException {
         Assert.notNull(sessionId, "Session ID must not be null!");
         SchemaMeta schemaMeta = new SchemaMeta();
-        if(schemasMeta.containsKey(sessionId)) schemaMeta = schemasMeta.get(sessionId);
-        else {
-            List<SchemaInfo> schemaInfos = new ArrayList<SchemaInfo>();
-            List<TableInfo> tableInfoArray = new ArrayList<TableInfo>();
-            schemaMeta.setName(schema);
-            schemaMeta.setType(connection.getType());
-            if(connection instanceof InfluxDBConnection) schemaMeta.setIsTimeSeries(true);
-            else schemaMeta.setIsTimeSeries(false);
-                try {
-                    tableInfoArray = queryExecutor.getTableInfo();
-                    for (TableInfo tableInfo : tableInfoArray) {
+        try {
+            if(schemasMeta.containsKey(sessionId)) {
+                if (!schemasMeta.get(sessionId).getName().equals(schema)) throw new IllegalArgumentException("Schema " + schema + "does not exist in session " + sessionId);
+                schemaMeta = schemasMeta.get(sessionId);
+            }
+            else {
+                List<SchemaInfo> schemaInfos = new ArrayList<SchemaInfo>();
+                List<TableInfo> tableInfoArray = new ArrayList<TableInfo>();
+                schemaMeta.setName(schema);
+                schemaMeta.setType(connection.getType());
+                if(connection instanceof InfluxDBConnection) schemaMeta.setIsTimeSeries(true);
+                else schemaMeta.setIsTimeSeries(false);
+                tableInfoArray = queryExecutor.getTableInfo();
+                if (tableInfoArray.isEmpty()) throw new SQLException("No available data for schema " + schema);
+                for (TableInfo tableInfo : tableInfoArray) {
                     SchemaInfo schemaInfo = new SchemaInfo();
                     schemaInfo.setId(tableInfo.getTable());
                     schemaInfo.setSchema(tableInfo.getSchema());
@@ -73,9 +77,9 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 }
                 schemaMeta.setData(schemaInfos);
                 schemasMeta.put(sessionId, schemaMeta);
-            } catch (Exception e) {
-                throw e;
             }
+        } catch (Exception e) {
+            throw e;
         }
         return Optional.ofNullable(schemaMeta);
     }
@@ -182,7 +186,7 @@ public class DatasetRepositoryImpl implements DatasetRepository {
                 schemaInfo.setTimeCol(columns.getTimeCol());
                 schemaInfo.setIdCol(columns.getIdCol());
                 schemaInfo.setValueCol(columns.getValueCol());
-                schemaInfo.setIsConfiged(true);
+                schemaInfo.setIsConfiged(columns.getIsConfiged());
                 return schemaInfo;
             }
         }

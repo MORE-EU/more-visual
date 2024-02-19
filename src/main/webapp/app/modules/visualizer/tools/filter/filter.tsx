@@ -117,7 +117,7 @@ export const Filter = () => {
             </IconButton>
           </Tooltip>
         </Box>
-        {queryResults &&
+        {queryResults && queryResults.measureStats &&
           selectedMeasures.map((col, idx) => {
             const stats = queryResults.measureStats[col];
             return (

@@ -149,7 +149,7 @@ export const disconnector = createAsyncThunk('disconnector', async (data: {}) =>
     return response;
 });
 
-export const getSchemaMetadata = createAsyncThunk('getSchemaMetadata', async (data: {schema: string; }) => {
+export const getSchemaMetadata = createAsyncThunk('getSchemaMetadata', async (data: {schema: string}) => {
   try {
     const sessionId = JSON.parse(localStorage.getItem("sessionId"));
     const response = await axios.get(`api/datasets/metadata/${data.schema}`, {params : {sessionId}}).then(res => res);
@@ -159,7 +159,7 @@ export const getSchemaMetadata = createAsyncThunk('getSchemaMetadata', async (da
   }
 });
 
-export const getUserStudySchemaMetadata = createAsyncThunk('getUserStudySchemaMetadata', async (data: {schema: string;}) =>{
+export const getUserStudySchemaMetadata = createAsyncThunk('getUserStudySchemaMetadata', async (data: {schema: string}) =>{
   try {
     const sessionId = JSON.parse(localStorage.getItem("sessionId"));
     const response = await axios.get(`api/user-study/metadata/${data.schema}`,  {params : {sessionId}}).then(res => res);
@@ -169,21 +169,21 @@ export const getUserStudySchemaMetadata = createAsyncThunk('getUserStudySchemaMe
   }
 });
 
-export const getColumnNames = createAsyncThunk('getColumnNames', async (data: { schema: string, id: string;}) => {
+export const getColumnNames = createAsyncThunk('getColumnNames', async (data: { schema: string, id: string}) => {
   const sessionId = JSON.parse(localStorage.getItem("sessionId"));
   const response = await axios.get(`api/datasets/metadata/columns/${data.schema}/${data.id}`, {params : {sessionId}}).then(res => res);
   return response;  
 });
 
 
-export const updateSchemaInfoColumnNames = createAsyncThunk('updateSchemaInfoColumnNames', async (data: { schema: string, id: string, columns: {timeCol: string; idCol: string; valueCol: string;}}) => {
+export const updateSchemaInfoColumnNames = createAsyncThunk('updateSchemaInfoColumnNames', async (data: { schema: string, id: string, columns: {timeCol: string | null, idCol: string | null, valueCol: string | null,isConfiged: boolean}}) => {
   const { schema, id, columns } = data;
   const sessionId = JSON.parse(localStorage.getItem("sessionId"));
   const response = await axios.put(`api/datasets/metadata/columns/${schema}/${id}`,columns, {params: {sessionId}}).then(res => res);
   return response;
 });
 
-export const getDataset = createAsyncThunk('getDataset', async (data: { schema: string; id: string }) => {
+export const getDataset = createAsyncThunk('getDataset', async (data: { schema: string, id: string }) => {
   const { schema, id } = data;
   const sessionId = JSON.parse(localStorage.getItem("sessionId"));
   try {
@@ -674,7 +674,6 @@ const visualizer = createSlice({
       (state, action) => {
         state.loading = false;
         state.errorMessage = action.error.message;
-        state.schemaMeta.data[state.datasetChoice].isConfiged = false;
         state.uploadDatasetError = true;
       }
     );
