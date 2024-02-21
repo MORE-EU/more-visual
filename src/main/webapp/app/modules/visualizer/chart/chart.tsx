@@ -689,6 +689,10 @@ export const Chart = () => {
     return isUserStudy ? (!m4QueryResultsLoading && !queryResultsLoading) : !queryResultsLoading
   }
 
+  const computeAccuracy = (maxErrorBound) => {
+    return Math.floor(((accuracy + (1 - parseFloat(maxErrorBound))) / 2) * 100 * 100)  / 100;
+  }
+
   return (
     <>
       <Grid
@@ -712,7 +716,7 @@ export const Chart = () => {
           <>
             <div style={{background: 'rgb(0,0,0,0.1)', padding:'1px', position: 'absolute', top: '-3px', right: '0px', zIndex: 999 }}>
               { queryResults.error ? (
-                  <div><b>Accuracy: </b>{Object.entries(queryResults.error).map(([key, value]) => `${dataset.header[key]}: ${Math.floor((1 - parseFloat(value)) * 100 * 100)  / 100}%`).join('\n')}</div>
+                  <div><b>Accuracy: </b>{Object.entries(queryResults.error).map(([key, value]) => `${dataset.header[key]}: ${computeAccuracy(value)}%`).join('\n')}</div>
                 ) : (
                   <div><b>Accuracy: </b>{Object.entries(queryResults.data).map(([key, value]) => `${dataset.header[key]}: 100%`).join('\n')}</div>
                 )}
