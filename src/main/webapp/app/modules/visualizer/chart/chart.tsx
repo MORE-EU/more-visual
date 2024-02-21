@@ -185,7 +185,7 @@ export const Chart = () => {
         updateQueryResults({
           schema: schemaMeta.name,
           id: dataset.id,
-          from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.1,
+          from: from ? from : dataset.timeRange.to - (dataset.timeRange.to - dataset.timeRange.from) * 0.02,
           to: to ? to : dataset.timeRange.to,
           viewPort,
           selectedMeasures,
