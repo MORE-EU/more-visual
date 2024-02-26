@@ -12,6 +12,7 @@ import ForecastingFeatureExtr from '../forecasting-feature-extraction/forecastin
 import ForecastingAlgSelection from '../forecasting-train-results/forecasting-alg-selection';
 import ForecastingResults from '../forecasting-results/forecasting-results';
 import { startTraining } from 'app/modules/store/forecastingSlice';
+import { resetForecastingState } from 'app/modules/store/visualizerSlice';
 
 const steps = ['Data Selection', 'Feature Selection', 'Algorithm Selection'];
 
@@ -115,6 +116,7 @@ const ForecastingTrainStepper = props => {
   const handleReset = () => {
     setNewTrain(false);
     setActiveStep(0);
+    dispatch(resetForecastingState());
   };
 
   return (
