@@ -620,6 +620,7 @@ const visualizer = createSlice({
       state.queryResultsCompleted = true;
       state.queryResults = action.payload.response;
       state.data = action.payload.response.data;
+      //TODO: handle uncaught promise when empty data fom measure 0 or set from and to differetly
       state.from = action.payload.response.data[Object.keys(action.payload.response.data)[0]][0].timestamp;
       state.to = action.payload.response.data[Object.keys(action.payload.response.data)[0]][action.payload.response.data[Object.keys(action.payload.response.data)[0]].length - 1].timestamp;
     });
@@ -675,6 +676,7 @@ const visualizer = createSlice({
         state.loading = false;
         state.errorMessage = action.error.message;
         state.uploadDatasetError = true;
+        state.queryResultsLoading = false;
       }
     );
     builder.addMatcher(isAnyOf(updateQueryResults.rejected, updateM4QueryResults.rejected, updateCompareQueryResults.rejected), (state, action) => {

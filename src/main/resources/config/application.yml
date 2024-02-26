@@ -116,3 +116,5 @@ application:
   toolHost: 83.212.75.52
   #  toolHost: localhost
   toolPort: 50053
+  forecastHost: localhost
+  forecastPort: 50051

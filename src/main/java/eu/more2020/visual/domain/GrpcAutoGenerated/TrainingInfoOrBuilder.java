@@ -30,4 +30,64 @@ public interface TrainingInfoOrBuilder extends
    */
   com.google.protobuf.ByteString
       getConfigBytes();
+
+  /**
+   * <code>string host = 3;</code>
+   * @return The host.
+   */
+  java.lang.String getHost();
+  /**
+   * <code>string host = 3;</code>
+   * @return The bytes for host.
+   */
+  com.google.protobuf.ByteString
+      getHostBytes();
+
+  /**
+   * <code>string port = 4;</code>
+   * @return The port.
+   */
+  java.lang.String getPort();
+  /**
+   * <code>string port = 4;</code>
+   * @return The bytes for port.
+   */
+  com.google.protobuf.ByteString
+      getPortBytes();
+
+  /**
+   * <code>string username = 5;</code>
+   * @return The username.
+   */
+  java.lang.String getUsername();
+  /**
+   * <code>string username = 5;</code>
+   * @return The bytes for username.
+   */
+  com.google.protobuf.ByteString
+      getUsernameBytes();
+
+  /**
+   * <code>string password = 6;</code>
+   * @return The password.
+   */
+  java.lang.String getPassword();
+  /**
+   * <code>string password = 6;</code>
+   * @return The bytes for password.
+   */
+  com.google.protobuf.ByteString
+      getPasswordBytes();
+
+  /**
+   * <code>string databaseName = 7;</code>
+   * @return The databaseName.
+   */
+  java.lang.String getDatabaseName();
+  /**
+   * <code>string databaseName = 7;</code>
+   * @return The bytes for databaseName.
+   */
+  com.google.protobuf.ByteString
+      getDatabaseNameBytes();
 }

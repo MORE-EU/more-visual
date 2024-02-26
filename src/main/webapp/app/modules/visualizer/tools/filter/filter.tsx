@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import { useAppDispatch, useAppSelector } from 'app/modules/store/storeConfig';
 import { resetFilters, updateFilter, updateQueryResults } from 'app/modules/store/visualizerSlice';
@@ -121,7 +121,7 @@ export const Filter = () => {
           selectedMeasures.map((col, idx) => {
             const stats = queryResults.measureStats[col];
             return (
-              <>
+              <Fragment key={`filters-fragment-${col}-${idx}`}>
               {stats &&
               <Box
                 key={`filters-container-${col}-${idx}`}
@@ -197,7 +197,7 @@ export const Filter = () => {
                 </Box>
               </Box>
               }
-              </>
+              </Fragment>
             );
           })}
       </Box>

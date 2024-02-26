@@ -383,6 +383,7 @@ export const Chart = () => {
     });
 
     // Set initial extremes
+    //TODO: if intial data are empty throws error
     chart.current.xAxis[0].setExtremes(
       data[selectedMeasures[0]][2].timestamp,
       data[selectedMeasures[0]][data[selectedMeasures[0]].length - 2].timestamp

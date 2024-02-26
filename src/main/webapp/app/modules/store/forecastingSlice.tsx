@@ -30,6 +30,7 @@ const requestTargetsData = (response, getState, dispatch) => {
 
 export const startTraining = createAsyncThunk('startTraining', async (config: IForecastingForm, { getState, dispatch }) => {
   const state: any = getState();
+  const sessionId = JSON.parse(localStorage.getItem("sessionId"));
   const id = uuidv4();
   localStorage.setItem('id', id);
   dispatch(setForecastingData({ ...state.forecasting.forecastingData, id: id }));
@@ -37,6 +38,8 @@ export const startTraining = createAsyncThunk('startTraining', async (config: IF
     .post(`api/forecasting/train`, {
       id,
       config: JSON.stringify(config),
+    }, {
+      params: {sessionId}
     })
     .then(res => res);
   dispatch(getProgress());
@@ -76,7 +79,8 @@ export const deleteModelByName = createAsyncThunk('deleteModelByName', async (mo
 });
 
 export const getInference = createAsyncThunk('getInference', async (info: { timestamp: number; model_name: string; kind: string }) => {
-  const response = await axios.post(`api/forecasting/inference`, info).then(res => res.data);
+  const sessionId = JSON.parse(localStorage.getItem("sessionId"));
+  const response = await axios.post(`api/forecasting/inference`, info, {params: {sessionId}}).then(res => res.data);
   return response;
 });
 
@@ -91,6 +95,7 @@ export const getInitialSeries = createAsyncThunk(
   async (data: { from; to; schema; id; measure }, { getState, dispatch }) => {
     const { from, to, schema, id, measure } = data;
     const state: any = getState();
+    const sessionId = JSON.parse(localStorage.getItem("sessionId"));
     const query = {
       from,
       to,
@@ -98,7 +103,7 @@ export const getInitialSeries = createAsyncThunk(
       measures: [state.visualizer.dataset.header.indexOf(measure)],
       filter: {},
     };
-    const response = await axios.post(`api/datasets/${schema}/${id}/query`, query).then(res => res);
+    const response = await axios.post(`api/datasets/${schema}/${id}/query`, query, {params: {sessionId}}).then(res => res);
     return response.data;
   }
 );

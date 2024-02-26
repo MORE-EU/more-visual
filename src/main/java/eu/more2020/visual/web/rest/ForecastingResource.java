@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.more2020.visual.domain.UserSession;
 import eu.more2020.visual.domain.Forecasting.DBs.Meta;
 import eu.more2020.visual.domain.Forecasting.Grpc.AllResultsRes;
 import eu.more2020.visual.domain.Forecasting.Grpc.HandleDataReq;
@@ -29,6 +31,7 @@ import eu.more2020.visual.domain.Forecasting.Grpc.TargetReq;
 import eu.more2020.visual.domain.Forecasting.Grpc.TimestampReq;
 import eu.more2020.visual.domain.Forecasting.Grpc.TrainingInfoReq;
 import eu.more2020.visual.repository.MetaRepository;
+import eu.more2020.visual.service.SessionService;
 import eu.more2020.visual.service.forecasting.ForecastingAthenaImpl;
 import eu.more2020.visual.service.forecasting.ForecastingCallsImpl;
 import eu.more2020.visual.service.forecasting.ForecastingUtils;
@@ -43,16 +46,24 @@ public class ForecastingResource {
     @Autowired
     private MetaRepository metaRepository;
 
-    public ForecastingResource(ForecastingCallsImpl forecastingCallsImpl, ForecastingUtils forecastingUtils, ForecastingAthenaImpl forecastingAthenaImpl) {
+    @Autowired
+    private final SessionService sessionService;
+
+    public ForecastingResource(ForecastingCallsImpl forecastingCallsImpl, 
+                               ForecastingUtils forecastingUtils, 
+                               ForecastingAthenaImpl forecastingAthenaImpl,
+                               SessionService sessionService) {
         this.forecastingCallsImpl = forecastingCallsImpl;
         this.forecastingUtils = forecastingUtils;
         this.forecastingAthenaImpl = forecastingAthenaImpl;
+        this.sessionService = sessionService;
     }
 
     @PostMapping("/forecasting/train")
-    public ResponseEntity<StatusRes> StartTraining(@RequestBody TrainingInfoReq info) throws IOException {
+    public ResponseEntity<StatusRes> StartTraining(@RequestParam String sessionId, @RequestBody TrainingInfoReq info) throws IOException {
         log.debug("REST request to start training");
-        return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingStartTraining(info));
+        UserSession userSession = sessionService.getSession(sessionId);
+        return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingStartTraining(userSession, info));
     }
 
     @PostMapping("/forecasting/progress")
@@ -74,9 +85,10 @@ public class ForecastingResource {
     }
     
     @PostMapping("/forecasting/inference")
-    public ResponseEntity<InferenceRes> GetInference(@RequestBody TimestampReq timestamp) throws IOException {
+    public ResponseEntity<InferenceRes> GetInference(@RequestParam String sessionId, @RequestBody TimestampReq timestamp) throws IOException {
         log.debug("REST request to get inference of model: ", timestamp.getModel_name());
-        return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingInference(timestamp));
+        UserSession userSession = sessionService.getSession(sessionId);
+        return ResponseEntity.ok().body(forecastingCallsImpl.ForecastingInference(userSession, timestamp));
     }
     
     @PostMapping("/forecasting/Athenainference")

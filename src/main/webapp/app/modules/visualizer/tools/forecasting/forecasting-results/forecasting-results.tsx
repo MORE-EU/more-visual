@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Grid from '@mui/material/Grid';
@@ -125,7 +125,7 @@ const ForecastingResults = () => {
   const open = Boolean(anchorEl);
   const dispatch = useAppDispatch();
   const { forecastingData, savedModels } = useAppSelector(state => state.forecasting);
-  const [intervalID, setIntervalID] = useState(null);
+  const intervalID = useRef<number>();
   const [modelInfo, setmodelInfo] = useState({ model_name: '', model_type: '', target: '' });
   const [openSnack, setOpenSnack] = useState(false);
 
@@ -160,18 +160,16 @@ const ForecastingResults = () => {
     if (Object.values(forecastingData.status).some(el => el !== 'done') && Object.keys(forecastingData.status.length > 0)) {
       return;
     } else if (Object.keys(forecastingData.status.length > 0) && intervalID !== null) {
-      clearInterval(intervalID);
+      clearInterval(intervalID.current);
     }
   }, [forecastingData]);
 
   useEffect(() => {
-    setIntervalID(
-      setInterval(() => {
+      intervalID.current =  setInterval(() => {
         dispatch(getProgress());
-      }, 3000)
-    );
+      }, 3000);
     return () => {
-      clearInterval(intervalID);
+      clearInterval(intervalID.current);
     };
   }, []);
 

@@ -30,4 +30,76 @@ public interface TrainingInfoOrBuilder extends
    */
   com.google.protobuf.ByteString
       getConfigBytes();
+
+  /**
+   * <code>string host = 3;</code>
+   * @return The host.
+   */
+  java.lang.String getHost();
+  /**
+   * <code>string host = 3;</code>
+   * @return The bytes for host.
+   */
+  com.google.protobuf.ByteString
+      getHostBytes();
+
+  /**
+   * <code>string port = 4;</code>
+   * @return The port.
+   */
+  java.lang.String getPort();
+  /**
+   * <code>string port = 4;</code>
+   * @return The bytes for port.
+   */
+  com.google.protobuf.ByteString
+      getPortBytes();
+
+  /**
+   * <code>string username = 5;</code>
+   * @return The username.
+   */
+  java.lang.String getUsername();
+  /**
+   * <code>string username = 5;</code>
+   * @return The bytes for username.
+   */
+  com.google.protobuf.ByteString
+      getUsernameBytes();
+
+  /**
+   * <code>string password = 6;</code>
+   * @return The password.
+   */
+  java.lang.String getPassword();
+  /**
+   * <code>string password = 6;</code>
+   * @return The bytes for password.
+   */
+  com.google.protobuf.ByteString
+      getPasswordBytes();
+
+  /**
+   * <code>string schema = 7;</code>
+   * @return The schema.
+   */
+  java.lang.String getSchema();
+  /**
+   * <code>string schema = 7;</code>
+   * @return The bytes for schema.
+   */
+  com.google.protobuf.ByteString
+      getSchemaBytes();
+
+  /**
+   * <code>string database = 8;</code>
+   * @return The database.
+   */
+  java.lang.String getDatabase();
+  /**
+   * <code>string database = 8;</code>
+   * @return The bytes for database.
+   */
+  com.google.protobuf.ByteString
+      getDatabaseBytes();
 }

@@ -13,8 +13,8 @@ public class SessionService {
 
     private Map<String, UserSession> activeSessions = new ConcurrentHashMap<>();
 
-    public UserSession createSession() {
-        UserSession userSession = new UserSession();
+    public UserSession createSession(String host, String port, String username, String password, String databaseName) {
+        UserSession userSession = new UserSession(host, port, username, password,databaseName);
         userSession.setSessionId(UUID.randomUUID().toString());
         activeSessions.put(userSession.getSessionId(), userSession);
         return userSession;

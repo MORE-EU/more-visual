@@ -120,39 +120,43 @@ public final class GrpcProto {
     java.lang.String[] descriptorData = {
       "\n\021forecasting.proto\"\016\n\014EmptyRequest\"\030\n\006M" +
       "odels\022\016\n\006models\030\001 \003(\t\"\036\n\tModelName\022\021\n\tmo" +
-      "delName\030\001 \001(\t\"*\n\014TrainingInfo\022\n\n\002id\030\001 \001(" +
-      "\t\022\016\n\006config\030\002 \001(\t\"\"\n\006Target\022\014\n\004name\030\001 \001(" +
-      "\t\022\n\n\002id\030\002 \001(\t\"$\n\006Status\022\n\n\002id\030\001 \001(\t\022\016\n\006s" +
-      "tatus\030\002 \001(\t\"\023\n\005JobID\022\n\n\002id\030\001 \001(\t\"@\n\tTime" +
-      "stamp\022\021\n\ttimestamp\030\001 \001(\003\022\022\n\nmodel_name\030\002" +
-      " \001(\t\022\014\n\004kind\030\003 \001(\t\"f\n\010Progress\022\n\n\002id\030\001 \001" +
-      "(\t\022!\n\004data\030\002 \003(\0132\023.Progress.DataEntry\032+\n" +
-      "\tDataEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\002" +
-      "8\001\"\332\001\n\013Predictions\0222\n\013predictions\030\001 \003(\0132" +
-      "\035.Predictions.PredictionsEntry\0220\n\nevalua" +
-      "tion\030\002 \003(\0132\034.Predictions.EvaluationEntry" +
-      "\0322\n\020PredictionsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005val" +
-      "ue\030\002 \001(\002:\0028\001\0321\n\017EvaluationEntry\022\013\n\003key\030\001" +
-      " \001(\t\022\r\n\005value\030\002 \001(\002:\0028\001\"\177\n\007Results\022\016\n\006ta" +
-      "rget\030\001 \001(\t\022&\n\007metrics\030\002 \003(\0132\025.Results.Me" +
-      "tricsEntry\032<\n\014MetricsEntry\022\013\n\003key\030\001 \001(\t\022" +
-      "\033\n\005value\030\002 \001(\0132\014.Predictions:\0028\001\"\'\n\nAllR" +
-      "esults\022\031\n\007results\030\001 \003(\0132\010.Results\"q\n\tInf" +
-      "erence\0220\n\013predictions\030\001 \003(\0132\033.Inference." +
-      "PredictionsEntry\0322\n\020PredictionsEntry\022\013\n\003" +
-      "key\030\001 \001(\t\022\r\n\005value\030\002 \001(\002:\0028\001\"C\n\tModelInf" +
-      "o\022\022\n\nmodel_type\030\001 \001(\t\022\022\n\nmodel_name\030\002 \001(" +
-      "\t\022\016\n\006target\030\003 \001(\t2\322\002\n\nRouteGuide\022)\n\rStar" +
-      "tTraining\022\r.TrainingInfo\032\007.Status\"\000\022\"\n\013G" +
-      "etProgress\022\006.JobID\032\t.Progress\"\000\022/\n\030GetSp" +
-      "ecificTargetResults\022\007.Target\032\010.Results\"\000" +
-      "\022-\n\024GetAllTargetsResults\022\006.JobID\032\013.AllRe" +
-      "sults\"\000\022(\n\014GetInference\022\n.Timestamp\032\n.In" +
-      "ference\"\000\022\"\n\tSaveModel\022\n.ModelInfo\032\007.Sta" +
-      "tus\"\000\022#\n\tGetModels\022\r.EmptyRequest\032\007.Mode" +
-      "ls\022\"\n\013DeleteModel\022\n.ModelName\032\007.ModelsB:" +
-      "\n+eu.more2020.visual.domain.GrpcAutoGene" +
-      "ratedB\tGrpcProtoP\001b\006proto3"
+      "delName\030\001 \001(\t\"\200\001\n\014TrainingInfo\022\n\n\002id\030\001 \001" +
+      "(\t\022\016\n\006config\030\002 \001(\t\022\014\n\004host\030\003 \001(\t\022\014\n\004port" +
+      "\030\004 \001(\t\022\020\n\010username\030\005 \001(\t\022\020\n\010password\030\006 \001" +
+      "(\t\022\024\n\014databaseName\030\007 \001(\t\"\"\n\006Target\022\014\n\004na" +
+      "me\030\001 \001(\t\022\n\n\002id\030\002 \001(\t\"$\n\006Status\022\n\n\002id\030\001 \001" +
+      "(\t\022\016\n\006status\030\002 \001(\t\"\023\n\005JobID\022\n\n\002id\030\001 \001(\t\"" +
+      "\226\001\n\tTimestamp\022\021\n\ttimestamp\030\001 \001(\003\022\022\n\nmode" +
+      "l_name\030\002 \001(\t\022\014\n\004kind\030\003 \001(\t\022\014\n\004host\030\004 \001(\t" +
+      "\022\014\n\004port\030\005 \001(\t\022\020\n\010username\030\006 \001(\t\022\020\n\010pass" +
+      "word\030\007 \001(\t\022\024\n\014databaseName\030\010 \001(\t\"f\n\010Prog" +
+      "ress\022\n\n\002id\030\001 \001(\t\022!\n\004data\030\002 \003(\0132\023.Progres" +
+      "s.DataEntry\032+\n\tDataEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
+      "\005value\030\002 \001(\t:\0028\001\"\332\001\n\013Predictions\0222\n\013pred" +
+      "ictions\030\001 \003(\0132\035.Predictions.PredictionsE" +
+      "ntry\0220\n\nevaluation\030\002 \003(\0132\034.Predictions.E" +
+      "valuationEntry\0322\n\020PredictionsEntry\022\013\n\003ke" +
+      "y\030\001 \001(\t\022\r\n\005value\030\002 \001(\002:\0028\001\0321\n\017Evaluation" +
+      "Entry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\002:\0028\001\"\177\n" +
+      "\007Results\022\016\n\006target\030\001 \001(\t\022&\n\007metrics\030\002 \003(" +
+      "\0132\025.Results.MetricsEntry\032<\n\014MetricsEntry" +
+      "\022\013\n\003key\030\001 \001(\t\022\033\n\005value\030\002 \001(\0132\014.Predictio" +
+      "ns:\0028\001\"\'\n\nAllResults\022\031\n\007results\030\001 \003(\0132\010." +
+      "Results\"q\n\tInference\0220\n\013predictions\030\001 \003(" +
+      "\0132\033.Inference.PredictionsEntry\0322\n\020Predic" +
+      "tionsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\002:\002" +
+      "8\001\"C\n\tModelInfo\022\022\n\nmodel_type\030\001 \001(\t\022\022\n\nm" +
+      "odel_name\030\002 \001(\t\022\016\n\006target\030\003 \001(\t2\322\002\n\nRout" +
+      "eGuide\022)\n\rStartTraining\022\r.TrainingInfo\032\007" +
+      ".Status\"\000\022\"\n\013GetProgress\022\006.JobID\032\t.Progr" +
+      "ess\"\000\022/\n\030GetSpecificTargetResults\022\007.Targ" +
+      "et\032\010.Results\"\000\022-\n\024GetAllTargetsResults\022\006" +
+      ".JobID\032\013.AllResults\"\000\022(\n\014GetInference\022\n." +
+      "Timestamp\032\n.Inference\"\000\022\"\n\tSaveModel\022\n.M" +
+      "odelInfo\032\007.Status\"\000\022#\n\tGetModels\022\r.Empty" +
+      "Request\032\007.Models\022\"\n\013DeleteModel\022\n.ModelN" +
+      "ame\032\007.ModelsB:\n+eu.more2020.visual.domai" +
+      "n.GrpcAutoGeneratedB\tGrpcProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -181,7 +185,7 @@ public final class GrpcProto {
     internal_static_TrainingInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_TrainingInfo_descriptor,
-        new java.lang.String[] { "Id", "Config", });
+        new java.lang.String[] { "Id", "Config", "Host", "Port", "Username", "Password", "DatabaseName", });
     internal_static_Target_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_Target_fieldAccessorTable = new
@@ -205,7 +209,7 @@ public final class GrpcProto {
     internal_static_Timestamp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Timestamp_descriptor,
-        new java.lang.String[] { "Timestamp", "ModelName", "Kind", });
+        new java.lang.String[] { "Timestamp", "ModelName", "Kind", "Host", "Port", "Username", "Password", "DatabaseName", });
     internal_static_Progress_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_Progress_fieldAccessorTable = new

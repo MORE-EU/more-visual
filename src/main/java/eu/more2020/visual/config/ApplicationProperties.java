@@ -14,6 +14,8 @@ public class ApplicationProperties {
     String timeFormat;
     String toolHost;
     int toolPort;
+    String forecastHost;
+    int forecastPort;
 
     public String getWorkspacePath() {
         return workspacePath;
@@ -54,4 +56,20 @@ public class ApplicationProperties {
     public void setToolPort(int toolPort) {
         this.toolPort = toolPort;
     }
+    public String getForecastHost() {
+        return forecastHost;
+    }
+
+    public void setForecastHost(String forecastHost) {
+        this.forecastHost = forecastHost;
+    }
+    
+    public int getForecastPort() {
+        return forecastPort;
+    }
+
+    public void setForecastPort(int forecastPort) {
+        this.forecastPort = forecastPort;
+    }
+
 }

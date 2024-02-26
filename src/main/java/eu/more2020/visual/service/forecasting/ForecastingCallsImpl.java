@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 
+import eu.more2020.visual.config.ApplicationProperties;
+import eu.more2020.visual.domain.UserSession;
 import eu.more2020.visual.domain.Forecasting.DBs.Meta;
 import eu.more2020.visual.domain.Forecasting.Grpc.AllResultsRes;
 import eu.more2020.visual.domain.Forecasting.Grpc.InferenceRes;
@@ -46,22 +48,30 @@ import io.grpc.ManagedChannelBuilder;
 @Service
 public class ForecastingCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
 
+    private final ApplicationProperties applicationProperties;
+
     @Autowired
     private MetaRepository metaRepository;
 
     @Autowired
-    public ForecastingCallsImpl(MetaRepository metaRepository) {
+    public ForecastingCallsImpl(MetaRepository metaRepository, ApplicationProperties applicationProperties) {
         this.metaRepository = metaRepository;
+        this.applicationProperties = applicationProperties;
     }
 
-    public StatusRes ForecastingStartTraining (TrainingInfoReq info) throws InvalidProtocolBufferException, JsonProcessingException {
+    public StatusRes ForecastingStartTraining (UserSession userSession, TrainingInfoReq info) throws InvalidProtocolBufferException, JsonProcessingException {
         TrainingInfo request = TrainingInfo.newBuilder()
                 .setId(info.getId())
                 .setConfig(info.getConfig())
+                .setHost(userSession.getHost())
+                .setPort(userSession.getPort())
+                .setUsername(userSession.getUsername())
+                .setPassword(userSession.getPassword())
+                .setDatabaseName(userSession.getDatabaseName())
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getForecastHost(), applicationProperties.getForecastPort())
                 .usePlaintext()
                 .build();
 
@@ -92,7 +102,7 @@ public class ForecastingCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getForecastHost(), applicationProperties.getForecastPort())
                 .usePlaintext()
                 .build();
 
@@ -124,7 +134,7 @@ public class ForecastingCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getForecastHost(), applicationProperties.getForecastPort())
                 .usePlaintext()
                 .build();
 
@@ -155,7 +165,7 @@ public class ForecastingCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getForecastHost(), applicationProperties.getForecastPort())
                 .usePlaintext()
                 .build();
 
@@ -180,15 +190,20 @@ public class ForecastingCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
         return responseObject;
     }
     
-    public InferenceRes ForecastingInference (TimestampReq timestamp) throws InvalidProtocolBufferException, JsonProcessingException {
+    public InferenceRes ForecastingInference (UserSession userSession, TimestampReq timestamp) throws InvalidProtocolBufferException, JsonProcessingException {
         Timestamp request = Timestamp.newBuilder()
                 .setTimestamp(timestamp.getTimestamp())
                 .setModelName(timestamp.getModel_name())
                 .setKind(timestamp.getKind())
+                .setHost(userSession.getHost())
+                .setPort(userSession.getPort())
+                .setUsername(userSession.getUsername())
+                .setPassword(userSession.getPassword())
+                .setDatabaseName(userSession.getDatabaseName())
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getForecastHost(), applicationProperties.getForecastPort())
                 .usePlaintext()
                 .build();
 
@@ -221,7 +236,7 @@ public class ForecastingCallsImpl extends RouteGuideGrpc.RouteGuideImplBase {
                 .build();
 
         // Create a channel to connect to the target gRPC server
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("83.212.75.52", 50051)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(applicationProperties.getForecastHost(), applicationProperties.getForecastPort())
                 .usePlaintext()
                 .build();
 

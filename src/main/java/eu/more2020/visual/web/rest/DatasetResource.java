@@ -271,7 +271,12 @@ public class DatasetResource {
     @PostMapping("/database/connect") 
     public ResponseEntity<String> connector(@RequestBody DbConnector dbConnector) throws SQLException {
         log.debug("Rest request to connect to db");
-        UserSession userSession = sessionService.createSession();
+        UserSession userSession = sessionService.createSession(dbConnector.getHost(), 
+                                                               dbConnector.getPort(), 
+                                                               dbConnector.getUsername(), 
+                                                               dbConnector.getPassword(), 
+                                                               dbConnector.getDatabase());
+        
         DatabaseConnection databaseConnection = null;
         String url = null;
         switch (dbConnector.getType()) {

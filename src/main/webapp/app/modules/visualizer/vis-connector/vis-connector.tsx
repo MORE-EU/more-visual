@@ -39,6 +39,10 @@ const VisConnector = () => {
         setStep(false);
     }
 
+    const getLoadingStatus = () => {
+        return loading;
+    }
+
     return (
         <>
         {!step && (
@@ -70,7 +74,7 @@ const VisConnector = () => {
                 <Typography variant="subtitle1" fontSize={20} sx={{ borderBottom: `2px solid ${grey[400]}`}}>
                     New Data Source
                 </Typography>
-                <Button variant="contained" sx={{borderRadius: 2, }} startIcon={<StorageIcon />} onClick={() => {setStep(true);}}>
+                <Button disabled={getLoadingStatus()} variant="contained" sx={{borderRadius: 2, }} startIcon={<StorageIcon />} onClick={() => {setStep(true);}}>
                     <Typography sx={{[mdTheme.breakpoints.down('md')]: {display: 'none'},}} > Database </Typography>
                 </Button>
                 <Button disabled variant="contained"  sx={{borderRadius: 2,}} startIcon={<UploadFileIcon/>}>

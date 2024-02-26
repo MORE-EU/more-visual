@@ -100,6 +100,7 @@ const VisControlDatasets = ({}) => {
             {schemaMeta.type !== "csv" && !schemaMeta.isTimeSeries && (
               <ListItemButton key={'new-db-dataset-list-button-sd'} 
               component={Link}
+              disabled={getLoadingStatus()}
               to={`/configure/${schemaMeta.name}`}
               onClick={handleDBUpoladChange}>
                 <ListItemText  primary={`new dataset`} sx={ {display: { xs: 'none', md: 'block' }}} />

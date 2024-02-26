@@ -18,6 +18,12 @@ private static final long serialVersionUID = 0L;
   private TrainingInfo() {
     id_ = "";
     config_ = "";
+    host_ = "";
+    port_ = "";
+    username_ = "";
+    password_ = "";
+    schema_ = "";
+    database_ = "";
   }
 
   @java.lang.Override
@@ -60,6 +66,42 @@ private static final long serialVersionUID = 0L;
             java.lang.String s = input.readStringRequireUtf8();
 
             config_ = s;
+            break;
+          }
+          case 26: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            host_ = s;
+            break;
+          }
+          case 34: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            port_ = s;
+            break;
+          }
+          case 42: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            username_ = s;
+            break;
+          }
+          case 50: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            password_ = s;
+            break;
+          }
+          case 58: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            schema_ = s;
+            break;
+          }
+          case 66: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            database_ = s;
             break;
           }
           default: {
@@ -170,6 +212,234 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int HOST_FIELD_NUMBER = 3;
+  private volatile java.lang.Object host_;
+  /**
+   * <code>string host = 3;</code>
+   * @return The host.
+   */
+  @java.lang.Override
+  public java.lang.String getHost() {
+    java.lang.Object ref = host_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      host_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string host = 3;</code>
+   * @return The bytes for host.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getHostBytes() {
+    java.lang.Object ref = host_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      host_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int PORT_FIELD_NUMBER = 4;
+  private volatile java.lang.Object port_;
+  /**
+   * <code>string port = 4;</code>
+   * @return The port.
+   */
+  @java.lang.Override
+  public java.lang.String getPort() {
+    java.lang.Object ref = port_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      port_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string port = 4;</code>
+   * @return The bytes for port.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getPortBytes() {
+    java.lang.Object ref = port_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      port_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int USERNAME_FIELD_NUMBER = 5;
+  private volatile java.lang.Object username_;
+  /**
+   * <code>string username = 5;</code>
+   * @return The username.
+   */
+  @java.lang.Override
+  public java.lang.String getUsername() {
+    java.lang.Object ref = username_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      username_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string username = 5;</code>
+   * @return The bytes for username.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getUsernameBytes() {
+    java.lang.Object ref = username_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      username_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int PASSWORD_FIELD_NUMBER = 6;
+  private volatile java.lang.Object password_;
+  /**
+   * <code>string password = 6;</code>
+   * @return The password.
+   */
+  @java.lang.Override
+  public java.lang.String getPassword() {
+    java.lang.Object ref = password_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      password_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string password = 6;</code>
+   * @return The bytes for password.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getPasswordBytes() {
+    java.lang.Object ref = password_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      password_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int SCHEMA_FIELD_NUMBER = 7;
+  private volatile java.lang.Object schema_;
+  /**
+   * <code>string schema = 7;</code>
+   * @return The schema.
+   */
+  @java.lang.Override
+  public java.lang.String getSchema() {
+    java.lang.Object ref = schema_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      schema_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string schema = 7;</code>
+   * @return The bytes for schema.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getSchemaBytes() {
+    java.lang.Object ref = schema_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      schema_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int DATABASE_FIELD_NUMBER = 8;
+  private volatile java.lang.Object database_;
+  /**
+   * <code>string database = 8;</code>
+   * @return The database.
+   */
+  @java.lang.Override
+  public java.lang.String getDatabase() {
+    java.lang.Object ref = database_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      database_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string database = 8;</code>
+   * @return The bytes for database.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getDatabaseBytes() {
+    java.lang.Object ref = database_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      database_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -190,6 +460,24 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(config_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 2, config_);
     }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(host_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, host_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(port_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, port_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 5, username_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(password_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 6, password_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(schema_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 7, schema_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(database_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 8, database_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -204,6 +492,24 @@ private static final long serialVersionUID = 0L;
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(config_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, config_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(host_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, host_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(port_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, port_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, username_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(password_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, password_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(schema_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, schema_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(database_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, database_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -224,6 +530,18 @@ private static final long serialVersionUID = 0L;
         .equals(other.getId())) return false;
     if (!getConfig()
         .equals(other.getConfig())) return false;
+    if (!getHost()
+        .equals(other.getHost())) return false;
+    if (!getPort()
+        .equals(other.getPort())) return false;
+    if (!getUsername()
+        .equals(other.getUsername())) return false;
+    if (!getPassword()
+        .equals(other.getPassword())) return false;
+    if (!getSchema()
+        .equals(other.getSchema())) return false;
+    if (!getDatabase()
+        .equals(other.getDatabase())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -239,6 +557,18 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getId().hashCode();
     hash = (37 * hash) + CONFIG_FIELD_NUMBER;
     hash = (53 * hash) + getConfig().hashCode();
+    hash = (37 * hash) + HOST_FIELD_NUMBER;
+    hash = (53 * hash) + getHost().hashCode();
+    hash = (37 * hash) + PORT_FIELD_NUMBER;
+    hash = (53 * hash) + getPort().hashCode();
+    hash = (37 * hash) + USERNAME_FIELD_NUMBER;
+    hash = (53 * hash) + getUsername().hashCode();
+    hash = (37 * hash) + PASSWORD_FIELD_NUMBER;
+    hash = (53 * hash) + getPassword().hashCode();
+    hash = (37 * hash) + SCHEMA_FIELD_NUMBER;
+    hash = (53 * hash) + getSchema().hashCode();
+    hash = (37 * hash) + DATABASE_FIELD_NUMBER;
+    hash = (53 * hash) + getDatabase().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -376,6 +706,18 @@ private static final long serialVersionUID = 0L;
 
       config_ = "";
 
+      host_ = "";
+
+      port_ = "";
+
+      username_ = "";
+
+      password_ = "";
+
+      schema_ = "";
+
+      database_ = "";
+
       return this;
     }
 
@@ -404,6 +746,12 @@ private static final long serialVersionUID = 0L;
       eu.more2020.visual.grpc.TrainingInfo result = new eu.more2020.visual.grpc.TrainingInfo(this);
       result.id_ = id_;
       result.config_ = config_;
+      result.host_ = host_;
+      result.port_ = port_;
+      result.username_ = username_;
+      result.password_ = password_;
+      result.schema_ = schema_;
+      result.database_ = database_;
       onBuilt();
       return result;
     }
@@ -458,6 +806,30 @@ private static final long serialVersionUID = 0L;
       }
       if (!other.getConfig().isEmpty()) {
         config_ = other.config_;
+        onChanged();
+      }
+      if (!other.getHost().isEmpty()) {
+        host_ = other.host_;
+        onChanged();
+      }
+      if (!other.getPort().isEmpty()) {
+        port_ = other.port_;
+        onChanged();
+      }
+      if (!other.getUsername().isEmpty()) {
+        username_ = other.username_;
+        onChanged();
+      }
+      if (!other.getPassword().isEmpty()) {
+        password_ = other.password_;
+        onChanged();
+      }
+      if (!other.getSchema().isEmpty()) {
+        schema_ = other.schema_;
+        onChanged();
+      }
+      if (!other.getDatabase().isEmpty()) {
+        database_ = other.database_;
         onChanged();
       }
       this.mergeUnknownFields(other.unknownFields);
@@ -637,6 +1009,462 @@ private static final long serialVersionUID = 0L;
   checkByteStringIsUtf8(value);
       
       config_ = value;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object host_ = "";
+    /**
+     * <code>string host = 3;</code>
+     * @return The host.
+     */
+    public java.lang.String getHost() {
+      java.lang.Object ref = host_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        host_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string host = 3;</code>
+     * @return The bytes for host.
+     */
+    public com.google.protobuf.ByteString
+        getHostBytes() {
+      java.lang.Object ref = host_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        host_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string host = 3;</code>
+     * @param value The host to set.
+     * @return This builder for chaining.
+     */
+    public Builder setHost(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      host_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string host = 3;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearHost() {
+      
+      host_ = getDefaultInstance().getHost();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string host = 3;</code>
+     * @param value The bytes for host to set.
+     * @return This builder for chaining.
+     */
+    public Builder setHostBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      host_ = value;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object port_ = "";
+    /**
+     * <code>string port = 4;</code>
+     * @return The port.
+     */
+    public java.lang.String getPort() {
+      java.lang.Object ref = port_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        port_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string port = 4;</code>
+     * @return The bytes for port.
+     */
+    public com.google.protobuf.ByteString
+        getPortBytes() {
+      java.lang.Object ref = port_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        port_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string port = 4;</code>
+     * @param value The port to set.
+     * @return This builder for chaining.
+     */
+    public Builder setPort(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      port_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string port = 4;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearPort() {
+      
+      port_ = getDefaultInstance().getPort();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string port = 4;</code>
+     * @param value The bytes for port to set.
+     * @return This builder for chaining.
+     */
+    public Builder setPortBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      port_ = value;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object username_ = "";
+    /**
+     * <code>string username = 5;</code>
+     * @return The username.
+     */
+    public java.lang.String getUsername() {
+      java.lang.Object ref = username_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        username_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string username = 5;</code>
+     * @return The bytes for username.
+     */
+    public com.google.protobuf.ByteString
+        getUsernameBytes() {
+      java.lang.Object ref = username_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        username_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string username = 5;</code>
+     * @param value The username to set.
+     * @return This builder for chaining.
+     */
+    public Builder setUsername(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      username_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string username = 5;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearUsername() {
+      
+      username_ = getDefaultInstance().getUsername();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string username = 5;</code>
+     * @param value The bytes for username to set.
+     * @return This builder for chaining.
+     */
+    public Builder setUsernameBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      username_ = value;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object password_ = "";
+    /**
+     * <code>string password = 6;</code>
+     * @return The password.
+     */
+    public java.lang.String getPassword() {
+      java.lang.Object ref = password_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        password_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string password = 6;</code>
+     * @return The bytes for password.
+     */
+    public com.google.protobuf.ByteString
+        getPasswordBytes() {
+      java.lang.Object ref = password_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        password_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string password = 6;</code>
+     * @param value The password to set.
+     * @return This builder for chaining.
+     */
+    public Builder setPassword(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      password_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string password = 6;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearPassword() {
+      
+      password_ = getDefaultInstance().getPassword();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string password = 6;</code>
+     * @param value The bytes for password to set.
+     * @return This builder for chaining.
+     */
+    public Builder setPasswordBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      password_ = value;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object schema_ = "";
+    /**
+     * <code>string schema = 7;</code>
+     * @return The schema.
+     */
+    public java.lang.String getSchema() {
+      java.lang.Object ref = schema_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        schema_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string schema = 7;</code>
+     * @return The bytes for schema.
+     */
+    public com.google.protobuf.ByteString
+        getSchemaBytes() {
+      java.lang.Object ref = schema_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        schema_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string schema = 7;</code>
+     * @param value The schema to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSchema(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      schema_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string schema = 7;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearSchema() {
+      
+      schema_ = getDefaultInstance().getSchema();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string schema = 7;</code>
+     * @param value The bytes for schema to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSchemaBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      schema_ = value;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object database_ = "";
+    /**
+     * <code>string database = 8;</code>
+     * @return The database.
+     */
+    public java.lang.String getDatabase() {
+      java.lang.Object ref = database_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        database_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string database = 8;</code>
+     * @return The bytes for database.
+     */
+    public com.google.protobuf.ByteString
+        getDatabaseBytes() {
+      java.lang.Object ref = database_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        database_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string database = 8;</code>
+     * @param value The database to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDatabase(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      database_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string database = 8;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearDatabase() {
+      
+      database_ = getDefaultInstance().getDatabase();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string database = 8;</code>
+     * @param value The bytes for database to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDatabaseBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      database_ = value;
       onChanged();
       return this;
     }
