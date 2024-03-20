@@ -25,6 +25,7 @@
     "@mui/styles": "^5.10.3",
     "@mui/system": "^5.10.3",
     "@mui/x-date-pickers": "^5.0.16",
+    "@mui/x-tree-view": "^6.17.0",
     "@randex/material-ui-multiple-dates-picker": "^0.4.0",
     "@reduxjs/toolkit": "^1.8.5",
     "axios": "^0.25.0",
@@ -56,11 +57,11 @@
     "redux-devtools-log-monitor": "1.4.0",
     "redux-promise-middleware": "6.1.2",
     "redux-thunk": "2.3.0",
+    "rimraf": "3.0.2",
     "seedrandom": "^3.0.5",
     "simplebar-react": "^2.4.3",
     "tslib": "1.11.1",
-    "uuid": "7.0.3",
-    "rimraf": "3.0.2"
+    "uuid": "7.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.19.1",

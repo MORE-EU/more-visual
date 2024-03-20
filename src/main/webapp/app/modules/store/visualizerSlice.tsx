@@ -145,7 +145,7 @@ export const connector = createAsyncThunk('connector', async (dbConnector: {name
 
 export const disconnector = createAsyncThunk('disconnector', async (data: {}) => {
     const sessionId = JSON.parse(localStorage.getItem("sessionId"));
-    const response = await axios.post(`api/database/disconnect`, sessionId).then(res => res);
+    const response = await axios.post(`api/database/disconnect`, null, {params : {sessionId}}).then(res => res);
     return response;
 });
 
@@ -620,7 +620,6 @@ const visualizer = createSlice({
       state.queryResultsCompleted = true;
       state.queryResults = action.payload.response;
       state.data = action.payload.response.data;
-      //TODO: handle uncaught promise when empty data fom measure 0 or set from and to differetly
       state.from = action.payload.response.data[Object.keys(action.payload.response.data)[0]][0].timestamp;
       state.to = action.payload.response.data[Object.keys(action.payload.response.data)[0]][action.payload.response.data[Object.keys(action.payload.response.data)[0]].length - 1].timestamp;
     });

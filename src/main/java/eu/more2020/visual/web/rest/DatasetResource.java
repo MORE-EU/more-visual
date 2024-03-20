@@ -300,7 +300,7 @@ public class DatasetResource {
     }
 
     @PostMapping("/database/disconnect")
-    public ResponseEntity<Boolean> disconnector(@Valid @RequestBody String sessionId) throws SQLException {
+    public ResponseEntity<Boolean> disconnector(@RequestParam String sessionId) throws SQLException {
         log.debug("Rest request to close connection for session {}", sessionId);
         sessionId = sessionId.replace("=", "");
         UserSession userSession = sessionService.getSession(sessionId);

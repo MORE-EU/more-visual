@@ -33,7 +33,7 @@ const Header = props => {
           Home
           </Typography>
         </Link>
-        {schemaMeta ?<Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={`${isUserStudy ?  `user-study/${params.type}` : ""}/visualize/${schemaMeta.name}`}>
+        {schemaMeta ?<Link underline="hover" sx={{ display: 'flex', alignItems: 'center' }} color="inherit" href={isUserStudy ?  `user-study/${params.type}` : schemaMeta.isTimeSeries ? `/visualize/${schemaMeta.name}` : `/configure/${schemaMeta.name}`}>
         <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
           {schemaMeta.name}
           </Typography>

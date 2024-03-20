@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-
+import { alpha, styled } from '@mui/material/styles';
 import Typography from "@mui/material/Typography";
-import FormControl from "@mui/material/FormControl";
 import Grid from '@mui/material/Grid';
-import InputLabel from "@mui/material/InputLabel";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import MenuItem from "@mui/material/MenuItem";
-import {SelectChangeEvent}  from "@mui/material/Select";
-import Select from "@mui/material/Select";
 import LogoutIcon from '@mui/icons-material/Logout';
+import { TreeView } from '@mui/x-tree-view/TreeView';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import { TreeItemProps } from "@mui/x-tree-view/TreeItem";
+import { treeItemClasses } from "@mui/x-tree-view/TreeItem";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import { Link, useHistory } from "react-router-dom";
 
@@ -27,12 +28,34 @@ const defaultSelectedDataset: ISelectedDataset = {
     table: '',
 }
 
+const CustomTreeItem = React.forwardRef(
+    (props: TreeItemProps, ref: React.Ref<HTMLLIElement>) => (
+        <TreeItem {...props} ref={ref} />
+    ),
+);
+  
+const StyledTreeItem = styled(CustomTreeItem)(({ theme }) => ({
+    [`& .${treeItemClasses.iconContainer}`]: {
+        '& .close': {
+            opacity: 0.3,
+        },
+    },
+    [`& .${treeItemClasses.group}`]: {
+        marginLeft: 15,
+        paddingLeft: 18,
+        borderLeft: `1px solid ${alpha(theme.palette.text.primary, 0.4)}`,
+    },
+}));
+  
+
 const VisControlDatasetSelection = () => {
     const [selectedDataset, setSelectedDataset] = useState<ISelectedDataset>(defaultSelectedDataset);
+    const [expanded, setExpanded] = useState<string[]>([]);
+    const [selected, setSelected] = useState<string>('');
+
 
     const dispatch = useAppDispatch();
     const { schemaMeta, datasetChoice} = useAppSelector(state => state.visualizer);
-    const history = useHistory();
     
     useEffect(() => {
         schemaMeta && setSelectedDataset(prevDataset =>
@@ -52,16 +75,11 @@ const VisControlDatasetSelection = () => {
         }
     },[selectedDataset.table]);
 
-    const schemaSelectChange = (event: SelectChangeEvent) => {
-        const {name, value} = event.target;
+    const selectedDatasetChange = (schema, table) => {
         setSelectedDataset(prevDataset => (
-            {...prevDataset, [name]: value}                                                                                                                                                                                                                                                       
-        ));
-    }
-
-    const tableChange = (name) => {
-        setSelectedDataset(prevDataset => (
-            {...prevDataset, table: name}
+            {...prevDataset,
+                schema: schema,
+                table: table}
         ));
     }
 
@@ -72,44 +90,51 @@ const VisControlDatasetSelection = () => {
         }
     };
 
+    const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
+        setExpanded(nodeIds);
+    };
+
+    const handleSelect = (event: React.SyntheticEvent, nodeIds: string) => {
+        setSelected(nodeIds);
+    };
+    
+    
+
     return (
         <Grid sx={{width: "100%", height: "100%"}} >
-            <Grid sx={{ width: '100%', display: 'flex', flexDirection: 'column', rowGap: 1, }} >
-                <Typography variant="h6" gutterBottom>
-                    Upload Dataset
-                </Typography>
-                <Grid item>
-                    <FormControl size="small" fullWidth>
-                        <InputLabel id="schemaInput">
-                            Schema
-                        </InputLabel>
-                        <Select labelId="schemaInput" id="schemaSelectInput" name="schema" label="schema" value={selectedDataset.schema} onChange={schemaSelectChange}>
-                            {schemaMeta.data.map(file => file.schema).filter(
+            <Typography variant="h6" gutterBottom>
+                Upload Dataset
+            </Typography>
+            <Grid item>
+                <TreeView
+                    defaultCollapseIcon={<ExpandMoreIcon />}
+                    defaultExpandIcon={<ChevronRightIcon />}
+                    expanded={expanded}
+                    selected={selected}
+                    onNodeToggle={handleToggle}
+                    onNodeSelect={handleSelect}
+                    multiSelect={false}
+                >   
+                    <StyledTreeItem
+                        nodeId={schemaMeta.name}
+                        label={schemaMeta.name}
+                    >
+                        {schemaMeta.data.map(file => file.schema).filter(
                             (schema, idx, curr_schema) => curr_schema.indexOf(schema) === idx).map(schema => 
-                            (<MenuItem key={schema} value={schema}>{schema}</MenuItem>)
-                            )}
-                        </Select>
-                    </FormControl>
-                </Grid>
-                <Grid item>
-                    <Typography variant="subtitle2" gutterBottom>
-                        Tables
-                    </Typography>
-                    <List disablePadding dense>
-                    {schemaMeta.data.filter(file => file.schema === selectedDataset.schema && !file.isConfiged).map((file, idx) => (
-                        <ListItemButton
-                            key={idx}
-                            selected={schemaMeta.data[datasetChoice].id === file.id && schemaMeta.data[datasetChoice].schema === file.schema}
-                            onClick={() => {tableChange(file.id)}}
-                            divider
-                        >
-                            <TableChartOutlinedIcon />
-                            <ListItemText primary={`${file.id}`} />
-                            
-                        </ListItemButton>
-                    ))}
-                    </List>
-                </Grid>
+                            (<StyledTreeItem nodeId={`schema-${schema}`} key={schema} label={schema}>
+                                {schemaMeta.data.filter(file => file.schema === schema && !file.isConfiged).map((file, idx) => (
+                                    <StyledTreeItem
+                                        nodeId={`table-${schema}-${file.id}`}
+                                        key={idx}
+                                        label={file.id}
+                                        onClick={() => {selectedDatasetChange(schema,file.id)}}
+                                        icon={<TableChartOutlinedIcon/>}
+                                    />
+                                ))}
+                                </StyledTreeItem>)
+                        )}
+                    </StyledTreeItem>
+                </TreeView>
             </Grid>
             <Grid>
                 {(schemaMeta.data.filter( file => file.isConfiged).length > 0) && 

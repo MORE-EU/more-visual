@@ -125,7 +125,7 @@ const ForecastingResults = () => {
   const open = Boolean(anchorEl);
   const dispatch = useAppDispatch();
   const { forecastingData, savedModels } = useAppSelector(state => state.forecasting);
-  const intervalID = useRef<number>();
+  const intervalID = useRef<number>(null);
   const [modelInfo, setmodelInfo] = useState({ model_name: '', model_type: '', target: '' });
   const [openSnack, setOpenSnack] = useState(false);
 

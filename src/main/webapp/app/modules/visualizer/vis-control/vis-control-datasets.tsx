@@ -40,7 +40,6 @@ const VisControlDatasets = ({}) => {
   const handleDBUpoladChange = e => {
     dispatch(updateActiveTool(null));
     dispatch(resetFilters());
-    dispatch(updateDatasetChoice(schemaMeta.data.findIndex(file => !file.isConfiged)));
     dispatch(setDatasetIsConfiged(false));
     dispatch(resetDataset());
   }
