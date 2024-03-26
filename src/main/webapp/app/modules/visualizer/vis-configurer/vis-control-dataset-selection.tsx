@@ -48,7 +48,7 @@ const StyledTreeItem = styled(CustomTreeItem)(({ theme }) => ({
 }));
   
 
-const VisControlDatasetSelection = () => {
+const VisControlDatasetSelection = ({setDatasetIsSelected}) => {
     const [selectedDataset, setSelectedDataset] = useState<ISelectedDataset>(defaultSelectedDataset);
     const [expanded, setExpanded] = useState<string[]>([]);
     const [selected, setSelected] = useState<string>('');
@@ -58,20 +58,11 @@ const VisControlDatasetSelection = () => {
     const { schemaMeta, datasetChoice} = useAppSelector(state => state.visualizer);
     
     useEffect(() => {
-        schemaMeta && setSelectedDataset(prevDataset =>
-            {
-                return {...prevDataset,
-                    schema: schemaMeta.data[datasetChoice].schema,
-                    table: schemaMeta.data[datasetChoice].id
-                }
-            });
-    },[]);
-
-    useEffect(() => {
         if (selectedDataset.table) {
             const idx = schemaMeta.data.findIndex(file => file.schema === selectedDataset.schema && file.id === selectedDataset.table);
             if (datasetChoice !== idx)
                 dispatch(updateDatasetChoice(idx));
+            setDatasetIsSelected(true);
         }
     },[selectedDataset.table]);
 
@@ -136,7 +127,7 @@ const VisControlDatasetSelection = () => {
                     </StyledTreeItem>
                 </TreeView>
             </Grid>
-            <Grid>
+            <Grid item>
                 {(schemaMeta.data.filter( file => file.isConfiged).length > 0) && 
                     <Typography variant="h6" gutterBottom>
                         Configured Datasets
@@ -146,7 +137,6 @@ const VisControlDatasetSelection = () => {
                     {schemaMeta.data.filter( file => file.isConfiged).map((file, idx) => (
                     <ListItemButton
                         key={idx}
-                        selected={schemaMeta.data[datasetChoice].id === file.id && schemaMeta.data[datasetChoice].schema === file.schema}
                         component={Link}
                         to={`/visualize/${file.schema}/${file.id}`}
                         onClick={() => {
@@ -162,7 +152,7 @@ const VisControlDatasetSelection = () => {
                         to={`/visualize`}
                         onClick={() => {dispatch(resetFetchData());dispatch(disconnector({}));}}
                     >
-                        <ListItemText primary={`close connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
+                        <ListItemText primary={`Close Connection`} sx={ {display: { xs: 'none', md: 'block' }}} />
                         <LogoutIcon />
                     </ListItemButton>
                 </List>

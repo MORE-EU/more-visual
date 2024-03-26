@@ -10,7 +10,7 @@ import { useAppSelector } from 'app/modules/store/storeConfig';
 import { useParams } from 'react-router-dom';
 
 const Header = props => {
-  const { schemaMeta, datasetChoice, isUserStudy} = useAppSelector(state => state.visualizer);
+  const { schemaMeta, datasetChoice, dataset, isUserStudy} = useAppSelector(state => state.visualizer);
   const params: any = useParams();
 
   return (
@@ -39,7 +39,7 @@ const Header = props => {
           </Typography>
         </Link>:
         <Skeleton variant='text' width={50}/>}
-        {schemaMeta ? <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
+        {schemaMeta && dataset ? <Typography sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
           {schemaMeta.data[datasetChoice].id}
         </Typography> : <Skeleton variant='text' width={50}/>}
       </Breadcrumbs>

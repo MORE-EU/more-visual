@@ -21,6 +21,7 @@ const mdTheme = createTheme();
 export const VisConfigurer = () => {
     const [openSnack, setOpenSnack] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+    const [datasetIsSelected, setDatasetIsSelected] = useState(false);
     const { schemaMeta, datasetChoice, selectedConnection, datasetIsConfiged, errorMessage } = useAppSelector(state => state.visualizer);
     const dispatch = useAppDispatch();
     const history = useHistory();
@@ -77,7 +78,7 @@ export const VisConfigurer = () => {
                     >
                         <Grid sx={{ width: '20%', height: 'calc(100% - 30px)', p: 1 }}>
                             <Paper elevation={1} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
-                                {schemaMeta && <VisControlDatasetSelection />}
+                                {schemaMeta && <VisControlDatasetSelection setDatasetIsSelected={setDatasetIsSelected} />}
                             </Paper>
                         </Grid>
                         <Grid sx={{ width: '80%', p: 1, flexGrow: 1, height: 'calc(100% - 30px)' }}>
@@ -89,7 +90,7 @@ export const VisConfigurer = () => {
                                     height: '100%',
                                 }}
                             >
-                                {schemaMeta && !schemaMeta.data[datasetChoice].isConfiged && <VisControlDatasetConfig /> }
+                                {schemaMeta && datasetIsSelected && <VisControlDatasetConfig /> }
                             </Paper>
                         </Grid>
                     </Grid>
